@@ -1,14 +1,16 @@
 # clj-server-practice
 
-FIXME: my new application.
-
-## Installation
-
-Download from https://github.com/asuki/clj-server-practice
+A project to practice of creating web server in clojure.
 
 ## Usage
 
-FIXME: explanation
+Run server.
+```
+clj -X:server
+```
+
+See http://localhost:3000
+
 
 Run the project directly, via `:exec-fn`:
 
@@ -77,3 +79,8 @@ _Feel free to remove or change the `LICENSE` file and remove or update this_
 _section of the `README.md` file!_
 
 Distributed under the Eclipse Public License version 1.0.
+
+## References
+
+- [Ring について知る](https://ayato-p.github.io/clojure-beginner/intro_web_development/part2_what_is_ring.html)
+- [clojure/webstore-demo/integrant-simple-server/deps.edn](https://github.com/karimarttila/clojure/blob/master/webstore-demo/integrant-simple-server/deps.edn)
