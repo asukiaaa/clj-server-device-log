@@ -1,17 +1,44 @@
 (ns asuki.clj-server-practice
-  (:require [ring.adapter.jetty :as server])
+  (:require [bidi.bidi :as bidi]
+            [bidi.ring :as br]
+            [hiccup.core :as hc]
+            [ring.adapter.jetty :as server])
   (:gen-class))
 
-(defonce server (atom nil))
-
-(defn handler [req]
+(defn- top [req]
   {:status 200
-   :headers {"Content-Type" "text/plain"}
-   :body "Hello, world"})
+   :body (hc/html
+          [:div
+           [:h1 "top page"]
+           [:a {:href "/users"} "users"]])})
+
+(defn- users [req]
+  {:status 200
+   :body "users index"})
+
+(defn- user [req]
+  {:status 200
+   :body (str "user " (:id (:params req)))})
+
+(defn- handle-404 [req]
+  {:status 404})
+
+(defonce server (atom nil))
+(def route
+  ["/"
+   {"" top
+    "users" users
+    "favicon.ico" handle-404
+    ["users/" [#"\d+" :id]] user}])
+
+(def handler
+  (br/make-handler route))
 
 (defn start-server []
   (when-not @server
-    (reset! server (server/run-jetty handler {:port 3000 :join? false}))))
+    (let [port 3000]
+      (reset! server (server/run-jetty handler {:port port :join? false}))
+      (println (str "server starts on port " port)))))
 
 (defn stop-server []
   (when @server
@@ -26,8 +53,8 @@
 (defn greet
   "Callable entry point to the application."
   [data]
-  (start-server)
-  (println (str "Hello, " (or (:name data) "World") "!")))
+  (println data)
+  (start-server))
 
 (defn -main
   "I don't do a whole lot ... yet."

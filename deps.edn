@@ -10,9 +10,9 @@
   :server
   {:ns-default asuki.clj-server-practice
    :exec-fn greet
-   ;:exec-args {:name "Clojure"}
-   :extra-deps {ring/ring-core {:mvn/version "1.9.5"}
-                ring/ring-jetty-adapter {:mvn/version "1.9.5"}}}
+   :extra-deps {bidi/bidi {:mvn/version "2.1.6"}
+                hiccup/hiccup {:mvn/version "1.0.5"}
+                ring/ring {:mvn/version "1.9.5"}}}
   :runner
   {:extra-deps {io.github.cognitect-labs/test-runner
                 {:git/url "https://github.com/cognitect-labs/test-runner"

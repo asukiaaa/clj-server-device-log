@@ -84,3 +84,5 @@ Distributed under the Eclipse Public License version 1.0.
 
 - [Ring について知る](https://ayato-p.github.io/clojure-beginner/intro_web_development/part2_what_is_ring.html)
 - [clojure/webstore-demo/integrant-simple-server/deps.edn](https://github.com/karimarttila/clojure/blob/master/webstore-demo/integrant-simple-server/deps.edn)
+- [Clojure で Web アプリケーションを作るときに Compojure の代わりに bidi を使う](https://qiita.com/ayato_p/items/8ed4688a4540491e87e0)
+- [ClojureのWeb開発でもっとも重要なRing Handlerについて理解する](https://tech.toyokumo.co.jp/entry/2019/07/03/122656)
