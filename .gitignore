@@ -14,5 +14,9 @@
 .hgignore
 .hg/
 
+# files from some plugin
+.clj-kondo
+.lsp
+
 # system volumes for docker
 .volumes
