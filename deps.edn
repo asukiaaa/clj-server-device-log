@@ -1,5 +1,10 @@
 {:paths ["src" "resources"]
- :deps {org.clojure/clojure {:mvn/version "1.10.3"}}
+ :deps {org.clojure/clojure {:mvn/version "1.10.3"}
+        bidi/bidi {:mvn/version "2.1.6"}
+        hiccup/hiccup {:mvn/version "1.0.5"}
+        org.clojure/java.jdbc {:mvn/version "0.7.12"}
+        org.mariadb.jdbc/mariadb-java-client {:mvn/version "2.7.5"} ; {:mvn/version "3.0.3"}
+        ring/ring {:mvn/version "1.9.5"}}
  :aliases
  {:run-m {:main-opts ["-m" "asuki.clj-server-practice"]}
   :run-x {:ns-default asuki.clj-server-practice
@@ -7,14 +12,9 @@
           :exec-args {:name "Clojure"}}
   :test {:extra-paths ["test"]
          :extra-deps {org.clojure/test.check {:mvn/version "1.1.0"}}}
-  :server
+  :dev
   {:ns-default asuki.clj-server-practice
-   :exec-fn greet
-   :extra-deps {bidi/bidi {:mvn/version "2.1.6"}
-                hiccup/hiccup {:mvn/version "1.0.5"}
-                org.clojure/java.jdbc {:mvn/version "0.7.12"}
-                org.mariadb.jdbc/mariadb-java-client {:mvn/version "2.7.5"} ; {:mvn/version "3.0.3"}
-                ring/ring {:mvn/version "1.9.5"}}}
+   :exec-fn run-relodable}
   :runner
   {:extra-deps {io.github.cognitect-labs/test-runner
                 {:git/url "https://github.com/cognitect-labs/test-runner"

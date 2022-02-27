@@ -2,7 +2,8 @@
   (:require [bidi.ring :as br]
             [clojure.java.jdbc :as jdbc]
             [hiccup.core :as hc]
-            [ring.adapter.jetty :as server])
+            [ring.adapter.jetty :as server]
+            [ring.middleware.reload :refer [wrap-reload]])
   (:gen-class))
 
 (def db-spec (or (System/getenv "DATABASE_URL")
@@ -77,10 +78,19 @@
 (def handler
   (br/make-handler route))
 
-(defn start-server []
-  (when-not @server
-    (let [port 3000]
-      (reset! server (server/run-jetty handler {:port port :join? false}))
+(def relodable-handler
+  (wrap-reload #'handler))
+
+(defn start-server [& args]
+  (let [port (.get args 0)
+        relodable (.contains args :relodable)]
+    ;; (println args " port " port " relodable " relodable)
+    (when-not @server
+      (reset! server (server/run-jetty
+                      (if relodable
+                        relodable-handler
+                        handler)
+                      {:port port :join? false}))
       (println (str "server starts on port " port)))))
 
 (defn stop-server []
@@ -93,6 +103,12 @@
     (stop-server)
     (start-server)))
 
+(defn run-relodable
+  "Callable entry point to the application."
+  [& args]
+  (println args)
+  (start-server 3000 :relodable))
+
 (defn greet
   "Callable entry point to the application."
   [data]
@@ -103,4 +119,4 @@
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
-  (greet {:name (first args)}))
+  (start-server 80))

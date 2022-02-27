@@ -4,7 +4,7 @@ services:
     # image: clojure:openjdk-18-tools-deps-bullseye
     # working_dir: /usr/src/app
     build: .
-    command: "clj -X:server"
+    command: "clj -X:dev"
     volumes:
       - .:/usr/src/app
       - .volumes/m2:/root/.m2
