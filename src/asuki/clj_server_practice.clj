@@ -123,4 +123,7 @@
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
-  (start-server (or (System/getenv "PORT") 80)))
+  (let [port (if-let [str-port (System/getenv "PORT")]
+               (read-string str-port)
+               80)]
+    (start-server port)))
