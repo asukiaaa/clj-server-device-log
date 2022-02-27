@@ -17,6 +17,13 @@ docker-compose up
 See http://localhost:3000
 
 
+Access to mariadb
+
+```
+./bin/mariadb
+```
+
+
 Run the project directly, via `:exec-fn`:
 
     $ clojure -X:run-x
