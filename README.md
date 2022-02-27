@@ -24,6 +24,8 @@ Access to mariadb
 ```
 
 
+### Tips
+
 Run the project directly, via `:exec-fn`:
 
     $ clojure -X:run-x
@@ -48,7 +50,7 @@ Run the project's tests (they'll fail until you edit them):
 
     $ clojure -X:test:runner
 
-Build an uberjar:
+### Build an uberjar
 
     $ clojure -X:uberjar
 
@@ -64,22 +66,6 @@ also need to remove `:sync-pom true` from the `deps.edn` file (in the `:exec-arg
 Run that uberjar:
 
     $ java -jar clj-server-practice.jar
-
-## Options
-
-FIXME: listing of options this app accepts.
-
-## Examples
-
-...
-
-### Bugs
-
-...
-
-### Any Other Sections
-### That You Think
-### Might be Useful
 
 ## License
 
