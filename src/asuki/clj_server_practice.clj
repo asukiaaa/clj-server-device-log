@@ -7,6 +7,7 @@
   (:gen-class))
 
 (def db-spec (or (System/getenv "DATABASE_URL")
+                 (System/getenv "JAWSDB_MARIA_URL")
                  {:dbtype "mysql"
                   :host "mariadb"
                   :port 3306
