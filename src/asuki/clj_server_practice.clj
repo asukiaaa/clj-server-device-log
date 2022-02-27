@@ -123,4 +123,4 @@
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
-  (start-server 80))
+  (start-server (or (System/getenv "PORT") 80)))
