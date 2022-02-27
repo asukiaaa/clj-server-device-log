@@ -1,0 +1,34 @@
+version: "3.9"
+services:
+  web:
+    # image: clojure:openjdk-18-tools-deps-bullseye
+    # working_dir: /usr/src/app
+    build: .
+    command: "clj -X:server"
+    volumes:
+      - .:/usr/src/app
+      - .volumes/m2:/root/.m2
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: mysql://mariadb:3306/server_practice?user=maria-user&password=maria-pass
+    depends_on:
+      - mariadb
+  mariadb:
+    image: "mariadb:10.8"
+    volumes:
+      - .volumes/mariadb:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: maria-root-pass
+      MYSQL_DATABASE: server_practice
+      MYSQL_USER: maria-user
+      MYSQL_PASSWORD: maria-pass
+  # postgres:
+  #   image: "postgres:alpine"
+  #   volumes:
+  #     - .volumes/postgres:/var/lib/postgresql/data
+  #   environment:
+  #     POSTGRES_USER: postgreuser
+  #     POSTGRES_PASSWORD: pstgrepass
+  #     POSTGRES_DB: server_practice
+  #     TZ: "Asia/Tokyo"

@@ -12,6 +12,8 @@
    :exec-fn greet
    :extra-deps {bidi/bidi {:mvn/version "2.1.6"}
                 hiccup/hiccup {:mvn/version "1.0.5"}
+                org.clojure/java.jdbc {:mvn/version "0.7.12"}
+                org.mariadb.jdbc/mariadb-java-client {:mvn/version "2.7.5"} ; {:mvn/version "3.0.3"}
                 ring/ring {:mvn/version "1.9.5"}}}
   :runner
   {:extra-deps {io.github.cognitect-labs/test-runner

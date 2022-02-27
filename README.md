@@ -2,11 +2,16 @@
 
 A project to practice of creating web server in clojure.
 
+## Setup
+
+Install docker-compose
+
 ## Usage
 
-Run server.
+Run
+
 ```
-clj -X:server
+docker-compose up
 ```
 
 See http://localhost:3000
@@ -86,3 +91,11 @@ Distributed under the Eclipse Public License version 1.0.
 - [clojure/webstore-demo/integrant-simple-server/deps.edn](https://github.com/karimarttila/clojure/blob/master/webstore-demo/integrant-simple-server/deps.edn)
 - [Clojure で Web アプリケーションを作るときに Compojure の代わりに bidi を使う](https://qiita.com/ayato_p/items/8ed4688a4540491e87e0)
 - [ClojureのWeb開発でもっとも重要なRing Handlerについて理解する](https://tech.toyokumo.co.jp/entry/2019/07/03/122656)
+- [データベースへ接続する](https://ayato-p.github.io/clojure-beginner/intro_web_development/part5_connect_to_database.html)
+- [clojure.java.jdbc](http://clojure.github.io/java.jdbc/#clojure.java.jdbc/get-connection)
+
+- [ClojureのLaciniaでGraphQL API開発してみた](https://qiita.com/lagenorhynque/items/eebb9a36859789520dbf)
+- [CLOJURE PROGRAMMING WORLD: 6 ESSENTIAL LIBRARIES AND OTHER TOOLS](https://freshcodeit.com/freshcode-post/clojure-programming-world-frameworks-and-other-tools)
+
+- [Ring | GraphQLize](https://www.graphqlize.org/docs/getting_started/clojure/ring)
+- [clojureのroutingライブラリでbidiがわからなかったのでreititを使ったら楽だった。](https://amagasa30.hatenablog.com/entry/2020/12/11/003035)
