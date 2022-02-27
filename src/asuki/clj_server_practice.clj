@@ -64,7 +64,9 @@
               [:div "no user"]))}))
 
 (defn- handle-404 [req]
-  {:status 404})
+  {:status 404
+   :body (hc/html
+          [:div "404 not found"])})
 
 (defonce server (atom nil))
 (def route
@@ -73,7 +75,8 @@
     ;"graphql" graphql-handler
     "users" users
     "favicon.ico" handle-404
-    ["users/" [#"\d+" :id]] user}])
+    ["users/" [#"\d+" :id]] user
+    [:*] handle-404}])
 
 (def handler
   (br/make-handler route))
