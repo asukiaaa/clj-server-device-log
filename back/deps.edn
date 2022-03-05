@@ -8,14 +8,14 @@
         ring/ring {:mvn/version "1.9.5"}
         ring/ring-json {:mvn/version "0.5.1"}}
  :aliases
- {:run-m {:main-opts ["-m" "asuki.clj-server-practice"]}
-  :run-x {:ns-default asuki.clj-server-practice
+ {:run-m {:main-opts ["-m" "asuki.back"]}
+  :run-x {:ns-default asuki.back
           :exec-fn greet
           :exec-args {:name "Clojure"}}
   :test {:extra-paths ["test"]
          :extra-deps {org.clojure/test.check {:mvn/version "1.1.0"}}}
   :dev
-  {:ns-default asuki.clj-server-practice
+  {:ns-default asuki.back
    :exec-fn run-relodable}
   :runner
   {:extra-deps {io.github.cognitect-labs/test-runner
@@ -25,6 +25,6 @@
   :uberjar {:replace-deps {com.github.seancorfield/depstar {:mvn/version "2.0.216"}}
             :exec-fn hf.depstar/uberjar
             :exec-args {:aot true
-                        :jar "clj-server-practice.jar"
-                        :main-class "asuki.clj-server-practice"
+                        :jar "back.jar"
+                        :main-class "asuki.back"
                         :sync-pom true}}}}

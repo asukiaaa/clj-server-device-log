@@ -1,6 +1,6 @@
-(ns asuki.clj-server-practice-test
+(ns asuki.back-test
   (:require [clojure.test :refer :all]
-            [asuki.clj-server-practice :refer :all]))
+            [back.core :refer :all]))
 
 (deftest a-test
   (testing "FIXME, I fail."

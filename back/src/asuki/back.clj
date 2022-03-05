@@ -1,4 +1,4 @@
-(ns asuki.clj-server-practice
+(ns asuki.back
   (:require [bidi.ring :as br]
             [clojure.data.json :as json]
             [clojure.string :as str]
