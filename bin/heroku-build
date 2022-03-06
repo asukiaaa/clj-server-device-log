@@ -1,0 +1,7 @@
+#!/bin bash
+
+cd ~/front
+yarn
+clj -M -m cljs.main -co build.edn -v -c
+cd ~/back
+clj -M:run-m
