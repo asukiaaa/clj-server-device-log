@@ -1,28 +1,14 @@
-# clj-server-practice
+# clj-server-practice/back
 
 A project to practice of creating web server in clojure.
 
 ## Setup
 
-Install docker-compose
+- clojure cli
 
 ## Usage
 
-Run
-
-```
-docker-compose up
-```
-
-See http://localhost:3000
-
-
-Access to mariadb
-
-```
-./bin/mariadb
-```
-
+clj -X:dev
 
 ### Tips
 

@@ -1,12 +1,13 @@
 version: "3.9"
 services:
-  web:
+  back:
     # image: clojure:openjdk-18-tools-deps-bullseye
     # working_dir: /usr/src/app/back
     build: ./back
     command: "clj -X:dev"
     volumes:
       - ./back:/usr/src/app/back
+      - ./front:/usr/src/app/front
       - .volumes/m2:/root/.m2
     ports:
       - "3000:3000"
@@ -14,6 +15,15 @@ services:
       DATABASE_URL: mysql://mariadb:3306/server_practice?user=maria-user&password=maria-pass
     depends_on:
       - mariadb
+  front:
+    # image: clojure:openjdk-18-tools-deps-bullseye
+    # working_dir: /usr/src/app/front
+    build: ./front
+    command: bash -c "yarn && clj -M -m cljs.main -co build.edn -v --watch ./src -c"
+    volumes:
+      - ./front:/usr/src/app/front
+      - .volumes/m2:/root/.m2
+      - .volumes/yarn:/root/yarn
   mariadb:
     image: "mariadb:10.8"
     volumes:

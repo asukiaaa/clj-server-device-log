@@ -3,10 +3,12 @@
             [clojure.data.json :as json]
             [clojure.string :as str]
             [clojure.java.jdbc :as jdbc]
+            [hiccup.page :refer [html5]]
             [hiccup.core :as hc]
-            [ring.adapter.jetty :as server]
+            [ring.adapter.jetty :refer [run-jetty]]
             [ring.middleware.json :refer [wrap-json-body]]
-            [ring.middleware.reload :refer [wrap-reload]])
+            [ring.middleware.reload :refer [wrap-reload]]
+            #_[ring.middleware.x-headers :refer [wrap-frame-options]])
   (:gen-class))
 
 (def db-spec (or (System/getenv "DATABASE_URL")
@@ -56,11 +58,24 @@
 
 (defn- top [req]
   {:status 200
-   :body (hc/html
-          [:div
-           [:h1 "top page"]
-           [:p [:a {:href "/users"} "users"]]
-           [:p [:a {:href "/device_logs"} "device logs"]]])})
+   ;:headers {"Content-Type" "text/html"}
+   :body (html5
+          [:head
+
+           #_[:script {:src "./out/main.js" :type "text/javascript"}]
+           #_[:base {:href "/"}]
+           #_[:script {:src "/front/out/main.js" :type "module"}]]
+          [:body
+           [:div {:id "app"}]
+           #_[:script {:src "/front/out/index.js"
+                       :type "module"}]
+           [:base {:href "/front/"}]
+           [:script {:src "./out/main.js"
+                     :type "text/javascript"}]
+           [:div
+            [:h1 "top page"]
+            [:p [:a {:href "/users"} "users"]]
+            [:p [:a {:href "/device_logs"} "device logs"]]]])})
 
 (defn- users [req]
   (let [users (jdbc/query db-spec "select * from user")]
@@ -136,6 +151,8 @@
 (def route
   ["/"
    {"" top
+    "front/" {"out/index.html" top #_(br/->WrapMiddleware top wrap-frame-options)
+              "" (br/->Files {:dir "../front"})}
     ;"graphql" graphql-handler
     "device_logs" {"" device-logs
                    ["/" [#"\d+" :id]] device-log}
@@ -154,15 +171,16 @@
 
 (defn start-server [& args]
   (let [port (.get args 0)
+        host "0.0.0.0"
         relodable (.contains args :relodable)]
     ;; (println args " port " port " relodable " relodable)
     (when-not @server
-      (reset! server (server/run-jetty
+      (reset! server (run-jetty
                       (if relodable
                         relodable-handler
                         handler)
-                      {:port port :join? false}))
-      (println (str "server starts on port " port)))))
+                      {:port port :host host :join? false}))
+      (println (str "server starts on http://" host ":" port)))))
 
 (defn stop-server []
   (when @server
