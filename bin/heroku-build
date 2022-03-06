@@ -2,6 +2,6 @@
 
 cd ~/front
 npm install
-clj -M -m cljs.main -co build.edn -v -c
+clj -m cljs.main -co build.edn -v -c
 cd ~/back
 clj -M:run-m
