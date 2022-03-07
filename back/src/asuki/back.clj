@@ -124,7 +124,8 @@
             (if log
               [:div
                [:p (:id log)]
-               [:p (:data log)]
+               [:p [:pre {:style "overflow:auto"}
+                    (-> (:data log) json/read-json json/pprint-json with-out-str)]]
                [:p (:created_at log)]]
               [:div "no data"]))}))
 
