@@ -136,6 +136,7 @@
 
 (defn- api-raw-device-log [req]
   (let [request-method (:request-method req)]
+    (println req)
     (when (and (= request-method :post)
                (-> (:headers req)
                    (get "authorization")
@@ -144,6 +145,7 @@
                    (last)
                    (= key-auth)))
       (let [body (:body req)]
+        (println body)
         (jdbc/insert! db-spec :raw_device_log {:data (json/write-str body)}))
       {:status 200
        :body "ok"})))
