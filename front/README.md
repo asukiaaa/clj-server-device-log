@@ -18,7 +18,7 @@ yarn
 
 #### once
 ```bash
-clj -M -m cljs.main -co build.edn -v -c
+clj -M -m cljs.main -co build.edn -O advanced -v -c
 ```
 
 #### auto

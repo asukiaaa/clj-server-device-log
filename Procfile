@@ -1,1 +1,1 @@
-web: bin/heroku-build
+web: cd back && java -jar back.jar

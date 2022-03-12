@@ -1,7 +1,0 @@
-#!/bin/bash
-
-# cd ~/front
-# npm install
-# clj -m cljs.main -co build.edn -v -c
-cd ~/back
-clj -M:run-m
