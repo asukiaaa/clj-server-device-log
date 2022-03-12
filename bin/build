@@ -1,4 +1,0 @@
-#!/bin/bash
-
-# a file to skip lein build on heroku
-# do nothing
