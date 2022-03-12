@@ -153,8 +153,7 @@
 (def route
   ["/"
    {"" top
-    "front/" {"out/index.html" top #_(br/->WrapMiddleware top wrap-frame-options)
-              "" (br/->Files {:dir "../front"})}
+    "front/" {"" (br/->Files {:dir "../front"})}
     ;"graphql" graphql-handler
     "device_logs" {"" device-logs
                    ["/" [#"\d+" :id]] device-log}
