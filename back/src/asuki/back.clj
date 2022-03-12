@@ -61,16 +61,15 @@
    ;:headers {"Content-Type" "text/html"}
    :body (html5
           [:head
-
            #_[:script {:src "./out/main.js" :type "text/javascript"}]
            #_[:base {:href "/"}]
            #_[:script {:src "/front/out/main.js" :type "module"}]]
           [:body
-           [:div {:id "app"}]
+           [:div {:id "app"} "maybe loading js"]
            #_[:script {:src "/front/out/index.js"
                        :type "module"}]
            [:base {:href "/front/"}]
-           [:script {:src "./out/main.js"
+           [:script {:src "./dest/main.js"
                      :type "text/javascript"}]
            [:div
             [:h1 "top page"]

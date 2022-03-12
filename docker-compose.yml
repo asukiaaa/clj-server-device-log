@@ -23,7 +23,6 @@ services:
     volumes:
       - ./front:/usr/src/app/front
       - .volumes/m2:/root/.m2
-      - .volumes/yarn:/root/yarn
   mariadb:
     image: "mariadb:10.8"
     volumes:

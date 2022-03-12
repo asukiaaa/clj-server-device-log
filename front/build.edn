@@ -6,7 +6,7 @@
  ;:install-deps true
  :target :bundle
  :watch-fn (fn [] (println "Updated build"))
- :bundle-cmd {:none ["npx" "webpack" "./out/index.js" "-o" "out" "--mode=development"
+ :bundle-cmd {:none ["npx" "webpack" "./out/index.js" "-o" "dest" "--mode=development"
                      #_"--watch"]
               ; :default ["npx" "webpack" "./out/index.js" "-o" "out"  "--watch" "./src"]
               }
