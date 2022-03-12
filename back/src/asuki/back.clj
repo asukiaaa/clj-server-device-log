@@ -69,7 +69,7 @@
            #_[:script {:src "/front/out/index.js"
                        :type "module"}]
            [:base {:href "/front/"}]
-           [:script {:src "./dest/main.js"
+           [:script {:src "./out-webpack/main.js"
                      :type "text/javascript"}]
            [:div
             [:h1 "top page"]

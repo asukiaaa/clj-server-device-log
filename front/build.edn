@@ -1,15 +1,13 @@
 {:main reagent-practice.core
- :output-to "out/index.js"
- :output-dir "out"
- :asset-path "out"
+ :output-to "out-cljs/index.js"
+ :output-dir "out-cljs"
+ ;:asset-path "out"
  ;:deps-cmd "yarn"
  ;:install-deps true
  :target :bundle
  :watch-fn (fn [] (println "Updated build"))
- :bundle-cmd {:none ["npx" "webpack" "./out/index.js" "-o" "dest" "--mode=development"
-                     #_"--watch"]
-              ; :default ["npx" "webpack" "./out/index.js" "-o" "out"  "--watch" "./src"]
-              }
+ :bundle-cmd {:none ["npx" "webpack" "./out-cljs/index.js" "-o" "out-webpack" "--mode=development"]
+              :default ["npx" "webpack" "./out-cljs/index.js" "-o" "out-webpack"]}
  #_:foreign-libs
  #_[#{:file "out/bundje.js",
       :provides ["react" "react-dom" "create-react-class" "react-dom/server"],
@@ -17,4 +15,4 @@
                        react-dom ReactDOM
                        create-react-class createReactClass
                        react-dom/server ReactDOMServer}}]
- #_:closure-defines #_{cljs.core/*global* "window"}} ;; needed for advanced
+ :closure-defines {cljs.core/*global* "window"}} ;; needed for advanced

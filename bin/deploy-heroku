@@ -18,6 +18,6 @@ if [ "$APP_INFO" = "" ]; then
   exit 1
 fi
 
-docker-compose run front bash -c "yarn && clj -M -m cljs.main -co build.edn -v -c"
+docker-compose run front bash -c "yarn && clj -M -m cljs.main -co build.edn -O advanced -v -c"
 docker-compose run back clj -X:uberjar
-heroku deploy:jar back/back.jar -a $APP_NAME -i front/out -i front/dest
+heroku deploy:jar back/back.jar -a $APP_NAME -i front/out-webpack
