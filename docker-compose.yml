@@ -5,6 +5,7 @@ services:
     # working_dir: /usr/src/app/back
     build: ./back
     command: "clj -X:dev"
+    # command: bash -c "PORT=3000 java -jar back.jar"
     volumes:
       - ./back:/usr/src/app/back
       - ./front:/usr/src/app/front
@@ -20,6 +21,7 @@ services:
     # working_dir: /usr/src/app/front
     build: ./front
     command: bash -c "yarn && clj -M -m cljs.main -co build.edn -v --watch ./src -c"
+    # command: bash -c "yarn && clj -M -m cljs.main -co build.edn -c"
     volumes:
       - ./front:/usr/src/app/front
       - .volumes/m2:/root/.m2
