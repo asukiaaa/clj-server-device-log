@@ -3,7 +3,7 @@ FROM clojure:openjdk-18-bullseye
 # FROM debian:bullseye
 
 RUN apt update
-RUN apt install -y git curl vim less
+# RUN apt install -y git curl vim less
 
 # # clojure
 # RUN apt update
