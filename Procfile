@@ -1,1 +1,1 @@
-web: cd back && java -jar back.jar
+web: ls && pwd && cd ~/back && java -jar back.jar
