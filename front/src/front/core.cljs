@@ -1,4 +1,4 @@
-(ns reagent-practice.core
+(ns front.core
   (:require #_[goog.dom :as gdom]
             #_react-dom
             [reagent.dom :as dom]))

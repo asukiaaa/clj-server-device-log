@@ -1,4 +1,4 @@
-{:main reagent-practice.core
+{:main front.core
  :output-to "out-cljs/index.js"
  :output-dir "out-cljs"
  ;:asset-path "out"
