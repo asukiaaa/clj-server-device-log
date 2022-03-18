@@ -37,6 +37,7 @@ Then include out/main.js like this.
 
 ## References
 
+- [figwheel Configuration Options](https://figwheel.org/config-options.html)
 - [cljs webpack](https://clojurescript.org/guides/webpack)
 - [0.8 Upgrade guide](https://cljdoc.org/d/reagent/reagent/1.1.0/doc/other/0-8-upgrade-guide)
 - [reagent/test-environments/bundle/build.edn](https://github.com/reagent-project/reagent/blob/master/test-environments/bundle/build.edn)

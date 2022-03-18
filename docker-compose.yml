@@ -20,11 +20,15 @@ services:
     # image: clojure:openjdk-18-tools-deps-bullseye
     # working_dir: /usr/src/app/front
     build: ./front
-    command: bash -c "yarn && clj -M -m cljs.main -co build.edn -v --watch ./src -c"
+    command: bash -c "yarn && clj -M:build-dev"
+    # command: bash -c "yarn && clj -M -m cljs.main -co build.edn -v --watch ./src -c"
     # command: bash -c "yarn && clj -M -m cljs.main -co build.edn -c"
     volumes:
       - ./front:/usr/src/app/front
       - .volumes/m2:/root/.m2
+    ports:
+      - "9500:9500"
+      - "9550:9550" # web socket for figwheel
   mariadb:
     image: "mariadb:10.8"
     volumes:
