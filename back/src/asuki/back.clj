@@ -68,11 +68,11 @@
            [:div {:id "app"} "maybe loading js"]
            #_[:script {:src "/front/out/index.js"
                        :type "module"}]
-           [:base {:href "/front/"}]
-           [:script {:src "./out-figwheel/index.js"
+           #_[:base {:href "/front/target/public/"}]
+           [:script {:src "cljs-out/figwheel-dev-main.js"
                      :type "text/javascript"}]
            #_[:script {:src "./out-webpack/main.js"
-                     :type "text/javascript"}]
+                       :type "text/javascript"}]
            [:div
             [:h1 "top page"]
             [:p [:a {:href "/users"} "users"]]
@@ -155,8 +155,10 @@
 (def route
   ["/"
    {"" top
-    "front/" {"" (br/->Files {:dir "../front"})}
-    ;"graphql" graphql-handler
+    ;; "" (br/->Files {:dir "../front/resources/public"})
+    "cljs-out" (br/->Files {:dir "../front/target/public/cljs-out"})
+    ;; "front/" {"" (br/->Files {:dir "../front"})}
+    ;; "graphql" graphql-handler
     "device_logs" {"" device-logs
                    ["/" [#"\d+" :id]] device-log}
     "favicon.ico" handle-404

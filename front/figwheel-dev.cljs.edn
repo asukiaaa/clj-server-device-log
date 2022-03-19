@@ -1,9 +1,9 @@
 ^{:watch-dirs ["src"]
   #_:css-dirs #_["resources/public/css"]}
 {:main front.core
- :output-to "out-figwheel/index.js"
- :output-dir "out-figwheel"
- :asset-path "out-figwheel"
+ ;:output-to "out-figwheel/index.js"
+ ;:output-dir "out-figwheel"
+ ;:asset-path "out-figwheel"
  :aot-cache false
  :closure-defines
  #:figwheel.repl{connect-url
