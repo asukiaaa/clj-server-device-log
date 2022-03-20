@@ -1,4 +1,4 @@
-(ns asuki.back-test
+(ns asuki.back.core-test
   (:require [clojure.test :refer :all]
             [back.core :refer :all]))
 
