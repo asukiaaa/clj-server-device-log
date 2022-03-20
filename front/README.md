@@ -16,23 +16,20 @@ yarn
 
 ### Build
 
+#### hot reload
+```bash
+clj -M:dev
+```
+
 #### once
 ```bash
-clj -M -m cljs.main -co build.edn -O advanced -v -c
+clj -M:build
 ```
-
-#### auto
-```
-clj -M -m cljs.main -co build.edn -v --watch ./src -c
-```
-
-TODO hot reload
 
 ### Include
 Then include out/main.js like this.
 ```html
-<base href="/path-public-dir">
-<script href="./out/main.js" type="text/javascript" />
+<script href="./out-webpack/main.js" type="text/javascript" />
 ```
 
 ## References
