@@ -20,7 +20,7 @@ services:
     # image: clojure:openjdk-18-tools-deps-bullseye
     # working_dir: /usr/src/app/front
     build: ./front
-    command: bash -c "yarn && clj -M:build-dev"
+    command: bash -c "yarn && clj -M:dev"
     # command: bash -c "yarn && clj -M -m cljs.main -co build.edn -v --watch ./src -c"
     # command: bash -c "yarn && clj -M -m cljs.main -co build.edn -c"
     volumes:

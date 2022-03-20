@@ -66,11 +66,13 @@
            #_[:script {:src "/front/out/main.js" :type "module"}]]
           [:body
            [:div {:id "app"} "maybe loading js"]
+           [:script {:src "/front/out-webpack/main.js"
+                     :type "text/javascript"}]
            #_[:script {:src "/front/out/index.js"
                        :type "module"}]
            #_[:base {:href "/front/target/public/"}]
-           [:script {:src "cljs-out/figwheel-dev-main.js"
-                     :type "text/javascript"}]
+           #_[:script {:src "cljs-out/figwheel-dev-main.js"
+                       :type "text/javascript"}]
            #_[:script {:src "./out-webpack/main.js"
                        :type "text/javascript"}]
            [:div
@@ -155,9 +157,8 @@
 (def route
   ["/"
    {"" top
-    ;; "" (br/->Files {:dir "../front/resources/public"})
     "cljs-out" (br/->Files {:dir "../front/target/public/cljs-out"})
-    ;; "front/" {"" (br/->Files {:dir "../front"})}
+    "front/" {"" (br/->Files {:dir "../front"})}
     ;; "graphql" graphql-handler
     "device_logs" {"" device-logs
                    ["/" [#"\d+" :id]] device-log}
