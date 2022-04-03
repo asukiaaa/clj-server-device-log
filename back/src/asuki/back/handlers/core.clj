@@ -87,7 +87,7 @@
   (let [request-method (:request-method req)]
     (println req)
     (when (and (= request-method :post)
-               (handler-util/match-bearer))
+               (handler-util/match-bearer req))
       (let [body (:body req)]
         (println body)
         (model-raw-device-log/create {:data (json/write-str body)}))
