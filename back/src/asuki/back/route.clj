@@ -7,14 +7,13 @@
 (def main
   ["/"
    {"" handlers/top
+    "public" (br/->Files {:dir "../front/resources/public"})
     "cljs-out" (br/->Files {:dir "../front/target/public/cljs-out"})
     "front/out-webpack" (br/->Files {:dir "../front/out-webpack"})
     "graphql" (br/->WrapMiddleware handler-graphql/core wrap-json-body)
     "device_logs" {"" handlers/device-logs
                    ["/" [#"\d+" :id]] handlers/device-log}
     "favicon.ico" handlers/handle-404
-    "users" {"" handlers/users
-             ["/" [#"\d+" :id]] handlers/user}
     "api"
     {"/raw_device_log" (br/->WrapMiddleware handlers/api-raw-device-log wrap-json-body)}
     "404" handlers/handle-404}])

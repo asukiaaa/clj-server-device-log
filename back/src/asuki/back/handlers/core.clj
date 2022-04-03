@@ -11,6 +11,7 @@
    ;:headers {"Content-Type" "text/html"}
    :body (html5
           [:head
+           [:link {:rel "stylesheet" :href "/public/css/bootstrap.min.css"}]
            #_[:script {:src "./out/main.js" :type "text/javascript"}]
            #_[:base {:href "/"}]
            #_[:script {:src "/front/out/main.js" :type "module"}]]
@@ -21,12 +22,12 @@
            #_[:base {:href "/front/target/public/"}]
            #_[:script {:src "cljs-out/figwheel-dev-main.js" :type "text/javascript"}]
            #_[:script {:src "./out-webpack/main.js" :type "text/javascript"}]
-           [:div
+           #_[:div
             [:h1 "top page"]
             [:p [:a {:href "/users"} "users"]]
             [:p [:a {:href "/device_logs"} "device logs"]]]])})
 
-(defn users [req]
+#_(defn users [req]
   (let [users (model-user/get-all)]
     {:status 200
      :body (html5
@@ -38,7 +39,7 @@
                  [:a {:href (str "/users/" (:id user))}
                   (str (:id user) " " (:name user))]])]])}))
 
-(defn user [req]
+#_(defn user [req]
   (let [id (:id (:params req))
         user (model-user/get-by-id id)]
     {:status 200
