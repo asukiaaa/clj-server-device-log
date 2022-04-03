@@ -1,9 +1,8 @@
 (ns asuki.back.handlers.core
   (:require [clojure.data.json :as json]
-            [clojure.string :as str]
             [hiccup.page :refer [html5]]
             #_[hiccup.core :as hc]
-            [asuki.back.config :refer [key-auth]]
+            [asuki.back.handlers.util :as handler-util]
             [asuki.back.models.user :as model-user]
             [asuki.back.models.raw-device-log :as model-raw-device-log]))
 
@@ -21,7 +20,7 @@
            #_[:script {:src "/front/out/index.js" :type "module"}]
            #_[:base {:href "/front/target/public/"}]
            #_[:script {:src "cljs-out/figwheel-dev-main.js" :type "text/javascript"}]
-           #_[:script {:src "./out-webpack/main.js":type "text/javascript"}]
+           #_[:script {:src "./out-webpack/main.js" :type "text/javascript"}]
            [:div
             [:h1 "top page"]
             [:p [:a {:href "/users"} "users"]]
@@ -88,12 +87,7 @@
   (let [request-method (:request-method req)]
     (println req)
     (when (and (= request-method :post)
-               (-> (:headers req)
-                   (get "authorization")
-                   (str/split #" ")
-                   #_((fn [x] (println x) x))
-                   (last)
-                   (= key-auth)))
+               (handler-util/match-bearer))
       (let [body (:body req)]
         (println body)
         (model-raw-device-log/create {:data (json/write-str body)}))

@@ -66,6 +66,9 @@ Distributed under the Eclipse Public License version 1.0.
 
 ## References
 
+- [サービス間連携のためのGraphQL APIをClojureで開発している話](https://tech-magazine.opt.ne.jp/entry/2021/01/13/124551)
+- [GitHub GraphQLにcurlでqueryを投げる](https://qiita.com/ikemura23/items/4b0dd5a82abc9364638e)
+- [ClojureでGraphQLサーバを立てる](https://qiita.com/223kazuki/items/ba4ba84e2da1daea3b52)
 - [Ring について知る](https://ayato-p.github.io/clojure-beginner/intro_web_development/part2_what_is_ring.html)
 - [clojure/webstore-demo/integrant-simple-server/deps.edn](https://github.com/karimarttila/clojure/blob/master/webstore-demo/integrant-simple-server/deps.edn)
 - [Clojure で Web アプリケーションを作るときに Compojure の代わりに bidi を使う](https://qiita.com/ayato_p/items/8ed4688a4540491e87e0)

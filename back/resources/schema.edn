@@ -1,0 +1,58 @@
+{:objects
+ {:RawDeviceLog
+  {:fields
+   {:id {:type (non-null Int)}
+    :data {:type String}
+    :created_at {:type String}}}
+  :RawDeviceLogs
+  {:fields
+   {:list {:type (list :RawDeviceLog)}
+    :total {:type Int}}}
+  :BoardGame
+  {:fields
+   {:id {:type (non-null ID)}
+    :name {:type (non-null String)}
+    :summary
+    {:type String
+     :description "A one-line summary of the game."}
+    :description
+    {:type String
+     :description "A long-form description of the game."}
+    :designers
+    {:type (non-null (list (non-null :Designer)))
+     :description "Designers who contributed to the game."
+     :resolve :BoardGame/designers}
+    :min_players
+    {:type Int
+     :description "The minimum number of players the game supports."}
+    :max_players
+    {:type Int
+     :description "The maximum number of players the game supports."}
+    :play_time
+    {:type Int
+     :description "Play time in minutes for a typical game."}}
+   :description "A physical or virtual board game."}
+  :Designer
+  {:fields
+   {:id {:type (non-null ID)}
+    :name {:type (non-null String)}
+    :url
+    {:type String
+     :description "Home page URL if known."}
+    :games
+    {:type (non-null (list (non-null :BoardGame)))
+     :description "Games designed by this designer."
+     :resolve :Designer/games}}
+   :description
+   "A person who may have contributed to a board game design."}}
+ :queries
+ {:raw_device_logs
+  {:type :RawDeviceLogs
+   :args {:limit {:type Int}
+          :date_gt {:type String}}
+   :resolve :query/raw-device-logs}
+  :game_by_id
+  {:type :BoardGame
+   :description "Access a BoardGame by its unique id if it exists."
+   :args {:id {:type ID}}
+   :resolve :query/game-by-id}}}

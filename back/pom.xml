@@ -27,13 +27,23 @@
   <dependencies>
     <dependency>
       <groupId>org.clojure</groupId>
+      <artifactId>data.json</artifactId>
+      <version>2.4.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.clojure</groupId>
       <artifactId>clojure</artifactId>
       <version>1.10.3</version>
     </dependency>
     <dependency>
-      <groupId>bidi</groupId>
-      <artifactId>bidi</artifactId>
-      <version>2.1.6</version>
+      <groupId>ring</groupId>
+      <artifactId>ring-json</artifactId>
+      <version>0.5.1</version>
+    </dependency>
+    <dependency>
+      <groupId>com.walmartlabs</groupId>
+      <artifactId>lacinia</artifactId>
+      <version>1.2-alpha-1</version>
     </dependency>
     <dependency>
       <groupId>hiccup</groupId>
@@ -42,18 +52,13 @@
     </dependency>
     <dependency>
       <groupId>org.clojure</groupId>
-      <artifactId>data.json</artifactId>
-      <version>2.4.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.clojure</groupId>
       <artifactId>java.jdbc</artifactId>
       <version>0.7.12</version>
     </dependency>
     <dependency>
-      <groupId>org.mariadb.jdbc</groupId>
-      <artifactId>mariadb-java-client</artifactId>
-      <version>2.7.5</version>
+      <groupId>bidi</groupId>
+      <artifactId>bidi</artifactId>
+      <version>2.1.6</version>
     </dependency>
     <dependency>
       <groupId>ring</groupId>
@@ -61,9 +66,9 @@
       <version>1.9.5</version>
     </dependency>
     <dependency>
-      <groupId>ring</groupId>
-      <artifactId>ring-json</artifactId>
-      <version>0.5.1</version>
+      <groupId>org.mariadb.jdbc</groupId>
+      <artifactId>mariadb-java-client</artifactId>
+      <version>2.7.5</version>
     </dependency>
   </dependencies>
   <build>

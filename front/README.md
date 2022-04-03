@@ -34,6 +34,7 @@ Then include out/main.js like this.
 
 ## References
 
+- [reagent/examples/functional-components-and-hooks/src/example/core.cljs](https://github.com/reagent-project/reagent/blob/c214466bbcf099eafdfe28ff7cb91f99670a8433/examples/functional-components-and-hooks/src/example/core.cljs)
 - [Using NPM - figwheel-main](https://figwheel.org/docs/npm.html)
 - [figwheel Configuration Options](https://figwheel.org/config-options.html)
 - [cljs webpack](https://clojurescript.org/guides/webpack)
