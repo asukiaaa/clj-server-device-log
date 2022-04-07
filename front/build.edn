@@ -6,8 +6,8 @@
  ;:install-deps true
  :target :bundle
  :watch-fn (fn [] (println "Updated build"))
- :bundle-cmd {:none ["npx" "webpack" "./out-cljs/index.js" "-o" "out-webpack" "--mode=development"]
-              :default ["npx" "webpack" "./out-cljs/index.js" "-o" "out-webpack"]}
+ :bundle-cmd {:none ["npx" "webpack" "./out-cljs/index.js" "-o" "out-webpack/public" "--mode=development"]
+              :default ["npx" "webpack" "./out-cljs/index.js" "-o" "out-webpack/public"]}
  #_:foreign-libs
  #_[#{:file "out/bundje.js",
       :provides ["react" "react-dom" "create-react-class" "react-dom/server"],

@@ -1,13 +1,12 @@
-{:paths ["src" "resources"]
+{:paths ["src" "resources" "../front/resources" "../front/target" "../front/out-webpack"]
  :deps {org.clojure/clojure {:mvn/version "1.10.3"}
-        bidi/bidi {:mvn/version "2.1.6"}
-        hiccup/hiccup {:mvn/version "1.0.5"}
         com.walmartlabs/lacinia {:mvn/version "1.2-alpha-1"}
+        hiccup/hiccup {:mvn/version "1.0.5"}
+        io.pedestal/pedestal.service {:mvn/version "0.5.10"}
+        io.pedestal/pedestal.jetty {:mvn/version "0.5.10"}
         org.clojure/data.json {:mvn/version "2.4.0"}
         org.clojure/java.jdbc {:mvn/version "0.7.12"}
-        org.mariadb.jdbc/mariadb-java-client {:mvn/version "2.7.5"} ; {:mvn/version "3.0.3"}
-        ring/ring {:mvn/version "1.9.5"}
-        ring/ring-json {:mvn/version "0.5.1"}}
+        org.mariadb.jdbc/mariadb-java-client {:mvn/version "2.7.5"}}
  :aliases
  {:run-m {:main-opts ["-m" "asuki.back.core"]}
   :run-x {:ns-default asuki.back.core

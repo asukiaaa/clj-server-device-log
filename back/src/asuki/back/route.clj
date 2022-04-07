@@ -1,19 +1,17 @@
 (ns asuki.back.route
   (:require [asuki.back.handlers.core :as handlers]
-            [asuki.back.handlers.graphql :as handler-graphql]
-            [bidi.ring :as br]
-            [ring.middleware.json :refer [wrap-json-body]]))
+            [io.pedestal.http.body-params :refer [body-params]]
+            [io.pedestal.http :refer [html-body]]
+            [asuki.back.handlers.graphql :as handler-graphql]))
 
 (def main
-  ["/"
-   {"" handlers/top
-    "public" (br/->Files {:dir "../front/resources/public"})
-    "cljs-out" (br/->Files {:dir "../front/target/public/cljs-out"})
-    "front/out-webpack" (br/->Files {:dir "../front/out-webpack"})
-    "graphql" (br/->WrapMiddleware handler-graphql/core wrap-json-body)
-    "device_logs" {"" handlers/device-logs
-                   ["/" [#"\d+" :id]] handlers/device-log}
-    "favicon.ico" handlers/handle-404
-    "api"
-    {"/raw_device_log" (br/->WrapMiddleware handlers/api-raw-device-log wrap-json-body)}
-    "404" handlers/handle-404}])
+  #{["/" :get [html-body handlers/top] :route-name :top]
+    ["/device_logs" :get [html-body handlers/device-logs] :route-name :device-logs]
+    ["/device_logs/:id" :get [html-body handlers/device-log]
+     :route-name :show-device-log
+     :constraints  {:id #"[0-9]+"}]
+    ["/graphql" :post [(body-params) handler-graphql/core] :route-name :graphql]
+    ["/api/raw_device_log"
+     :post [(body-params) handlers/api-raw-device-log]
+     :route-name :post-raw-device-log]
+    ["/404" :get [html-body handlers/handle-404] :route-name :show-404]})

@@ -20,4 +20,4 @@ fi
 
 docker-compose run front bash -c "yarn && clj -M -m cljs.main -co build.edn -O advanced -v -c"
 docker-compose run back clj -X:uberjar
-heroku deploy:jar back/back.jar -a $APP_NAME -i front/out-webpack:front/resources/public
+heroku deploy:jar back/back.jar -a $APP_NAME -i front/out-webpack/public:front/resources/public

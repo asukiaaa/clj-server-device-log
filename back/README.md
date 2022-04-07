@@ -66,6 +66,8 @@ Distributed under the Eclipse Public License version 1.0.
 
 ## References
 
+- [Routing Quick Reference](http://pedestal.io/reference/routing-quick-reference)
+- [Clojureサービス開発ライブラリPedestal入門](https://qiita.com/lagenorhynque/items/fbd66ebaa0352ec4253d)
 - [サービス間連携のためのGraphQL APIをClojureで開発している話](https://tech-magazine.opt.ne.jp/entry/2021/01/13/124551)
 - [GitHub GraphQLにcurlでqueryを投げる](https://qiita.com/ikemura23/items/4b0dd5a82abc9364638e)
 - [ClojureでGraphQLサーバを立てる](https://qiita.com/223kazuki/items/ba4ba84e2da1daea3b52)

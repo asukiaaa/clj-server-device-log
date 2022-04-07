@@ -11,7 +11,7 @@
  :bundle-cmd {:none ["npx" "webpack"
                      "--entry" "./target/public/cljs-out/figwheel-dev/main.js"
                      ;; "--entry" "./out-figwheel/main.js"
-                     "--output-path" "./out-webpack"
+                     "--output-path" "./out-webpack/public"
                      "--output-filename" "main.js"
                      "--mode=development"]
               :default ["npx" "webpack" "./out-cljs/index.js" "-o" "out-webpack"]}

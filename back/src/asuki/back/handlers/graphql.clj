@@ -18,14 +18,13 @@
   (let [request-method (:request-method req)]
     (println req)
     (if (= request-method :post)
-      (let [body (:body req)
-            query (get body "query")]
+      (let [body (:json-params req)
+            query (:query body)]
         (println "handle post action")
         (println body)
         (println query)
         {:status 200
          :headers {"Content-Type" "application/json"}
          :body (json/write-str (lacinia/execute (build-schema) query nil nil))})
-
       {:status 200
        :body "graphql"})))
