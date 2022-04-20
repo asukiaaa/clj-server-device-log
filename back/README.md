@@ -66,6 +66,8 @@ Distributed under the Eclipse Public License version 1.0.
 
 ## References
 
+- [lacinia-pedestal/src/com/walmartlabs/lacinia/pedestal.clj](https://github.com/walmartlabs/lacinia-pedestal/blob/88468c0c1ba0bc7a84fcafb20ce6150e48545e18/src/com/walmartlabs/lacinia/pedestal.clj)
+- [lacinia-pedestal/docs/_examples/custom-setup.edn](https://github.com/walmartlabs/lacinia-pedestal/blob/e70f853ff96ac2c8f315bc5a6d429213df0c5d04/docs/_examples/custom-setup.edn)
 - [Routing Quick Reference](http://pedestal.io/reference/routing-quick-reference)
 - [Clojureサービス開発ライブラリPedestal入門](https://qiita.com/lagenorhynque/items/fbd66ebaa0352ec4253d)
 - [サービス間連携のためのGraphQL APIをClojureで開発している話](https://tech-magazine.opt.ne.jp/entry/2021/01/13/124551)
