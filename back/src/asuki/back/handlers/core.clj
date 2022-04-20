@@ -8,6 +8,7 @@
   {:status 200
    :body (html5
           [:head
+           [:meta {:name "viewport" :content "width=device-width,initial-scale=1"}]
            [:link {:rel "stylesheet" :href "/css/bootstrap.min.css"}]
            #_[:script {:src "./out/main.js" :type "text/javascript"}]
            #_[:base {:href "/"}]
