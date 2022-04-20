@@ -1,5 +1,6 @@
 {:paths ["src" "resources" "../front/resources" "../front/target" "../front/out-webpack"]
  :deps {org.clojure/clojure {:mvn/version "1.10.3"}
+        clj-time/clj-time {:mvn/version "0.15.2"}
         com.walmartlabs/lacinia {:mvn/version "1.2-alpha-1"}
         com.walmartlabs/lacinia-pedestal {:mvn/version "1.1"}
         hiccup/hiccup {:mvn/version "1.0.5"}

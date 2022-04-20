@@ -10,7 +10,7 @@
     ["/device_logs/:id" :get [html-body handlers/device-log]
      :route-name :show-device-log
      :constraints  {:id #"[0-9]+"}]
-    ["/graphql" :post [(body-params) handler-graphql/core] :route-name :graphql]
+    ["/graphql" :post handler-graphql/core :route-name :graphql]
     ["/api/raw_device_log"
      :post [(body-params) handlers/api-raw-device-log]
      :route-name :post-raw-device-log]

@@ -4,10 +4,10 @@
 (defn raw-device-logs
   [context args _]
   (println "args in raw-device-logs" args)
-  (let [logs (model-raw-device-log/get-all)]
-    (print "logs" logs)
+  (let [logs (model-raw-device-log/get-all args)
+        total (model-raw-device-log/get-count-all args)]
     {:list logs
-     :total (count logs)}))
+     :total total}))
 
 (defn game-by-id
   [context args _]

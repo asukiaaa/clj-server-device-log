@@ -2,7 +2,6 @@
   (:require [clojure.data.json :as json]
             [hiccup.page :refer [html5]]
             [asuki.back.handlers.util :as handler-util]
-            [asuki.back.models.user :as model-user]
             [asuki.back.models.raw-device-log :as model-raw-device-log]))
 
 (defn top [req]

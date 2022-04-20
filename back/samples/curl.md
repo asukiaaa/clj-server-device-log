@@ -25,3 +25,30 @@ curl -X POST ${HOST}/graphql \
    -H "Authorization: Bearer ${AUTHORIZATION_BEARER}" \
    -d "{ \"query\": \"{ raw_device_logs{ list { id data created_at } total }}\"}"
 ```
+
+```sh
+AUTHORIZATION_BEARER="XXYYZZ"
+HOST=http://localhost:3000
+curl -X POST ${HOST}/graphql \
+   -H 'Content-Type: application/json' \
+   -H "Authorization: Bearer ${AUTHORIZATION_BEARER}" \
+   -d "{ \"query\": \"{ raw_device_logs(limit: 1){ list { id data created_at } total }}\"}"
+```
+
+```sh
+AUTHORIZATION_BEARER="XXYYZZ"
+HOST=http://localhost:3000
+curl -X POST ${HOST}/graphql \
+   -H 'Content-Type: application/json' \
+   -H "Authorization: Bearer ${AUTHORIZATION_BEARER}" \
+   -d "{ \"query\": \"{ raw_device_logs(where: \\\"[{\\\\\\\"key\\\\\\\": \\\\\\\"created_at\\\\\\\", \\\\\\\"action\\\\\\\": \\\\\\\"gt\\\\\\\", \\\\\\\"value\\\\\\\": \\\\\\\"2022-03-06 00:00:00\\\\\\\"}]\\\"){ list { id data created_at } total }}\"}"
+```
+
+```sh
+AUTHORIZATION_BEARER="XXYYZZ"
+HOST=http://localhost:3000
+curl -X POST ${HOST}/graphql \
+   -H 'Content-Type: application/json' \
+   -H "Authorization: Bearer ${AUTHORIZATION_BEARER}" \
+   -d "{ \"query\": \"{ raw_device_logs(where: \\\"[{\\\\\\\"key\\\\\\\": \\\\\\\"created_at\\\\\\\", \\\\\\\"action\\\\\\\": \\\\\\\"gt\\\\\\\", \\\\\\\"value\\\\\\\": \\\\\\\"2022-03-06 00:00:00\\\\\\\"}]\\\", order: \\\"[{\\\\\\\"key\\\\\\\": \\\\\\\"id\\\\\\\", \\\\\\\"dir\\\\\\\": \\\\\\\"asc\\\\\\\"}]\\\"){ list { id data created_at } total }}\"}"
+```
