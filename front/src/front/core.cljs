@@ -10,20 +10,20 @@
                        :supported-operations #{:query :mutate}}
                 :ws nil})
 
-(defn get-by-value-config [data value-config]
+(defn get-by-json-key [data json-key]
   #_(println value-config (vector? value-config))
   (when (not (nil? data))
     (cond
-      (string? value-config) (get data value-config)
-      (or (vector? value-config) (seq? value-config))
-      (let [key (first value-config)
+      (string? json-key) (get data json-key)
+      (or (vector? json-key) (seq? json-key))
+      (let [key (first json-key)
             new-data (get data key)
-            new-value-config (rest value-config)]
-        #_(println #_data value-config)
-        #_(print key new-data new-value-config (type new-value-config))
-        (if (= 1 (count value-config))
+            new-json-key (rest json-key)]
+        #_(println #_data json-key)
+        #_(print key new-data new-json-key (type new-json-key))
+        (if (= 1 (count json-key))
           new-data
-          (get-by-value-config new-data new-value-config)))
+          (get-by-json-key new-data new-json-key)))
       :else data)))
 
 (defn component-device-log [log col-settings]
@@ -36,8 +36,8 @@
       [:td id]
       (for [col col-settings]
         (let [label (get col "label")
-              value-config (get col "value")]
-          [:td {:key label} (get-by-value-config data value-config)]))
+              json-key (get col "json_key")]
+          [:td {:key label} (get-by-json-key data json-key)]))
       [:td (:created_at log)]
       [:td [:a ;; .btn.btn-outline-primary.btn-sm
             {:href "#"
@@ -63,14 +63,14 @@
                      (set-logs (-> data :raw_device_logs :list))
                      (set-count-total (-> data :raw_device_logs :total)))
         ;; default-str-renderer "[{\"label\": \"camera_id\", \"value\": \"camera_id\"}, {\"label\": \"pi\", \"value\": [\"cpu\", \"model\"]},{\"label\": \"volt\", \"value\":[\"readonly_state\",\"volt_battery\"]}]"
-        default-str-renderer "[{\"label\": \"camera_id\", \"value\": \"camera_id\"},{\"label\": \"battery\", \"value\":[\"readonly_state\",\"volt_battery\"]}, {\"label\": \"panel\", \"value\":[\"readonly_state\",\"volt_panel\"]}]"
+        default-str-renderer "[{\"label\": \"camera_id\", \"json_key\": \"camera_id\"},{\"label\": \"battery\", \"json_key\":[\"readonly_state\",\"volt_battery\"]}, {\"label\": \"panel\", \"json_key\":[\"readonly_state\",\"volt_panel\"]}]"
         [str-renderer set-str-renderer] (react/useState default-str-renderer)
         [str-draft-renderer set-str-draft-renderer] (react/useState default-str-renderer)
         ;; default-str-where "[{\"key\": \"created_at\", \"action\": \"gt\", \"value\": \"2022-03-10 00:00:00\"}]}]"
         default-str-where "[{\"key\": \"created_at\", \"action\": \"in-hours-24\"}]"
         [str-where set-str-where] (react/useState default-str-where)
         [str-draft-where set-str-draft-where] (react/useState default-str-where)
-        default-str-order "[{\"key\": \"data\", \"json_key\": \"$.camera_id\", \"dir\": \"desc\"}]"
+        default-str-order "[{\"key\": \"data\", \"json_key\": \"camera_id\", \"dir\": \"desc\"}]"
         [str-order set-str-order] (react/useState default-str-order)
         [str-draft-order set-str-draft-order] (react/useState default-str-order)
         parse-setting #(.parse js/JSON str-renderer)
@@ -105,15 +105,15 @@
       [:div "renderer"]
       [:textarea.form-control.mb-1
        {:type :text :default-value str-renderer
-        :on-change (fn [e] (println e) (set-str-draft-renderer (-> e .-target .-value)))}]
+        :on-change (fn [e] (set-str-draft-renderer (-> e .-target .-value)))}]
       [:div "where"]
       [:textarea.form-control.mb-1
        {:type :text :default-value str-where
-        :on-change (fn [e] (println e) (set-str-draft-where (-> e .-target .-value)))}]
+        :on-change (fn [e] (set-str-draft-where (-> e .-target .-value)))}]
       [:div "order"]
       [:textarea.form-control.mb-1
        {:type :text :default-value str-order
-        :on-change (fn [e] (println e) (set-str-draft-order (-> e .-target .-value)))}]
+        :on-change (fn [e] (set-str-draft-order (-> e .-target .-value)))}]
       [:a.btn.btn-outline-primary.btn-sm {:on-click on-click-apply} "apply"]]
      [:div.m-1 "renderer: " str-renderer]
      [:div.m-1 "where: " str-where]

@@ -27,9 +27,11 @@
   (let [escaped-key (filter-keys key)]
     (if (nil? json-key)
       escaped-key
-      (format "JSON_VALUE(%s,\"%s\")"
+      (format "JSON_VALUE(%s,\"$.%s\")"
               escaped-key
-              (escape-for-sql json-key)))))
+              (if (string? json-key)
+                (escape-for-sql json-key)
+                (join "." (for [k json-key] (escape-for-sql k))))))))
 
 (defn build-query-order [order]
   #_(println "build-query-order " order)
