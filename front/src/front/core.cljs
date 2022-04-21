@@ -67,7 +67,7 @@
         [str-renderer set-str-renderer] (react/useState default-str-renderer)
         [str-draft-renderer set-str-draft-renderer] (react/useState default-str-renderer)
         ;; default-str-where "[{\"key\": \"created_at\", \"action\": \"gt\", \"value\": \"2022-03-10 00:00:00\"}]}]"
-        default-str-where "[{\"key\": \"created_at\", \"action\": \"in-hours-24\"}]}]"
+        default-str-where "[{\"key\": \"created_at\", \"action\": \"in-hours-24\"}]"
         [str-where set-str-where] (react/useState default-str-where)
         [str-draft-where set-str-draft-where] (react/useState default-str-where)
         default-str-order "[{\"key\": \"data\", \"json_key\": \"$.camera_id\", \"dir\": \"desc\"}]"
