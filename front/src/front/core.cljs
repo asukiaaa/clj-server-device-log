@@ -70,7 +70,7 @@
         default-str-where "[{\"key\": \"created_at\", \"action\": \"in-hours-24\"}]"
         [str-where set-str-where] (react/useState default-str-where)
         [str-draft-where set-str-draft-where] (react/useState default-str-where)
-        default-str-order "[{\"key\": \"data\", \"json_key\": \"camera_id\", \"dir\": \"desc\"}]"
+        default-str-order "[{\"key\": \"data\", \"json_key\": \"camera_id\", \"dir\": \"desc\"},{\"key\":\"created_at\",\"dir\":\"desc\"}]"
         [str-order set-str-order] (react/useState default-str-order)
         [str-draft-order set-str-draft-order] (react/useState default-str-order)
         parse-setting #(.parse js/JSON str-renderer)
