@@ -1,6 +1,7 @@
 (ns asuki.back.models.raw-device-log
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.string :refer [join escape]]
+            [clojure.core :refer [re-find re-matcher]]
             [clojure.data.json :as json]
             [clj-time.core :as t]
             [clj-time.format :as f]
@@ -45,6 +46,9 @@
   #_(println "build query item where " args)
   (let [action (get args "action")
         value (get args "value")
+        str-hours-from-action (-> (re-matcher #"in-hours-(\d+)$" action)
+                                  re-find
+                                  second)
         target-key (build-target-key {:key (get args "key") :json-key (get args "json_key")})
         target-action (case action
                         "=" "="
@@ -56,10 +60,12 @@
         target-value (if (string? value) (str "\"" (escape-for-sql value) "\"")
                          value)]
     #_(println (join " " ["build-query-item-where" target-key target-action target-value]))
-    (case action
-      "in-hours-24" (join " " [target-key ">"
-                               (f/unparse (f/formatter "\"YYYY-MM-dd HH:mm:ss\"") (t/minus (t/now) (t/hours 24)))])
-      (join " " [target-key target-action target-value]))))
+    (cond
+      (not (nil? str-hours-from-action))
+      (join " " [target-key ">"
+                 (f/unparse (f/formatter "\"YYYY-MM-dd HH:mm:ss\"")
+                            (t/minus (t/now) (t/hours (Integer. str-hours-from-action))))])
+      :else (join " " [target-key target-action target-value]))))
 
 (defn build-query-where [where]
   (when-not (or (nil? where) (empty? where))
