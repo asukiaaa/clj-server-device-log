@@ -66,6 +66,10 @@ Distributed under the Eclipse Public License version 1.0.
 
 ## References
 
+- [Watch and auto reload a Clojure pedestal service on source change ](https://dev.to/praburajan/watch-and-auto-reload-a-clojure-pedestal-service-on-save-4ehl)
+- [Your First API](http://pedestal.io/guides/your-first-api)
+- [How can I reload code in a Clojure pedestal repl for a quick development workflow?](https://stackoverflow.com/questions/36390571/how-can-i-reload-code-in-a-clojure-pedestal-repl-for-a-quick-development-workflo)
+- [pedestal/samples/auto-reload-server/dev/dev.clj](https://github.com/pedestal/samples/blob/master/auto-reload-server/dev/dev.clj#L38)
 - [lacinia-pedestal/src/com/walmartlabs/lacinia/pedestal.clj](https://github.com/walmartlabs/lacinia-pedestal/blob/88468c0c1ba0bc7a84fcafb20ce6150e48545e18/src/com/walmartlabs/lacinia/pedestal.clj)
 - [lacinia-pedestal/docs/_examples/custom-setup.edn](https://github.com/walmartlabs/lacinia-pedestal/blob/e70f853ff96ac2c8f315bc5a6d429213df0c5d04/docs/_examples/custom-setup.edn)
 - [Routing Quick Reference](http://pedestal.io/reference/routing-quick-reference)
