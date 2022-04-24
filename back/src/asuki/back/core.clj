@@ -8,17 +8,16 @@
 
 (def modified-namespaces (ns-tracker "src"))
 
-(defn watch-routes-fn [routes]
-  (fn []
-    (doseq [ns-sym (modified-namespaces)]
-      (require ns-sym :reload))
-    (route/expand-routes routes)))
+(def routes-target routes-main)
 
-(defn start-server [& args]
-  (let [port (.get args 0)
-        host "0.0.0.0"
-        relodable (.contains args :relodable)
-        routes-target routes-main]
+(defn watched-routes-target []
+  (doseq [ns-sym (modified-namespaces)]
+    (require ns-sym :reload))
+  (route/expand-routes routes-target))
+
+(defn start-server [port & args]
+  (let [host "0.0.0.0"
+        relodable (when-not (nil? args) (.contains args :relodable))]
     ;; TODO hande relodable
     (println (str "in start-server " host ":" port))
     (-> {::http/routes routes-target
@@ -28,7 +27,7 @@
          ::http/type :jetty
          ::http/secure-headers {:content-security-policy-settings {:object-src "'none'"}}}
         (merge (if relodable
-                 {::http/routes (watch-routes-fn routes-target)
+                 {::http/routes watched-routes-target
                   ::http/join? false}
                  nil))
         http/create-server
