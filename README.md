@@ -1,5 +1,7 @@
 # clj-server-practice
 
+[{"key": "data","json_key":"camera_id","group_by":{"key":"created_at","order"}}]
+
 A project to practice of creating web server in clojure.
 
 ## Setup
@@ -21,6 +23,12 @@ Access to mariadb
 
 ```bash
 ./bin/mariadb
+```
+
+## Test
+
+```bash
+docker-compose run back clj -X:test:runner
 ```
 
 ## Deploy to heroku

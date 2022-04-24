@@ -57,6 +57,8 @@ curl -X POST ${HOST}/graphql \
 ```sh
 AUTHORIZATION_BEARER="XXYYZZ"
 HOST=http://localhost:3000
+# WHERE_RAW='[{"key":"created_at","action":"gt","value":"2022-03-06 00:00:00"}]'
+# WHERE_STR_ESCAPED=$(printf "%q" "$(printf "\"%q\"" "$WHERE_RAW")")
 curl -X POST ${HOST}/graphql \
    -H 'Content-Type: application/json' \
    -H "Authorization: Bearer ${AUTHORIZATION_BEARER}" \

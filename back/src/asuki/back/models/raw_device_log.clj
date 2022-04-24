@@ -16,16 +16,16 @@
     (escape text {\" "\\\""
                   \\ "\\\\"})))
 
-(defn filter-keys [key]
-  (when [contains? ["created_at" "id" "data"] key]
+(defn filter-key [key]
+  (when (.contains ["created_at" "id" "data"] key)
     key))
 
 (defn filter-order-dir [dir]
-  (when [contains? ["DESC" "desc" "ASC" "asc"] dir]
+  (when (.contains ["DESC" "desc" "ASC" "asc"] dir)
     dir))
 
 (defn build-target-key [{:keys [key json-key]}]
-  (let [escaped-key (filter-keys key)]
+  (let [escaped-key (filter-key key)]
     (if (nil? json-key)
       escaped-key
       (format "JSON_VALUE(%s,\"$.%s\")"
