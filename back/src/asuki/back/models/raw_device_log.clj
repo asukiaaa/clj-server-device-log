@@ -24,12 +24,15 @@
   (when (.contains ["DESC" "desc" "ASC" "asc"] dir)
     dir))
 
-(defn build-target-key [{:keys [key json-key]}]
-  (let [escaped-key (filter-key key)]
+(defn build-target-key [{:keys [key json-key table-key]}]
+  #_(println "build-target-key" key json-key table-key)
+  (let [escaped-key (filter-key key)
+        key-with-table (when-not (nil? escaped-key)
+                         (str (if table-key (str table-key ".") "") escaped-key))]
     (if (nil? json-key)
-      escaped-key
+      key-with-table
       (format "JSON_VALUE(%s,\"$.%s\")"
-              escaped-key
+              key-with-table
               (if (string? json-key)
                 (escape-for-sql json-key)
                 (join "." (for [k json-key] (escape-for-sql k))))))))
@@ -42,38 +45,70 @@
                                                   :json-key (or (:json-key item) (get item "json_key"))})
                                (filter-order-dir (or (get item "dir") (:dir item)))])))))
 
-(defn build-query-item-where [args]
-  #_(println "build query item where " args)
+(defn filter-target-action [action]
+  (case action
+    "=" "="
+    "gt" ">"
+    "gte" ">="
+    "lt" "<"
+    "lte" "<="
+    nil))
+
+(declare build-query-item-where)
+
+(defn build-where-not-exists [not-exists {:keys [db-table-key base-table-key]}]
+  #_(println "build-where-not-exists" db-table-key base-table-key)
+  (let [this-table-key (str base-table-key "1")]
+    (join " " ["NOT EXISTS (SELECT 1 from" db-table-key "as" this-table-key "where"
+               (join " and " (for [item not-exists]
+                               (let [key (build-query-item-where
+                                          item
+                                          {:base-table-key base-table-key
+                                           :this-table-key this-table-key})]
+                                 #_(print "key from build-query-item-where" key)
+                                 key)))
+               ")"])))
+
+(defn build-query-item-where [args {:keys [db-table-key base-table-key this-table-key]}]
+  #_(println "build query item where " args db-table-key base-table-key this-table-key)
   (let [action (get args "action")
         value (get args "value")
-        str-hours-from-action (-> (re-matcher #"in-hours-(\d+)$" action)
-                                  re-find
-                                  second)
-        target-key (build-target-key {:key (get args "key") :json-key (get args "json_key")})
-        target-action (case action
-                        "=" "="
-                        "gt" ">"
-                        "gte" ">="
-                        "lt" "<"
-                        "lte" "<="
-                        nil)
-        target-value (if (string? value) (str "\"" (escape-for-sql value) "\"")
-                         value)]
-    #_(println (join " " ["build-query-item-where" target-key target-action target-value]))
+        not-exists (get args "not_exists")
+        key (get args "key")
+        json-key (get args "json_key")
+        str-hours-from-action (when (string? action)
+                                (-> (re-matcher #"in-hours-(\d+)$" action)
+                                    re-find
+                                    second))
+        target-key (build-target-key {:key key
+                                      :json-key json-key
+                                      :table-key base-table-key})
+        target-action (filter-target-action action)
+        target-value (cond
+                       (string? value) (str "\"" (escape-for-sql value) "\"")
+                       (not (nil? this-table-key))
+                       (build-target-key {:key key
+                                          :json-key json-key
+                                          :table-key this-table-key})
+                       :else value)]
+    #_(println "build-query-item-where" target-key target-action target-value base-table-key this-table-key not-exists)
     (cond
+      (not (nil? not-exists))
+      (build-where-not-exists not-exists {:db-table-key db-table-key :base-table-key base-table-key})
       (not (nil? str-hours-from-action))
       (join " " [target-key ">"
                  (f/unparse (f/formatter "\"YYYY-MM-dd HH:mm:ss\"")
                             (t/minus (t/now) (t/hours (Integer. str-hours-from-action))))])
       :else (join " " [target-key target-action target-value]))))
 
-(defn build-query-where [where]
+(defn build-query-where [{:keys [where db-table-key base-table-key]}]
   (when-not (or (nil? where) (empty? where))
     #_(println "where" where)
     (str "WHERE "
-         (join ", " (for [item (json/read-str where)]
+         (join ", " (for [item where]
                       #_(println "item" item)
-                      (build-query-item-where item))))))
+                      (build-query-item-where item {:db-table-key db-table-key
+                                                    :base-table-key base-table-key}))))))
 
 (defn get-all [& [args]]
   (println "get-all" args)
@@ -81,16 +116,26 @@
         order (or (when-let [str-order (:order args)]
                     (json/read-str str-order))
                   (:order defaults))
-        str-query (join " " ["select * from raw_device_log"
-                             (build-query-where (:where args))
+        where (json/read-str (:where args))
+        db-table-key "raw_device_log"
+        base-table-key "rdl"
+        str-query (join " " ["select * from" db-table-key "as" base-table-key
+                             (build-query-where {:where where
+                                                 :db-table-key db-table-key
+                                                 :base-table-key base-table-key})
                              (build-query-order order)
                              "limit" limit])]
     (println "str-query " str-query)
     (jdbc/query db-spec str-query)))
 
 (defn get-count-all [& [args]]
-  (let [str-query  (join " " ["select COUNT(*) from raw_device_log"
-                              (build-query-where (:where args))])]
+  (let [db-table-key "raw_device_log"
+        base-table-key "rdl"
+        where (json/read-str (:where args))
+        str-query  (join " " ["select COUNT(*) from" db-table-key "as" base-table-key
+                              (build-query-where {:where where
+                                                  :db-table-key db-table-key
+                                                  :base-table-key base-table-key})])]
     (println "get-count-all str-query " str-query)
     (let [count-all (-> (jdbc/query db-spec str-query) first vals first)]
       count-all)))
