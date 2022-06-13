@@ -10,6 +10,31 @@
                        :supported-operations #{:query :mutate}}
                 :ws nil})
 
+(defn push-params [query-params]
+  ;; (println "push-url")
+  (let [url js/window.location.href
+        url-object (new js/URL url)
+        url-search-params (.-searchParams url-object)]
+    (doseq [[k v] query-params]
+      #_(println "in for" k v)
+      (.set url-search-params (name k) v))
+    ;; (println "url is" url)
+    ;; (println "url-object" url-object)
+    ;; (println "url-search-params" url-search-params)
+    (js/history.pushState nil nil (str "?" url-search-params))))
+
+(defn read-params []
+  ;; (println "read-params")
+  (let [url js/window.location.href
+        url-object (new js/URL url)
+        url-search-params (.-searchParams url-object)]
+    ;; (println "url is" url)
+    ;; (println "url-object" url-object)
+    ;; (println "url-search-params" url-search-params)
+    ;; (println "cljs params" (js->clj url-search-params))
+    (into {} (for [key (.keys url-search-params)]
+               [(keyword key) (.get url-search-params key)]))))
+
 (defn get-by-json-key [data json-key]
   #_(println value-config (vector? value-config))
   (when (not (nil? data))
@@ -62,17 +87,21 @@
         on-receive (fn [{:keys [data]}]
                      (set-logs (-> data :raw_device_logs :list))
                      (set-count-total (-> data :raw_device_logs :total)))
+        query-params (read-params)
+        query-str-renderer (:str-renderer query-params)
+        query-str-where (:str-where query-params)
+        query-str-order (:str-order query-params)
         ;; default-str-renderer "[{\"label\": \"camera_id\", \"value\": \"camera_id\"}, {\"label\": \"pi\", \"value\": [\"cpu\", \"model\"]},{\"label\": \"volt\", \"value\":[\"readonly_state\",\"volt_battery\"]}]"
         default-str-renderer "[{\"label\": \"camera_id\", \"json_key\": \"camera_id\"},{\"label\": \"battery\", \"json_key\":[\"readonly_state\",\"volt_battery\"]}, {\"label\": \"panel\", \"json_key\":[\"readonly_state\",\"volt_panel\"]}]"
-        [str-renderer set-str-renderer] (react/useState default-str-renderer)
-        [str-draft-renderer set-str-draft-renderer] (react/useState default-str-renderer)
+        [str-renderer set-str-renderer] (react/useState (or query-str-renderer default-str-renderer))
+        [str-draft-renderer set-str-draft-renderer] (react/useState str-renderer)
         ;; default-str-where "[{\"key\": \"created_at\", \"action\": \"gt\", \"value\": \"2022-03-10 00:00:00\"}]}]"
         default-str-where "[{\"key\": \"created_at\", \"action\": \"in-hours-24\"}]"
-        [str-where set-str-where] (react/useState default-str-where)
-        [str-draft-where set-str-draft-where] (react/useState default-str-where)
+        [str-where set-str-where] (react/useState (or query-str-where default-str-where))
+        [str-draft-where set-str-draft-where] (react/useState str-where)
         default-str-order "[{\"key\": \"data\", \"json_key\": \"camera_id\", \"dir\": \"desc\"},{\"key\":\"created_at\",\"dir\":\"desc\"}]"
-        [str-order set-str-order] (react/useState default-str-order)
-        [str-draft-order set-str-draft-order] (react/useState default-str-order)
+        [str-order set-str-order] (react/useState (or query-str-order default-str-order))
+        [str-draft-order set-str-draft-order] (react/useState str-order)
         parse-setting #(.parse js/JSON str-renderer)
         parsed-setting (try (parse-setting) (catch js/Error _ nil))
         col-settings (when (not (nil? parsed-setting)) (js->clj parsed-setting))
@@ -92,27 +121,46 @@
             (when is-different-renderer (set-str-renderer str-draft-renderer))
             (when is-different-where (set-str-where str-draft-where))
             (when is-different-order (set-str-order str-draft-order))
+            (push-params {:str-renderer str-draft-renderer :str-where str-draft-where :str-order str-draft-order})
             (update-device-logs str-draft-where str-draft-order)
             #_(when (or is-different-order is-different-where)
-                (update-device-logs str-draft-where str-draft-order))))]
+                (update-device-logs str-draft-where str-draft-order))))
+        on-pop-state
+        (fn []
+          #_(println "on pop")
+          (let [query-params (read-params)
+                query-str-renderer (:str-renderer query-params)
+                query-str-where (:str-where query-params)
+                query-str-order (:str-order query-params)]
+            (set-str-renderer query-str-renderer)
+            (set-str-draft-renderer query-str-renderer)
+            (set-str-draft-order query-str-order)
+            (set-str-order query-str-order)
+            (set-str-draft-where query-str-where)
+            (set-str-where query-str-where)
+            (update-device-logs query-str-where query-str-order)))]
     (react/useEffect
-     #(update-device-logs default-str-where default-str-order)
-     #())
+     (fn []
+       (.addEventListener js/window "popstate" on-pop-state)
+       (update-device-logs str-where str-order)
+       (fn [] ;; destructor
+         (.removeEventListener js/window "popstate" on-pop-state)))
+     #js [])
     [:div
      [:h1 "device logs"]
      [:div (str parse-error)]
      [:form.form-control
       [:div "renderer"]
       [:textarea.form-control.mb-1
-       {:type :text :default-value str-renderer
+       {:type :text :default-value str-renderer :key str-renderer
         :on-change (fn [e] (set-str-draft-renderer (-> e .-target .-value)))}]
       [:div "where"]
       [:textarea.form-control.mb-1
-       {:type :text :default-value str-where
+       {:type :text :default-value str-where :key str-where
         :on-change (fn [e] (set-str-draft-where (-> e .-target .-value)))}]
       [:div "order"]
       [:textarea.form-control.mb-1
-       {:type :text :default-value str-order
+       {:type :text :default-value str-order :key str-order
         :on-change (fn [e] (set-str-draft-order (-> e .-target .-value)))}]
       [:a.btn.btn-outline-primary.btn-sm {:on-click on-click-apply} "apply"]]
      [:div.m-1 "renderer: " str-renderer]
