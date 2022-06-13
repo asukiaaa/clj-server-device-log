@@ -129,9 +129,9 @@
         (fn []
           #_(println "on pop")
           (let [query-params (read-params)
-                query-str-renderer (:str-renderer query-params)
-                query-str-where (:str-where query-params)
-                query-str-order (:str-order query-params)]
+                query-str-renderer (or (:str-renderer query-params) default-str-renderer)
+                query-str-where (or (:str-where query-params) default-str-where)
+                query-str-order (or (:str-order query-params) default-str-order)]
             (set-str-renderer query-str-renderer)
             (set-str-draft-renderer query-str-renderer)
             (set-str-draft-order query-str-order)
