@@ -131,6 +131,8 @@
             (when is-different-where (set-str-where str-draft-where))
             (when is-different-order (set-str-order str-draft-order))
             (push-params {:str-renderer str-draft-renderer :str-where str-draft-where :str-order str-draft-order})
+            (set-logs [])
+            (set-count-total "")
             (update-device-logs str-draft-where str-draft-order)
             #_(when (or is-different-order is-different-where)
                 (update-device-logs str-draft-where str-draft-order))))
