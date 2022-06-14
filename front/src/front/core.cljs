@@ -36,8 +36,7 @@
                [(keyword key) (.get url-search-params key)]))))
 
 (defn get-by-json-key [data json-key]
-  #_(println value-config (vector? value-config))
-  (when (not (nil? data))
+  (when-not (nil? data)
     (cond
       (string? json-key) (get data json-key)
       (or (vector? json-key) (seq? json-key))
@@ -61,8 +60,16 @@
       [:td id]
       (for [col col-settings]
         (let [label (get col "label")
-              json-key (get col "json_key")]
-          [:td {:key label} (get-by-json-key data json-key)]))
+              bare-key (get col "key")
+              first-key (if (string? bare-key) bare-key (first bare-key))
+              target-field (when-not (empty? first-key)
+                             (case first-key
+                               "data" data
+                               "created_at" (:created_at log)
+                               "id" (:id log)
+                               :else nil))
+              json-key (when-not (string? bare-key) (rest bare-key))]
+          [:td {:key label} (get-by-json-key target-field json-key)]))
       [:td (:created_at log)]
       [:td [:a ;; .btn.btn-outline-primary.btn-sm
             {:href "#"
@@ -91,15 +98,15 @@
         query-str-renderer (:str-renderer query-params)
         query-str-where (:str-where query-params)
         query-str-order (:str-order query-params)
-        ;; default-str-renderer "[{\"label\": \"camera_id\", \"value\": \"camera_id\"}, {\"label\": \"pi\", \"value\": [\"cpu\", \"model\"]},{\"label\": \"volt\", \"value\":[\"readonly_state\",\"volt_battery\"]}]"
-        default-str-renderer "[{\"label\": \"camera_id\", \"json_key\": \"camera_id\"},{\"label\": \"battery\", \"json_key\":[\"readonly_state\",\"volt_battery\"]}, {\"label\": \"panel\", \"json_key\":[\"readonly_state\",\"volt_panel\"]}]"
+        default-str-renderer "[{\"label\": \"camera_id\", \"key\": [\"data\", \"camera_id\"]}, {\"label\": \"battery\", \"key\": [\"data\", \"readonly_state\", \"volt_battery\"]}, {\"label\": \"panel\", \"key\": [\"data\", \"readonly_state\", \"volt_panel\"]}]"
+        ;; default-str-renderer "[{\"label\": \"camera_id\", \"key\": \"data\"}]"
         [str-renderer set-str-renderer] (react/useState (or query-str-renderer default-str-renderer))
         [str-draft-renderer set-str-draft-renderer] (react/useState str-renderer)
         ;; default-str-where "[{\"key\": \"created_at\", \"action\": \"gt\", \"value\": \"2022-03-10 00:00:00\"}]}]"
         default-str-where "[{\"key\": \"created_at\", \"action\": \"in-hours-24\"}]"
         [str-where set-str-where] (react/useState (or query-str-where default-str-where))
         [str-draft-where set-str-draft-where] (react/useState str-where)
-        default-str-order "[{\"key\": \"data\", \"json_key\": \"camera_id\", \"dir\": \"desc\"},{\"key\":\"created_at\",\"dir\":\"desc\"}]"
+        default-str-order "[{\"key\": [\"data\", \"camera_id\"], \"dir\": \"desc\"},{\"key\":\"created_at\",\"dir\":\"desc\"}]"
         [str-order set-str-order] (react/useState (or query-str-order default-str-order))
         [str-draft-order set-str-draft-order] (react/useState str-order)
         parse-setting #(.parse js/JSON str-renderer)

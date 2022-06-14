@@ -24,25 +24,27 @@
   (when (.contains ["DESC" "desc" "ASC" "asc"] dir)
     dir))
 
-(defn build-target-key [{:keys [key json-key table-key]}]
-  #_(println "build-target-key" key json-key table-key)
-  (let [escaped-key (filter-key key)
-        key-with-table (when-not (nil? escaped-key)
-                         (str (if table-key (str table-key ".") "") escaped-key))]
-    (if (nil? json-key)
-      key-with-table
-      (format "JSON_VALUE(%s,\"$.%s\")"
-              key-with-table
-              (if (string? json-key)
-                (escape-for-sql json-key)
-                (join "." (for [k json-key] (escape-for-sql k))))))))
+(defn build-target-key [{:keys [key table-key]}]
+  #_(println "build-target-key" key table-key)
+  (let [record-key (if (string? key) key (first key))
+        json-key (when-not (string? key) (rest key))
+        escaped-key (filter-key record-key)]
+    (when-let [key-with-table (when-not (nil? escaped-key)
+                                (str (when table-key (str table-key ".")) escaped-key))]
+      (if (empty? json-key)
+        key-with-table
+        (format "JSON_VALUE(%s,\"$.%s\")"
+                key-with-table
+                (if (string? json-key)
+                  (escape-for-sql json-key)
+                  (join "." (for [k json-key] (escape-for-sql k)))))))))
 
-(defn build-query-order [order]
+(defn build-query-order [order table-key]
   #_(println "build-query-order " order)
   (str "ORDER BY "
        (join ", " (for [item order]
                     (join " " [(build-target-key {:key (or (get item "key") (:key item))
-                                                  :json-key (or (:json-key item) (get item "json_key"))})
+                                                  :table-key table-key})
                                (filter-order-dir (or (get item "dir") (:dir item)))])))))
 
 (defn filter-target-action [action]
@@ -76,20 +78,17 @@
         value (get args "value")
         not-exists (get args "not_exists")
         key (get args "key")
-        json-key (get args "json_key")
         str-hours-from-action (when (string? action)
                                 (-> (re-matcher #"in-hours-(\d+)$" action)
                                     re-find
                                     second))
         target-key (build-target-key {:key key
-                                      :json-key json-key
                                       :table-key base-table-key})
         target-action (filter-target-action action)
         target-value (cond
                        (string? value) (str "\"" (escape-for-sql value) "\"")
                        (not (nil? this-table-key))
                        (build-target-key {:key key
-                                          :json-key json-key
                                           :table-key this-table-key})
                        :else value)]
     #_(println "build-query-item-where" target-key target-action target-value base-table-key this-table-key not-exists)
@@ -124,7 +123,7 @@
                              (build-query-where {:where where
                                                  :db-table-key db-table-key
                                                  :base-table-key base-table-key})
-                             (build-query-order order)
+                             (build-query-order order base-table-key)
                              "limit 0," limit])]
     (println "str-query " str-query)
     (jdbc/with-db-transaction [db-transaction db-spec]
