@@ -107,9 +107,29 @@
     #_(println "where" where)
     (str "WHERE "
          (join " AND " (for [item where]
-                      #_(println "item" item)
-                      (build-query-item-where item {:db-table-key db-table-key
-                                                    :base-table-key base-table-key}))))))
+                         #_(println "item" item)
+                         (build-query-item-where item {:db-table-key db-table-key
+                                                       :base-table-key base-table-key}))))))
+
+(defn get-records-with-total [& [args]]
+  (println "get-records-with-total" args)
+  (let [limit (or (:limit args) (:limit defaults))
+        order (or (when-let [str-order (:order args)]
+                    (json/read-str str-order))
+                  (:order defaults))
+        where (json/read-str (:where args))
+        db-table-key "raw_device_log"
+        base-table-key "rdl"
+        str-query (join " " ["select SQL_CALC_FOUND_ROWS * from" db-table-key "as" base-table-key
+                             (build-query-where {:where where
+                                                 :db-table-key db-table-key
+                                                 :base-table-key base-table-key})
+                             (build-query-order order)
+                             "limit 0," limit])]
+    (println "str-query " str-query)
+    (jdbc/with-db-transaction [db-transaction db-spec]
+      {:records (jdbc/query db-transaction str-query)
+       :total (-> (jdbc/query db-transaction "SELECT FOUND_ROWS()") first vals first)})))
 
 (defn get-all [& [args]]
   (println "get-all" args)

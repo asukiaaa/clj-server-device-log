@@ -4,8 +4,9 @@
 (defn raw-device-logs
   [context args _]
   (println "args in raw-device-logs" args)
-  (let [logs (model-raw-device-log/get-all args)
-        total (model-raw-device-log/get-count-all args)]
+  (let [records-and-total (model-raw-device-log/get-records-with-total args)
+        logs (:records records-and-total)
+        total (:total records-and-total)]
     {:list logs
      :total total}))
 
