@@ -131,36 +131,6 @@
       {:records (jdbc/query db-transaction str-query)
        :total (-> (jdbc/query db-transaction "SELECT FOUND_ROWS()") first vals first)})))
 
-(defn get-all [& [args]]
-  (println "get-all" args)
-  (let [limit (or (:limit args) (:limit defaults))
-        order (or (when-let [str-order (:order args)]
-                    (json/read-str str-order))
-                  (:order defaults))
-        where (json/read-str (:where args))
-        db-table-key "raw_device_log"
-        base-table-key "rdl"
-        str-query (join " " ["select * from" db-table-key "as" base-table-key
-                             (build-query-where {:where where
-                                                 :db-table-key db-table-key
-                                                 :base-table-key base-table-key})
-                             (build-query-order order)
-                             "limit" limit])]
-    (println "str-query " str-query)
-    (jdbc/query db-spec str-query)))
-
-(defn get-count-all [& [args]]
-  (let [db-table-key "raw_device_log"
-        base-table-key "rdl"
-        where (json/read-str (:where args))
-        str-query  (join " " ["select COUNT(*) from" db-table-key "as" base-table-key
-                              (build-query-where {:where where
-                                                  :db-table-key db-table-key
-                                                  :base-table-key base-table-key})])]
-    (println "get-count-all str-query " str-query)
-    (let [count-all (-> (jdbc/query db-spec str-query) first vals first)]
-      count-all)))
-
 (defn get-by-id [id]
   (first (jdbc/query db-spec (str "select * from raw_device_log where id = " id))))
 
