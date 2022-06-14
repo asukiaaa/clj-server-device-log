@@ -60,8 +60,8 @@
 (defn build-where-not-exists [not-exists {:keys [db-table-key base-table-key]}]
   #_(println "build-where-not-exists" db-table-key base-table-key)
   (let [this-table-key (str base-table-key "1")]
-    (join " " ["NOT EXISTS (SELECT 1 from" db-table-key "as" this-table-key "where"
-               (join " and " (for [item not-exists]
+    (join " " ["NOT EXISTS (SELECT 1 FROM" db-table-key "AS" this-table-key "WHERE"
+               (join " AND " (for [item not-exists]
                                (let [key (build-query-item-where
                                           item
                                           {:base-table-key base-table-key
@@ -106,7 +106,7 @@
   (when-not (or (nil? where) (empty? where))
     #_(println "where" where)
     (str "WHERE "
-         (join ", " (for [item where]
+         (join " AND " (for [item where]
                       #_(println "item" item)
                       (build-query-item-where item {:db-table-key db-table-key
                                                     :base-table-key base-table-key}))))))
