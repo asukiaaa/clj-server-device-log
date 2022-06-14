@@ -52,6 +52,7 @@
     "gte" ">="
     "lt" "<"
     "lte" "<="
+    "not_null" "IS NOT NULL"
     nil))
 
 (declare build-query-item-where)
