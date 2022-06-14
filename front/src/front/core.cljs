@@ -105,7 +105,9 @@
         parse-setting #(.parse js/JSON str-renderer)
         parsed-setting (try (parse-setting) (catch js/Error _ nil))
         col-settings (when (not (nil? parsed-setting)) (js->clj parsed-setting))
-        parse-error (when (nil? parsed-setting) (try (parse-setting) (catch js/Error e e)))
+        parse-error-renderer (when (nil? parsed-setting) (try (parse-setting) (catch js/Error e e)))
+        parse-error-where (try (.parse js/JSON str-where) nil (catch js/Error e e))
+        parse-error-order (try (.parse js/JSON str-order) nil (catch js/Error e e))
         update-device-logs
         (fn [str-where str-order]
           (println "update device logs")
@@ -148,17 +150,19 @@
      #js [])
     [:div
      [:h1 "device logs"]
-     [:div (str parse-error)]
      [:form.form-control
       [:div "renderer"]
+      [:div (str parse-error-renderer)]
       [:textarea.form-control.mb-1
        {:type :text :default-value str-renderer :key str-renderer
         :on-change (fn [e] (set-str-draft-renderer (-> e .-target .-value)))}]
       [:div "where"]
+      [:div (str parse-error-where)]
       [:textarea.form-control.mb-1
        {:type :text :default-value str-where :key str-where
         :on-change (fn [e] (set-str-draft-where (-> e .-target .-value)))}]
       [:div "order"]
+      [:div (str parse-error-order)]
       [:textarea.form-control.mb-1
        {:type :text :default-value str-order :key str-order
         :on-change (fn [e] (set-str-draft-order (-> e .-target .-value)))}]
