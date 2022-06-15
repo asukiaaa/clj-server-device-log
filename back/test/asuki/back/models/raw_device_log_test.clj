@@ -1,5 +1,6 @@
 (ns asuki.back.models.raw-device-log-test
   (:require [clojure.test :refer :all]
+            [clojure.string :refer [includes?]]
             [asuki.back.models.raw-device-log :refer :all]))
 
 #_(deftest a-test
@@ -18,7 +19,15 @@
   (testing "json key"
     (is (= (build-target-key {:key ["data" "camera_id"]}) "JSON_VALUE(data,\"$.camera_id\")"))))
 
-(deftest test-building-where
+(deftest test-build-query-item-where
+  (testing "in-hours"
+    (is (includes? (build-query-item-where {"key" "created_at" "action" "in-hours-13"} [])
+                   "created_at >= ")))
+  (testing "not-in-hours"
+    (is (includes? (build-query-item-where {"key" "created_at" "action" "not-in-hours-10"} [])
+                   "created_at < "))))
+
+(deftest test-build-query-where
   (testing "where is nil"
     (is (= (build-query-where {:where nil}) nil)))
   (testing "where multiple"

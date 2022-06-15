@@ -80,10 +80,11 @@
         value (get args "value")
         not-exists (get args "not_exists")
         key (get args "key")
-        str-hours-from-action (when (string? action)
-                                (-> (re-matcher #"in-hours-(\d+)$" action)
-                                    re-find
-                                    second))
+        hours-action (when (string? action)
+                       (-> (re-matcher #"(in|not-in)-hours-(\d+)$" action)
+                           re-find
+                           #_((fn [x] (println "parsing hours-action" x) x))
+                           rest))
         target-key (build-target-key {:key key
                                       :table-key base-table-key})
         target-action (filter-target-action action)
@@ -97,10 +98,11 @@
     (cond
       (not (nil? not-exists))
       (build-where-not-exists not-exists {:db-table-key db-table-key :base-table-key base-table-key})
-      (not (nil? str-hours-from-action))
-      (join " " [target-key ">"
-                 (f/unparse (f/formatter "\"YYYY-MM-dd HH:mm:ss\"")
-                            (t/minus (t/now) (t/hours (Integer. str-hours-from-action))))])
+      (seq hours-action)
+      (join " " (let [[in-or-not-in str-hours] hours-action]
+                  [target-key (if (= in-or-not-in "in") ">=" "<")
+                   (f/unparse (f/formatter "\"YYYY-MM-dd HH:mm:ss\"")
+                              (t/minus (t/now) (t/hours (Integer. str-hours))))]))
       :else (join " " [target-key target-action target-value]))))
 
 (defn build-keys-for-where-max-group-by [base-table-key index]
