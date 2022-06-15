@@ -2,6 +2,9 @@
         org.clojure/clojurescript {:mvn/version "1.11.4"}
         ;; cljsjs/react {:mvn/version "17.0.2-0"}
         ;; cljsjs/react-dom {:mvn/version "17.0.2-0"}
+        ;; cljs-time/cljs-time {:mvn/version "0.1.0"}
+        com.andrewmcveigh/cljs-time {:mvn/version "0.5.2"}
+        ;; com.andrewmcveigh/cljs-time {:mvn/version "0.5.2"}
         reagent/reagent {:mvn/version "1.1.0" :exclusions [cljsjs/react cljsjs/react-dom]}
         re-graph/re-graph {:mvn/version "0.1.17"}}
  :paths ["src" "resources" "target" "node_modules"]

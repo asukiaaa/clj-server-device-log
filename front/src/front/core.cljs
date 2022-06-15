@@ -1,7 +1,9 @@
 (ns front.core
   (:require [reagent.dom :as dom]
             [clojure.string :refer [escape]]
-            [goog.string :as string]
+            [cljs-time.core :as t]
+            [cljs-time.format :as tf]
+            [goog.string]
             goog.string.format
             ["react" :as react]
             [re-graph.core :as re-graph]))
@@ -35,6 +37,11 @@
     (into {} (for [key (.keys url-search-params)]
                [(keyword key) (.get url-search-params key)]))))
 
+(defn get-col-label [col]
+  (or (get col "label")
+      (let [key (get col "key")]
+        (if (string? key) key (last key)))))
+
 (defn get-by-json-key [data json-key]
   (when-not (nil? data)
     (cond
@@ -50,6 +57,55 @@
           (get-by-json-key new-data new-json-key)))
       :else data)))
 
+(defn get-col-val [record col-setting & data _]
+  (let [data (or data (js->clj (.parse js/JSON (:data record))))
+        bare-key (get col-setting "key")
+        first-key (if (string? bare-key) bare-key (first bare-key))
+        target-field (when-not (empty? first-key)
+                       (case first-key
+                         "data" data
+                         "created_at" (:created_at record)
+                         "id" (:id record)
+                         :else nil))
+        json-key (when-not (string? bare-key) (rest bare-key))]
+    (get-by-json-key target-field json-key)))
+
+(defn build-badge-item [record badge & data _]
+  (let [req-when (get badge "when")
+        text (or (get badge "text") "no text")
+        val (get-col-val record req-when data)
+        action (get req-when "action")
+        hours-action (when (string? action)
+                       (-> (re-seq #"(in|not-in)-hours-(\d+)$" action)
+                           first
+                           #_((fn [x] (println "parsing hours-action" x) x))
+                           rest))]
+    ;; https://github.com/andrewmcveigh/cljs-time
+    (when (cond
+            (seq hours-action)
+            (let [[in-or-not-in str-hours] hours-action
+                  record-time (tf/parse (tf/formatter "YYYY-MM-dd HH:mm:ss.0") val)
+                  threshold-time (t/minus (t/now) (t/hours (js/parseInt str-hours)))
+                  formatter (tf/formatter "YYYY-MM-dd HH:mm:ss")
+                  str-target-time (tf/unparse formatter threshold-time)]
+              (println str-target-time val (tf/unparse formatter record-time))
+              (println str-hours (js/parseInt str-hours))
+              (if (= in-or-not-in "in")
+                (or (t/after? record-time threshold-time) (t/equal? record-time threshold-time))
+                (t/before? record-time threshold-time))
+              #_(println (tf/show-formatters))
+              #_(println js/date-fns.addHours)
+              #_(println dfns))
+            :else false)
+      [:span
+       [:span.badge.bg-secondary.mx-1 text]])))
+
+(defn build-badge [record col-setting & data _]
+  (when-let [raw-badge (get col-setting "badge")]
+    (if (map? raw-badge)
+      (build-badge-item record raw-badge data)
+      (for [badge raw-badge] (build-badge-item record badge data)))))
+
 (defn component-device-log [log col-settings]
   (let [[requested-to-open set-requested-to-open] (react/useState false)
         id (:id log)
@@ -59,17 +115,9 @@
      [:tr
       [:td id]
       (for [col col-settings]
-        (let [label (get col "label")
-              bare-key (get col "key")
-              first-key (if (string? bare-key) bare-key (first bare-key))
-              target-field (when-not (empty? first-key)
-                             (case first-key
-                               "data" data
-                               "created_at" (:created_at log)
-                               "id" (:id log)
-                               :else nil))
-              json-key (when-not (string? bare-key) (rest bare-key))]
-          [:td {:key label} (get-by-json-key target-field json-key)]))
+        [:td {:key (get-col-label col)}
+         (get-col-val log col data)
+         (build-badge log col data)])
       [:td (:created_at log)]
       [:td [:a ;; .btn.btn-outline-primary.btn-sm
             {:href "#"
@@ -98,11 +146,9 @@
         query-str-renderer (:str-renderer query-params)
         query-str-where (:str-where query-params)
         query-str-order (:str-order query-params)
-        default-str-renderer "[{\"label\": \"camera_id\", \"key\": [\"data\", \"camera_id\"]}, {\"label\": \"battery\", \"key\": [\"data\", \"readonly_state\", \"volt_battery\"]}, {\"label\": \"panel\", \"key\": [\"data\", \"readonly_state\", \"volt_panel\"]}]"
-        ;; default-str-renderer "[{\"label\": \"camera_id\", \"key\": \"data\"}]"
+        default-str-renderer "[{\"key\": [\"data\", \"camera_id\"], \"badge\": [{\"text\": \"not wakeup\", \"when\": {\"key\": \"created_at\", \"action\": \"not-in-hours-24\"}}]}, {\"label\": \"battery\", \"key\": [\"data\", \"readonly_state\", \"volt_battery\"]}, {\"label\": \"panel\", \"key\": [\"data\", \"readonly_state\", \"volt_panel\"]}]"
         [str-renderer set-str-renderer] (react/useState (or query-str-renderer default-str-renderer))
         [str-draft-renderer set-str-draft-renderer] (react/useState str-renderer)
-        ;; default-str-where "[{\"key\": \"created_at\", \"action\": \"gt\", \"value\": \"2022-03-10 00:00:00\"}]}]"
         default-str-where "[{\"key\": \"created_at\", \"action\": \"in-hours-24\"}]"
         [str-where set-str-where] (react/useState (or query-str-where default-str-where))
         [str-draft-where set-str-draft-where] (react/useState str-where)
@@ -185,7 +231,7 @@
        [:tr
         [:th "id"]
         (for [col col-settings]
-          (let [label (get col "label")]
+          (let [label (get-col-label col)]
             [:th {:key label} label]))
         [:th "created_at"]
         [:th "actions"]]]
