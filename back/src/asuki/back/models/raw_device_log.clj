@@ -59,26 +59,10 @@
     "not_null" "IS NOT NULL"
     nil))
 
-(declare build-query-item-where)
-
-(defn build-where-not-exists [not-exists {:keys [db-table-key base-table-key]}]
-  #_(println "build-where-not-exists" db-table-key base-table-key)
-  (let [this-table-key (str base-table-key "1")]
-    (join " " ["NOT EXISTS (SELECT 1 FROM" db-table-key "AS" this-table-key "WHERE"
-               (join " AND " (for [item not-exists]
-                               (let [key (build-query-item-where
-                                          item
-                                          {:base-table-key base-table-key
-                                           :this-table-key this-table-key})]
-                                 #_(print "key from build-query-item-where" key)
-                                 key)))
-               ")"])))
-
-(defn build-query-item-where [args {:keys [db-table-key base-table-key this-table-key]}]
-  #_(println "build query item where " args db-table-key base-table-key this-table-key)
+(defn build-query-item-where [args {:keys [base-table-key this-table-key]}]
+  #_(println "build query item where " args base-table-key this-table-key)
   (let [action (get args "action")
         value (get args "value")
-        not-exists (get args "not_exists")
         key (get args "key")
         hours-action (when (string? action)
                        (-> (re-matcher #"(in|not-in)-hours-(\d+)$" action)
@@ -96,8 +80,6 @@
                        :else value)]
     #_(println "build-query-item-where" target-key target-action target-value base-table-key this-table-key not-exists)
     (cond
-      (not (nil? not-exists))
-      (build-where-not-exists not-exists {:db-table-key db-table-key :base-table-key base-table-key})
       (seq hours-action)
       (join " " (let [[in-or-not-in str-hours] hours-action]
                   [target-key (if (= in-or-not-in "in") ">=" "<")
@@ -129,7 +111,7 @@
 (defn where-max-group-by? [item]
   (or (get item "group_by") (get item "max")))
 
-(defn build-query-where [{:keys [where db-table-key base-table-key]}]
+(defn build-query-where [{:keys [where base-table-key]}]
   (when-not (or (nil? where) (empty? where))
     #_(println "where" where)
     (let [where-max-group-by (filter where-max-group-by? where)
@@ -144,8 +126,7 @@
                           (join " AND "
                                 (for [item where-normal]
                                   #_(println "item" item)
-                                  (build-query-item-where item {:db-table-key db-table-key
-                                                                :base-table-key base-table-key})))]))))))
+                                  (build-query-item-where item {:base-table-key base-table-key})))]))))))
 
 (defn build-query-select-max-group-by [where-max-group-by {:keys [db-table-key base-table-key]}]
   #_(println "build-query-select-max-group-by" where-max-group-by)
@@ -185,7 +166,6 @@
         str-query (join " " ["SELECT SQL_CALC_FOUND_ROWS * FROM" db-table-key "AS" base-table-key
                              (when-not (empty? str-query-select-max-group-by) (str ", " str-query-select-max-group-by))
                              (build-query-where {:where where
-                                                 :db-table-key db-table-key
                                                  :base-table-key base-table-key})
                              (build-query-order order base-table-key)
                              "LIMIT 0," limit])]

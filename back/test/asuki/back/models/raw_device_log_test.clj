@@ -33,13 +33,4 @@
   (testing "where multiple"
     (is (= (build-query-where {:where [{"key" "id" "action" "not_null"}
                                        {"key" "id" "action" "gt" "value" "10"}]}))
-        "WHERE id IS NOT NULL AND id > 10"))
-  (testing "where not exists"
-    (is (= (build-query-where {:where [{"not_exists"
-                                        [{"action" "="
-                                          "key" ["data" "machine_id"]}
-                                         {"action" "lt"
-                                          "key" "created_at"}]}]
-                               :db-table-key "raw_device_log"
-                               :base-table-key "rd"})
-           "WHERE NOT EXISTS (SELECT 1 FROM raw_device_log AS rd1 WHERE JSON_VALUE(rd.data,\"$.machine_id\") = JSON_VALUE(rd1.data,\"$.machine_id\") AND rd.created_at < rd1.created_at )"))))
+        "WHERE id IS NOT NULL AND id > 10")))
