@@ -85,11 +85,10 @@
             (seq hours-action)
             (let [[in-or-not-in str-hours] hours-action
                   record-time (tf/parse (tf/formatter "YYYY-MM-dd HH:mm:ss.0") val)
-                  threshold-time (t/minus (t/now) (t/hours (js/parseInt str-hours)))
-                  formatter (tf/formatter "YYYY-MM-dd HH:mm:ss")
-                  str-target-time (tf/unparse formatter threshold-time)]
-              (println str-target-time val (tf/unparse formatter record-time))
-              (println str-hours (js/parseInt str-hours))
+                  ;; formatter (tf/formatter "YYYY-MM-dd HH:mm:ss")
+                  threshold-time (t/minus (t/now) (t/hours (js/parseInt str-hours)))]
+              ;; (println (tf/unparse formatter threshold-time) (tf/unparse formatter record-time))
+              ;; (println str-hours (js/parseInt str-hours))
               (if (= in-or-not-in "in")
                 (or (t/after? record-time threshold-time) (t/equal? record-time threshold-time))
                 (t/before? record-time threshold-time))
@@ -163,10 +162,8 @@
         parse-error-order (try (.parse js/JSON str-order) nil (catch js/Error e e))
         update-device-logs
         (fn [str-where str-order]
-          (println "update device logs")
           (let [query (goog.string.format "{ raw_device_logs(where: \"%s\", order: \"%s\") { total list { id created_at data } } }"
                                           (escape-str str-where) (escape-str str-order))]
-            (println query)
             (re-graph/query query {} on-receive)))
         on-click-apply
         (fn []
