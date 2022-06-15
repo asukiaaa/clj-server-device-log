@@ -136,7 +136,7 @@
           where-normal (filter #(not (where-max-group-by? %)) where)]
       (str "WHERE "
            (join " AND "
-                 (filter #(not (empty? %))
+                 (filter seq
                          [(join " AND "
                                 (for [[index item] (map-indexed vector where-max-group-by)]
                                   #_(println "item" item)
