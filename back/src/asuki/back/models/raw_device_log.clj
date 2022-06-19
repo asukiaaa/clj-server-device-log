@@ -168,7 +168,7 @@
                              (build-query-where {:where where
                                                  :base-table-key base-table-key})
                              (build-query-order order base-table-key)
-                             "LIMIT 0," limit])]
+                             "LIMIT " limit])]
     (println "str-query " str-query)
     (jdbc/with-db-transaction [db-transaction db-spec]
       {:records (jdbc/query db-transaction str-query)
