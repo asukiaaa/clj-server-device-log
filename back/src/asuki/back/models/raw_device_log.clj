@@ -51,8 +51,10 @@
 
 (defn filter-target-action [action]
   (case action
-    "=" "="
     "eq" "="
+    "=" "="
+    "ne" "!="
+    "!=" "!="
     "gt" ">"
     ">" ">"
     "gte" ">="
@@ -60,7 +62,7 @@
     "lt" "<"
     "<" "<"
     "lte" "<="
-     "<=" "<="
+    "<=" "<="
     "not_null" "IS NOT NULL"
     nil))
 
