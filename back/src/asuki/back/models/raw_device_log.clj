@@ -39,7 +39,11 @@
                 key-with-table
                 (if (string? json-key)
                   (escape-for-sql json-key)
-                  (join "." (for [k json-key] (escape-for-sql k)))))))))
+                  (join "" (for [[index k] (map-indexed vector json-key)]
+                             (if (number? k)
+                               (str "[" k "]")
+                               (str (when-not (= index 0) ".")
+                                    (escape-for-sql k)))))))))))
 
 (defn build-query-order [order table-key]
   #_(println "build-query-order " order)
