@@ -70,7 +70,7 @@
     "not_null" "IS NOT NULL"
     nil))
 
-(defn build-query-item-where [args {:keys [base-table-key this-table-key]}]
+(defn build-query-item-where-not-or [args {:keys [base-table-key this-table-key]}]
   #_(println "build query item where " args base-table-key this-table-key)
   (let [action (get args "action")
         value (get args "value")
@@ -97,6 +97,15 @@
                    (f/unparse (f/formatter "\"YYYY-MM-dd HH:mm:ss\"")
                               (t/minus (t/now) (t/hours (Integer. str-hours))))]))
       :else (join " " [target-key target-action target-value]))))
+
+(defn build-query-item-where [args {:keys [base-table-key this-table-key]}]
+  #_(println "build query item where " args base-table-key this-table-key)
+  (if-let [or-where (get args "or")]
+    (->> (for [item or-where]
+           (build-query-item-where item {:base-table-key base-table-key :this-table-key this-table-key}))
+         (join " OR ")
+         ((fn [query-or] (str "(" query-or ")"))))
+    (build-query-item-where-not-or args {:base-table-key base-table-key :this-table-key this-table-key})))
 
 (defn build-keys-for-where-max-group-by [base-table-key index]
   #_(println "build-keys-for-where-max-group-by" base-table-key index)
