@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker-compose exec mariadb mysql --host=localhost --user=maria-user --password=maria-pass server_practice
+docker compose exec mariadb mysql --host=localhost --user=maria-user --password=maria-pass server_practice

@@ -11,4 +11,4 @@ $0 some.dump"
   exit 1
 fi
 
-docker-compose exec -T mariadb mysql --host=localhost --user=maria-user --password=maria-pass server_practice < $1
+docker compose exec -T mariadb mysql --host=localhost --user=maria-user --password=maria-pass server_practice < $1
