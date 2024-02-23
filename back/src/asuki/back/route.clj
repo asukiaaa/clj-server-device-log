@@ -6,6 +6,7 @@
 
 (def main
   #{["/" :get [html-body handlers/top] :route-name :top]
+    ["/graph" :get [html-body handlers/top] :route-name :graph]
     ["/device_logs" :get [html-body handlers/device-logs] :route-name :device-logs]
     ["/device_logs/:id" :get [html-body handlers/device-log]
      :route-name :show-device-log
