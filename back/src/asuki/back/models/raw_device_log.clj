@@ -175,7 +175,7 @@
         order (or (when-let [str-order (:order args)]
                     (json/read-str str-order))
                   (:order defaults))
-        where (json/read-str (:where args))
+        where (when-let [w (:where args)] (json/read-str w))
         db-table-key "raw_device_log"
         base-table-key "rdl"
         where-max-group-by (filter where-max-group-by? where)
