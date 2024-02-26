@@ -47,11 +47,12 @@
 
 (defn build-query-order [order table-key]
   #_(println "build-query-order " order)
-  (str "ORDER BY "
-       (join ", " (for [item order]
-                    (join " " [(build-target-key {:key (or (get item "key") (:key item))
-                                                  :table-key table-key})
-                               (filter-order-dir (or (get item "dir") (:dir item)))])))))
+  (let [order-to-handle (or (seq order) (:order defaults))]
+    (str "ORDER BY "
+         (join ", " (for [item order-to-handle]
+                      (join " " [(build-target-key {:key (or (get item "key") (:key item))
+                                                    :table-key table-key})
+                                 (filter-order-dir (or (get item "dir") (:dir item)))]))))))
 
 (defn filter-target-action [action]
   (case action
@@ -172,9 +173,8 @@
 (defn get-records-with-total [& [args]]
   (println "get-records-with-total" args)
   (let [limit (or (:limit args) (:limit defaults))
-        order (or (when-let [str-order (:order args)]
-                    (json/read-str str-order))
-                  (:order defaults))
+        order (when-let [str-order (:order args)]
+                (json/read-str str-order))
         where (when-let [w (:where args)] (json/read-str w))
         db-table-key "raw_device_log"
         base-table-key "rdl"
