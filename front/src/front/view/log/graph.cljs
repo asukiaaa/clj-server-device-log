@@ -1,23 +1,37 @@
 (ns front.view.log.graph
   (:require [cljsjs.chartjs]
-            ["react" :as react]))
+            ["react" :as react]
+            [front.model.raw-device-log :as model.log]))
 
-(defn core []
-  (let [data {:type "bar"
-              :data {:labels ["2012" "2013" "2014" "2015" "2016"]
-                     :datasets [{:data [5 10 15 20 25]
-                                 :label "Rev in MM"
-                                 :backgroundColor "#90EE90"}
-                                {:data [3 6 9 12 15]
-                                 :label "Cost in MM"
-                                 :backgroundColor "#F08080"}]}}]
-    (print "hoge")
+(defn render-graph-canvas [config graph-id]
+  (react/useEffect
+   (fn []
+     (let [context (.getContext (.getElementById js/document graph-id) "2d")]
+       (js/Chart. context (clj->js config)))
+     (fn []))
+   #js [])
+  [:canvas {:id graph-id}])
+
+(defn render-graph [logs val-config]
+  (let [val-key (get val-config "key")
+        config {:type "line"
+                :data {:labels (for [log logs] (str (model.log/get-val-from-record log "created_at")))
+                       :datasets [{:data (for [log logs] (model.log/get-val-from-record log val-key))
+                                   :label (model.log/get-label-from-col-config val-config)
+                                   :backgroundColor "#90EE90"}]}}]
+    [:f> render-graph-canvas config (str "graph-" val-key)]))
+
+(defn core [str-where str-order config-renderer config-renderer-graph]
+  (let [[logs set-logs] (react/useState [])
+        on-receive (fn [logs _total] (set-logs logs))]
     (react/useEffect
      (fn []
-       (let [context (.getContext (.getElementById js/document "graph-sample") "2d")]
-         (js/Chart. context (clj->js data)))
+       (model.log/fetch-list {:where str-where :order str-order :on-receive on-receive})
        (fn []))
-     #js [])
-    [:div
-     [:p "graph page"]
-     [:canvas {:id "graph-sample"}]]))
+     #js [str-where str-order])
+
+    [:<>
+     (when-not (empty? logs)
+       (for [val-config config-renderer]
+         [:<> {:key val-config}
+          [:f> render-graph logs val-config]]))]))

@@ -49,6 +49,7 @@
  {:raw_device_logs
   {:type :RawDeviceLogs
    :args {:limit {:type Int}
+          :offset {:type Int}
           :where {:type String}
           :order {:type String}}
    :resolve :query/raw-device-logs}

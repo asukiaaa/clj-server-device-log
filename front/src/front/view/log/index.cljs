@@ -40,15 +40,16 @@
         query-str-where (:str-where query-params)
         query-str-order (:str-order query-params)
         [str-renderer set-str-renderer] (react/useState (or query-str-renderer (:str-renderer defaults)))
+        [str-renderer-graph set-str-renderer-graph] (react/useState)
         [str-draft-renderer set-str-draft-renderer] (react/useState str-renderer)
         [str-where set-str-where] (react/useState (or query-str-where (:str-where defaults)))
         [str-draft-where set-str-draft-where] (react/useState str-where)
         [str-order set-str-order] (react/useState (or query-str-order (:str-order defaults)))
         [str-draft-order set-str-draft-order] (react/useState str-order)
-        parse-setting #(.parse js/JSON str-renderer)
-        parsed-setting (try (parse-setting) (catch js/Error _ nil))
-        col-settings (when (not (nil? parsed-setting)) (js->clj parsed-setting))
-        parse-error-renderer (when (nil? parsed-setting) (try (parse-setting) (catch js/Error e e)))
+        parse-renderer #(.parse js/JSON str-renderer)
+        parsed-renderer (try (parse-renderer) (catch js/Error _ nil))
+        config-renderer (when (not (nil? parsed-renderer)) (js->clj parsed-renderer))
+        parse-error-renderer (when (nil? parsed-renderer) (try (parse-renderer) (catch js/Error e e)))
         parse-error-where (try (.parse js/JSON str-where) nil (catch js/Error e e))
         parse-error-order (try (.parse js/JSON str-order) nil (catch js/Error e e))
         on-click-apply
@@ -101,5 +102,5 @@
        {:type :text :default-value str-order :key str-order
         :on-change (fn [e] (set-str-draft-order (-> e .-target .-value)))}]
       [:a.btn.btn-outline-primary.btn-sm {:on-click on-click-apply} "apply"]]
-     [:f> log.graph/core]
-     [:f> log.list/core {:where str-where :order str-order :col-settings col-settings}]]))
+     [:f> log.graph/core str-where str-order config-renderer str-renderer-graph]
+     [:f> log.list/core str-where str-order config-renderer]]))
