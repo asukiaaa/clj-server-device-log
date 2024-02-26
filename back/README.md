@@ -64,8 +64,33 @@ _section of the `README.md` file!_
 
 Distributed under the Eclipse Public License version 1.0.
 
+## test commands
+
+```sh
+AUTH_BEARER="XXYYZZ"
+HOST=http://localhost:3000
+
+function escape_str () {
+  echo "$1" | sed 's/\\/\\\\/g' | sed 's/\"/\\"/g'
+}
+
+WHERE="[{\"key\": [\"data\", \"camera_id\"], \"action\": \"not_null\"}]"
+ESCAPED_WHERE=$(escape_str "$WHERE")
+ORDER="[{\"key\": \"created_at\", \"dir\": \"desc\"}]"
+ESCAPED_ORDER=$(escape_str "$ORDER")
+QUERY="{ raw_device_logs(where: \"$ESCAPED_WHERE\", order: \"$ESCAPED_ORDER\") { total list { id created_at data } } } }"
+ESCAPED_QUERY=$(escape_str "$QUERY")
+JSON="{\"query\": \"$ESCAPED_QUERY\"}"
+
+curl -X POST ${HOST}/graphql \
+  -H "Authorization: Bearer $AUTH_BEARER" \
+  -H "Content-Type: application/json" \
+  -d "$JSON"
+```
+
 ## References
 
+- [graphqlの動作確認をcurlで実施](https://asukiaaa.blogspot.com/2024/02/test-graphql-with-using-curl.html)
 - [Watch and auto reload a Clojure pedestal service on source change ](https://dev.to/praburajan/watch-and-auto-reload-a-clojure-pedestal-service-on-save-4ehl)
 - [Your First API](http://pedestal.io/guides/your-first-api)
 - [How can I reload code in a Clojure pedestal repl for a quick development workflow?](https://stackoverflow.com/questions/36390571/how-can-i-reload-code-in-a-clojure-pedestal-repl-for-a-quick-development-workflo)
