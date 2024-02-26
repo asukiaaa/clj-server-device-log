@@ -65,7 +65,7 @@
         json-key (when-not (string? bare-key) (rest bare-key))]
     (get-by-json-key target-field json-key)))
 
-(defn build-badge-item [record badge & data _]
+(defn build-badge-item [record badge data id]
   (let [req-when (get badge "when")
         text (or (get badge "text") "no text")
         val (get-col-val record req-when data)
@@ -91,14 +91,13 @@
               #_(println js/date-fns.addHours)
               #_(println dfns))
             :else false)
-      [:span
-       [:span.badge.bg-secondary.mx-1 text]])))
+      [:span.badge.bg-secondary.mx-1 {:key (str "badge" text id)} text])))
 
-(defn build-badge [record col-setting & data _]
+(defn build-badge [record col-setting data id]
   (when-let [raw-badge (get col-setting "badge")]
     (if (map? raw-badge)
-      (build-badge-item record raw-badge data)
-      (for [badge raw-badge] (build-badge-item record badge data)))))
+      (build-badge-item record raw-badge data id)
+      (for [badge raw-badge] (build-badge-item record badge data id)))))
 
 (defn component-device-log [log col-settings]
   (let [[requested-to-open set-requested-to-open] (react/useState false)
@@ -111,7 +110,7 @@
       (for [col col-settings]
         [:td {:key (get-col-label col)}
          (get-col-val log col data)
-         (build-badge log col data)])
+         (build-badge log col data id)])
       [:td (:created_at log)]
       [:td [:a ;; .btn.btn-outline-primary.btn-sm
             {:href "#"
@@ -130,24 +129,57 @@
     (escape text {\" "\\\""
                   \\ "\\\\"})))
 
-(defn core []
-  (let [[logs set-logs] (react/useState nil)
-        [count-total set-count-total] (react/useState nil)
+(declare goog.string.format) ; to avoid error of clj-kond
+(defn fetch-logs [{:keys [str-where str-order on-receive]}]
+  (let [query (goog.string.format "{ raw_device_logs(where: \"%s\", order: \"%s\") { total list { id created_at data } } }"
+                                  (escape-str str-where) (escape-str str-order))]
+    (re-graph/query query {} on-receive)))
+
+(defn log-list [{:keys [where order col-settings]}]
+  (let [[total set-total] (react/useState 0)
+        [logs set-logs] (react/useState [])
         on-receive (fn [{:keys [data]}]
-                     (set-logs (-> data :raw_device_logs :list))
-                     (set-count-total (-> data :raw_device_logs :total)))
-        query-params (read-params)
+                     #_(println "receive data for log-list" data)
+                     (let [received-total (-> data :raw_device_logs :total)
+                           received-logs  (-> data :raw_device_logs :list)]
+                       (set-total received-total)
+                       (set-logs received-logs)))]
+    (react/useEffect
+     (fn []
+       (fetch-logs {:str-where where :str-order order :on-receive on-receive})
+       (fn []))
+     #js [where order])
+    [:div
+     [:div.m-1 "total: " total]
+     [:table.table.table-sm
+      [:thead
+       [:tr
+        [:th "id"]
+        (for [col col-settings]
+          (let [label (get-col-label col)]
+            [:th {:key label} label]))
+        [:th "created_at"]
+        [:th "actions"]]]
+      [:tbody
+       (for [log logs]
+         [:<> {:key (:id log)}
+          [:f> component-device-log log col-settings]])]]]))
+
+(def defaults
+  {:str-renderer "[{\"key\": [\"data\", \"camera_id\"], \"badge\": [{\"text\": \"not wakeup\", \"when\": {\"key\": \"created_at\", \"action\": \"not-in-hours-24\"}}]}, {\"label\": \"battery\", \"key\": [\"data\", \"readonly_state\", \"volt_battery\"]}, {\"label\": \"panel\", \"key\": [\"data\", \"readonly_state\", \"volt_panel\"]}]"
+   :str-where "[{\"key\": \"created_at\", \"action\": \"in-hours-24\"}]"
+   :str-order "[{\"key\": [\"data\", \"camera_id\"], \"dir\": \"desc\"},{\"key\":\"created_at\",\"dir\":\"desc\"}]"})
+
+(defn core []
+  (let [query-params (read-params)
         query-str-renderer (:str-renderer query-params)
         query-str-where (:str-where query-params)
         query-str-order (:str-order query-params)
-        default-str-renderer "[{\"key\": [\"data\", \"camera_id\"], \"badge\": [{\"text\": \"not wakeup\", \"when\": {\"key\": \"created_at\", \"action\": \"not-in-hours-24\"}}]}, {\"label\": \"battery\", \"key\": [\"data\", \"readonly_state\", \"volt_battery\"]}, {\"label\": \"panel\", \"key\": [\"data\", \"readonly_state\", \"volt_panel\"]}]"
-        [str-renderer set-str-renderer] (react/useState (or query-str-renderer default-str-renderer))
+        [str-renderer set-str-renderer] (react/useState (or query-str-renderer (:str-renderer defaults)))
         [str-draft-renderer set-str-draft-renderer] (react/useState str-renderer)
-        default-str-where "[{\"key\": \"created_at\", \"action\": \"in-hours-24\"}]"
-        [str-where set-str-where] (react/useState (or query-str-where default-str-where))
+        [str-where set-str-where] (react/useState (or query-str-where (:str-where defaults)))
         [str-draft-where set-str-draft-where] (react/useState str-where)
-        default-str-order "[{\"key\": [\"data\", \"camera_id\"], \"dir\": \"desc\"},{\"key\":\"created_at\",\"dir\":\"desc\"}]"
-        [str-order set-str-order] (react/useState (or query-str-order default-str-order))
+        [str-order set-str-order] (react/useState (or query-str-order (:str-order defaults)))
         [str-draft-order set-str-draft-order] (react/useState str-order)
         parse-setting #(.parse js/JSON str-renderer)
         parsed-setting (try (parse-setting) (catch js/Error _ nil))
@@ -155,11 +187,6 @@
         parse-error-renderer (when (nil? parsed-setting) (try (parse-setting) (catch js/Error e e)))
         parse-error-where (try (.parse js/JSON str-where) nil (catch js/Error e e))
         parse-error-order (try (.parse js/JSON str-order) nil (catch js/Error e e))
-        update-device-logs
-        (fn [str-where str-order]
-          (let [query (goog.string.format "{ raw_device_logs(where: \"%s\", order: \"%s\") { total list { id created_at data } } }"
-                                          (escape-str str-where) (escape-str str-order))]
-            (re-graph/query query {} on-receive)))
         on-click-apply
         (fn []
           (let [is-different-renderer (not (= str-renderer str-draft-order))
@@ -169,29 +196,25 @@
             (when is-different-where (set-str-where str-draft-where))
             (when is-different-order (set-str-order str-draft-order))
             (push-params {:str-renderer str-draft-renderer :str-where str-draft-where :str-order str-draft-order})
-            (set-logs [])
-            (set-count-total "")
-            (update-device-logs str-draft-where str-draft-order)
+            #_(fetch-logs {:str-where str-draft-where :str-order str-draft-order :on-receive on-receive})
             #_(when (or is-different-order is-different-where)
                 (update-device-logs str-draft-where str-draft-order))))
         on-pop-state
         (fn []
           #_(println "on pop")
           (let [query-params (read-params)
-                query-str-renderer (or (:str-renderer query-params) default-str-renderer)
-                query-str-where (or (:str-where query-params) default-str-where)
-                query-str-order (or (:str-order query-params) default-str-order)]
+                query-str-renderer (or (:str-renderer query-params) (:str-renderer defaults))
+                query-str-where (or (:str-where query-params) (:str-where defaults))
+                query-str-order (or (:str-order query-params) (:str-order defaults))]
             (set-str-renderer query-str-renderer)
             (set-str-draft-renderer query-str-renderer)
             (set-str-draft-order query-str-order)
             (set-str-order query-str-order)
             (set-str-draft-where query-str-where)
-            (set-str-where query-str-where)
-            (update-device-logs query-str-where query-str-order)))]
+            (set-str-where query-str-where)))]
     (react/useEffect
      (fn []
        (.addEventListener js/window "popstate" on-pop-state)
-       (update-device-logs str-where str-order)
        (fn [] ;; destructor
          (.removeEventListener js/window "popstate" on-pop-state)))
      #js [])
@@ -214,20 +237,4 @@
        {:type :text :default-value str-order :key str-order
         :on-change (fn [e] (set-str-draft-order (-> e .-target .-value)))}]
       [:a.btn.btn-outline-primary.btn-sm {:on-click on-click-apply} "apply"]]
-     [:div.m-1 "renderer: " str-renderer]
-     [:div.m-1 "where: " str-where]
-     [:div.m-1 "order: " str-order]
-     [:div.m-1 "total: " count-total]
-     [:table.table.table-sm
-      [:thead
-       [:tr
-        [:th "id"]
-        (for [col col-settings]
-          (let [label (get-col-label col)]
-            [:th {:key label} label]))
-        [:th "created_at"]
-        [:th "actions"]]]
-      [:tbody
-       (for [log logs]
-         [:<> {:key (:id log)}
-          [:f> component-device-log log col-settings]])]]]))
+     [:f> log-list {:where str-where :order str-order :col-settings col-settings}]]))
