@@ -67,7 +67,8 @@
                             :label (model.log/get-label-from-col-config val-config)
                             :backgroundColor "#90EE90"}]}
          :options
-         {:scales
+         {:animation false
+          :scales
           {:x
            {:type "time"
             :time {:unit nil
