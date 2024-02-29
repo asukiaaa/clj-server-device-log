@@ -33,11 +33,11 @@
 #_(.log js/console (.-_date chart/_adapters))
 
 #_(def  values [{:x "2020-02-01" :y 100}
-              {:x "2020-02-02" :y 200}
-              {:x "2020-02-03" :y 300}
-              {:x "2020-02-04" :y 400}
-              {:x "2020-02-07" :y 200}
-              {:x "2020-02-14" :y 600}])
+                {:x "2020-02-02" :y 200}
+                {:x "2020-02-03" :y 300}
+                {:x "2020-02-04" :y 400}
+                {:x "2020-02-07" :y 200}
+                {:x "2020-02-14" :y 600}])
 
 (defn render-graph-canvas [config graph-id]
   (react/useEffect
@@ -64,14 +64,17 @@
                 :datasets [{:data (for [log logs] #_(model.log/get-val-from-record log val-key)
                                        {:x #_"2024-120-20" (:created_at log)
                                         :y (model.log/get-val-from-record log val-key)})
-                            #_:label #_(model.log/get-label-from-col-config val-config)
+                            :label (model.log/get-label-from-col-config val-config)
                             :backgroundColor "#90EE90"}]}
          :options
          {:scales
           {:x
            {:type "time"
-            :time {:displayFormats {:week "MM/dd"
-                                    :day "MM/dd"}}}}}}]
+            :time {:unit nil
+                   :displayFormats {:hour "HH"
+                                    :week "MM/dd"
+                                    :day "MM/dd"
+                                    :month "yyyy/MM"}}}}}}]
     [:f> render-graph-canvas config (str "graph-" val-key)]))
 
 (defn core [str-where str-order config-renderer config-renderer-graph]
@@ -82,8 +85,10 @@
        (model.log/fetch-list {:where str-where :order str-order :on-receive on-receive})
        (fn []))
      #js [str-where str-order])
-    [:<>
+    [:div.container-fluid
      (when-not (empty? logs)
-       (for [val-config config-renderer]
-         [:<> {:key val-config}
-          [:f> render-graph logs val-config]]))]))
+       [:div.row
+        (for [val-config config-renderer]
+          [:<> {:key val-config}
+           [:div.col-md-6
+            [:f> render-graph logs val-config]]])])]))
