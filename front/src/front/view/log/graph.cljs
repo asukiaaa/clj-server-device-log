@@ -85,7 +85,7 @@
        (model.log/fetch-list {:where str-where :order str-order :on-receive on-receive})
        (fn []))
      #js [str-where str-order])
-    [:div.container-fluid
+    [:div.container-fluid {:key (str str-where str-order config-renderer)}
      (when-not (empty? logs)
        [:div.row
         (for [val-config config-renderer]
