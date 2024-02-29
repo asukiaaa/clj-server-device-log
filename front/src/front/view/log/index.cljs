@@ -44,6 +44,7 @@
         [str-order set-str-order] (react/useState (or (:str-order query-params) (:str-order defaults)))
         [str-draft-order set-str-draft-order] (react/useState str-order)
         [show-graph set-show-graph] (react/useState (= "true" (or (:show-graph query-params) (:show-graph defaults))))
+        [show-config set-show-config] (react/useState false)
         [draft-show-graph set-draft-show-graph] (react/useState show-graph)
         parse-renderer #(.parse js/JSON str-renderer)
         parsed-renderer (try (parse-renderer) (catch js/Error _ nil))
@@ -91,7 +92,9 @@
      #js [])
     [:div
      [:h1 "device logs"]
-     [:form.form-control
+     [:a.btn.btn-outline-primary.btn-sm.m-2 {:on-click #(set-show-config (not show-config))}
+      (if show-config "hide config" "show config")]
+     [:form.form-control {:style {:display (if show-config "block" "none")}}
       [:div "renderer"]
       [:div (str parse-error-renderer)]
       [:textarea.form-control.mb-1
