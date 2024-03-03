@@ -34,6 +34,8 @@ Then include out/main.js like this.
 
 ## References
 
+- [info of analyzer](https://clojurians-log.clojureverse.org/shadow-cljs/2022-07-01/1656685747.417849)
+- [tools.deps / deps.edn](https://shadow-cljs.github.io/docs/UsersGuide.html#deps-edn)
 - [reagent/examples/functional-components-and-hooks/src/example/core.cljs](https://github.com/reagent-project/reagent/blob/c214466bbcf099eafdfe28ff7cb91f99670a8433/examples/functional-components-and-hooks/src/example/core.cljs)
 - [Using NPM - figwheel-main](https://figwheel.org/docs/npm.html)
 - [figwheel Configuration Options](https://figwheel.org/config-options.html)

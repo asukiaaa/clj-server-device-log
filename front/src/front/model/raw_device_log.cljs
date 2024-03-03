@@ -38,7 +38,7 @@
     (escape text {\" "\\\""
                   \\ "\\\\"})))
 
-(declare goog.string.format) ; to avoid error of clj-kond
+#_(declare goog.string.format) ; to avoid error of clj-kond
 
 (defn fetch-list [{:keys [where order limit offset on-receive]}]
   (let [query (goog.string.format "{ raw_device_logs(where: \"%s\", order: \"%s\", limit: %d, offset: %d) { total list { id created_at data } } }"

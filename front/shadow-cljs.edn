@@ -1,0 +1,8 @@
+{:deps {:aliases [:build :dev]}
+ :source-paths ["src"]
+ :builds
+ {:frontend
+  {:target :browser
+   :output-dir "out-cljs/public/out-cljs"
+   :asset-path "/out-cljs"
+   :modules {:main {:init-fn front.core/init}}}}}

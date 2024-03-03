@@ -15,7 +15,7 @@
            #_[:script {:src "/front/out/main.js" :type "module"}]]
           [:body
            [:div {:id "app"} "maybe loading js"]
-           [:script {:src "/main.js" :type "text/javascript"}]
+           [:script {:src "/out-cljs/main.js" :type "text/javascript"}]
            #_[:script {:src "/front/out/index.js" :type "module"}]
            #_[:base {:href "/front/target/public/"}]
            #_[:script {:src "cljs-out/figwheel-dev-main.js" :type "text/javascript"}]

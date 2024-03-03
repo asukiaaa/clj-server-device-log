@@ -3,3 +3,4 @@
 /out*
 /dest
 /target
+/.shadow-cljs

@@ -1,4 +1,4 @@
-{:paths ["src" "resources" "../front/resources" "../front/target" "../front/out-webpack"]
+{:paths ["src" "resources" "../front/resources" "../front/out-cljs"]
  :deps {org.clojure/clojure {:mvn/version "1.10.3"}
         clj-time/clj-time {:mvn/version "0.15.2"}
         com.walmartlabs/lacinia {:mvn/version "1.2-alpha-1"}

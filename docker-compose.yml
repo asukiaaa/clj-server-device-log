@@ -27,8 +27,7 @@ services:
       - ./front:/usr/src/app/front
       - .volumes/m2:/root/.m2
     ports:
-      - "9500:9500"
-      - "9550:9550" # web socket for figwheel
+      - "9630:9630" # web socket for shadow js
   mariadb:
     image: "mariadb:10.8"
     volumes:

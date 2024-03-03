@@ -12,3 +12,6 @@
    [:f> log.index/core]])
 
 (dom/render [component-app] (.getElementById js/document "app"))
+
+(defn init []
+  (println "init shadowjs"))

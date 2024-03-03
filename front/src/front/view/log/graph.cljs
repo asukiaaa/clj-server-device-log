@@ -1,17 +1,9 @@
 (ns front.view.log.graph
   (:require
-   [cljsjs.chartjs]
-   [cljsjs.chartjs-adapter-date-fns]
-   [cljsjs.date-fns]
-   #_"chart.js"
-   #_["chart.js" :as chart]
-   #_["chart.js" :refer (Chart)]
-   #_"moment"
-   #_"chartjs-adapter-moment"
-   #_["chartjs-adapter-moment" :as adapter]
-   #_["chart.js/auto" :refer [Chart]]
+   ["chart.js" :as chart]
+   ["date-fns"]
+   ["chartjs-adapter-date-fns"]
    ["react" :as react]
-   #_["date-fns/locale/index.js" :refer [ja]]
    [front.model.raw-device-log :as model.log]))
 
 #_(js/require "chart.js")
@@ -23,7 +15,7 @@
 #_(.registerer chart/Chart (chart/registerers))
 #_(println (chart/Chart.register (... chart/registerables)))
 #_(println (chart/registerables js/...))
-#_(doseq [r chart/registerables] #_(println r) (.register chart/Chart r))
+(doseq [r chart/registerables] #_(println r) (.register chart/Chart r))
 #_(.register chart/Chart chart/TimeScale)
 #_(.log js/console adapter)
 #_(println chart/registerables #_(first))
@@ -32,18 +24,11 @@
 #_(println chart/_adapters)
 #_(.log js/console (.-_date chart/_adapters))
 
-#_(def  values [{:x "2020-02-01" :y 100}
-                {:x "2020-02-02" :y 200}
-                {:x "2020-02-03" :y 300}
-                {:x "2020-02-04" :y 400}
-                {:x "2020-02-07" :y 200}
-                {:x "2020-02-14" :y 600}])
-
 (defn render-graph-canvas [config graph-id]
   (react/useEffect
    (fn []
      (let [context (.getContext (.getElementById js/document graph-id) "2d")]
-       (js/Chart. context (clj->js config)))
+       (chart/Chart. context (clj->js config)))
      (fn []))
    #js [])
   [:canvas {:id graph-id}])
@@ -51,7 +36,12 @@
 (defn render-graph [logs val-config]
   (let [val-key (get val-config "key")
         config #_{:type "line"
-                  :data {:datasets [{:data values
+                  :data {:datasets [{:data [{:x "2020-02-01" :y 100}
+                                            {:x "2020-02-02" :y 200}
+                                            {:x "2020-02-03" :y 300}
+                                            {:x "2020-02-04" :y 400}
+                                            {:x "2020-02-07" :y 200}
+                                            {:x "2020-02-14" :y 600}]
                                      :backgroundColor "#90EE90"}]}
                   :options
                   {:scales
