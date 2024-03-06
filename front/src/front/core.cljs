@@ -1,5 +1,5 @@
 (ns front.core
-  (:require [reagent.dom :as dom]
+  (:require [reagent.dom.client :as rc]
             [re-graph.core :as re-graph]
             [front.view.log.index :as log.index]))
 
@@ -11,7 +11,11 @@
   [:div
    [:f> log.index/core]])
 
-(dom/render [component-app] (.getElementById js/document "app"))
+(defonce root (rc/create-root (.getElementById js/document "app")))
 
 (defn init []
-  (println "init shadowjs"))
+  (println "init app")
+  (rc/render root [component-app]))
+
+(defn ^:dev/after-load re-render []
+  (init))

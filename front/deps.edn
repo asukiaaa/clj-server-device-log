@@ -3,7 +3,7 @@
         com.google.javascript/closure-compiler-unshaded {:mvn/version "v20230802"}
         com.andrewmcveigh/cljs-time {:mvn/version "0.5.2"}
         thheller/shadow-cljs {:mvn/version "2.27.5"}
-        reagent/reagent {:mvn/version "1.1.0" :exclusions [cljsjs/react cljsjs/react-dom]}
+        reagent/reagent {:mvn/version "1.2.0" :exclusions [cljsjs/react cljsjs/react-dom]}
         re-graph/re-graph {:mvn/version "0.1.17"}}
  :paths ["src" "resources" "target" "node_modules"]
  :aliases
