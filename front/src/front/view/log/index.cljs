@@ -34,7 +34,8 @@
    :str-where "[{\"key\": \"created_at\", \"action\": \"in-hours-24\"}]"
    :str-order "[{\"key\": [\"data\", \"camera_id\"], \"dir\": \"desc\"},{\"key\":\"created_at\",\"dir\":\"desc\"}]"
    :show-graph "false"
-   :show-table "true"})
+   :show-table "true"
+   :limit "100"})
 
 (defn parse-json [text]
   (let [parse-default-value #(.parse js/JSON text)
@@ -52,19 +53,30 @@
     {:type :text :default-value str-json :key str-json
      :on-change (fn [e] (set-draft (-> e .-target .-value)))}]])
 
-(defn render-textarea-with-into [label {:keys [default set-draft]} error-messate]
+(defn render-textarea-with-info [label {:keys [default set-draft]} error-messate]
   (render-textarea-json label default set-draft error-messate))
 
-(defn render-checkbox [label value-draft set-value-draft]
+(defn render-checkbox [label draft set-draft]
   [:span
-   [:input {:id label
-            :type "checkbox"
-            :checked (= "true" value-draft)
-            :on-change (fn [] (set-value-draft (if (= "true" value-draft) "false" "true")))}]
+   [:input.p-2
+    {:id label
+     :type "checkbox"
+     :checked (= "true" draft)
+     :on-change (fn [] (set-draft (if (= "true" draft) "false" "true")))}]
    [:label.p-2 {:for label} label]])
 
-(defn render-checkbox-with-into [label {:keys [draft set-draft]}]
+(defn render-checkbox-with-info [label {:keys [draft set-draft]}]
   (render-checkbox label draft set-draft))
+
+(defn render-input [label {:keys [key draft set-draft]} {:keys [type wrapper-class]}]
+  [:div {:class wrapper-class}
+   [:div
+    [:label {:for key} label]]
+   [:input.form-control
+    {:id label
+     :value draft
+     :type type
+     :on-change (fn [e] (set-draft (-> e .-target .-value)))}]])
 
 (defn get-param-str [key query-params]
   (or (get query-params key) (get defaults key)))
@@ -87,13 +99,13 @@
   (let [[logs set-logs] (react/useState)
         [logs-key set-logs-key] (react/useState)
         [total set-total] (react/useState)
-        [limit set-limit] (react/useState 100)
+        info-limit (build-state-info :limit (react/useState) (react/useState))
         info-str-renderer (build-state-info :str-renderer (react/useState) (react/useState))
         info-str-where (build-state-info :str-where (react/useState) (react/useState))
         info-str-order (build-state-info :str-order (react/useState) (react/useState))
         info-show-graph (build-state-info :show-graph (react/useState false) (react/useState false))
         info-show-table (build-state-info :show-table (react/useState true) (react/useState true))
-        arr-info [info-str-renderer info-str-order info-str-where info-show-graph info-show-table]
+        arr-info [info-limit info-str-renderer info-str-order info-str-where info-show-graph info-show-table]
         [show-config set-show-config] (react/useState true #_false)
         [config-renderer parse-error-config-renderer] (parse-json (:default info-str-renderer))
         [_ parse-error-where] (parse-json (:default info-str-where))
@@ -102,7 +114,7 @@
                              (doseq [info arr-info]
                                (-> (get-param-str (:key info) query-params)
                                    (set-all-val info))))
-        fetch-device-logs (fn [str-where str-order]
+        fetch-device-logs (fn [str-where str-order limit]
                             (model.log/fetch-list
                              {:str-order str-order
                               :str-where str-where
@@ -125,27 +137,30 @@
          (.removeEventListener js/window "popstate" load-query-params)))
      #js [])
     (let [str-where (:default info-str-where)
-          str-order (:default info-str-order)]
+          str-order (:default info-str-order)
+          limit (:default info-limit)]
       (react/useEffect
        (fn []
          (when-not (or (empty? str-where) (empty? str-order))
            #_(println "fetch logs" str-where str-order)
-           (fetch-device-logs str-where str-order))
+           (fetch-device-logs str-where str-order limit))
          (fn []))
-       #js [str-where str-order]))
+       #js [str-where str-order limit]))
     [:div
      [:h1 "device logs"]
      [:a.btn.btn-outline-primary.btn-sm.m-2 {:on-click #(set-show-config (not show-config))}
       (if show-config "hide config" "show config")]
      [:form.form-control {:style {:display (if show-config "block" "none")}}
-      [render-textarea-with-into "renderer" info-str-renderer parse-error-config-renderer]
-      [render-textarea-with-into "where" info-str-where parse-error-where]
-      [render-textarea-with-into "order" info-str-order parse-error-order]
+      [render-textarea-with-info "renderer" info-str-renderer parse-error-config-renderer]
+      [render-textarea-with-info "where" info-str-where parse-error-where]
+      [render-textarea-with-info "order" info-str-order parse-error-order]
       [:div
-       [render-checkbox-with-into "show graph" info-show-graph]
-       [render-checkbox-with-into "show table" info-show-table]]
+       [render-input "limit" info-limit {:type "number"}]]
+      [:div
+       [render-checkbox-with-info "show graph" info-show-graph]
+       [render-checkbox-with-info "show table" info-show-table]]
       [:a.btn.btn-outline-primary.btn-sm {:on-click on-click-apply} "apply"]]
-     [:div.m-1 "showing " (min (count logs) total) " from " total]
+     [:div.m-1 "got " (min (count logs) total) " from " total]
      (when (get-default-as-bool info-show-graph)
        [:f> log.graph/render-graphs logs-key logs config-renderer])
      (when (get-default-as-bool info-show-table)
