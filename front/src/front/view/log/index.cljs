@@ -107,7 +107,7 @@
         info-show-graph (build-state-info :show-graph (react/useState false) (react/useState false))
         info-show-table (build-state-info :show-table (react/useState true) (react/useState true))
         arr-info [info-limit info-str-renderer info-str-order info-str-where info-show-graph info-show-table]
-        [show-config set-show-config] (react/useState true #_false)
+        [show-config set-show-config] (react/useState false)
         [config-renderer parse-error-config-renderer] (parse-json (:default info-str-renderer))
         [_ parse-error-where] (parse-json (:default info-str-where))
         [_ parse-error-order] (parse-json (:default info-str-order))
