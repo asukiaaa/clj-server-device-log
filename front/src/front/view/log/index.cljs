@@ -1,7 +1,9 @@
 (ns front.view.log.index
   (:require ["react" :as react]
+            [reagent.core :as r]
             [front.view.log.graph :as log.graph]
-            [front.view.log.list :as log.list]))
+            [front.view.log.list :as log.list]
+            [front.model.raw-device-log :as model.log]))
 
 (defn push-params [query-params]
   ;; (println "push-url")
@@ -36,8 +38,10 @@
 
 (defn core []
   (let [query-params (read-params)
+        [logs set-logs] (react/useState [])
+        [total set-total] (react/useState)
+        [limit set-limit] (react/useState 100)
         [str-renderer set-str-renderer] (react/useState (or (:str-renderer query-params) (:str-renderer defaults)))
-        [str-renderer-graph set-str-renderer-graph] (react/useState)
         [str-draft-renderer set-str-draft-renderer] (react/useState str-renderer)
         [str-where set-str-where] (react/useState (or (:str-where query-params) (:str-where defaults)))
         [str-draft-where set-str-draft-where] (react/useState str-where)
@@ -52,6 +56,13 @@
         parse-error-renderer (when (nil? parsed-renderer) (try (parse-renderer) (catch js/Error e e)))
         parse-error-where (try (.parse js/JSON str-where) nil (catch js/Error e e))
         parse-error-order (try (.parse js/JSON str-order) nil (catch js/Error e e))
+        fetch-device-logs (fn [str-where str-order]
+                            (model.log/fetch-list {:str-order str-order
+                                                   :str-where str-where
+                                                   :limit limit
+                                                   :on-receive (fn [logs total]
+                                                                 (set-logs logs)
+                                                                 (set-total total))}))
         on-click-apply
         (fn []
           (let [is-different-renderer (not (= str-renderer str-draft-order))
@@ -87,6 +98,7 @@
     (react/useEffect
      (fn []
        (.addEventListener js/window "popstate" on-pop-state)
+       (fetch-device-logs str-where str-order)
        (fn [] ;; destructor
          (.removeEventListener js/window "popstate" on-pop-state)))
      #js [])
@@ -118,5 +130,6 @@
        [:label.p-2 {:for "show-graph"} "show graph"]]
       [:a.btn.btn-outline-primary.btn-sm {:on-click on-click-apply} "apply"]]
      (when show-graph
-       [:f> log.graph/core str-where str-order config-renderer str-renderer-graph])
-     [:f> log.list/core str-where str-order config-renderer]]))
+       [:f> log.graph/render-graphs (str str-where str-order config-renderer) logs config-renderer])
+     [:div.m-1 "showing: " (count logs) ", total: " total]
+     [:f> log.list/render-table-logs logs config-renderer]]))

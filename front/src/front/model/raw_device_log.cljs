@@ -40,9 +40,9 @@
 
 #_(declare goog.string.format) ; to avoid error of clj-kond
 
-(defn fetch-list [{:keys [where order limit offset on-receive]}]
+(defn fetch-list [{:keys [str-where str-order limit offset on-receive]}]
   (let [query (goog.string.format "{ raw_device_logs(where: \"%s\", order: \"%s\", limit: %d, offset: %d) { total list { id created_at data } } }"
-                                  (escape-str where) (escape-str order) (or limit 100) (or offset 0))]
+                                  (escape-str str-where) (escape-str str-order) (or limit 100) (or offset 0))]
     (re-graph/query query {} (fn [{:keys [data]}]
                                (let [received-total (-> data :raw_device_logs :total)
                                      received-logs  (-> data :raw_device_logs :list)]
