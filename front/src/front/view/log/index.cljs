@@ -97,7 +97,8 @@
 
 (defn core []
   (let [[logs set-logs] (react/useState)
-        [logs-key set-logs-key] (react/useState)
+        [logs-key-fetching set-logs-key-fetching] (react/useState)
+        [logs-key-fetched set-logs-key-fetched] (react/useState)
         [total set-total] (react/useState)
         info-limit (build-state-info :limit (react/useState) (react/useState))
         info-str-renderer (build-state-info :str-renderer (react/useState) (react/useState))
@@ -115,15 +116,17 @@
                                (-> (get-param-str (:key info) query-params)
                                    (set-all-val info))))
         fetch-device-logs (fn [str-where str-order limit]
-                            (model.log/fetch-list
-                             {:str-order str-order
-                              :str-where str-where
-                              :limit limit
-                              :on-receive
-                              (fn [logs total]
-                                (set-logs logs)
-                                (set-total total)
-                                (set-logs-key (str str-where str-order limit)))}))
+                            (let [logs-key (str str-where str-order limit)]
+                              (set-logs-key-fetching logs-key)
+                              (model.log/fetch-list
+                               {:str-order str-order
+                                :str-where str-where
+                                :limit limit
+                                :on-receive
+                                (fn [logs total]
+                                  (set-logs logs)
+                                  (set-total total)
+                                  (set-logs-key-fetched logs-key))})))
         on-click-apply (fn []
                          (->> (for [info arr-info] [(:key info) (:draft info)])
                               (into (sorted-map))
@@ -160,8 +163,11 @@
        [render-checkbox-with-info "show graph" info-show-graph]
        [render-checkbox-with-info "show table" info-show-table]]
       [:a.btn.btn-outline-primary.btn-sm {:on-click on-click-apply} "apply"]]
-     [:div.m-1 "got " (min (count logs) total) " from " total]
-     (when (get-default-as-bool info-show-graph)
-       [:f> log.graph/render-graphs logs-key logs config-renderer])
-     (when (get-default-as-bool info-show-table)
-       [:f> log.list/render-table-logs logs config-renderer])]))
+     (if (or (empty? logs-key-fetched) (not (= logs-key-fetched logs-key-fetching)))
+       [:div.m-1 "fetching"]
+       [:div
+        [:div.m-1 (str "requested " (min (count logs) total) " from " total)]
+        (when (get-default-as-bool info-show-graph)
+          [:f> log.graph/render-graphs logs-key-fetched logs config-renderer])
+        (when (get-default-as-bool info-show-table)
+          [:f> log.list/render-table-logs logs config-renderer])])]))
