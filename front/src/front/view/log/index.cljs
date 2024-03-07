@@ -166,7 +166,7 @@
      (if (or (empty? logs-key-fetched) (not (= logs-key-fetched logs-key-fetching)))
        [:div.m-1 "fetching"]
        [:div
-        [:div.m-1 (str "requested " (min (count logs) total) " from " total)]
+        [:div.m-1 (str "requested " (str (:default info-limit)) " from " total)]
         (when (get-default-as-bool info-show-graph)
           [:f> log.graph/render-graphs logs-key-fetched logs config-renderer])
         (when (get-default-as-bool info-show-table)
