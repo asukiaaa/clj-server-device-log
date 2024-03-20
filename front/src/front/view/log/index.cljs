@@ -150,7 +150,6 @@
          (fn []))
        #js [str-where str-order limit]))
     [:div
-     [:h1 "device logs"]
      [:a.btn.btn-outline-primary.btn-sm.m-2 {:on-click #(set-show-config (not show-config))}
       (if show-config "hide config" "show config")]
      [:form.form-control {:style {:display (if show-config "block" "none")}}

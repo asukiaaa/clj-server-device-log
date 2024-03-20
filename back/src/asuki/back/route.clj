@@ -6,11 +6,14 @@
 
 (def main
   #{["/" :get [html-body handlers/top] :route-name :top]
+    ["/front" :get [html-body handlers/top] :route-name :front-dashboard]
+    ["/front/" :get [html-body handlers/top] :route-name :front-dashboard-with-slash]
+    ["/front/*" :get [html-body handlers/top] :route-name :front]
     ["/graph" :get [html-body handlers/top] :route-name :graph]
     ["/device_logs" :get [html-body handlers/device-logs] :route-name :device-logs]
     ["/device_logs/:id" :get [html-body handlers/device-log]
      :route-name :show-device-log
-     :constraints  {:id #"[0-9]+"}]
+     :constraints {:id #"[0-9]+"}]
     ["/graphql" :post handler-graphql/core :route-name :graphql]
     ["/api/raw_device_log"
      :post [(body-params) handlers/api-raw-device-log]
