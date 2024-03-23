@@ -2,7 +2,6 @@
   (:require [clojure.java.jdbc :as jdbc]
             [asuki.back.config :refer [db-spec]]))
 
-
 (defn init-db []
   ;; (jdbc/get-connection db-spec) ; check connection to db
   (let [table-info (jdbc/query db-spec "Show tables")
