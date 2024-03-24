@@ -4,3 +4,4 @@
 /dest
 /target
 /.shadow-cljs
+/yarn-error.log
