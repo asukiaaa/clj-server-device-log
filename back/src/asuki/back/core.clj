@@ -3,7 +3,8 @@
   (:require [io.pedestal.http :as http]
             [io.pedestal.http.route :as route]
             [ns-tracker.core :refer [ns-tracker]]
-            [asuki.back.models.common :refer [init-db]]
+            [ragtime.repl :as ragr]
+            [asuki.back.config :as config]
             [asuki.back.route :refer [main] :rename {main routes-main}]))
 
 (def modified-namespaces (ns-tracker "src"))
@@ -18,7 +19,6 @@
 (defn start-server [port & args]
   (let [host "0.0.0.0"
         relodable (when-not (nil? args) (.contains args :relodable))]
-    ;; TODO hande relodable
     (println (str "in start-server " host ":" port))
     (-> {::http/routes routes-target
          ::http/port port
@@ -34,15 +34,16 @@
         http/start)
     (println (str "server starts on http://" host ":" port))))
 
-(defn run-relodable
-  [& args]
-  (init-db)
+(defn run-relodable [& args]
   (start-server 3000 :relodable))
 
-(defn -main
-  [& args]
-  (init-db)
-  (let [port (if-let [str-port (System/getenv "PORT")]
-               (read-string str-port)
-               80)]
-    (start-server port)))
+(defn -main [& args]
+  (condp = (first args)
+    "server-with-migration"
+    (fn []
+      (ragr/migrate config/ragtime)
+      (start-server config/port))
+    "server" (start-server config/port)
+    "db" (condp = (second args)
+           "migrate" (ragr/migrate config/ragtime)
+           "rollback" (ragr/rollback config/ragtime))))

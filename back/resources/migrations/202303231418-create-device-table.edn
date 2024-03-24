@@ -1,0 +1,9 @@
+{:up
+ ["CREATE TABLE device(
+   id SERIAL NOT NULL PRIMARY KEY UNIQUE,
+   device_group_id BIGINT UNSIGNED NOT NULL,
+   CONSTRAINT fk_device_device_group FOREIGN KEY(device_group_id) REFERENCES device_group(id),
+   name CHAR(255),
+   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP);"]
+ :down
+ ["DROP TABLE device;"]}

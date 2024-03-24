@@ -1,0 +1,12 @@
+{:up
+ ["CREATE TABLE user(
+   id SERIAL NOT NULL PRIMARY KEY UNIQUE,
+   name CHAR(255) NOT NULL,
+   email CHAR(255) NOT NULL UNIQUE,
+   hash CHAR(255),
+   salt CHAR(255),
+   password_reset JSON,
+   auth JSON,
+   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP);"]
+ :down
+ ["DROP TABLE user;"]}
