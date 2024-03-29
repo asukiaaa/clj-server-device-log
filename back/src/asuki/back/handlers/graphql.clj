@@ -1,5 +1,5 @@
 (ns asuki.back.handlers.graphql
-  (:require [asuki.back.graphql.resolver :as resolver]
+  (:require [asuki.back.graphql.resolver :refer [resolver-map]]
             [clojure.edn :as edn]
             [clojure.java.io :as io]
             [com.walmartlabs.lacinia.pedestal2 :as p2]
@@ -12,7 +12,7 @@
   (-> (io/resource "schema.edn")
       slurp
       edn/read-string
-      (util/attach-resolvers (resolver/resolver-map))
+      (util/attach-resolvers (resolver-map))
       schema/compile))
 
 (defn ^:private extract-user-info

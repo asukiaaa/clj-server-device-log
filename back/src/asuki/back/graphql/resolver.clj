@@ -10,25 +10,5 @@
     {:list logs
      :total total}))
 
-(defn game-by-id
-  [context args _]
-  (println "args in resolve-game-by-id" args)
-  {:id (:id args)
-   :name "zeyo"})
-
-(defn board-game-designers
-  [context args board-game]
-  ;; 第三引数には親オブジェクトが渡る
-  ;; 略
-  )
-
-(defn designer-games
-  [context args designer]
-  ;; 略
-  )
-
 (defn resolver-map []
-  {:query/raw-device-logs raw-device-logs
-   :query/game-by-id game-by-id
-   :BoardGame/designers board-game-designers
-   :Designer/games designer-games})
+  {:query/raw-device-logs raw-device-logs})
