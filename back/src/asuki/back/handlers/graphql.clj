@@ -12,7 +12,7 @@
   (-> (io/resource "schema.edn")
       slurp
       edn/read-string
-      (util/attach-resolvers (resolver-map))
+      (util/inject-resolvers resolver-map)
       schema/compile))
 
 (defn ^:private extract-user-info

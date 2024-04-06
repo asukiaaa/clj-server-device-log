@@ -10,5 +10,5 @@
     {:list logs
      :total total}))
 
-(defn resolver-map []
-  {:query/raw-device-logs raw-device-logs})
+(def resolver-map
+  {:Query/raw_device_logs raw-device-logs})
