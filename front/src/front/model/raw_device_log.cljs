@@ -1,6 +1,6 @@
 (ns front.model.raw-device-log
   (:require [clojure.string :refer [escape]]
-            goog.string.format
+            goog.string
             [re-graph.core :as re-graph]))
 
 (defn get-by-json-key [data json-key]

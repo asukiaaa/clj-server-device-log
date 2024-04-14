@@ -4,6 +4,7 @@
             [re-graph.core :as re-graph]
             [front.view.log.index :as log.index]
             [front.view.login :as login]
+            [front.view.dashboard :as dashboard]
             [front.view.layout :as layout]
             ["react-router-dom" :as router]))
 
@@ -34,7 +35,7 @@
    [:> router/Route {:path "/" :element (r/as-element [:f> layout/core])}
     [:> router/Route {:index true :element (r/as-element [:f> log.index/core])}]
     [:> router/Route {:path "/front"}
-     [:> router/Route {:index true :element (r/as-element [:div "todo front dashboard"])}]
+     [:> router/Route {:index true :element (r/as-element [:f> dashboard/core])}]
      [:> router/Route {:path "login" :element (r/as-element [:f> login/core])}]
      [:> router/Route {:path "users/:id" :element (r/as-element [:f> page-user-show])}]
      [:> router/Route {:path "*" :element (r/as-element [:div "page not found"]) :status 404}]]]])

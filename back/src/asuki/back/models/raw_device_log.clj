@@ -195,7 +195,7 @@
        :total (-> (jdbc/query db-transaction "SELECT FOUND_ROWS()") first vals first)})))
 
 (defn get-by-id [id]
-  (first (jdbc/query db-spec (str "select * from raw_device_log where id = " id))))
+  (first (jdbc/query db-spec ["select * from raw_device_log where id = ?" id])))
 
 (defn create [params]
   (jdbc/insert! db-spec :raw_device_log params))

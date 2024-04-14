@@ -1,5 +1,8 @@
 (ns front.view.login
-  (:require ["react" :as react]))
+  (:require ["react" :as react]
+            [front.model.user :as user]
+            ["react-router-dom" :as router]
+            [front.route :as route]))
 
 (defn render-text-input [{:keys [default set-val label type]}]
   [:<>
@@ -10,7 +13,8 @@
 (defn core []
   (let [[email set-email] (react/useState)
         [password set-password] (react/useState)
-        login (fn [] (println email password))]
+        navigate (router/useNavigate)
+        on-receive #(when-not (empty? %) (navigate route/dashboard))]
     [:div
      [:div.row
       [:div.col-md-4.col-lg-4]
@@ -20,4 +24,9 @@
        [render-text-input {:set-val set-email :label "Email"}]
        [render-text-input {:set-val set-password :label "Password" :type "password"}]
        [:div.mt-2.align-right
-        [:input.btn.btn-outline-primary {:type "button" :on-click login :value "login"}]]]]]))
+        [:input.btn.btn-outline-primary
+         {:type "button"
+          :on-click #(user/login {:email email
+                                  :password password
+                                  :on-receive on-receive})
+          :value "login"}]]]]]))

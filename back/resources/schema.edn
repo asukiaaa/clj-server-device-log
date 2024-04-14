@@ -8,6 +8,11 @@
   {:fields
    {:list {:type (list :RawDeviceLog)}
     :total {:type Int}}}
+  :User
+  {:fields
+   {:id {:type (non-null Int)}
+    :email {:type (non-null String)}
+    :name {:type String}}}
   :Query
   {:fields
    {:raw_device_logs
@@ -15,4 +20,10 @@
      :args {:limit {:type Int}
             :offset {:type Int}
             :where {:type String}
-            :order {:type String}}}}}}}
+            :order {:type String}}}}}
+  :Mutation
+  {:fields
+   {:login
+    {:type :User
+     :args {:email {:type String}
+            :password {:type String}}}}}}}

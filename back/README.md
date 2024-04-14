@@ -60,6 +60,11 @@ curl -X POST ${HOST}/graphql \
 
 ## References
 
+- [Game Rating Mutation](https://lacinia.readthedocs.io/en/latest/tutorial/rating-mutation.html)
+- [samples/buddy-auth/src/buddy_auth/service.clj](https://github.com/pedestal/pedestal/blob/master/samples/buddy-auth/src/buddy_auth/service.clj)
+- [Lacinia アプリ開発 Tips](https://qiita.com/223kazuki/items/50e5f62f19fed751ba40)
+- [buddyでユーザ認証](https://qiita.com/totakke/items/30c0582ad9cdd6a34cba)
+- [jdbc-ring-session](https://github.com/luminus-framework/jdbc-ring-session)
 - [graphqlの動作確認をcurlで実施](https://asukiaaa.blogspot.com/2024/02/test-graphql-with-using-curl.html)
 - [Watch and auto reload a Clojure pedestal service on source change ](https://dev.to/praburajan/watch-and-auto-reload-a-clojure-pedestal-service-on-save-4ehl)
 - [Your First API](http://pedestal.io/guides/your-first-api)

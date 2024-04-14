@@ -4,6 +4,7 @@
             [io.pedestal.http.route :as route]
             [ns-tracker.core :refer [ns-tracker]]
             [ragtime.repl :as ragr]
+            [asuki.back.models.user :as user]
             [asuki.back.config :as config]
             [asuki.back.route :refer [main] :rename {main routes-main}]))
 
@@ -37,13 +38,17 @@
 (defn run-relodable [& args]
   (start-server 3000 :relodable))
 
+(defn migrate []
+  (ragr/migrate config/ragtime)
+  (user/create-sample-admin-if-no-user))
+
 (defn -main [& args]
   (condp = (first args)
     "server-with-migration"
     (fn []
-      (ragr/migrate config/ragtime)
+      (migrate)
       (start-server config/port))
     "server" (start-server config/port)
     "db" (condp = (second args)
-           "migrate" (ragr/migrate config/ragtime)
+           "migrate" (migrate)
            "rollback" (ragr/rollback config/ragtime))))
