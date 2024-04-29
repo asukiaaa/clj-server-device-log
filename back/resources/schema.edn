@@ -26,4 +26,5 @@
    {:login
     {:type :User
      :args {:email {:type String}
-            :password {:type String}}}}}}}
+            :password {:type String}}}
+    :logout {:type Boolean}}}}}

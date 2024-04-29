@@ -57,4 +57,4 @@
                            :password "admin-pass"})))
 
 (defn filter-for-session [user]
-  (select-keys user [:id :name :email :created_at]))
+  (select-keys user [:id]))

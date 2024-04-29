@@ -13,15 +13,13 @@
 
 (defn login [context args _]
   (println "args for login" args)
-  #_(println :body (:body (:request context)))
-  #_(println :session (:session (:request context)))
-  (let [user (:loggedin-user context)]
-    (println user)
-    (println (keys context))
-    #_(println :user-info (:user-info context))
-    #_(println :session (:session (:request context)))
-    user))
+  (let [; error-login (:error-login) ; TODO
+        user-loggedin-now (:user-loggedin-now context)]
+    user-loggedin-now))
+
+(defn logout [_ _ _] true)
 
 (def resolver-map
   {:Query/raw_device_logs raw-device-logs
-   :Mutation/login login})
+   :Mutation/login login
+   :Mutation/logout logout})

@@ -60,6 +60,7 @@ curl -X POST ${HOST}/graphql \
 
 ## References
 
+- [JWT (Json Web Token)](https://funcool.github.io/buddy-sign/latest/01-jwt.html)
 - [Game Rating Mutation](https://lacinia.readthedocs.io/en/latest/tutorial/rating-mutation.html)
 - [samples/buddy-auth/src/buddy_auth/service.clj](https://github.com/pedestal/pedestal/blob/master/samples/buddy-auth/src/buddy_auth/service.clj)
 - [Lacinia アプリ開発 Tips](https://qiita.com/223kazuki/items/50e5f62f19fed751ba40)

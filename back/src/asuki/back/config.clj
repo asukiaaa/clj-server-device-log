@@ -12,6 +12,9 @@
 (def key-auth (or (System/getenv "KEY_AUTHORIZATION")
                   "XXYYZZ"))
 
+(def secret-for-session (or (System/getenv "SECRET_FOR_SESSION")
+                            "secret-for-session-xxyyzz"))
+
 (def port (if-let [str-port (System/getenv "PORT")]
             (read-string str-port)
             80))
