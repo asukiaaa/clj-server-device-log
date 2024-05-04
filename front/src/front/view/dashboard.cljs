@@ -9,4 +9,5 @@
         logout #(navigate route/login)]
     [:div "dashboard TODO"
      [:div "hoge"]
+     [:a {:on-click #(user/get-loggedin {:on-receive (fn [user] (println user))})} "get"]
      [:a {:on-click #(user/logout {:on-receive logout})} "logout"]]))

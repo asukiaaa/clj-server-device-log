@@ -20,7 +20,8 @@
      :args {:limit {:type Int}
             :offset {:type Int}
             :where {:type String}
-            :order {:type String}}}}}
+            :order {:type String}}}
+    :user_loggedin {:type :User}}}
   :Mutation
   {:fields
    {:login

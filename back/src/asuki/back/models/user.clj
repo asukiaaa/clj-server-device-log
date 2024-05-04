@@ -22,6 +22,9 @@
 (defn get-by-email [email & [{:keys [transaction]}]]
   (first (jdbc/query (or transaction db-spec) ["SELECT * FROM user WHERE email = ?" email])))
 
+(defn get-by-id [id & [{:keys [transaction]}]]
+  (first (jdbc/query (or transaction db-spec) ["SELECT * FROM user WHERE id = ?" id])))
+
 (defn create-with-password [params]
   (let [email (:email params)
         password (:password params)

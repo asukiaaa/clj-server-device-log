@@ -11,3 +11,8 @@
 (defn logout [{:keys [on-receive]}]
   (re-graph/mutate "{ logout }" () (fn [{:keys [data]}]
                                      (on-receive (:logout data)))))
+
+(defn get-loggedin [{:keys [on-receive]}]
+  (let [query (goog.string.format "{ user_loggedin { id email name } }")]
+    (re-graph/query query () (fn [{:keys [data]}]
+                               (on-receive (:user_loggedin data))))))
