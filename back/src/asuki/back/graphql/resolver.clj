@@ -18,7 +18,9 @@
         user-loggedin-now (:user-loggedin-now context)]
     user-loggedin-now))
 
-(defn logout [_ _ _] true)
+(defn logout [_ _ _]
+  (println "received logout request")
+  true)
 
 (defn user-loggedin [context args _]
   (println "args for user-loggedin" args)

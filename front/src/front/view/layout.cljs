@@ -2,15 +2,14 @@
   (:require ["react" :as react]
             ["react-router-dom" :as router]
             [front.model.user :as user]
-            [front.route :as route]))
+            [front.route :as route]
+            [front.model.user :as model.user]))
 
 (defn core []
   (let [location (router/useLocation)
         navigate (router/useNavigate)
         [user set-user] (react/useState nil)
-        logout (fn []
-                 (set-user nil)
-                 (navigate route/login))]
+        logout (fn [] (model.user/logout {:on-receive #(navigate route/login)}))]
     (react/useEffect
      (fn [] (user/get-loggedin {:on-receive #(set-user %)})
        (fn []))
