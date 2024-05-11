@@ -15,15 +15,16 @@
 ;https://reactrouter.com/en/main/routers/create-browser-router
 (def app-router
   (router/createBrowserRouter
-   (clj->js [{:path "/"
-              :element (r/as-element [:f> layout/core])
-              :children
-              [{:index true :element (r/as-element [:f> log.index/core])}
-               {:path "front"
-                :children
-                [{:index true :element (r/as-element [:f> dashboard/core])}
-                 {:path "login" :element (r/as-element [:f> login/core])}
-                 {:path "*" :element (r/as-element [:div "page not found"]) :status 404}]}]}])))
+   (clj->js
+    [{:path "/"
+      :element (r/as-element [:f> layout/core])
+      :children
+      [{:index true :element (r/as-element [:f> log.index/core])}
+       {:path "front"
+        :children
+        [{:index true :element (r/as-element [:f> dashboard/core])}
+         {:path "login" :element (r/as-element [:f> login/core])}
+         {:path "*" :element (r/as-element [:div "page not found"]) :status 404}]}]}])))
 
 (defonce root (rc/create-root (.getElementById js/document "app")))
 
