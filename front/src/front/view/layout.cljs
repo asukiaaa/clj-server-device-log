@@ -5,15 +5,23 @@
             [front.route :as route]
             [front.model.user :as model.user]))
 
+(def loader
+  ; https://gist.github.com/pesterhazy/c4bab748214d2d59883e05339ce22a0f#asynchronous-conditionals
+  (fn []
+    (js/Promise.
+     (fn [resolve _reject]
+       (model.user/get-loggedin
+        {:on-receive (fn [user]
+                       (println :received-user user)
+                       (resolve user))})))))
+
 (defn core []
-  (let [location (router/useLocation)
-        navigate (router/useNavigate)
-        [user set-user] (react/useState nil)
-        logout (fn [] (model.user/logout {:on-receive #(navigate route/login)}))]
-    (react/useEffect
-     (fn [] (user/get-loggedin {:on-receive #(set-user %)})
-       (fn []))
-     (clj->js [location]))
+  (let [navigate (router/useNavigate)
+        revalidator (router/useRevalidator)
+        user (router/useRouteLoaderData "user-loggedin")
+        logout (fn [] (model.user/logout {:on-receive (fn []
+                                                        (.revalidate revalidator)
+                                                        (navigate route/login))}))]
     [:div
      [:nav.navbar.bg-body-tertiary.border-bottom
       [:div.container-fluid

@@ -14,7 +14,11 @@
   (let [[email set-email] (react/useState)
         [password set-password] (react/useState)
         navigate (router/useNavigate)
-        on-receive #(when-not (empty? %) (navigate route/dashboard))]
+        revalidator (router/useRevalidator)
+        on-receive #(when-not (empty? %)
+                      (do
+                        (.revalidate revalidator)
+                        (navigate route/dashboard)))]
     [:div
      [:div.row
       [:div.col-md-4.col-lg-4]
