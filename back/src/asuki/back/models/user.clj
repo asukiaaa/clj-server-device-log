@@ -3,7 +3,8 @@
             [clojure.string :as cstr]
             [buddy.core.hash :as bhash]
             [buddy.core.codecs :as codecs]
-            [asuki.back.config :refer [db-spec]]))
+            [asuki.back.config :refer [db-spec]]
+            [asuki.back.models.util :as model.util]))
 
 (defn build-hash [password salt]
   (-> (str password salt) bhash/sha3-512 codecs/bytes->hex))
@@ -58,6 +59,10 @@
     (create-with-password {:email "admin@example.com"
                            :name "admin"
                            :password "admin-pass"})))
+
+(defn get-list-with-total [args]
+  (let [str-query "SELECT * FROM user;"]
+    (model.util/get-list-with-total str-query)))
 
 (defn filter-for-session [user]
   (select-keys user [:id]))

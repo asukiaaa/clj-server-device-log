@@ -6,11 +6,7 @@
 (defn raw-device-logs
   [_ args _]
   (println "args for raw-device-logs" args)
-  (let [records-and-total (model-raw-device-log/get-records-with-total args)
-        logs (:records records-and-total)
-        total (:total records-and-total)]
-    {:list logs
-     :total total}))
+  (model-raw-device-log/get-list-with-total args))
 
 (defn login [context args _]
   (println "args for login" args)
@@ -18,19 +14,30 @@
         user-loggedin-now (:user-loggedin-now context)]
     user-loggedin-now))
 
+(defn get-user-loggedin [context]
+  (:user-loggedin context))
+
 (defn logout [_ _ _]
   (println "received logout request")
   true)
 
 (defn user-loggedin [context args _]
   (println "args for user-loggedin" args)
-  (let [context-user-loggedin (:user-loggedin context)]
+  (let [user-loggedin (get-user-loggedin context)]
     #_(println context-user-loggedin)
-    (when-let [id (:id context-user-loggedin)]
+    (when-let [id (:id user-loggedin)]
       (model.user/get-by-id id))))
+
+(defn users [context args _]
+  (println "args for users" args)
+  (let [user-loggedin (get-user-loggedin context)]
+    ; TODO show only admin
+    (when-not (empty? user-loggedin)
+      (model.user/get-list-with-total args))))
 
 (def resolver-map
   {:Query/raw_device_logs raw-device-logs
    :Query/user_loggedin user-loggedin
+   :Query/users users
    :Mutation/login login
    :Mutation/logout logout})

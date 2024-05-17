@@ -13,10 +13,20 @@
    {:id {:type (non-null Int)}
     :email {:type (non-null String)}
     :name {:type String}}}
+  :Users
+  {:fields
+   {:list {:type (list :User)}
+    :total {:type Int}}}
   :Query
   {:fields
    {:raw_device_logs
     {:type :RawDeviceLogs
+     :args {:limit {:type Int}
+            :offset {:type Int}
+            :where {:type String}
+            :order {:type String}}}
+    :users
+    {:type Users
      :args {:limit {:type Int}
             :offset {:type Int}
             :where {:type String}

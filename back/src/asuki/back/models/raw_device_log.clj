@@ -6,7 +6,8 @@
             [clojure.walk :as walk]
             [clj-time.core :as t]
             [clj-time.format :as f]
-            [asuki.back.config :refer [db-spec]]))
+            [asuki.back.config :refer [db-spec]]
+            [asuki.back.models.util :as model.util]))
 
 (def defaults
   {:limit 100
@@ -170,8 +171,8 @@
       (println "query for select-max-group-by" query)
       query)))
 
-(defn get-records-with-total [& [args]]
-  (println "get-records-with-total" args)
+(defn get-list-with-total [& [args]]
+  (println "get-list-with-total" args)
   (let [limit (or (:limit args) (:limit defaults))
         order (when-let [str-order (:order args)]
                 (json/read-str str-order))
@@ -190,7 +191,8 @@
                              (build-query-order order base-table-key)
                              "LIMIT " limit])]
     (println "str-query " str-query)
-    (jdbc/with-db-transaction [db-transaction db-spec]
+    (model.util/get-list-with-total [str-query])
+    #_(jdbc/with-db-transaction [db-transaction db-spec]
       {:records (jdbc/query db-transaction str-query)
        :total (-> (jdbc/query db-transaction "SELECT FOUND_ROWS()") first vals first)})))
 

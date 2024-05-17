@@ -49,9 +49,9 @@
                 [:div "no user"]))}))
 
 (defn device-logs [req]
-  (let [records-and-total (model-raw-device-log/get-records-with-total)
-        ;; total (:total records-and-total)
-        logs (:records records-and-total)]
+  (let [list-and-total (model-raw-device-log/get-list-with-total)
+        ;; total (:total list-and-total)
+        logs (:list list-and-total)]
     {:status 200
      :body (html5
             [:div

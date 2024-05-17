@@ -6,6 +6,7 @@
             [front.view.login :as login]
             [front.view.dashboard :as dashboard]
             [front.view.layout :as layout]
+            [front.view.users.index :as user.index]
             ["react-router-dom" :as router]))
 
 (re-graph/init {:http {:url "/graphql"
@@ -26,6 +27,7 @@
         :children
         [{:index true :element (r/as-element [:f> dashboard/core])}
          {:path "login" :element (r/as-element [:f> login/core])}
+         {:path "users" :element (r/as-element [:f> user.index/core])}
          {:path "*" :element (r/as-element [:div "page not found"]) :status 404}]}]}])))
 
 (defonce root (rc/create-root (.getElementById js/document "app")))

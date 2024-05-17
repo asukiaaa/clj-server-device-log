@@ -5,15 +5,11 @@
             [front.route :as route]
             [front.model.user :as model.user]))
 
-(def loader
+(defn loader []
   ; https://gist.github.com/pesterhazy/c4bab748214d2d59883e05339ce22a0f#asynchronous-conditionals
-  (fn []
-    (js/Promise.
-     (fn [resolve _reject]
-       (model.user/get-loggedin
-        {:on-receive (fn [user]
-                       (println :received-user user)
-                       (resolve user))})))))
+  (js/Promise.
+   (fn [resolve _reject]
+     (model.user/get-loggedin {:on-receive #(resolve %)}))))
 
 (defn core []
   (let [navigate (router/useNavigate)

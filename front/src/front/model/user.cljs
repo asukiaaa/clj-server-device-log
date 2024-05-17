@@ -16,3 +16,8 @@
   (let [query (goog.string.format "{ user_loggedin { id email name } }")]
     (re-graph/query query () (fn [{:keys [data]}]
                                (on-receive (:user_loggedin data))))))
+
+(defn fetch-list-and-total [{:keys [on-receive]}]
+  (let [query "{ users { total list { id email name } } }"]
+    (re-graph/query query () (fn [{:keys [data]}]
+                               (on-receive (:users data))))))
