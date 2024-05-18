@@ -12,7 +12,10 @@
   {:fields
    {:id {:type (non-null Int)}
     :email {:type (non-null String)}
-    :name {:type String}}}
+    :name {:type String}
+    :permission {:type String}
+    :created_at {:type String}
+    :updated_at {:type String}}}
   :Users
   {:fields
    {:list {:type (list :User)}
@@ -31,6 +34,9 @@
             :offset {:type Int}
             :where {:type String}
             :order {:type String}}}
+    :user
+    {:type User
+     :args {:id {:type Int}}}
     :user_loggedin {:type :User}}}
   :Mutation
   {:fields

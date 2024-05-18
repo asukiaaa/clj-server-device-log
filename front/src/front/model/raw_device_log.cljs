@@ -1,6 +1,6 @@
 (ns front.model.raw-device-log
-  (:require [clojure.string :refer [escape]]
-            goog.string
+  (:require goog.string
+            [front.model.util :refer [escape-str]]
             [re-graph.core :as re-graph]))
 
 (defn get-by-json-key [data json-key]
@@ -32,13 +32,6 @@
                          :else nil))
         json-key (when-not (string? val-key) (rest val-key))]
     (get-by-json-key target-field json-key)))
-
-(defn escape-str [text]
-  (when-not (nil? text)
-    (escape text {\" "\\\""
-                  \\ "\\\\"})))
-
-#_(declare goog.string.format) ; to avoid error of clj-kond
 
 (defn fetch-list [{:keys [str-where str-order limit offset on-receive]}]
   (let [query (goog.string.format "{ raw_device_logs(where: \"%s\", order: \"%s\", limit: %d, offset: %d) { total list { id created_at data } } }"

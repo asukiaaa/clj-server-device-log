@@ -12,14 +12,6 @@
 (defn random-str [len]
   (apply str (repeatedly len #(rand-nth "abcdefghijklmnopqrstuvwxyz0123456789:[]\\/.,\"!#$%&'()-^"))))
 
-(defn get-all []
-  (jdbc/query db-spec "SELECT * FROM user"))
-
-(defn get-by-id [id]
-  (first (jdbc/query db-spec
-                     #_(str "SELECT * FROM user WHERE id = " id)
-                     ["SELECT * FROM user WHERE id = ?" id])))
-
 (defn get-by-email [email & [{:keys [transaction]}]]
   (first (jdbc/query (or transaction db-spec) ["SELECT * FROM user WHERE email = ?" email])))
 

@@ -35,9 +35,18 @@
     (when-not (empty? user-loggedin)
       (model.user/get-list-with-total args))))
 
+(defn user [context args _]
+  (println "args for user" args)
+  (let [user-loggedin (get-user-loggedin context)
+        id-user (:id args)]
+   ; TODO show only admin
+    (when (and (seq user-loggedin) (integer? id-user))
+      (model.user/get-by-id id-user))))
+
 (def resolver-map
   {:Query/raw_device_logs raw-device-logs
-   :Query/user_loggedin user-loggedin
    :Query/users users
+   :Query/user user
+   :Query/user_loggedin user-loggedin
    :Mutation/login login
    :Mutation/logout logout})
