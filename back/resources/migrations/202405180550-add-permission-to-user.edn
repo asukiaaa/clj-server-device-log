@@ -1,0 +1,5 @@
+{:up
+ ["ALTER TABLE user ADD COLUMN
+   permission JSON AFTER auth;"]
+ :down
+ ["ALTER TABLE user DROP COLUMN permission;"]}

@@ -9,7 +9,7 @@ A project to practice of creating web server in clojure.
 ## Usage
 
 ```sh
-clj -X:run db migrate
+clj -M:run db migrate
 clj -X:dev
 ```
 

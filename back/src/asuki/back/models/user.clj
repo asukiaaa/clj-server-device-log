@@ -58,7 +58,8 @@
   (when (= (get-total-count) 0)
     (create-with-password {:email "admin@example.com"
                            :name "admin"
-                           :password "admin-pass"})))
+                           :password "admin-pass"
+                           :permission "{\"role\": \"admin\"}"})))
 
 (defn get-list-with-total [args]
   (let [str-query "SELECT * FROM user;"]
