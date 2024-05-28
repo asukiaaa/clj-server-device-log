@@ -25,5 +25,7 @@
        [:ul.nav.justify-content-end
         (if (nil? user)
           [:li.nav-item [:> router/Link {:to route/login :class "nav-link"} "Login"]]
-          [:li.nav-item [:a {:on-click logout :class "nav-link"} "Logout"]])]]]
+          [:<>
+           [:li.nav-item [:> router/Link {:to route/dashboard :class "nav-link"} "Dashboard"]]
+           [:li.nav-item [:a {:on-click logout :class "nav-link"} "Logout"]]])]]]
      [:> router/Outlet]]))

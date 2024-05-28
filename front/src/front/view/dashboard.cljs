@@ -7,7 +7,5 @@
 (defn core []
   (let [navigate (router/useNavigate)
         logout #(navigate route/login)]
-    [:div "dashboard TODO"
-     [:div "hoge"]
-     [:a {:on-click #(user/get-loggedin {:on-receive (fn [user] (println user))})} "get"]
-     [:a {:on-click #(user/logout {:on-receive logout})} "logout"]]))
+    [:div.list-group
+     [:> router/Link {:to route/users :class "list-group-item list-group-item-action"} "users"]]))

@@ -24,6 +24,7 @@
        (fn []))
      #js [])
     [:div
+     [:> router/Link {:to route/user-create} "new"]
      [:div "total " total]
      [:table.table.table-sm
       [:thead

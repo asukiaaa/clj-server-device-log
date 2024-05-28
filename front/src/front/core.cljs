@@ -8,6 +8,7 @@
             [front.view.layout :as layout]
             [front.view.users.index :as user.index]
             [front.view.users.show :as user.show]
+            [front.view.users.create :as user.create]
             ["react-router-dom" :as router]))
 
 (re-graph/init {:http {:url "/graphql"
@@ -31,6 +32,7 @@
          {:path "users"
           :children
           [{:index true :element (r/as-element [:f> user.index/core])}
+           {:path "create" :element (r/as-element [:f> user.create/core])}
            {:path ":idUser" :element (r/as-element [:f> user.show/core])}]}
          {:path "*" :element (r/as-element [:div "page not found"]) :status 404}]}]}])))
 

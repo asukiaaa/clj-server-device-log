@@ -43,10 +43,24 @@
     (when (and (seq user-loggedin) (integer? id-user))
       (model.user/get-by-id id-user))))
 
+(defn user-create [context args _]
+  (println "args user-create" args)
+  (let [user-loggedin (get-user-loggedin context)
+        user-args (:user args)
+        user-create-result (model.user/create-with-password user-args)
+        user (:user user-create-result)
+        errors (:errors user-create-result)]
+    ; TODO handle only admin
+    ; TODO support creating password reset url
+    (if (seq user)
+      {:user user}
+      {:errors errors})))
+
 (def resolver-map
   {:Query/raw_device_logs raw-device-logs
    :Query/users users
    :Query/user user
    :Query/user_loggedin user-loggedin
+   :Mutation/user user-create
    :Mutation/login login
    :Mutation/logout logout})

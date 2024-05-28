@@ -1,4 +1,11 @@
-{:objects
+{:input-objects
+ {:UserInput
+  {:fields
+   {:email {:type (non-null String)}
+    :name {:type String}
+    :permission {:type String}
+    :password {:type String}}}}
+ :objects
  {:RawDeviceLog
   {:fields
    {:id {:type (non-null Int)}
@@ -16,9 +23,14 @@
     :permission {:type String}
     :created_at {:type String}
     :updated_at {:type String}}}
+  :UserCreateResponse
+  {:fields
+   {:errors {:type String}
+    :user {:type User}
+    :url_password_reset {:type String}}}
   :Users
   {:fields
-   {:list {:type (list :User)}
+   {:list {:type (list User)}
     :total {:type Int}}}
   :Query
   {:fields
@@ -40,8 +52,12 @@
     :user_loggedin {:type :User}}}
   :Mutation
   {:fields
-   {:login
-    {:type :User
+   {:user
+    {:type UserCreateResponse
+     :args {:user {:type UserInput}
+            :requireUrlPasswordReset {:type Boolean}}}
+    :login
+    {:type User
      :args {:email {:type String}
             :password {:type String}}}
     :logout {:type Boolean}}}}}
