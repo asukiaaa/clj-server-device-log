@@ -1,15 +1,38 @@
 (ns front.view.layout
   (:require ["react" :as react]
             ["react-router-dom" :as router]
+            [clojure.walk :refer [keywordize-keys]]
+            [clojure.string :refer [includes?]]
+            [lambdaisland.uri :as lamb.uri]
             [front.model.user :as user]
             [front.route :as route]
             [front.model.user :as model.user]))
 
-(defn loader []
+(defn loader [js-params]
+  (let [{:keys [request]} (-> js-params js->clj keywordize-keys)
+        url (.-url request)
+        uri (lamb.uri/uri url)
+        path (:path uri)
+        show-loginpage-when-not-loggedin (and (includes? path "/front") (not (includes? path route/login)))]
+    #_(js/console.log request)
+    (println show-loginpage-when-not-loggedin)
   ; https://gist.github.com/pesterhazy/c4bab748214d2d59883e05339ce22a0f#asynchronous-conditionals
-  (js/Promise.
-   (fn [resolve _reject]
-     (model.user/get-loggedin {:on-receive #(resolve %)}))))
+    (js/Promise.
+     (fn [resolve _reject]
+       (model.user/get-loggedin
+        {:on-receive
+         (fn [user]
+           (println :user user)
+           #_(resolve user)
+           (if user
+             (resolve user)
+             (if show-loginpage-when-not-loggedin
+               (let [query (:query uri)
+                     path-afetr-login (str path "?" query)
+                     encoded-path-after-login (js/escape path-afetr-login)]
+                 (println path-afetr-login encoded-path-after-login)
+                 (resolve (router/redirect (str route/login "?path_after_login=" encoded-path-after-login))))
+               (resolve nil))))})))))
 
 (defn core []
   (let [navigate (router/useNavigate)

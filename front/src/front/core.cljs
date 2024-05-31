@@ -22,6 +22,7 @@
     [{:path "/"
       :id "user-loggedin"
       :loader layout/loader
+      :shouldRevalidate (fn [] true)
       :element (r/as-element [:f> layout/core])
       :children
       [{:index true :element (r/as-element [:f> log.index/core])}

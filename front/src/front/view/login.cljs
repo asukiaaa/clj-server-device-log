@@ -11,14 +11,16 @@
                          :on-change (fn [e] (set-val (-> e .-target .-value)))}]])
 
 (defn core []
-  (let [[email set-email] (react/useState)
+  (let [[search-params _set-search-params] (router/useSearchParams)
+        path-afetr-login (or (.get search-params "path_after_login") route/dashboard)
+        [email set-email] (react/useState)
         [password set-password] (react/useState)
         navigate (router/useNavigate)
         revalidator (router/useRevalidator)
         on-receive #(when-not (empty? %)
                       (do
                         (.revalidate revalidator)
-                        (navigate route/dashboard)))]
+                        (navigate path-afetr-login)))]
     [:div
      [:div.row
       [:div.col-md-4.col-lg-4]
