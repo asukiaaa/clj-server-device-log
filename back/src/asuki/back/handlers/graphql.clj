@@ -65,14 +65,9 @@
                 (jwt/unsign (-> context :request :session :user) config/secret-for-session)
                 (catch Exception e (println "catched" (.getMessage e))))
               user-loggedin (if (not (empty? user-loggedin-now))
-                              (model.user/filter-for-session user-loggedin-now)
-                              user-in-session)]
-          #_(println :user-loggedin-now user-loggedin-now)
-          #_(println :user-in-session user-in-session)
-          #_(println :user-loggedin user-loggedin)
+                              user-loggedin-now
+                              (model.user/get-by-id (:id user-in-session)))]
           (cond-> context
-            (not (empty? user-loggedin-now))
-            (assoc-in [:request :lacinia-app-context :user-loggedin-now] user-loggedin-now)
             (not (empty? user-loggedin))
             (assoc-in [:request :lacinia-app-context :user-loggedin] user-loggedin)))))
     :leave
@@ -81,7 +76,6 @@
         (if (has-query-of-logout? context)
           (assoc-in context [:response :session] (dissoc session :user))
           (if-let [user (or (-> context :request :lacinia-app-context :user-loggedin))]
-            ; TODO encrypt user data
             (assoc-in context [:response :session]
                       (assoc session :user
                              (jwt/sign user config/secret-for-session)))

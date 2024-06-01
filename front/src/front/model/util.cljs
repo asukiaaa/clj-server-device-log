@@ -5,3 +5,6 @@
   (when-not (nil? text)
     (escape text {\" "\\\""
                   \\ "\\\\"})))
+
+(defn build-error-messages [errors]
+  (for [e errors] (:message e)))

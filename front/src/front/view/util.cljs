@@ -1,5 +1,5 @@
 (ns front.view.util
-  (:require ["react" :as react]))
+  (:require [clojure.walk :refer [keywordize-keys]]))
 
 (defn build-state-info [key build-state]
   (let [state-default (build-state)

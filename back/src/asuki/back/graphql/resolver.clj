@@ -1,7 +1,15 @@
 (ns asuki.back.graphql.resolver
   (:require [asuki.back.models.raw-device-log :as model-raw-device-log]
             [asuki.back.models.user :as model.user]
-            [com.walmartlabs.lacinia.resolve :as resolve]))
+            [com.walmartlabs.lacinia.resolve :refer [resolve-as]]))
+
+(defn get-user-loggedin [context]
+  (:user-loggedin context))
+
+(defn handle-only-for-admin [context fn-to-handle]
+  (if (model.user/admin? (get-user-loggedin context))
+    (fn-to-handle)
+    (resolve-as nil {:message "no permission to handle"})))
 
 (defn raw-device-logs
   [_ args _]
@@ -10,11 +18,6 @@
 
 (defn login [context args _]
   (println "args for login" args)
-  (let [; error-login (:error-login) ; TODO
-        user-loggedin-now (:user-loggedin-now context)]
-    user-loggedin-now))
-
-(defn get-user-loggedin [context]
   (:user-loggedin context))
 
 (defn logout [_ _ _]
@@ -24,37 +27,35 @@
 (defn user-loggedin [context args _]
   (println "args for user-loggedin" args)
   (let [user-loggedin (get-user-loggedin context)]
-    #_(println context-user-loggedin)
     (when-let [id (:id user-loggedin)]
       (model.user/get-by-id id))))
 
 (defn users [context args _]
   (println "args for users" args)
-  (let [user-loggedin (get-user-loggedin context)]
-    ; TODO show only admin
-    (when-not (empty? user-loggedin)
-      (model.user/get-list-with-total args))))
+  (handle-only-for-admin
+   context
+   (fn [] (model.user/get-list-with-total args))))
 
 (defn user [context args _]
   (println "args for user" args)
-  (let [user-loggedin (get-user-loggedin context)
-        id-user (:id args)]
-   ; TODO show only admin
-    (when (and (seq user-loggedin) (integer? id-user))
-      (model.user/get-by-id id-user))))
+  (handle-only-for-admin
+   context
+   (fn []
+     (when-let [id-user (:id args)]
+       (model.user/get-by-id id-user)))))
 
 (defn user-create [context args _]
   (println "args user-create" args)
-  (let [user-loggedin (get-user-loggedin context)
-        user-args (:user args)
-        user-create-result (model.user/create-with-password user-args)
-        user (:user user-create-result)
-        errors (:errors user-create-result)]
-    ; TODO handle only admin
-    ; TODO support creating password reset url
-    (if (seq user)
-      {:user user}
-      {:errors errors})))
+  (handle-only-for-admin
+   context
+   (fn []
+     (let [user-args (:user args)
+           user-create-result (model.user/create-with-password user-args)
+           user (:user user-create-result)
+           errors (:errors user-create-result)]
+       (if (seq user)
+         {:user user}
+         {:errors errors})))))
 
 (def resolver-map
   {:Query/raw_device_logs raw-device-logs

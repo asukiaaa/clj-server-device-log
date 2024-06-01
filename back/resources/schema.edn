@@ -11,7 +11,7 @@
    {:id {:type (non-null Int)}
     :data {:type String}
     :created_at {:type String}}}
-  :RawDeviceLogs
+  :ResponseRawDeviceLogListTotal
   {:fields
    {:list {:type (list :RawDeviceLog)}
     :total {:type Int}}}
@@ -23,25 +23,25 @@
     :permission {:type String}
     :created_at {:type String}
     :updated_at {:type String}}}
-  :UserCreateResponse
+  :ResponseUserCreate
   {:fields
    {:errors {:type String}
     :user {:type User}
     :url_password_reset {:type String}}}
-  :Users
+  :ResponseUserListTotal
   {:fields
    {:list {:type (list User)}
     :total {:type Int}}}
   :Query
   {:fields
    {:raw_device_logs
-    {:type :RawDeviceLogs
+    {:type ResponseRawDeviceLogListTotal
      :args {:limit {:type Int}
             :offset {:type Int}
             :where {:type String}
             :order {:type String}}}
     :users
-    {:type Users
+    {:type ResponseUserListTotal
      :args {:limit {:type Int}
             :offset {:type Int}
             :where {:type String}
@@ -53,7 +53,7 @@
   :Mutation
   {:fields
    {:user
-    {:type UserCreateResponse
+    {:type ResponseUserCreate
      :args {:user {:type UserInput}
             :requireUrlPasswordReset {:type Boolean}}}
     :login

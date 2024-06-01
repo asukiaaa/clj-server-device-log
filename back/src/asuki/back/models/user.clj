@@ -6,6 +6,9 @@
             [asuki.back.config :refer [db-spec]]
             [asuki.back.models.util :as model.util]))
 
+(defn admin? [user]
+  (-> user :permission json/read-json :role (= "admin")))
+
 (defn build-hash [password salt]
   (-> (str password salt) bhash/sha3-512 codecs/bytes->hex))
 

@@ -3,6 +3,7 @@
             [front.view.log.graph :as log.graph]
             [front.view.log.list :as log.list]
             [front.model.raw-device-log :as model.log]
+            [front.view.common-layout :as common-layout]
             [front.view.util :refer [build-state-info render-checkbox render-input render-textarea]]))
 
 (defn push-params [query-params]
@@ -57,8 +58,9 @@
   (= "true" (:default info)))
 
 (defn core []
-  (let [[logs set-logs] (react/useState)
-        [logs-key-fetching set-logs-key-fetching] (react/useState)
+  (let [info-common-layout (common-layout/build-info #(react/useState))
+        fetching (:fetching info-common-layout)
+        [logs set-logs] (react/useState)
         [logs-key-fetched set-logs-key-fetched] (react/useState)
         [total set-total] (react/useState)
         info-limit (build-state-info :limit #(react/useState))
@@ -78,16 +80,17 @@
                                    (set-all-val info))))
         fetch-device-logs (fn [str-where str-order limit]
                             (let [logs-key (str str-where str-order limit)]
-                              (set-logs-key-fetching logs-key)
+                              (common-layout/fetch-start info-common-layout)
                               (model.log/fetch-list
                                {:str-order str-order
                                 :str-where str-where
                                 :limit limit
                                 :on-receive
-                                (fn [logs total]
+                                (fn [logs total errors]
                                   (set-logs logs)
                                   (set-total total)
-                                  (set-logs-key-fetched logs-key))})))
+                                  (set-logs-key-fetched logs-key)
+                                  (common-layout/fetch-finished info-common-layout errors))})))
         on-click-apply (fn []
                          (->> (for [info arr-info] [(:key info) (:draft info)])
                               (into (sorted-map))
@@ -122,12 +125,12 @@
       [:div
        [render-checkbox "show graph" info-show-graph]
        [render-checkbox "show table" info-show-table]]
-      [:a.btn.btn-outline-primary.btn-sm {:on-click on-click-apply} "apply"]]
-     (if (or (empty? logs-key-fetched) (not (= logs-key-fetched logs-key-fetching)))
-       [:div.m-1 "fetching"]
-       [:div
-        [:div.m-1 (str "requested " (str (:default info-limit)) " from " total)]
-        (when (get-default-as-bool info-show-graph)
-          [:f> log.graph/render-graphs logs-key-fetched logs config-renderer])
-        (when (get-default-as-bool info-show-table)
-          [:f> log.list/render-table-logs logs config-renderer])])]))
+      [:a.btn.btn-outline-primary.btn-sm {:on-click on-click-apply :class (when fetching "disabled")} "apply"]]
+     (common-layout/wrapper
+      info-common-layout
+      [:div
+       [:div.m-1 (str "requested " (str (:default info-limit)) " from " total)]
+       (when (get-default-as-bool info-show-graph)
+         [:f> log.graph/render-graphs logs-key-fetched logs config-renderer])
+       (when (get-default-as-bool info-show-table)
+         [:f> log.list/render-table-logs logs config-renderer])])]))
