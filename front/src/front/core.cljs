@@ -8,6 +8,7 @@
             [front.view.layout :as layout]
             [front.view.users.index :as user.index]
             [front.view.users.show :as user.show]
+            [front.view.page404 :as page404]
             [front.view.users.create :as user.create]
             ["react-router-dom" :as router]))
 
@@ -35,7 +36,7 @@
           [{:index true :element (r/as-element [:f> user.index/core])}
            {:path "create" :element (r/as-element [:f> user.create/core])}
            {:path ":idUser" :element (r/as-element [:f> user.show/core])}]}
-         {:path "*" :element (r/as-element [:div "page not found"]) :status 404}]}]}])))
+         {:path "*" :element (r/as-element page404/core) :status 404}]}]}])))
 
 (defonce root (rc/create-root (.getElementById js/document "app")))
 

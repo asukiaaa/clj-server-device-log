@@ -2,25 +2,25 @@
   (:require ["react" :as react]
             ["react-router-dom" :as router]
             [front.route :as route]
-            [front.view.common-layout :as common-layout]
+            [front.view.common.wrapper.fetching :as wrapper.fetching]
             [front.model.user :as model.user]))
 
 (defn core []
   (let [params (js->clj (router/useParams))
         id-user (get params "idUser")
         [user set-user] (react/useState)
-        info-common-layout (common-layout/build-info #(react/useState))]
+        info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))]
     (react/useEffect
      (fn []
-       (common-layout/fetch-start info-common-layout)
+       (wrapper.fetching/start info-wrapper-fetching)
        (model.user/fetch-by-id {:id id-user
                                 :on-receive (fn [user errors]
                                               (set-user user)
-                                              (common-layout/fetch-finished info-common-layout errors))})
+                                              (wrapper.fetching/finished info-wrapper-fetching errors))})
        (fn []))
      #js [])
-    (common-layout/wrapper
-     {:info info-common-layout
+    (wrapper.fetching/wrapper
+     {:info info-wrapper-fetching
       :renderer
       (if (empty? user)
         [:div "no data"]

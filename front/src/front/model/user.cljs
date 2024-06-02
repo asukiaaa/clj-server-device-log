@@ -7,6 +7,9 @@
 (def keys-for-user [:id :email :name :permission :created_at :updated_at])
 (def str-keys-for-user (clojure.string/join " " (map name keys-for-user)))
 
+(defn admin? [user]
+  (->> user :permission #(.parse js/JSON) :role (= "admin")))
+
 (defn login [{:keys [email password on-receive]}]
   (let [mutation (goog.string.format "{ login(email: \"%s\", password: \"%s\") { id email name } }"
                                      (escape-str email) (escape-str password))]

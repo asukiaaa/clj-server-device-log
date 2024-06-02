@@ -1,12 +1,12 @@
 (ns front.view.layout
-  (:require ["react" :as react]
-            ["react-router-dom" :as router]
+  (:require ["react-router-dom" :as router]
             [clojure.walk :refer [keywordize-keys]]
             [clojure.string :refer [includes?]]
             [lambdaisland.uri :as lamb.uri]
             [front.model.user :as user]
             [front.route :as route]
-            [front.model.user :as model.user]))
+            [front.model.user :as model.user]
+            [front.view.util :as util]))
 
 (defn loader [js-params]
   (let [{:keys [request]} (-> js-params js->clj keywordize-keys)
@@ -32,7 +32,7 @@
 (defn core []
   (let [navigate (router/useNavigate)
         revalidator (router/useRevalidator)
-        user (router/useRouteLoaderData "user-loggedin")
+        user (router/useRouteLoaderData util/key-user-loggedin)
         logout (fn [] (model.user/logout {:on-receive (fn []
                                                         (.revalidate revalidator)
                                                         (navigate route/login))}))]

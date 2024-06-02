@@ -2,7 +2,7 @@
   (:require ["react" :as react]
             ["react-router-dom" :as router]
             [front.route :as route]
-            [front.view.common-layout :as common-layout]
+            [front.view.common.wrapper.fetching :as wrapper.fetching]
             [front.model.user :as model.user]))
 
 (defn render-user [user]
@@ -16,21 +16,22 @@
 
 (defn core []
   (let [[user-list-and-total set-user-list-and-total] (react/useState)
-        info-common-layout (common-layout/build-info #(react/useState))
+        info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
         users (:list user-list-and-total)
         total (:total user-list-and-total)]
     (react/useEffect
      (fn []
-       (common-layout/fetch-start info-common-layout)
-       (model.user/fetch-list-and-total {:on-receive (fn [result errors]
-                                                       (set-user-list-and-total result)
-                                                       (common-layout/fetch-finished info-common-layout errors))})
+       (wrapper.fetching/start info-wrapper-fetching)
+       (model.user/fetch-list-and-total
+        {:on-receive (fn [result errors]
+                       (set-user-list-and-total result)
+                       (wrapper.fetching/finished info-wrapper-fetching errors))})
        (fn []))
      #js [])
     [:<>
      [:> router/Link {:to route/user-create} "new"]
-     (common-layout/wrapper
-      {:info info-common-layout
+     (wrapper.fetching/wrapper
+      {:info info-wrapper-fetching
        :renderer
        [:<>
         [:div "total " total]

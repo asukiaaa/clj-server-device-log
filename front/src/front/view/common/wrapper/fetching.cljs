@@ -1,4 +1,5 @@
-(ns front.view.common-layout)
+(ns front.view.common.wrapper.fetching
+  (:require [front.view.page404 :as page404]))
 
 (defn build-info [fn-useState]
   (let [state-fetching (fn-useState)
@@ -8,17 +9,19 @@
      :errors (first state-errors)
      :set-errors (second state-errors)}))
 
-(defn fetch-start [{:keys [set-fetching]}]
+(defn start [{:keys [set-fetching]}]
   (set-fetching true))
 
-(defn fetch-finished [{:keys [set-fetching set-errors]} errors]
+(defn finished [{:keys [set-fetching set-errors]} errors]
   (set-fetching false)
   (set-errors errors))
 
-(defn wrapper [{:keys [info renderer]}]
+(defn wrapper [{:keys [info renderer show-404]}]
   (let [{:keys [fetching errors]} info]
-    (if fetching
-      [:div "fetching"]
+    (cond
+      show-404 page404/core
+      fetching [:div "fetching"]
+      :else
       [:<>
        (when errors
          (for [e errors]

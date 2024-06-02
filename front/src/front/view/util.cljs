@@ -1,6 +1,8 @@
 (ns front.view.util
   (:require [clojure.walk :refer [keywordize-keys]]))
 
+(def key-user-loggedin "user-loggedin")
+
 (defn build-state-info [key build-state]
   (let [state-default (build-state)
         state-draft (build-state)

@@ -3,7 +3,7 @@
             [front.view.log.graph :as log.graph]
             [front.view.log.list :as log.list]
             [front.model.raw-device-log :as model.log]
-            [front.view.common-layout :as common-layout]
+            [front.view.common.wrapper.fetching :as wrapper.fetching]
             [front.view.util :refer [build-state-info render-checkbox render-input render-textarea]]))
 
 (defn push-params [query-params]
@@ -58,8 +58,8 @@
   (= "true" (:default info)))
 
 (defn core []
-  (let [info-common-layout (common-layout/build-info #(react/useState))
-        fetching (:fetching info-common-layout)
+  (let [info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
+        fetching (:fetching info-wrapper-fetching)
         [logs set-logs] (react/useState)
         [logs-key-fetched set-logs-key-fetched] (react/useState)
         [total set-total] (react/useState)
@@ -80,7 +80,7 @@
                                    (set-all-val info))))
         fetch-device-logs (fn [str-where str-order limit]
                             (let [logs-key (str str-where str-order limit)]
-                              (common-layout/fetch-start info-common-layout)
+                              (wrapper.fetching/start info-wrapper-fetching)
                               (model.log/fetch-list
                                {:str-order str-order
                                 :str-where str-where
@@ -90,7 +90,7 @@
                                   (set-logs logs)
                                   (set-total total)
                                   (set-logs-key-fetched logs-key)
-                                  (common-layout/fetch-finished info-common-layout errors))})))
+                                  (wrapper.fetching/finished info-wrapper-fetching errors))})))
         on-click-apply (fn []
                          (->> (for [info arr-info] [(:key info) (:draft info)])
                               (into (sorted-map))
@@ -126,8 +126,8 @@
        [render-checkbox "show graph" info-show-graph]
        [render-checkbox "show table" info-show-table]]
       [:a.btn.btn-outline-primary.btn-sm {:on-click on-click-apply :class (when fetching "disabled")} "apply"]]
-     (common-layout/wrapper
-      {:info info-common-layout
+     (wrapper.fetching/wrapper
+      {:info info-wrapper-fetching
        :renderer
        [:div
         [:div.m-1 (str "requested " (str (:default info-limit)) " from " total)]
