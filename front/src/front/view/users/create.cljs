@@ -4,9 +4,10 @@
             [clojure.walk :refer [keywordize-keys]]
             [front.route :as route]
             [front.model.user :as model.user]
+            [front.view.common.wrapper.show404 :as wrapper.show404]
             [front.view.util :as util]))
 
-(defn core []
+(defn- page []
   (let [navigate (router/useNavigate)
         state-info-name (util/build-state-info :name #(react/useState))
         state-info-email (util/build-state-info :email #(react/useState))
@@ -34,3 +35,8 @@
       [util/render-input "password (10 chars or more)" state-info-password {:type :password}]
       [util/render-textarea "permission" state-info-permission]
       [:a.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply} "apply"]]]))
+
+(defn core []
+  (wrapper.show404/wrapper
+   {:permission :admin
+    :page page}))

@@ -3,6 +3,7 @@
             ["react-router-dom" :as router]
             [front.route :as route]
             [front.view.common.wrapper.fetching :as wrapper.fetching]
+            [front.view.common.wrapper.show404 :as wrapper.show404]
             [front.model.user :as model.user]))
 
 (defn render-user [user]
@@ -14,7 +15,7 @@
    [:td (:updated_at user)]
    [:td [:> router/Link {:to (route/user-show (:id user))} "show"]]])
 
-(defn core []
+(defn-  page []
   (let [[user-list-and-total set-user-list-and-total] (react/useState)
         info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
         users (:list user-list-and-total)
@@ -48,3 +49,8 @@
           (for [user users]
             [:<> {:key (:id user)}
              [:f> render-user user]])]]]})]))
+
+(defn core []
+  (wrapper.show404/wrapper
+   {:permission :admin
+    :page page}))

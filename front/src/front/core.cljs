@@ -36,7 +36,7 @@
           [{:index true :element (r/as-element [:f> user.index/core])}
            {:path "create" :element (r/as-element [:f> user.create/core])}
            {:path ":idUser" :element (r/as-element [:f> user.show/core])}]}
-         {:path "*" :element (r/as-element page404/core) :status 404}]}]}])))
+         {:path "*" :element (r/as-element [:f> page404/core]) :status 404}]}]}])))
 
 (defonce root (rc/create-root (.getElementById js/document "app")))
 

@@ -1,7 +1,9 @@
 (ns front.view.util
-  (:require [clojure.walk :refer [keywordize-keys]]))
+  (:require ["react-router-dom" :as router]))
 
 (def key-user-loggedin "user-loggedin")
+(defn get-user-loggedin []
+  (router/useRouteLoaderData key-user-loggedin))
 
 (defn build-state-info [key build-state]
   (let [state-default (build-state)

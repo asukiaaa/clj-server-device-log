@@ -2,10 +2,11 @@
   (:require ["react" :as react]
             ["react-router-dom" :as router]
             [front.route :as route]
+            [front.view.common.wrapper.show404 :as wrapper.show404]
             [front.view.common.wrapper.fetching :as wrapper.fetching]
             [front.model.user :as model.user]))
 
-(defn core []
+(defn- page []
   (let [params (js->clj (router/useParams))
         id-user (get params "idUser")
         [user set-user] (react/useState)
@@ -36,3 +37,8 @@
              [:tr {:key key}
               [:td key]
               [:td (get user key)]])]]])})))
+
+(defn core []
+  (wrapper.show404/wrapper
+   {:permission :admin
+    :page page}))

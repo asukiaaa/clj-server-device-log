@@ -1,6 +1,7 @@
 (ns front.model.user
   (:require goog.string
             clojure.string
+            [clojure.walk :refer [keywordize-keys]]
             [front.model.util :as util :refer [escape-str]]
             [re-graph.core :as re-graph]))
 
@@ -8,7 +9,7 @@
 (def str-keys-for-user (clojure.string/join " " (map name keys-for-user)))
 
 (defn admin? [user]
-  (->> user :permission #(.parse js/JSON) :role (= "admin")))
+  (->> user :permission (.parse js/JSON) js->clj keywordize-keys :role (= "admin")))
 
 (defn login [{:keys [email password on-receive]}]
   (let [mutation (goog.string.format "{ login(email: \"%s\", password: \"%s\") { id email name } }"

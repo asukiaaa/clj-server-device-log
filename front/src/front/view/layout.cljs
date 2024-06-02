@@ -3,9 +3,8 @@
             [clojure.walk :refer [keywordize-keys]]
             [clojure.string :refer [includes?]]
             [lambdaisland.uri :as lamb.uri]
-            [front.model.user :as user]
-            [front.route :as route]
             [front.model.user :as model.user]
+            [front.route :as route]
             [front.view.util :as util]))
 
 (defn loader [js-params]
