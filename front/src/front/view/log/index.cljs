@@ -127,10 +127,11 @@
        [render-checkbox "show table" info-show-table]]
       [:a.btn.btn-outline-primary.btn-sm {:on-click on-click-apply :class (when fetching "disabled")} "apply"]]
      (common-layout/wrapper
-      info-common-layout
-      [:div
-       [:div.m-1 (str "requested " (str (:default info-limit)) " from " total)]
-       (when (get-default-as-bool info-show-graph)
-         [:f> log.graph/render-graphs logs-key-fetched logs config-renderer])
-       (when (get-default-as-bool info-show-table)
-         [:f> log.list/render-table-logs logs config-renderer])])]))
+      {:info info-common-layout
+       :renderer
+       [:div
+        [:div.m-1 (str "requested " (str (:default info-limit)) " from " total)]
+        (when (get-default-as-bool info-show-graph)
+          [:f> log.graph/render-graphs logs-key-fetched logs config-renderer])
+        (when (get-default-as-bool info-show-table)
+          [:f> log.list/render-table-logs logs config-renderer])]})]))

@@ -15,11 +15,12 @@
   (set-fetching false)
   (set-errors errors))
 
-(defn wrapper [{:keys [fetching errors]} renderer]
-  (if fetching
-    [:div "fetching"]
-    [:<>
-     (when errors
-       (for [e errors]
-         [:div.alert.alert-danger.m-1 {:key e} e]))
-     renderer]))
+(defn wrapper [{:keys [info renderer]}]
+  (let [{:keys [fetching errors]} info]
+    (if fetching
+      [:div "fetching"]
+      [:<>
+       (when errors
+         (for [e errors]
+           [:div.alert.alert-danger.m-1 {:key e} e]))
+       renderer])))

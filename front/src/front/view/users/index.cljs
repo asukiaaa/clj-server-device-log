@@ -30,19 +30,20 @@
     [:<>
      [:> router/Link {:to route/user-create} "new"]
      (common-layout/wrapper
-      info-common-layout
-      [:<>
-       [:div "total " total]
-       [:table.table.table-sm
-        [:thead
-         [:tr
-          [:th "id"]
-          [:th "email"]
-          [:th "name"]
-          [:th "created_at"]
-          [:th "updated_at"]
-          [:th "actions"]]]
-        [:tbody
-         (for [user users]
-           [:<> {:key (:id user)}
-            [:f> render-user user]])]]])]))
+      {:info info-common-layout
+       :renderer
+       [:<>
+        [:div "total " total]
+        [:table.table.table-sm
+         [:thead
+          [:tr
+           [:th "id"]
+           [:th "email"]
+           [:th "name"]
+           [:th "created_at"]
+           [:th "updated_at"]
+           [:th "actions"]]]
+         [:tbody
+          (for [user users]
+            [:<> {:key (:id user)}
+             [:f> render-user user]])]]]})]))
