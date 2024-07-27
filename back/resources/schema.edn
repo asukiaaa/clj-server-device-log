@@ -1,10 +1,15 @@
 {:input-objects
- {:UserInput
+ {:UserCreateInput
   {:fields
    {:email {:type (non-null String)}
     :name {:type String}
     :permission {:type String}
-    :password {:type String}}}}
+    :password {:type String}}}
+  :UserEditInput
+  {:fields
+   {:email {:type (non-null String)}
+    :name {:type String}
+    :permission {:type String}}}}
  :objects
  {:RawDeviceLog
   {:fields
@@ -28,6 +33,10 @@
    {:errors {:type String}
     :user {:type User}
     :url_password_reset {:type String}}}
+  :ResponseUserEdit
+  {:fields
+   {:errors {:type String}
+    :user {:type User}}}
   :ResponseUserListTotal
   {:fields
    {:list {:type (list User)}
@@ -52,9 +61,14 @@
     :user_loggedin {:type :User}}}
   :Mutation
   {:fields
-   {:user
+   {:userCreate
     {:type ResponseUserCreate
-     :args {:user {:type UserInput}
+     :args {:user {:type UserCreateInput}
+            :requireUrlPasswordReset {:type Boolean}}}
+    :userEdit
+    {:type ResponseUserEdit
+     :args {:id {:type Int}
+            :user {:type UserEditInput}
             :requireUrlPasswordReset {:type Boolean}}}
     :login
     {:type User

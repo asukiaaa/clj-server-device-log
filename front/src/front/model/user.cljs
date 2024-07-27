@@ -1,4 +1,5 @@
 (ns front.model.user
+  (:refer-clojure :exclude [update])
   (:require goog.string
             clojure.string
             [clojure.walk :refer [keywordize-keys]]
@@ -39,7 +40,7 @@
 
 (defn create [{:keys [name email password permission on-receive]}]
   (let [require-url-password-reset "false"
-        query (goog.string.format "{ user(user: { name: \"%s\", email: \"%s\", password: \"%s\", permission: \"%s\" }, requireUrlPasswordReset: %s ) { errors url_password_reset user { %s } } }"
+        query (goog.string.format "{ userCreate(user: { name: \"%s\", email: \"%s\", password: \"%s\", permission: \"%s\" }, requireUrlPasswordReset: %s ) { errors url_password_reset user { %s } } }"
                                   (util/escape-str name)
                                   (util/escape-str email)
                                   (util/escape-str password)
@@ -47,4 +48,16 @@
                                   require-url-password-reset
                                   str-keys-for-user)]
     (re-graph/mutate query () (fn [{:keys [data errors]}]
-                                (on-receive (:user data) (util/build-error-messages errors))))))
+                                (on-receive (:userCreate data) (util/build-error-messages errors))))))
+
+(defn update [{:keys [id name email permission on-receive]}]
+  (println id name email permission)
+  (let [query (goog.string.format "{ userEdit(id: %d, user: { name: \"%s\", email: \"%s\", permission: \"%s\" }) { errors user { %s } } }"
+                                  (util/escape-str id)
+                                  (util/escape-str name)
+                                  (util/escape-str email)
+                                  (util/escape-str permission)
+                                  str-keys-for-user)]
+    (re-graph/mutate query () (fn [{:keys [data errors]}]
+                                (println data)
+                                (on-receive (:userEdit data) (util/build-error-messages errors))))))

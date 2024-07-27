@@ -14,7 +14,7 @@
         state-info-password (util/build-state-info :password #(react/useState))
         state-info-permission (util/build-state-info :permission #(react/useState))
         on-receive (fn [data]
-                     (if-let [errors-str (:__errors data)]
+                     (if-let [errors-str (:errors data)]
                        (let [errors (keywordize-keys (js->clj (.parse js/JSON errors-str)))]
                          (doseq [state [state-info-name state-info-email state-info-password state-info-permission]]
                            (let [key (:key state)

@@ -13,7 +13,10 @@
    [:td (:name user)]
    [:td (:created_at user)]
    [:td (:updated_at user)]
-   [:td [:> router/Link {:to (route/user-show (:id user))} "show"]]])
+   [:td
+    [:> router/Link {:to (route/user-show (:id user))} "show"]
+    " "
+    [:> router/Link {:to (route/user-edit (:id user))} "edit"]]])
 
 (defn-  page []
   (let [[user-list-and-total set-user-list-and-total] (react/useState)

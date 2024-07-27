@@ -17,6 +17,10 @@
      :errors (first state-errors)
      :set-errors (second state-errors)}))
 
+(defn set-default-and-draft [info val]
+  ((:set-default info) val)
+  ((:set-draft info) val))
+
 (defn render-errors [errors]
   (when errors
     (for [error errors]
@@ -40,14 +44,14 @@
      :on-change (fn [] (set-draft (if (= "true" draft) "false" "true")))}]
    [:label.p-2 {:for label} label]])
 
-(defn render-input [label {:keys [key draft set-draft errors]} {:keys [type wrapper-class]}]
+(defn render-input [label {:keys [default key draft set-draft errors]} {:keys [type wrapper-class]}]
   [:div {:class wrapper-class}
    [:div
     [:label {:for key} label]]
    [:input.form-control
     {:id label
      :class (when errors :is-invalid)
-     :value draft
+     :value (or draft default)
      :type type
      :on-change (fn [e] (set-draft (-> e .-target .-value)))}]
    (when errors

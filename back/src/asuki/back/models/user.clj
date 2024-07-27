@@ -24,6 +24,9 @@
 (defn filter-params-to-create [params]
   (select-keys params [:email :name :permission]))
 
+(defn filter-params-to-update [params]
+  (select-keys params [:email :name :permission]))
+
 (defn validate-password [password]
   (cond-> nil
     (nil? password) (conj "required")
@@ -48,20 +51,26 @@
           errors {:email validate-email
                   :permission validate-permission}))
 
+(defn append-error [errors key message]
+  (assoc errors key (concat (get errors key) [message])))
+
+(defn append-system-error [errors message]
+  (let [key :__system]
+    (append-error errors key message)))
+
 (defn validate-params-for-password [errors params]
   (if-let [errors-for-password (validate-password (:password params))]
     (assoc errors :password (concat (:password errors) errors-for-password))
     errors))
 
 (defn create-with-password [params]
-  (println :creae-with-password params)
   (jdbc/with-db-transaction [t-con db-spec]
     (let [email (:email params)
           user-in-db (get-by-email email {:transaction t-con})]
       (if-let [errors (cond-> (-> nil
                                   (validate-params-exept-for-password params)
                                   (validate-params-for-password params))
-                        (seq user-in-db) (assoc :email ["User already exists"]))]
+                        (seq user-in-db) (append-error :email "User already exists"))]
         {:errors (json/write-str errors)}
         (let [password (:password params)
               salt (random-str 20)
@@ -74,6 +83,20 @@
                             (assoc :salt salt)
                             (assoc :hash hash)))
           {:user (get-by-email email {:transaction t-con})})))))
+
+(defn update [id params]
+  (println :update-user id params)
+  (jdbc/with-db-transaction [t-con db-spec]
+    (let [user-in-db (get-by-id id {:transaction t-con})]
+      (if-let [errors (cond-> (-> nil
+                                  (validate-params-exept-for-password params))
+                        (empty? user-in-db) (append-system-error "User does not exist"))]
+        {:errors (json/write-str errors)}
+        (do
+          (jdbc/update! t-con :user
+                        (filter-params-to-update params)
+                        ["id = ?" id])
+          {:user (get-by-id id {:transaction t-con})})))))
 
 (defn get-by-email-password [email password]
   (when-let [user (get-by-email email)]

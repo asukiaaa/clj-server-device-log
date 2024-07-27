@@ -53,6 +53,20 @@
            user-create-result (model.user/create-with-password user-args)
            user (:user user-create-result)
            errors (:errors user-create-result)]
+        (if (seq user)
+         {:user user}
+         {:errors errors})))))
+
+(defn user-edit [context args _]
+  (println "args user-edit" args)
+  (handle-only-for-admin
+   context
+   (fn []
+     (let [user-args (:user args)
+           user-id (:id args)
+           user-create-result (model.user/update user-id user-args)
+           user (:user user-create-result)
+           errors (:errors user-create-result)]
        (if (seq user)
          {:user user}
          {:errors errors})))))
@@ -62,6 +76,7 @@
    :Query/users users
    :Query/user user
    :Query/user_loggedin user-loggedin
-   :Mutation/user user-create
+   :Mutation/userCreate user-create
+   :Mutation/userEdit user-edit
    :Mutation/login login
    :Mutation/logout logout})
