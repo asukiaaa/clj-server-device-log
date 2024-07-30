@@ -1,4 +1,3 @@
-version: "3.9"
 services:
   back:
     # image: clojure:openjdk-18-tools-deps-bullseye
