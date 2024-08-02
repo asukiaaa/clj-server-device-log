@@ -70,6 +70,9 @@
      :args {:id {:type Int}
             :user {:type UserEditInput}
             :requireUrlPasswordReset {:type Boolean}}}
+    :userDelete
+    {:type Int
+     :args {:id {:type Int}}}
     :login
     {:type User
      :args {:email {:type String}

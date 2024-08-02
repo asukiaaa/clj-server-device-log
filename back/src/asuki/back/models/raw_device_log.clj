@@ -1,6 +1,6 @@
 (ns asuki.back.models.raw-device-log
   (:require [clojure.java.jdbc :as jdbc]
-            [clojure.string :refer [join escape]]
+            [clojure.string :refer [join]]
             [clojure.core :refer [re-find re-matcher]]
             [clojure.data.json :as json]
             [clojure.walk :as walk]
@@ -12,11 +12,6 @@
 (def defaults
   {:limit 100
    :order [{:key "created_at" :dir "DESC"}]})
-
-(defn escape-for-sql [text]
-  (when-not (nil? text)
-    (escape text {\" "\\\""
-                  \\ "\\\\"})))
 
 (defn filter-key [key]
   (when (.contains ["created_at" "id" "data"] key)
@@ -39,12 +34,12 @@
         (format "JSON_VALUE(%s,\"$.%s\")"
                 key-with-table
                 (if (string? json-key)
-                  (escape-for-sql json-key)
+                  (model.util/escape-for-sql json-key)
                   (join "" (for [[index k] (map-indexed vector json-key)]
                              (if (number? k)
                                (str "[" k "]")
                                (str (when-not (= index 0) ".")
-                                    (escape-for-sql k)))))))))))
+                                    (model.util/escape-for-sql k)))))))))))
 
 (defn build-query-order [order table-key]
   #_(println "build-query-order " order)
@@ -86,7 +81,7 @@
                                       :table-key base-table-key})
         target-action (filter-target-action action)
         target-value (cond
-                       (string? value) (str "\"" (escape-for-sql value) "\"")
+                       (string? value) (str "\"" (model.util/escape-for-sql value) "\"")
                        (not (nil? this-table-key))
                        (build-target-key {:key key
                                           :table-key this-table-key})
@@ -193,8 +188,8 @@
     (println "str-query " str-query)
     (model.util/get-list-with-total [str-query])
     #_(jdbc/with-db-transaction [db-transaction db-spec]
-      {:records (jdbc/query db-transaction str-query)
-       :total (-> (jdbc/query db-transaction "SELECT FOUND_ROWS()") first vals first)})))
+        {:records (jdbc/query db-transaction str-query)
+         :total (-> (jdbc/query db-transaction "SELECT FOUND_ROWS()") first vals first)})))
 
 (defn get-by-id [id]
   (first (jdbc/query db-spec ["select * from raw_device_log where id = ?" id])))

@@ -17,7 +17,8 @@
   (model-raw-device-log/get-list-with-total args))
 
 (defn login [context args _]
-  (println "args for login" args)
+  (println "requested user login")
+  #_(println "args for login" args)
   (:user-loggedin context))
 
 (defn logout [_ _ _]
@@ -53,7 +54,7 @@
            user-create-result (model.user/create-with-password user-args)
            user (:user user-create-result)
            errors (:errors user-create-result)]
-        (if (seq user)
+       (if (seq user)
          {:user user}
          {:errors errors})))))
 
@@ -71,6 +72,15 @@
          {:user user}
          {:errors errors})))))
 
+(defn user-delete [context args _]
+  (println "args user-delete" args)
+  (handle-only-for-admin
+   context
+   (fn []
+     (let [user-id (:id args)]
+       (model.user/delete user-id)
+       user-id))))
+
 (def resolver-map
   {:Query/raw_device_logs raw-device-logs
    :Query/users users
@@ -78,5 +88,6 @@
    :Query/user_loggedin user-loggedin
    :Mutation/userCreate user-create
    :Mutation/userEdit user-edit
+   :Mutation/userDelete user-delete
    :Mutation/login login
    :Mutation/logout logout})

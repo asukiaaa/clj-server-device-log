@@ -1,6 +1,7 @@
 (ns asuki.back.models.util
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.data.json :as json]
+            [clojure.string :refer [escape]]
             [asuki.back.config :refer [db-spec]]))
 
 (defn get-list-with-total [query-get-records]
@@ -12,3 +13,8 @@
   (try
     (let [result (json/read-str input)] {:parsed result})
     (catch Exception e {:error (str (.getMessage e))})))
+
+(defn escape-for-sql [text]
+  (when-not (nil? text)
+    (escape text {\" "\\\""
+                  \\ "\\\\"})))

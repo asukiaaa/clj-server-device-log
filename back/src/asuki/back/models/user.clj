@@ -6,6 +6,9 @@
             [asuki.back.config :refer [db-spec]]
             [asuki.back.models.util :as model.util]))
 
+(defn delete [id]
+  (jdbc/delete! db-spec :user ["id = ?" id]))
+
 (defn admin? [user]
   (-> user :permission json/read-json :role (= "admin")))
 

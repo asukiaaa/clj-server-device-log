@@ -6,7 +6,7 @@
             [front.view.common.wrapper.show404 :as wrapper.show404]
             [front.model.user :as model.user]))
 
-(defn render-user [user]
+(defn render-user [user on-delete]
   [:tr
    [:td (:id user)]
    [:td (:email user)]
@@ -16,20 +16,30 @@
    [:td
     [:> router/Link {:to (route/user-show (:id user))} "show"]
     " "
-    [:> router/Link {:to (route/user-edit (:id user))} "edit"]]])
+    [:> router/Link {:to (route/user-edit (:id user))} "edit"]
+    " "
+    [:a {:on-click
+         (fn [e]
+           (.preventDefault e)
+           (when (js/confirm (str "delete user id:" (:id user) " name:" (:name user)))
+             (model.user/delete {:id (:id user) :on-receive on-delete})))
+         :href ""}
+     "delete"]]])
 
 (defn-  page []
   (let [[user-list-and-total set-user-list-and-total] (react/useState)
         info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
         users (:list user-list-and-total)
-        total (:total user-list-and-total)]
+        total (:total user-list-and-total)
+        load-list (fn []
+                    (wrapper.fetching/start info-wrapper-fetching)
+                    (model.user/fetch-list-and-total
+                     {:on-receive (fn [result errors]
+                                    (set-user-list-and-total result)
+                                    (wrapper.fetching/finished info-wrapper-fetching errors))}))]
     (react/useEffect
      (fn []
-       (wrapper.fetching/start info-wrapper-fetching)
-       (model.user/fetch-list-and-total
-        {:on-receive (fn [result errors]
-                       (set-user-list-and-total result)
-                       (wrapper.fetching/finished info-wrapper-fetching errors))})
+       (load-list)
        (fn []))
      #js [])
     [:<>
@@ -51,7 +61,7 @@
          [:tbody
           (for [user users]
             [:<> {:key (:id user)}
-             [:f> render-user user]])]]]})]))
+             [:f> render-user user load-list]])]]]})]))
 
 (defn core []
   (wrapper.show404/wrapper

@@ -34,7 +34,7 @@
                                (on-receive (:users data) (util/build-error-messages errors))))))
 
 (defn fetch-by-id [{:keys [id on-receive]}]
-  (let [query (goog.string.format "{ user(id: %d) { %s } }" (int id) str-keys-for-user)]
+  (let [query (goog.string.format "{ user(id: %d) { %s } }" (util/escape-int id) str-keys-for-user)]
     (re-graph/query query () (fn [{:keys [data errors]}]
                                (on-receive (:user data) (util/build-error-messages errors))))))
 
@@ -53,7 +53,7 @@
 (defn update [{:keys [id name email permission on-receive]}]
   (println id name email permission)
   (let [query (goog.string.format "{ userEdit(id: %d, user: { name: \"%s\", email: \"%s\", permission: \"%s\" }) { errors user { %s } } }"
-                                  (util/escape-str id)
+                                  (util/escape-int id)
                                   (util/escape-str name)
                                   (util/escape-str email)
                                   (util/escape-str permission)
@@ -61,3 +61,10 @@
     (re-graph/mutate query () (fn [{:keys [data errors]}]
                                 (println data)
                                 (on-receive (:userEdit data) (util/build-error-messages errors))))))
+
+(defn delete [{:keys [id on-receive]}]
+  (let [query (goog.string.format "{ userDelete(id: %d) }"
+                                  (util/escape-int id))]
+    (re-graph/mutate query {} (fn [{:keys [data errors]}]
+                                (println :on-receive-user-delete data)
+                                (on-receive {:userDelete data} (util/build-error-messages errors))))))
