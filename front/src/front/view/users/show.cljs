@@ -25,8 +25,7 @@
       :renderer
       (if (empty? user)
         [:div "no data"]
-        [:div
-         "TODO: " [:> router/Link {:to (route/user-edit id-user)} "edit"]
+        [:div [:> router/Link {:to (route/user-edit id-user)} "edit"]
          [:table.table.table-sm
           [:thead
            [:tr
