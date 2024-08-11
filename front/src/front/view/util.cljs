@@ -5,6 +5,31 @@
 (defn get-user-loggedin []
   (router/useRouteLoaderData key-user-loggedin))
 
+(defn push-query-params [query-params]
+  ;; (println "push-url")
+  (let [url js/window.location.href
+        url-object (new js/URL url)
+        url-search-params (.-searchParams url-object)]
+    (doseq [[k v] query-params]
+      #_(println "in for" k v)
+      (.set url-search-params (name k) v))
+    ;; (println "url is" url)
+    ;; (println "url-object" url-object)
+    ;; (println "url-search-params" url-search-params)
+    (js/history.pushState nil nil (str "?" url-search-params))))
+
+(defn read-query-params []
+  ;; (println "read-params")
+  (let [url js/window.location.href
+        url-object (new js/URL url)
+        url-search-params (.-searchParams url-object)]
+    ;; (println "url is" url)
+    ;; (println "url-object" url-object)
+    ;; (println "url-search-params" url-search-params)
+    ;; (println "cljs params" (js->clj url-search-params))
+    (into {} (for [key (.keys url-search-params)]
+               [(keyword key) (.get url-search-params key)]))))
+
 (defn build-state-info [key build-state]
   (let [state-default (build-state)
         state-draft (build-state)

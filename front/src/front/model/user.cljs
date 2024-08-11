@@ -27,8 +27,10 @@
     (re-graph/query query () (fn [{:keys [data errors]}]
                                (on-receive (:user_loggedin data) (util/build-error-messages errors))))))
 
-(defn fetch-list-and-total [{:keys [on-receive]}]
-  (let [query (goog.string.format "{ users { total list { %s } } }" str-keys-for-user)]
+(defn fetch-list-and-total [{:keys [on-receive limit page]}]
+  (let [str-offset-limit-for-user (util/build-str-args-offset-limit-for-index limit page)
+        str-args-with-parenthesis (if (empty? str-offset-limit-for-user) "" (goog.string.format "(%s)" str-offset-limit-for-user))
+        query (goog.string.format "{ users %s { total list { %s } } }" str-args-with-parenthesis str-keys-for-user)]
     (println :query query)
     (re-graph/query query () (fn [{:keys [data errors]}]
                                (on-receive (:users data) (util/build-error-messages errors))))))
@@ -51,7 +53,6 @@
                                 (on-receive (:userCreate data) (util/build-error-messages errors))))))
 
 (defn update [{:keys [id name email permission on-receive]}]
-  (println id name email permission)
   (let [query (goog.string.format "{ userEdit(id: %d, user: { name: \"%s\", email: \"%s\", permission: \"%s\" }) { errors user { %s } } }"
                                   (util/escape-int id)
                                   (util/escape-str name)

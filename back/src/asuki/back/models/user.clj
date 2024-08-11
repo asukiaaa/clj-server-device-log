@@ -1,4 +1,5 @@
 (ns asuki.back.models.user
+  (:refer-clojure :exclude [update])
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.data.json :as json]
             [buddy.core.hash :as bhash]
@@ -117,8 +118,9 @@
                            :permission "{\"role\": \"admin\"}"})))
 
 (defn get-list-with-total [args]
-  (let [str-query "SELECT * FROM user;"]
-    (model.util/get-list-with-total str-query)))
+  (-> (model.util/build-query-get-index "user")
+      (model.util/append-limit-offset-by-limit-page-params args)
+      model.util/get-list-with-total))
 
 (defn filter-for-session [user]
   (select-keys user [:id]))

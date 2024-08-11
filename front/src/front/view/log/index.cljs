@@ -1,35 +1,11 @@
 (ns front.view.log.index
   (:require ["react" :as react]
+            ["react-router-dom" :as router]
             [front.view.log.graph :as log.graph]
             [front.view.log.list :as log.list]
             [front.model.raw-device-log :as model.log]
             [front.view.common.wrapper.fetching :as wrapper.fetching]
-            [front.view.util :refer [build-state-info render-checkbox render-input render-textarea]]))
-
-(defn push-params [query-params]
-  ;; (println "push-url")
-  (let [url js/window.location.href
-        url-object (new js/URL url)
-        url-search-params (.-searchParams url-object)]
-    (doseq [[k v] query-params]
-      #_(println "in for" k v)
-      (.set url-search-params (name k) v))
-    ;; (println "url is" url)
-    ;; (println "url-object" url-object)
-    ;; (println "url-search-params" url-search-params)
-    (js/history.pushState nil nil (str "?" url-search-params))))
-
-(defn read-params []
-  ;; (println "read-params")
-  (let [url js/window.location.href
-        url-object (new js/URL url)
-        url-search-params (.-searchParams url-object)]
-    ;; (println "url is" url)
-    ;; (println "url-object" url-object)
-    ;; (println "url-search-params" url-search-params)
-    ;; (println "cljs params" (js->clj url-search-params))
-    (into {} (for [key (.keys url-search-params)]
-               [(keyword key) (.get url-search-params key)]))))
+            [front.view.util :as util :refer [build-state-info render-checkbox render-input render-textarea]]))
 
 (def defaults
   {:str-renderer "[{\"key\": [\"data\", \"camera_id\"], \"badge\": [{\"text\": \"not wakeup\", \"when\": {\"key\": \"created_at\", \"action\": \"not-in-hours-24\"}}]}, {\"label\": \"battery\", \"key\": [\"data\", \"readonly_state\", \"volt_battery\"]}, {\"label\": \"panel\", \"key\": [\"data\", \"readonly_state\", \"volt_panel\"]}]"
@@ -58,7 +34,8 @@
   (= "true" (:default info)))
 
 (defn core []
-  (let [info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
+  (let [location (router/useLocation)
+        info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
         fetching (:fetching info-wrapper-fetching)
         [logs set-logs] (react/useState)
         [logs-key-fetched set-logs-key-fetched] (react/useState)
@@ -74,7 +51,7 @@
         [config-renderer parse-error-config-renderer] (parse-json (:default info-str-renderer))
         [_ parse-error-where] (parse-json (:default info-str-where))
         [_ parse-error-order] (parse-json (:default info-str-order))
-        load-query-params #(let [query-params (read-params)]
+        load-query-params #(let [query-params (util/read-query-params)]
                              (doseq [info arr-info]
                                (-> (get-param-str (:key info) query-params)
                                    (set-all-val info))))
@@ -94,15 +71,13 @@
         on-click-apply (fn []
                          (->> (for [info arr-info] [(:key info) (:draft info)])
                               (into (sorted-map))
-                              push-params)
+                              util/push-query-params)
                          (load-query-params))]
     (react/useEffect
      (fn []
        (load-query-params)
-       (.addEventListener js/window "popstate" load-query-params)
-       (fn [] ;; destructor
-         (.removeEventListener js/window "popstate" load-query-params)))
-     #js [])
+       (fn []))
+     #js [location])
     (let [str-where (:default info-str-where)
           str-order (:default info-str-order)
           limit (:default info-limit)]
