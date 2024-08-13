@@ -4,10 +4,12 @@
             [front.route :as route]
             [front.view.common.wrapper.show404 :as wrapper.show404]
             [front.view.common.wrapper.fetching :as wrapper.fetching]
+            [front.view.util :as util]
             [front.model.user :as model.user]))
 
 (defn- page []
   (let [params (js->clj (router/useParams))
+        navigate (router/useNavigate)
         id-user (get params "idUser")
         [user set-user] (react/useState)
         info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))]
@@ -25,7 +27,15 @@
       :renderer
       (if (empty? user)
         [:div "no data"]
-        [:div [:> router/Link {:to (route/user-edit id-user)} "edit"]
+        [:div
+         [:> router/Link {:to route/users} "index"]
+         " "
+         [:> router/Link {:to (route/user-edit id-user)} "edit"]
+         " "
+         [:f> util/btn-confirm-delete
+          {:message-confirm (model.user/build-confirmation-message-for-deleting user)
+           :action-delete #(model.user/delete {:id (:id user)
+                                               :on-receive (fn [] (navigate route/users))})}]
          [:table.table.table-sm
           [:thead
            [:tr

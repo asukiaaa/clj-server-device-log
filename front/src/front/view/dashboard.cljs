@@ -9,4 +9,5 @@
         is-admin (model.user/admin? user-loggedin)]
     [:div.list-group
      (when is-admin [:> router/Link {:to route/users :class "list-group-item list-group-item-action"} "users"])
+     [:> router/Link {:to route/device-groups :class "list-group-item list-group-item-action"} "device groups"]
      [:> router/Link {:to route/profile :class "list-group-item list-group-item-action"} "profile TODO"]]))

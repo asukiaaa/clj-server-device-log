@@ -1,4 +1,4 @@
-(ns front.view.users.index
+(ns front.view.device-groups.index
   (:require ["react" :as react]
             ["react-router-dom" :as router]
             [goog.string :refer [format]]
@@ -7,23 +7,23 @@
             [front.view.common.wrapper.fetching :as wrapper.fetching]
             [front.view.common.wrapper.show404 :as wrapper.show404]
             [front.view.util :as util]
-            [front.model.user :as model.user]))
+            [front.model.device-group :as model.device-group]))
 
-(defn render-user [user on-delete]
+(defn render-device-group [device-group on-delete]
   [:tr
-   [:td (:id user)]
-   [:td (:email user)]
-   [:td (:name user)]
-   [:td (:created_at user)]
-   [:td (:updated_at user)]
+   [:td (:id device-group)]
+   [:td (:user_id device-group)]
+   [:td (:name device-group)]
+   [:td (:created_at device-group)]
+   [:td (:updated_at device-group)]
    [:td
-    [:> router/Link {:to (route/user-show (:id user))} "show"]
+    [:> router/Link {:to (route/user-show (:id device-group))} "show"]
     " "
-    [:> router/Link {:to (route/user-edit (:id user))} "edit"]
+    [:> router/Link {:to (route/user-edit (:id device-group))} "edit"]
     " "
-    [:f> util/btn-confirm-delete
-     {:message-confirm (model.user/build-confirmation-message-for-deleting user)
-      :action-delete #(model.user/delete {:id (:id user) :on-receive on-delete})}]]])
+    [:> util/btn-confirm-delete
+     {:message-confirm (str "delete device_groupp id:" (:id device-group) " name:" (:name device-group))
+      :action-delete #(model.device-group/delete {:id (:id device-group) :on-receive on-delete})}]]])
 
 (defn-  page []
   (let [location (router/useLocation)
@@ -39,8 +39,8 @@
         (fn [page] (format "%s?page=%d&limit=%d" route/users page number-limit))
         load-list (fn []
                     (wrapper.fetching/start info-wrapper-fetching)
-                    (println number-limit number-page)
-                    (model.user/fetch-list-and-total
+                    #_(println number-limit number-page)
+                    (model.device-group/fetch-list-and-total
                      {:limit number-limit
                       :page number-page
                       :on-receive (fn [result errors]
@@ -62,7 +62,7 @@
          [:thead
           [:tr
            [:th "id"]
-           [:th "email"]
+           [:th "user_id"]
            [:th "name"]
            [:th "created_at"]
            [:th "updated_at"]
@@ -70,7 +70,7 @@
          [:tbody
           (for [user users]
             [:<> {:key (:id user)}
-             [:f> render-user user load-list]])]]
+             [:f> render-device-group user load-list]])]]
         [:f> pagination/core {:build-url build-url-by-page
                               :total-page number-total-page
                               :current-page number-page}]]})]))

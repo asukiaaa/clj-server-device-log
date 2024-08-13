@@ -82,3 +82,11 @@
    (when errors
      (for [error errors]
        [:div.invalid-feedback {:key error} error]))])
+
+(defn btn-confirm-delete [{:keys [message-confirm action-delete]}]
+  [:a {:on-click
+       (fn [e]
+         (.preventDefault e)
+         (when (js/confirm message-confirm) (action-delete)))
+       :href ""}
+   "delete"])

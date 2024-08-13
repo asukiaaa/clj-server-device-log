@@ -13,3 +13,11 @@
 
 (defn user-edit [id]
   (str (user-show id) "/edit"))
+
+(def device-groups (str front "/device_groups"))
+
+(defn device-group-show [id]
+  (str device-groups "/" id))
+
+(defn device-group-edit [id]
+  (str (device-group-show id) "/edit"))

@@ -28,6 +28,17 @@
     :permission {:type String}
     :created_at {:type String}
     :updated_at {:type String}}}
+  :DeviceGroup
+  {:fields
+   {:id {:type (non-null Int)}
+    :user_id {:type (non-null Int)}
+    :name {:type String}
+    :created_at {:type String}
+    :updated_at {:type String}}}
+  :ResponseDeviceGroupListTotal
+  {:fields
+   {:list {:type (list DeviceGroup)}
+    :total {:type Int}}}
   :ResponseUserCreate
   {:fields
    {:errors {:type String}
@@ -45,6 +56,12 @@
   {:fields
    {:raw_device_logs
     {:type ResponseRawDeviceLogListTotal
+     :args {:limit {:type Int}
+            :page {:type Int}
+            :where {:type String}
+            :order {:type String}}}
+    :device_groups
+    {:type ResponseDeviceGroupListTotal
      :args {:limit {:type Int}
             :page {:type Int}
             :where {:type String}

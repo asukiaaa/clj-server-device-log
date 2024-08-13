@@ -1,6 +1,7 @@
 (ns asuki.back.graphql.resolver
   (:require [asuki.back.models.raw-device-log :as model-raw-device-log]
             [asuki.back.models.user :as model.user]
+            [asuki.back.models.device-group :as model.device-group]
             [com.walmartlabs.lacinia.resolve :refer [resolve-as]]))
 
 (defn get-user-loggedin [context]
@@ -81,10 +82,16 @@
        (model.user/delete user-id)
        user-id))))
 
+(defn device-groups [context args _]
+  (handle-only-for-admin
+   context
+   #(model.device-group/get-list-with-total args)))
+
 (def resolver-map
   {:Query/raw_device_logs raw-device-logs
    :Query/users users
    :Query/user user
+   :Query/device_groups device-groups
    :Query/user_loggedin user-loggedin
    :Mutation/userCreate user-create
    :Mutation/userEdit user-edit

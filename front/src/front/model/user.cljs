@@ -28,17 +28,17 @@
                                (on-receive (:user_loggedin data) (util/build-error-messages errors))))))
 
 (defn fetch-list-and-total [{:keys [on-receive limit page]}]
-  (let [str-offset-limit-for-user (util/build-str-args-offset-limit-for-index limit page)
-        str-args-with-parenthesis (if (empty? str-offset-limit-for-user) "" (goog.string.format "(%s)" str-offset-limit-for-user))
-        query (goog.string.format "{ users %s { total list { %s } } }" str-args-with-parenthesis str-keys-for-user)]
-    (println :query query)
-    (re-graph/query query () (fn [{:keys [data errors]}]
-                               (on-receive (:users data) (util/build-error-messages errors))))))
+  (util/fetch-list-and-total {:name-table "users"
+                              :str-keys-of-list str-keys-for-user
+                              :on-receive on-receive
+                              :limit limit
+                              :page page}))
 
 (defn fetch-by-id [{:keys [id on-receive]}]
-  (let [query (goog.string.format "{ user(id: %d) { %s } }" (util/escape-int id) str-keys-for-user)]
-    (re-graph/query query () (fn [{:keys [data errors]}]
-                               (on-receive (:user data) (util/build-error-messages errors))))))
+  (util/fetch-by-id {:name-table "user"
+                     :str-keys-of-list str-keys-for-user
+                     :id id
+                     :on-receive on-receive}))
 
 (defn create [{:keys [name email password permission on-receive]}]
   (let [require-url-password-reset "false"
@@ -60,12 +60,13 @@
                                   (util/escape-str permission)
                                   str-keys-for-user)]
     (re-graph/mutate query () (fn [{:keys [data errors]}]
-                                (println data)
+                                #_(println data)
                                 (on-receive (:userEdit data) (util/build-error-messages errors))))))
 
+(defn build-confirmation-message-for-deleting [user]
+  (str "delete user id:" (:id user) " name:" (:name user)))
+
 (defn delete [{:keys [id on-receive]}]
-  (let [query (goog.string.format "{ userDelete(id: %d) }"
-                                  (util/escape-int id))]
-    (re-graph/mutate query {} (fn [{:keys [data errors]}]
-                                (println :on-receive-user-delete data)
-                                (on-receive {:userDelete data} (util/build-error-messages errors))))))
+  (util/delete-by-id {:name-table "user"
+                      :id id
+                      :on-receive on-receive}))
