@@ -1,6 +1,6 @@
 (ns front.model.user
   (:refer-clojure :exclude [update])
-  (:require goog.string
+  (:require [goog.string :refer [format]]
             clojure.string
             [clojure.walk :refer [keywordize-keys]]
             [front.model.util :as util :refer [escape-str]]
@@ -41,19 +41,21 @@
                      :on-receive on-receive}))
 
 (defn create [{:keys [name email password permission on-receive]}]
-  (let [require-url-password-reset "false"
-        query (goog.string.format "{ userCreate(user: { name: \"%s\", email: \"%s\", password: \"%s\", permission: \"%s\" }, requireUrlPasswordReset: %s ) { errors url_password_reset user { %s } } }"
-                                  (util/escape-str name)
-                                  (util/escape-str email)
-                                  (util/escape-str password)
-                                  (util/escape-str permission)
-                                  require-url-password-reset
-                                  str-keys-for-user)]
-    (re-graph/mutate query () (fn [{:keys [data errors]}]
-                                (on-receive (:userCreate data) (util/build-error-messages errors))))))
+  (let [require-url-password-reset "false"]
+    (util/create {:name-table "user"
+                  :str-input-params
+                  (format "user: { name: \"%s\", email: \"%s\", password: \"%s\", permission: \"%s\" }, requireUrlPasswordReset: %s"
+                          (util/escape-str name)
+                          (util/escape-str email)
+                          (util/escape-str password)
+                          (util/escape-str permission)
+                          require-url-password-reset)
+                  :str-keys-receive (format "url_password_reset user { %s }"
+                                            str-keys-for-user)
+                  :on-receive on-receive})))
 
 (defn update [{:keys [id name email permission on-receive]}]
-  (let [query (goog.string.format "{ userEdit(id: %d, user: { name: \"%s\", email: \"%s\", permission: \"%s\" }) { errors user { %s } } }"
+  (let [query (goog.string.format "{ user_update(id: %d, user: { name: \"%s\", email: \"%s\", permission: \"%s\" }) { errors user { %s } } }"
                                   (util/escape-int id)
                                   (util/escape-str name)
                                   (util/escape-str email)
@@ -61,7 +63,7 @@
                                   str-keys-for-user)]
     (re-graph/mutate query () (fn [{:keys [data errors]}]
                                 #_(println data)
-                                (on-receive (:userEdit data) (util/build-error-messages errors))))))
+                                (on-receive (:user_update data) (util/build-error-messages errors))))))
 
 (defn build-confirmation-message-for-deleting [user]
   (str "delete user id:" (:id user) " name:" (:name user)))

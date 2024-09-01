@@ -77,5 +77,5 @@
 
 (defn core []
   (wrapper.show404/wrapper
-   {:permission :admin
+   {:permission wrapper.show404/permission-admin
     :page page}))

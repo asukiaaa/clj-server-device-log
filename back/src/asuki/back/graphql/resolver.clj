@@ -47,7 +47,8 @@
        (model.user/get-by-id id-user)))))
 
 (defn user-create [context args _]
-  (println "args user-create" args)
+  (println "handle user-create" (-> args :user :email))
+  #_(println "args user-create" args)
   (handle-only-for-admin
    context
    (fn []
@@ -59,16 +60,17 @@
          {:user user}
          {:errors errors})))))
 
-(defn user-edit [context args _]
-  (println "args user-edit" args)
+(defn user-update [context args _]
+  (println "handle user-update")
+  #_(println "args user-edit" args)
   (handle-only-for-admin
    context
    (fn []
      (let [user-args (:user args)
            user-id (:id args)
-           user-create-result (model.user/update user-id user-args)
-           user (:user user-create-result)
-           errors (:errors user-create-result)]
+           user-update-result (model.user/update user-id user-args)
+           user (:user user-update-result)
+           errors (:errors user-update-result)]
        (if (seq user)
          {:user user}
          {:errors errors})))))
@@ -82,19 +84,29 @@
        (model.user/delete user-id)
        user-id))))
 
-(defn device-groups [context args _]
-  (handle-only-for-admin
-   context
-   #(model.device-group/get-list-with-total args)))
+(defn device-groups-for-user [context args _]
+  (let [user (get-user-loggedin context)]
+    (model.device-group/get-list-with-total-for-user args (:id user))))
+
+(defn device-group-for-user [context args _]
+  (let [user (get-user-loggedin context)]
+    (model.device-group/get-by-id-for-user (:id args) (:id user))))
+
+(defn device-group-create-for-user [context args _]
+  (println "args device-group-create-for-user" args)
+  (let [user (get-user-loggedin context)]
+    (model.device-group/create {:name (:name args) :user_id (:id user)})))
 
 (def resolver-map
   {:Query/raw_device_logs raw-device-logs
    :Query/users users
    :Query/user user
-   :Query/device_groups device-groups
+   :Query/device_groups device-groups-for-user
+   :Query/device_group device-group-for-user
    :Query/user_loggedin user-loggedin
-   :Mutation/userCreate user-create
-   :Mutation/userEdit user-edit
-   :Mutation/userDelete user-delete
+   :Mutation/user_create user-create
+   :Mutation/user_update user-update
+   :Mutation/user_delete user-delete
+   :Mutation/device_group_create device-group-create-for-user
    :Mutation/login login
    :Mutation/logout logout})

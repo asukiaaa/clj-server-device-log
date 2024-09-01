@@ -5,19 +5,13 @@
 (def login (str front "/login"))
 
 (def profile (str front "/profile"))
+
 (def users (str front "/users"))
 (def user-create (str users "/create"))
-
-(defn user-show [id]
-  (str users "/" id))
-
-(defn user-edit [id]
-  (str (user-show id) "/edit"))
+(defn user-show [id] (str users "/" id))
+(defn user-edit [id] (str (user-show id) "/edit"))
 
 (def device-groups (str front "/device_groups"))
-
-(defn device-group-show [id]
-  (str device-groups "/" id))
-
-(defn device-group-edit [id]
-  (str (device-group-show id) "/edit"))
+(def device-group-create (str device-groups "/create"))
+(defn device-group-show [id] (str device-groups "/" id))
+(defn device-group-edit [id] (str (device-group-show id) "/edit"))

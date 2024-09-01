@@ -23,7 +23,7 @@
   (first (jdbc/query (or transaction db-spec) ["SELECT * FROM user WHERE email = ?" email])))
 
 (defn get-by-id [id & [{:keys [transaction]}]]
-  (first (jdbc/query (or transaction db-spec) ["SELECT * FROM user WHERE id = ?" id])))
+  (model.util/get-by-id id "user" {:transaction transaction}))
 
 (defn filter-params-to-create [params]
   (select-keys params [:email :name :permission]))

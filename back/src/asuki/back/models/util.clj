@@ -33,3 +33,7 @@
     (let [offset (* limit page)]
       (format "%s LIMIT %d OFFSET %d" str-query (int limit) (int offset)))
     str-query))
+
+(defn get-by-id [id name-table & [{:keys [transaction]}]]
+  (let [query (format "SELECT * FROM %s WHERE id = ?" name-table)]
+    (first (jdbc/query (or transaction db-spec) [query id]))))

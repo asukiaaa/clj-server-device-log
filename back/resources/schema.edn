@@ -39,6 +39,10 @@
   {:fields
    {:list {:type (list DeviceGroup)}
     :total {:type Int}}}
+  :ResponseDeviceGroupCreate
+  {:fields
+   {:errors {:type String}
+    :device_group {:type DeviceGroup}}}
   :ResponseUserCreate
   {:fields
    {:errors {:type String}
@@ -66,6 +70,9 @@
             :page {:type Int}
             :where {:type String}
             :order {:type String}}}
+    :device_group
+    {:type DeviceGroup
+     :args {:id {:type (non-null Int)}}}
     :users
     {:type ResponseUserListTotal
      :args {:limit {:type Int}
@@ -78,18 +85,21 @@
     :user_loggedin {:type :User}}}
   :Mutation
   {:fields
-   {:userCreate
+   {:user_create
     {:type ResponseUserCreate
      :args {:user {:type UserCreateInput}
             :requireUrlPasswordReset {:type Boolean}}}
-    :userEdit
+    :user_update
     {:type ResponseUserEdit
      :args {:id {:type Int}
             :user {:type UserEditInput}
             :requireUrlPasswordReset {:type Boolean}}}
-    :userDelete
+    :user_delete
     {:type Int
      :args {:id {:type Int}}}
+    :device_group_create
+    {:type ResponseDeviceGroupCreate
+     :args {:name {:type (non-null String)}}}
     :login
     {:type User
      :args {:email {:type String}

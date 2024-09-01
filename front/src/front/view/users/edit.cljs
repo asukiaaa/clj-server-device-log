@@ -10,7 +10,7 @@
 
 (defn- page []
   (let [params (js->clj (router/useParams))
-        id-user (get params "idUser")
+        id-user (get params "id_user")
         navigate (router/useNavigate)
         state-info-name (util/build-state-info :name #(react/useState))
         state-info-email (util/build-state-info :email #(react/useState))
@@ -61,5 +61,5 @@
 
 (defn core []
   (wrapper.show404/wrapper
-   {:permission :admin
+   {:permission wrapper.show404/permission-admin
     :page page}))

@@ -7,11 +7,13 @@
             [front.view.dashboard :as dashboard]
             [front.view.layout :as layout]
             [front.view.users.index :as user.index]
+            [front.view.users.create :as user.create]
             [front.view.users.show :as user.show]
             [front.view.users.edit :as user.edit]
             [front.view.device-groups.index :as device-group.index]
+            [front.view.device-groups.create :as device-group.create]
+            [front.view.device-groups.show :as device-group.show]
             [front.view.page404 :as page404]
-            [front.view.users.create :as user.create]
             ["react-router-dom" :as router]))
 
 (re-graph/init {:http {:url "/graphql"
@@ -37,14 +39,14 @@
           :children
           [{:index true :element (r/as-element [:f> user.index/core])}
            {:path "create" :element (r/as-element [:f> user.create/core])}
-           {:path ":idUser" :element (r/as-element [:f> user.show/core])}
-           {:path ":idUser/edit" :element (r/as-element [:f> user.edit/core])}]}
+           {:path ":id_user" :element (r/as-element [:f> user.show/core])}
+           {:path ":id_user/edit" :element (r/as-element [:f> user.edit/core])}]}
          {:path "device_groups"
           :children
           [{:index true :element (r/as-element [:f> device-group.index/core])}
-           #_{:path "create" :element (r/as-element [:f> device-group.create/core])}
-           #_{:path ":idDeviceGroup" :element (r/as-element [:f> device-group.show/core])}
-           #_{:path ":idDeviceGroup/edit" :element (r/as-element [:f> device-group.edit/core])}]}
+           {:path "create" :element (r/as-element [:f> device-group.create/core])}
+           {:path ":id_device_group" :element (r/as-element [:f> device-group.show/core])}
+           #_{:path ":id_device_group/edit" :element (r/as-element [:f> device-group.edit/core])}]}
          {:path "*" :element (r/as-element [:f> page404/core]) :status 404}]}]}])))
 
 (defonce root (rc/create-root (.getElementById js/document "app")))
