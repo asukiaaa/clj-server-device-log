@@ -15,13 +15,19 @@
             [io.pedestal.interceptor :refer [interceptor]]))
 
 (defn build-schema []
-  (-> (io/resource "schema.edn")
-      slurp
-      edn/read-string
-      (util/inject-resolvers resolver-map)
-      schema/compile))
+  (try
+    (let [schema (-> (io/resource "schema.edn")
+                     slurp
+                     edn/read-string
+                     (util/inject-resolvers resolver-map)
+                     schema/compile)]
+      schema)
+    (catch Exception e
+      (println "failed build-schema")
+      (println e)
+      (throw e))))
 
-(defonce schema (build-schema))
+(defonce schema (build-schema)) ; check able to build schema on loading code
 
 (defn ^:private extract-user-info [request]
   {:email "todo on extart-user-info"})
