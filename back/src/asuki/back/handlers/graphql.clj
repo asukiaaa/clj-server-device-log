@@ -88,8 +88,8 @@
             context))))}))
 
 (defn ^:private interceptors
-  [schema]
-  (-> (p2/default-interceptors schema nil)
+  [build-schema]
+  (-> (p2/default-interceptors build-schema nil)
       (inject user-info-interceptor :after ::p2/inject-app-context)))
 
 (def core (interceptors build-schema))
