@@ -6,7 +6,7 @@
         hiccup/hiccup {:mvn/version "1.0.5"}
         io.pedestal/pedestal.service {:mvn/version "0.6.3"}
         io.pedestal/pedestal.jetty {:mvn/version "0.6.3"}
-        ns-tracker/ns-tracker {:mvn/version "0.4.0"}
+        ns-tracker/ns-tracker {:mvn/version "1.0.0"}
         buddy/buddy-core {:mvn/version "1.11.423"}
         buddy/buddy-sign {:mvn/version "3.5.351"}
         jdbc-ring-session/jdbc-ring-session {:mvn/version "1.5.4"}
