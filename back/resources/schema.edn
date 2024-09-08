@@ -1,15 +1,18 @@
 {:input-objects
- {:UserCreateInput
+ {:InputUserCreate
   {:fields
    {:email {:type (non-null String)}
     :name {:type String}
     :permission {:type String}
     :password {:type String}}}
-  :UserEditInput
+  :InputUserUpdate
   {:fields
    {:email {:type (non-null String)}
     :name {:type String}
-    :permission {:type String}}}}
+    :permission {:type String}}}
+  :InputDeviceGroupCreateUpdate
+  {:fields
+   {:name {:type String}}}}
  :objects
  {:RawDeviceLog
   {:fields
@@ -39,7 +42,10 @@
   {:fields
    {:list {:type (list DeviceGroup)}
     :total {:type Int}}}
-  :ResponseDeviceGroupCreate
+  :ResponseDelete
+  {:fields
+   {:errors {:type String}}}
+  :ResponseDeviceGroupCreateUpdate
   {:fields
    {:errors {:type String}
     :device_group {:type DeviceGroup}}}
@@ -48,7 +54,7 @@
    {:errors {:type String}
     :user {:type User}
     :url_password_reset {:type String}}}
-  :ResponseUserEdit
+  :ResponseUserUpdate
   {:fields
    {:errors {:type String}
     :user {:type User}}}
@@ -87,19 +93,26 @@
   {:fields
    {:user_create
     {:type ResponseUserCreate
-     :args {:user {:type UserCreateInput}
+     :args {:user {:type InputUserCreate}
             :requireUrlPasswordReset {:type Boolean}}}
     :user_update
-    {:type ResponseUserEdit
-     :args {:id {:type Int}
-            :user {:type UserEditInput}
+    {:type ResponseUserUpdate
+     :args {:id {:type (non-null Int)}
+            :user {:type InputUserUpdate}
             :requireUrlPasswordReset {:type Boolean}}}
     :user_delete
-    {:type Int
-     :args {:id {:type Int}}}
-    :device_group_create
-    {:type ResponseDeviceGroupCreate
-     :args {:name {:type (non-null String)}}}
+    {:type ResponseDelete
+     :args {:id {:type (non-null Int)}}}
+    :device_group_for_user_create
+    {:type ResponseDeviceGroupCreateUpdate
+     :args {:device_group {:type InputDeviceGroupCreateUpdate}}}
+    :device_group_for_user_update
+    {:type ResponseDeviceGroupCreateUpdate
+     :args {:id {:type (non-null Int)}
+            :device_group {:type InputDeviceGroupCreateUpdate}}}
+    :device_group_for_user_delete
+    {:type ResponseDelete
+     :args {:id {:type (non-null Int)}}}
     :login
     {:type User
      :args {:email {:type String}

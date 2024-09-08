@@ -22,14 +22,25 @@
                      :on-receive on-receive}))
 
 (defn delete [{:keys [id on-receive]}]
-  (util/delete-by-id {:name-table name-table
+  (util/delete-by-id {:name-table (str name-table "_for_user")
                       :id id
                       :on-receive on-receive}))
 
 (defn create [{:keys [name on-receive]}]
-  (let [str-params (goog.string.format "name: \"%s\""
+  (let [str-params (goog.string.format "device_group: {name: \"%s\"}"
                                        (util/escape-str name))]
-    (util/create {:name-table name-table
+    (util/create {:name-table (str name-table "_for_user")
+                  :str-keys-receive (goog.string.format "%s { %s }"
+                                                        name-table
+                                                        str-keys-for-device-group)
+                  :str-input-params str-params
+                  :on-receive on-receive})))
+
+(defn update [{:keys [id name on-receive]}]
+  (let [str-params (goog.string.format "id: %d, device_group: {name: \"%s\"}"
+                                       (util/escape-int id)
+                                       (util/escape-str name))]
+    (util/update {:name-table (str name-table "_for_user")
                   :str-keys-receive (goog.string.format "%s { %s }"
                                                         name-table
                                                         str-keys-for-device-group)

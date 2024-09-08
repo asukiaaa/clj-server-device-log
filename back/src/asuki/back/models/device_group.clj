@@ -11,14 +11,22 @@
 (defn filter-params [params]
   (select-keys params [:name :user_id]))
 
+(defn get-by-id [id & [{:keys [transaction]}]]
+  (model.util/get-by-id id name-table {:transaction transaction}))
+
 (defn delete [id]
   (jdbc/delete! db-spec key-table ["id = ?" id]))
 
 (defn update [id params]
   (jdbc/update! db-spec key-table params ["id = ?" id]))
 
-(defn get-by-id [id & [{:keys [transaction]}]]
-  (model.util/get-by-id id name-table {:transaction transaction}))
+(defn for-user-update [{:keys [id id-user params]}]
+  (jdbc/with-db-transaction [t-con db-spec]
+    (jdbc/update! db-spec key-table params ["id = ? AND user_id = ?" id id-user])
+    {:device_group (get-by-id id {:transaction t-con})}))
+
+(defn for-user-delete [{:keys [id id-user]}]
+  (jdbc/delete! db-spec key-table ["id = ? AND user_id = ?" id id-user]))
 
 (defn get-by-id-for-user [id user-id & [{:keys [transaction]}]]
   (first (jdbc/query (or transaction db-spec)

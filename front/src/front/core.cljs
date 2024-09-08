@@ -13,6 +13,7 @@
             [front.view.device-groups.index :as device-group.index]
             [front.view.device-groups.create :as device-group.create]
             [front.view.device-groups.show :as device-group.show]
+            [front.view.device-groups.edit :as device-group.edit]
             [front.view.page404 :as page404]
             ["react-router-dom" :as router]))
 
@@ -46,7 +47,7 @@
           [{:index true :element (r/as-element [:f> device-group.index/core])}
            {:path "create" :element (r/as-element [:f> device-group.create/core])}
            {:path ":id_device_group" :element (r/as-element [:f> device-group.show/core])}
-           #_{:path ":id_device_group/edit" :element (r/as-element [:f> device-group.edit/core])}]}
+           {:path ":id_device_group/edit" :element (r/as-element [:f> device-group.edit/core])}]}
          {:path "*" :element (r/as-element [:f> page404/core]) :status 404}]}]}])))
 
 (defonce root (rc/create-root (.getElementById js/document "app")))

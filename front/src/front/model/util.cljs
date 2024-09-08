@@ -1,4 +1,5 @@
 (ns front.model.util
+  (:refer-clojure :exclude [update])
   (:require [clojure.string :refer [escape]]
             [goog.string :refer [format]]
             [re-graph.core :as re-graph]))
@@ -42,20 +43,29 @@
                                (on-receive (get data (keyword name-table))
                                            (build-error-messages errors))))))
 
-(defn delete-by-id [{:keys [name-table id on-receive]}]
-  (let [key-request (str name-table "_delete")
-        query (goog.string.format "{ %s (id: %d) }"
-                                  key-request (escape-int id))]
-    (re-graph/mutate query {} (fn [{:keys [data errors]}]
-                                (on-receive (get data (keyword key-request))
+(defn mutate-with-receive-params [{:keys [str-key-request on-receive str-input-params str-keys-receive]}]
+  (let [query (goog.string.format "{ %s( %s ) { errors %s } }"
+                                  str-key-request
+                                  str-input-params
+                                  (or str-keys-receive ""))]
+    (re-graph/mutate query () (fn [{:keys [data errors]}]
+                                (on-receive (get data (keyword str-key-request))
                                             (build-error-messages errors))))))
 
-(defn create [{:keys [name-table str-input-params on-receive str-keys-receive]}]
-  (let [key-request (str name-table "_create")
-        query (goog.string.format "{ %s( %s ) { errors %s } }"
-                                  key-request
-                                  str-input-params
-                                  str-keys-receive)]
-    (re-graph/mutate query () (fn [{:keys [data errors]}]
-                                (on-receive (get data (keyword key-request))
-                                            (build-error-messages errors))))))
+(defn delete-by-id [{:keys [name-table id on-receive]}]
+  (mutate-with-receive-params {:str-key-request (str name-table "_delete")
+                               :on-receive on-receive
+                               :str-input-params (goog.string.format "id: %d"
+                                                                     (escape-int id))}))
+
+(defn create [{:keys [name-table on-receive str-input-params str-keys-receive]}]
+  (mutate-with-receive-params {:str-key-request (str name-table "_create")
+                               :on-receive on-receive
+                               :str-input-params str-input-params
+                               :str-keys-receive str-keys-receive}))
+
+(defn update [{:keys [name-table on-receive str-input-params str-keys-receive]}]
+  (mutate-with-receive-params {:str-key-request (str name-table "_update")
+                               :on-receive on-receive
+                               :str-input-params str-input-params
+                               :str-keys-receive str-keys-receive}))

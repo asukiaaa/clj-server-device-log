@@ -92,10 +92,25 @@
   (let [user (get-user-loggedin context)]
     (model.device-group/get-by-id-for-user (:id args) (:id user))))
 
-(defn device-group-create-for-user [context args _]
-  (println "args device-group-create-for-user" args)
+(defn device-group-for-user-create [context args _]
+  (println "args device-group-for-user-create" args)
+  (let [user (get-user-loggedin context)
+        params_device_group (-> (:device_group args)
+                                (assoc :user_id (:id user)))]
+    (model.device-group/create params_device_group)))
+
+(defn device-group-for-user-update [context args _]
+  (println "args device-group-for-user-create" args)
   (let [user (get-user-loggedin context)]
-    (model.device-group/create {:name (:name args) :user_id (:id user)})))
+    (model.device-group/for-user-update {:id (:id args)
+                                         :id-user (:id user)
+                                         :params (:device_group args)})))
+
+(defn device-group-for-user-delete [context args _]
+  (println "args device-group-for-user-delete" args)
+  (let [user (get-user-loggedin context)]
+    (model.device-group/for-user-delete {:id (:id args)
+                                         :id-user (:id user)})))
 
 (def resolver-map
   {:Query/raw_device_logs raw-device-logs
@@ -107,6 +122,8 @@
    :Mutation/user_create user-create
    :Mutation/user_update user-update
    :Mutation/user_delete user-delete
-   :Mutation/device_group_create device-group-create-for-user
+   :Mutation/device_group_for_user_create device-group-for-user-create
+   :Mutation/device_group_for_user_update device-group-for-user-update
+   :Mutation/device_group_for_user_delete device-group-for-user-delete
    :Mutation/login login
    :Mutation/logout logout})
