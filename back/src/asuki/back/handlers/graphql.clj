@@ -1,15 +1,12 @@
 (ns asuki.back.handlers.graphql
   (:require [asuki.back.graphql.resolver :refer [resolver-map]]
-            [clojure.data.json :as json]
             [clojure.edn :as edn]
             [clojure.java.io :as io]
             [buddy.sign.jwt :as jwt]
-            #_[clojure.pprint :refer [pprint]]
             [com.walmartlabs.lacinia.pedestal2 :as p2]
             [com.walmartlabs.lacinia.pedestal :refer [inject]]
             [com.walmartlabs.lacinia.schema :as schema]
             [com.walmartlabs.lacinia.util :as util]
-            [com.walmartlabs.lacinia.parser :as parser]
             [asuki.back.models.user :as model.user]
             [asuki.back.config :as config]
             [io.pedestal.interceptor :refer [interceptor]]))
