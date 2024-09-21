@@ -5,11 +5,14 @@
             [clojure.string :refer [escape join]]
             [asuki.back.config :refer [db-spec]]))
 
-(defn get-list-with-total [query-get-records]
+(defn get-list-with-total [query-get-records & [{:keys [build-item]}]]
   (println :query-get-records query-get-records)
   (jdbc/with-db-transaction [db-transaction db-spec]
-    {:list (jdbc/query db-transaction query-get-records)
-     :total (-> (jdbc/query db-transaction "SELECT FOUND_ROWS()") first vals first)}))
+    (let [items (jdbc/query db-transaction query-get-records)
+          total (-> (jdbc/query db-transaction "SELECT FOUND_ROWS()") first vals first)
+          items (if (nil? build-item) items (map build-item items))]
+      {:list items
+       :total total})))
 
 (defn parse-json [input]
   (try
@@ -21,10 +24,12 @@
     (escape text {\" "\\\""
                   \\ "\\\\"})))
 
-(defn build-query-get-index [name-table & {:keys [with-calc-found-rows]}]
-  (let [with-calc-found-rows (if (nil? with-calc-found-rows) true with-calc-found-rows)]
+(defn build-query-get-index [name-table & [{:keys [with-calc-found-rows str-keys-select]}]]
+  (let [with-calc-found-rows (if (nil? with-calc-found-rows) true with-calc-found-rows)
+        str-keys-select (if (nil? str-keys-select) "*" str-keys-select)]
     (->> ["SELECT" (when with-calc-found-rows "SQL_CALC_FOUND_ROWS")
-          "* FROM" (escape-for-sql name-table)]
+          str-keys-select
+          "FROM" (escape-for-sql name-table)]
          (filter seq)
          (join " "))))
 

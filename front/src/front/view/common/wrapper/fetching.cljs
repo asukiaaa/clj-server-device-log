@@ -12,6 +12,9 @@
 (defn start [{:keys [set-fetching]}]
   (set-fetching true))
 
+(defn set-errors [{:keys [set-errors]} errors]
+  (set-errors errors))
+
 (defn finished [{:keys [set-fetching set-errors]} errors]
   (set-fetching false)
   (set-errors errors))

@@ -29,14 +29,14 @@
 
 (defn fetch-list-and-total [{:keys [on-receive limit page]}]
   (util/fetch-list-and-total {:name-table "users"
-                              :str-keys-of-list str-keys-for-user
+                              :str-keys-of-item str-keys-for-user
                               :on-receive on-receive
                               :limit limit
                               :page page}))
 
 (defn fetch-by-id [{:keys [id on-receive]}]
   (util/fetch-by-id {:name-table "user"
-                     :str-keys-of-list str-keys-for-user
+                     :str-keys-of-item str-keys-for-user
                      :id id
                      :on-receive on-receive}))
 

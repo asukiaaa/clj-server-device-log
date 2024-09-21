@@ -8,16 +8,22 @@
 (def keys-for-device-group [:id :user_id :name :created_at :updated_at])
 (def str-keys-for-device-group (clojure.string/join " " (map name keys-for-device-group)))
 
+(defn build-select-options-from-list-and-total [list-and-total]
+  (for [item (:list list-and-total)]
+    (let [id (:id item)
+          name (:name item)]
+      [id (str id " " name)])))
+
 (defn fetch-list-and-total [{:keys [on-receive limit page]}]
   (util/fetch-list-and-total {:name-table "device_groups"
-                              :str-keys-of-list str-keys-for-device-group
+                              :str-keys-of-item str-keys-for-device-group
                               :on-receive on-receive
                               :limit limit
                               :page page}))
 
 (defn fetch-by-id [{:keys [id on-receive]}]
   (util/fetch-by-id {:name-table name-table
-                     :str-keys-of-list str-keys-for-device-group
+                     :str-keys-of-item str-keys-for-device-group
                      :id id
                      :on-receive on-receive}))
 

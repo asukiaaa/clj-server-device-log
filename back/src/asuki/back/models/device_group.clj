@@ -15,6 +15,7 @@
   (model.util/get-by-id id name-table {:transaction transaction}))
 
 (defn delete [id]
+  ; TODO prohibit deleting when who has device
   (jdbc/delete! db-spec key-table ["id = ?" id]))
 
 (defn update [id params]
@@ -26,6 +27,7 @@
     {:device_group (get-by-id id {:transaction t-con})}))
 
 (defn for-user-delete [{:keys [id id-user]}]
+  ; TODO prohibit deleting when who has device
   (jdbc/delete! db-spec key-table ["id = ? AND user_id = ?" id id-user]))
 
 (defn get-by-id-for-user [id user-id & [{:keys [transaction]}]]

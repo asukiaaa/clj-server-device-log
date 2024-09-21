@@ -24,21 +24,29 @@
     (escape text {\" "\\\""
                   \\ "\\\\"})))
 
+(defn build-input-str-for-int [val]
+  (let [val (escape-int val)]
+    (if (nil? val) "null" (str val))))
+
+(defn build-input-str-for-str [val]
+  (let [val (escape-str val)]
+    (if (nil? val) "null" (format "\"%s\"" val))))
+
 (defn build-error-messages [errors]
   (for [e errors] (:message e)))
 
-(defn fetch-list-and-total [{:keys [name-table str-keys-of-list on-receive limit page]}]
+(defn fetch-list-and-total [{:keys [name-table str-keys-of-item on-receive limit page]}]
   (let [str-offset-limit-for-user (build-str-args-offset-limit-for-index limit page)
         str-args-with-parenthesis (if (empty? str-offset-limit-for-user) ""
                                       (format "(%s)" str-offset-limit-for-user))
-        query (format "{ %s %s { total list { %s } } }" name-table str-args-with-parenthesis str-keys-of-list)]
+        query (format "{ %s %s { total list { %s } } }" name-table str-args-with-parenthesis str-keys-of-item)]
     #_(println :query query)
     (re-graph/query query () (fn [{:keys [data errors]}]
                                (on-receive (get data (keyword name-table))
                                            (build-error-messages errors))))))
 
-(defn fetch-by-id [{:keys [name-table str-keys-of-list id on-receive]}]
-  (let [query (goog.string.format "{ %s (id: %d) { %s } }" name-table (escape-int id) str-keys-of-list)]
+(defn fetch-by-id [{:keys [name-table str-keys-of-item id on-receive]}]
+  (let [query (goog.string.format "{ %s (id: %d) { %s } }" name-table (escape-int id) str-keys-of-item)] 
     (re-graph/query query () (fn [{:keys [data errors]}]
                                (on-receive (get data (keyword name-table))
                                            (build-error-messages errors))))))

@@ -7,9 +7,13 @@
     :password {:type String}}}
   :InputUserUpdate
   {:fields
-   {:email {:type (non-null String)}
+   {:email {:type String}
     :name {:type String}
     :permission {:type String}}}
+  :InputDeviceCreateUpdate
+  {:fields
+   {:name {:type String}
+    :device_group_id {:type Int}}}
   :InputDeviceGroupCreateUpdate
   {:fields
    {:name {:type String}}}}
@@ -31,11 +35,24 @@
     :permission {:type String}
     :created_at {:type String}
     :updated_at {:type String}}}
+  :Device
+  {:fields
+   {:id {:type (non-null Int)}
+    :device_group_id {:type (non-null Int)}
+    :name {:type String}
+    :device_group {:type DeviceGroup}
+    :created_at {:type String}
+    :updated_at {:type String}}}
+  :ResponseDeviceListTotal
+  {:fields
+   {:list {:type (list Device)}
+    :total {:type Int}}}
   :DeviceGroup
   {:fields
    {:id {:type (non-null Int)}
     :user_id {:type (non-null Int)}
     :name {:type String}
+    ; :devices {:type ResponseDeviceListTotal}
     :created_at {:type String}
     :updated_at {:type String}}}
   :ResponseDeviceGroupListTotal
@@ -45,6 +62,10 @@
   :ResponseDelete
   {:fields
    {:errors {:type String}}}
+  :ResponseDeviceCreateUpdate
+  {:fields
+   {:errors {:type String}
+    :device {:type Device}}}
   :ResponseDeviceGroupCreateUpdate
   {:fields
    {:errors {:type String}
@@ -70,6 +91,15 @@
             :page {:type Int}
             :where {:type String}
             :order {:type String}}}
+    :devices
+    {:type ResponseDeviceListTotal
+     :args {:limit {:type Int}
+            :page {:type Int}
+            :where {:type String}
+            :order {:type String}}}
+    :device
+    {:type Device
+     :args {:id {:type (non-null Int)}}}
     :device_groups
     {:type ResponseDeviceGroupListTotal
      :args {:limit {:type Int}
@@ -101,6 +131,16 @@
             :user {:type InputUserUpdate}
             :requireUrlPasswordReset {:type Boolean}}}
     :user_delete
+    {:type ResponseDelete
+     :args {:id {:type (non-null Int)}}}
+    :device_for_user_create
+    {:type ResponseDeviceCreateUpdate
+     :args {:device {:type InputDeviceCreateUpdate}}}
+    :device_for_user_update
+    {:type ResponseDeviceCreateUpdate
+     :args {:id {:type (non-null Int)}
+            :device {:type InputDeviceCreateUpdate}}}
+    :device_for_user_delete
     {:type ResponseDelete
      :args {:id {:type (non-null Int)}}}
     :device_group_for_user_create

@@ -8,6 +8,7 @@
             [asuki.back.models.util :as model.util]))
 
 (defn delete [id]
+  ; TODO prohibit deleting when who has device_group
   (jdbc/delete! db-spec :user ["id = ?" id]))
 
 (defn admin? [user]

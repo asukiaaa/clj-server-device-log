@@ -1,6 +1,7 @@
 (ns asuki.back.graphql.resolver
   (:require [asuki.back.models.raw-device-log :as model-raw-device-log]
             [asuki.back.models.user :as model.user]
+            [asuki.back.models.device :as model.device]
             [asuki.back.models.device-group :as model.device-group]
             [com.walmartlabs.lacinia.resolve :refer [resolve-as]]))
 
@@ -84,6 +85,10 @@
        (model.user/delete user-id)
        user-id))))
 
+(defn devices-for-user [context args _]
+  (let [user (get-user-loggedin context)]
+    (model.device/get-list-with-total-for-user args (:id user))))
+
 (defn device-groups-for-user [context args _]
   (let [user (get-user-loggedin context)]
     (model.device-group/get-list-with-total-for-user args (:id user))))
@@ -112,16 +117,43 @@
     (model.device-group/for-user-delete {:id (:id args)
                                          :id-user (:id user)})))
 
+(defn device-for-user-create [context args _]
+  (println "args device-for-user-create" args)
+  (let [user (get-user-loggedin context)
+        params_device_group (:device args)]
+    (model.device/create-for-user params_device_group (:id user))))
+
+(defn device-for-user [context args _]
+  (println "args device-for-user" args)
+  (let [user (get-user-loggedin context)]
+    (model.device/get-by-id-for-user (:id args) (:id user))))
+
+(defn device-for-user-update [context args _]
+  (println "args device-for-user-update" args)
+  (let [user (get-user-loggedin context)
+        params (-> args :device)]
+    (model.device/for-user-update {:id (:id args) :id-user (:id user) :params params})))
+
+(defn device-for-user-delete [context args _]
+  (println "args device-for-user-delete" args)
+  (let [user (get-user-loggedin context)]
+    (model.device/for-user-delete {:id (:id args) :id-user (:id user)})))
+
 (def resolver-map
   {:Query/raw_device_logs raw-device-logs
    :Query/users users
    :Query/user user
+   :Query/devices devices-for-user
+   :Query/device device-for-user
    :Query/device_groups device-groups-for-user
    :Query/device_group device-group-for-user
    :Query/user_loggedin user-loggedin
    :Mutation/user_create user-create
    :Mutation/user_update user-update
    :Mutation/user_delete user-delete
+   :Mutation/device_for_user_create device-for-user-create
+   :Mutation/device_for_user_update device-for-user-update
+   :Mutation/device_for_user_delete device-for-user-delete
    :Mutation/device_group_for_user_create device-group-for-user-create
    :Mutation/device_group_for_user_update device-group-for-user-update
    :Mutation/device_group_for_user_delete device-group-for-user-delete

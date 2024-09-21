@@ -83,6 +83,25 @@
      (for [error errors]
        [:div.invalid-feedback {:key error} error]))])
 
+(defn render-select [label {:keys [default key draft set-draft errors]} value-labels {:keys [type wrapper-class]}]
+  [:div {:class wrapper-class}
+   [:div
+    [:label {:for key} label]]
+   [:select.form-control
+    {:id label
+     :name key
+     :class (when errors :is-invalid)
+     :default-value (or draft default)
+     :type type
+     :on-change (fn [e] (set-draft (-> e .-target .-value)))}
+    [:option ""]
+    (let [value-selected (or draft default)]
+      (for [[value label] value-labels]
+        [:option {:value value :key value} label (= value value-selected)]))]
+   (when errors
+     (for [error errors]
+       [:div.invalid-feedback {:key error} error]))])
+
 (defn btn-confirm-delete [{:keys [message-confirm action-delete]}]
   [:a {:on-click
        (fn [e]

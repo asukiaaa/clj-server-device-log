@@ -11,6 +11,11 @@
 (defn user-show [id] (str users "/" id))
 (defn user-edit [id] (str (user-show id) "/edit"))
 
+(def devices (str front "/devices"))
+(def device-create (str devices "/create"))
+(defn device-show [id] (str devices "/" id))
+(defn device-edit [id] (str (device-show id) "/edit"))
+
 (def device-groups (str front "/device_groups"))
 (def device-group-create (str device-groups "/create"))
 (defn device-group-show [id] (str device-groups "/" id))
