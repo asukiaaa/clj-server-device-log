@@ -5,7 +5,7 @@
             [front.model.util :as util]))
 
 (def name-table "device")
-(def keys-for-device [:id :device_group_id :name :created_at :updated_at])
+(def keys-for-device [:id :device_group_id :name :hash_post :created_at :updated_at])
 (def str-keys-for-device (clojure.string/join " " (map name keys-for-device)))
 (def str-keys-for-device-with-device-group (str str-keys-for-device " device_group{id name user_id}"))
 

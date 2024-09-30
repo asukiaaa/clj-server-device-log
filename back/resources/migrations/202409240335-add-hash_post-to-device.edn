@@ -1,0 +1,6 @@
+{:up
+ ["ALTER TABLE device ADD COLUMN
+   hash_post text DEFAULT \"aaaa\" NOT NULL AFTER name;"
+  "ALTER TABLE device ALTER COLUMN hash_post DROP DEFAULT;"]
+ :down
+ ["ALTER TABLE device DROP COLUMN hash_post;"]}

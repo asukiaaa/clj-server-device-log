@@ -15,7 +15,7 @@
     item))
 
 (defn filter-params [params]
-  (select-keys params [:name :device_group_id]))
+  (select-keys params [:name :device_group_id :hash_post]))
 
 (defn get-by-id [id & [{:keys [transaction]}]]
   (model.util/get-by-id id name-table {:transaction transaction}))
@@ -69,7 +69,9 @@
       (if (empty? device-group)
         {:errors ["device group does not avairable"]}
         (do
-          (jdbc/insert! t-con key-table (filter-params params))
+          (jdbc/insert! t-con key-table (-> params
+                                            (assoc :hash_post (model.util/build-random-str-alphabets-and-number 40))
+                                            filter-params))
           (let [id (-> (jdbc/query t-con "SELECT LAST_INSERT_ID()")
                        first vals first)
                 item (get-by-id id {:transaction t-con})]

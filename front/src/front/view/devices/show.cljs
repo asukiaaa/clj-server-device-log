@@ -43,7 +43,7 @@
             [:th "key"]
             [:th "value"]]]
           [:tbody
-           (for [key [:id :name :device_group :created_at :updated_at]]
+           (for [key [:id :name :hash_post :device_group :created_at :updated_at]]
              [:tr {:key key}
               [:td key]
               [:td

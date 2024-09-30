@@ -5,6 +5,15 @@
             [clojure.string :refer [escape join]]
             [asuki.back.config :refer [db-spec]]))
 
+(def ^:private str-alphabets-and-number "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+(def ^:private str-parentesis-and-special-chars ":[]\\/.,\"!#$%&'()-^")
+
+(defn build-randomstr-complex [len]
+  (apply str (repeatedly len #(rand-nth (str str-alphabets-and-number str-parentesis-and-special-chars)))))
+
+(defn build-random-str-alphabets-and-number [len]
+  (apply str (repeatedly len #(rand-nth str-alphabets-and-number))))
+
 (defn get-list-with-total [query-get-records & [{:keys [build-item]}]]
   (println :query-get-records query-get-records)
   (jdbc/with-db-transaction [db-transaction db-spec]

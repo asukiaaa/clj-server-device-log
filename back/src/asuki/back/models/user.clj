@@ -17,9 +17,6 @@
 (defn build-hash [password salt]
   (-> (str password salt) bhash/sha3-512 codecs/bytes->hex))
 
-(defn random-str [len]
-  (apply str (repeatedly len #(rand-nth "abcdefghijklmnopqrstuvwxyz0123456789:[]\\/.,\"!#$%&'()-^"))))
-
 (defn get-by-email [email & [{:keys [transaction]}]]
   (first (jdbc/query (or transaction db-spec) ["SELECT * FROM user WHERE email = ?" email])))
 
@@ -78,7 +75,7 @@
                         (seq user-in-db) (append-error :email "User already exists"))]
         {:errors (json/write-str errors)}
         (let [password (:password params)
-              salt (random-str 20)
+              salt (model.util/build-randomstr-complex 20)
               hash (build-hash password salt)]
           ; (println salt hash)
           (jdbc/insert! t-con :user
