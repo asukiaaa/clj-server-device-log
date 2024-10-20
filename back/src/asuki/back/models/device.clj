@@ -2,6 +2,7 @@
   (:refer-clojure :exclude [update])
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.core :refer [format]]
+            [clojure.string :as str]
             [asuki.back.models.device-group :as model.device-group]
             [asuki.back.config :refer [db-spec]]
             [asuki.back.models.util :as model.util]))
@@ -88,3 +89,12 @@
   (-> (model.util/build-query-get-index name-table)
       (model.util/append-limit-offset-by-limit-page-params params)
       model.util/get-list-with-total))
+
+(defn get-by-key-post [key-post]
+  (println :key-post key-post)
+  (when-not (nil? key-post)
+    (let [[key id hash] (str/split key-post #":")
+          device (when (= key "device")
+                   (get-by-id id))]
+      (when (= hash (:hash_post device))
+        device))))

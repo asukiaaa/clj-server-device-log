@@ -1,3 +1,20 @@
+# curl
+
+Example commands to post data.
+
+## post with using device hash
+
+```sh
+HASH_POST="device:1:aaaa"
+HOST=http://localhost:3000
+curl -X POST ${HOST}/api/raw_device_log?key_post=${HASH_POST} \
+   -H 'Content-Type: application/json' \
+   -H "Authorization: Bearer ${AUTHORIZATION_BEARER}" \
+   -d "{\"type\":\"test\",\"machine_id\":\"${MACHINE_ID}\"}"
+```
+
+## post with using authorization bearer
+
 ```sh
 MACHINE_ID=`cat /etc/machine-id`
 AUTHORIZATION_BEARER="XXYYZZ"

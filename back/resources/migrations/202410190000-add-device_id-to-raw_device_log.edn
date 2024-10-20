@@ -1,0 +1,7 @@
+{:up
+ ["ALTER TABLE raw_device_log
+   ADD COLUMN device_id BIGINT UNSIGNED AFTER id,
+   ADD CONSTRAINT fk_device_raw_device_log
+   FOREIGN KEY(device_id) REFERENCES device(id)"]
+ :down
+ ["ALTER TABLE raw_device_log DROP CONSTRAINT fk_device_raw_device_log, DROP COLUMN device_id"]}

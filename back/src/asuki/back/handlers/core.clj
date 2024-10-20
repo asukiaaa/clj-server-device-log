@@ -2,7 +2,8 @@
   (:require [clojure.data.json :as json]
             [hiccup.page :refer [html5]]
             [asuki.back.handlers.util :as handler-util]
-            [asuki.back.models.raw-device-log :as model-raw-device-log]))
+            [asuki.back.models.raw-device-log :as model-raw-device-log]
+            [asuki.back.models.device :as model.device]))
 
 (defn top [req]
   {:status 200
@@ -85,12 +86,15 @@
           [:div "404 not found"])})
 
 (defn api-raw-device-log [req]
-  (let [request-method (:request-method req)]
-    (println req)
+  (let [request-method (:request-method req)
+        matched-bearer (handler-util/match-bearer req)
+        key-post (-> req :query-params :key_post)
+        device-to-post (model.device/get-by-key-post key-post)]
     (when (and (= request-method :post)
-               (handler-util/match-bearer req))
+               (or matched-bearer device-to-post))
       (let [body (:json-params req)]
         (println body)
-        (model-raw-device-log/create {:data (json/write-str body)}))
+        (model-raw-device-log/create {:data (json/write-str body)
+                                      :device_id (:id device-to-post)}))
       {:status 200
        :body "ok"})))

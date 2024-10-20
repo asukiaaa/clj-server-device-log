@@ -47,11 +47,13 @@
              [:tr {:key key}
               [:td key]
               [:td
-               #_(get item key)
                (case key
                  :device_group (let [device-group (:device_group item)]
-                                 (str device-group)
-                                 #_(str (:device_group_id item) " " (:name device-group)))
+                                 (str device-group))
+                 :hash_post (let [hash (get item key)]
+                              [:<>
+                               [:div (str hash)]
+                               [:div (str "key_post=" (model.device/build-key-post item))]])
                  (get item key))]])]]])})))
 
 (defn core []
