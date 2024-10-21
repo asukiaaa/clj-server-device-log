@@ -16,7 +16,7 @@
 (defn raw-device-logs
   [_ args _]
   (println "args for raw-device-logs" args)
-  (model-raw-device-log/get-list-with-total args))
+  (model-raw-device-log/get-list-with-total args {:str-where-and "device_id = NULL"}))
 
 (defn login [context args _]
   (println "requested user login")

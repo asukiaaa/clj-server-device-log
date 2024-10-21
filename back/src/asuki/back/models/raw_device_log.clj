@@ -21,9 +21,9 @@
   (when (.contains ["DESC" "desc" "ASC" "asc"] dir)
     dir))
 
-(defn build-target-key [{:keys [key table-key] :as args}]
-  #_(println "build-target-key" key table-key args)
-  (let [fn-filter-key (or (:filter-key args) filter-key)
+(defn build-target-key [{:keys [key table-key] :as params}]
+  #_(println "build-target-key" key table-key params)
+  (let [fn-filter-key (or (:filter-key params) filter-key)
         record-key (if (string? key) key (first key))
         json-key (when-not (string? key) (rest key))
         escaped-key (fn-filter-key record-key)]
@@ -67,11 +67,11 @@
     "not_null" "IS NOT NULL"
     nil))
 
-(defn build-query-item-where-not-or [args {:keys [base-table-key this-table-key]}]
-  #_(println "build query item where " args base-table-key this-table-key)
-  (let [action (get args "action")
-        value (get args "value")
-        key (get args "key")
+(defn build-query-item-where-not-or [params {:keys [base-table-key this-table-key]}]
+  #_(println "build query item where " params base-table-key this-table-key)
+  (let [action (get params "action")
+        value (get params "value")
+        key (get params "key")
         hours-action (when (string? action)
                        (-> (re-matcher #"(in|not-in)-hours-(\d+)$" action)
                            re-find
@@ -95,14 +95,14 @@
                               (t/minus (t/now) (t/hours (Integer. str-hours))))]))
       :else (join " " [target-key target-action target-value]))))
 
-(defn build-query-item-where [args {:keys [base-table-key this-table-key]}]
-  #_(println "build query item where " args base-table-key this-table-key)
-  (if-let [or-where (get args "or")]
+(defn build-query-item-where [params {:keys [base-table-key this-table-key]}]
+  #_(println "build query item where " params base-table-key this-table-key)
+  (if-let [or-where (get params "or")]
     (->> (for [item or-where]
            (build-query-item-where item {:base-table-key base-table-key :this-table-key this-table-key}))
          (join " OR ")
          ((fn [query-or] (str "(" query-or ")"))))
-    (build-query-item-where-not-or args {:base-table-key base-table-key :this-table-key this-table-key})))
+    (build-query-item-where-not-or params {:base-table-key base-table-key :this-table-key this-table-key})))
 
 (defn build-keys-for-where-max-group-by [base-table-key index]
   #_(println "build-keys-for-where-max-group-by" base-table-key index)
@@ -128,12 +128,13 @@
 (defn where-max-group-by? [item]
   (or (get item "group_by") (get item "max")))
 
-(defn build-query-where [{:keys [where base-table-key]}]
+(defn build-query-where [{:keys [where base-table-key str-where-and]}]
   (when-not (or (nil? where) (empty? where))
     #_(println "where" where)
     (let [where-max-group-by (filter where-max-group-by? where)
           where-normal (filter #(not (where-max-group-by? %)) where)]
       (str "WHERE "
+           (when str-where-and (str str-where-and " AND "))
            (join " AND "
                  (filter seq
                          [(join " AND "
@@ -166,12 +167,12 @@
       (println "query for select-max-group-by" query)
       query)))
 
-(defn get-list-with-total [& [args]]
-  (println "get-list-with-total" args)
-  (let [limit (or (:limit args) (:limit defaults))
-        order (when-let [str-order (:order args)]
+(defn get-list-with-total [params & [{:keys [str-where-and]}]]
+  (println "get-list-with-total" params)
+  (let [limit (or (:limit params) (:limit defaults))
+        order (when-let [str-order (:order params)]
                 (json/read-str str-order))
-        where (when-let [w (:where args)] (json/read-str w))
+        where (when-let [w (:where params)] (json/read-str w))
         db-table-key "raw_device_log"
         base-table-key "rdl"
         where-max-group-by (filter where-max-group-by? where)
@@ -182,7 +183,8 @@
         str-query (join " " ["SELECT SQL_CALC_FOUND_ROWS * FROM" db-table-key "AS" base-table-key
                              (when-not (empty? str-query-select-max-group-by) (str ", " str-query-select-max-group-by))
                              (build-query-where {:where where
-                                                 :base-table-key base-table-key})
+                                                 :base-table-key base-table-key
+                                                 :str-where-and str-where-and})
                              (build-query-order order base-table-key)
                              "LIMIT " limit])]
     (println "str-query " str-query)
