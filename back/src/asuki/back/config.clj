@@ -19,6 +19,6 @@
             (read-string str-port)
             80))
 
-(def ragtime
+(defn build-for-ragtime []
   {:datastore (rjdbc/sql-database db-spec)
    :migrations (rjdbc/load-resources "migrations")})

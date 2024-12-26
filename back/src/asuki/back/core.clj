@@ -20,7 +20,6 @@
 (defn start-server [port & args]
   (let [host "0.0.0.0"
         relodable (when-not (nil? args) (.contains args :relodable))]
-    (println (str "in start-server " host ":" port))
     (-> {::http/routes routes-target
          ::http/port port
          ::http/host host
@@ -35,20 +34,23 @@
         http/start)
     (println (str "server starts on http://" host ":" port))))
 
-(defn run-relodable [& args]
+(defn run-relodable [& _args]
   (start-server 3000 :relodable))
 
-(defn migrate []
-  (ragr/migrate config/ragtime)
+(defn db-migrate []
+  (ragr/migrate (config/build-for-ragtime))
   (user/create-sample-admin-if-no-user))
+
+(defn db-rollback []
+  (ragr/rollback (config/build-for-ragtime)))
 
 (defn -main [& args]
   (condp = (first args)
     "server-with-migration"
     (fn []
-      (migrate)
+      (db-migrate)
       (start-server config/port))
     "server" (start-server config/port)
     "db" (condp = (second args)
-           "migrate" (migrate)
-           "rollback" (ragr/rollback config/ragtime))))
+           "migrate" (db-migrate)
+           "rollback" (db-rollback))))
