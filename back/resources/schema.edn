@@ -92,6 +92,13 @@
             :page {:type Int}
             :where {:type String}
             :order {:type String}}}
+    :raw_device_logs_for_device
+    {:type ResponseRawDeviceLogListTotal
+     :args {:device_id {:type Int}
+            :limit {:type Int}
+            :page {:type Int}
+            :where {:type String}
+            :order {:type String}}}
     :devices
     {:type ResponseDeviceListTotal
      :args {:limit {:type Int}

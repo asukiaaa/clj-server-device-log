@@ -58,14 +58,14 @@
         fetch-device-logs (fn [str-where str-order limit]
                             (let [logs-key (str str-where str-order limit)]
                               (wrapper.fetching/start info-wrapper-fetching)
-                              (model.log/fetch-list
+                              (model.log/fetch-list-and-total
                                {:str-order str-order
                                 :str-where str-where
                                 :limit limit
                                 :on-receive
-                                (fn [logs total errors]
-                                  (set-logs logs)
-                                  (set-total total)
+                                (fn [data errors]
+                                  (set-logs (:list data))
+                                  (set-total (:total data))
                                   (set-logs-key-fetched logs-key)
                                   (wrapper.fetching/finished info-wrapper-fetching errors))})))
         on-click-apply (fn []

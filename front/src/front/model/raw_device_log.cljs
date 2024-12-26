@@ -1,7 +1,12 @@
 (ns front.model.raw-device-log
   (:require goog.string
-            [front.model.util :refer [escape-str]]
-            [re-graph.core :as re-graph]))
+            clojure.string
+            [front.model.util :as util :refer [escape-str]]))
+
+(def name-table "raw_device_log")
+(def keys-for-raw-device-logs [:id :created_at :data])
+(def str-keys-for-raw-device-logs (clojure.string/join " " (map name keys-for-raw-device-logs)))
+#_(def str-keys-for-raw-device-logs-with-device-id (str str-keys-for-device " device{id name}"))
 
 (defn get-by-json-key [data json-key]
   (when-not (nil? data)
@@ -33,10 +38,20 @@
         json-key (when-not (string? val-key) (rest val-key))]
     (get-by-json-key target-field json-key)))
 
-(defn fetch-list [{:keys [str-where str-order limit page on-receive]}]
-  (let [query (goog.string.format "{ raw_device_logs(where: \"%s\", order: \"%s\", limit: %d, page: %d) { total list { id created_at data } } }"
-                                  (escape-str str-where) (escape-str str-order) (or limit 100) (or page 0))]
-    (re-graph/query query {} (fn [{:keys [data errors]}]
-                               (let [received-total (-> data :raw_device_logs :total)
-                                     received-logs  (-> data :raw_device_logs :list)]
-                                 (on-receive received-logs received-total errors))))))
+(defn fetch-list-and-total [{:keys [str-where str-order limit page on-receive]} & {:keys [str-name-table str-params]}]
+  (util/fetch-list-and-total {:name-table (or str-name-table (str name-table "s"))
+                              :str-keys-of-item str-keys-for-raw-device-logs
+                              :str-params (str (if str-params (str str-params ", ") "")
+                                               (goog.string/format "where: \"%s\", order: \"%s\""
+                                                                   (escape-str str-where) (escape-str str-order)))
+                              :on-receive on-receive
+                              :limit limit
+                              :page page}))
+
+(defn fetch-list-and-total-for-device  [{:keys [id-device str-where str-order limit page on-receive]}]
+  (fetch-list-and-total {:str-where str-where
+                         :str-order str-order
+                         :limit limit
+                         :pate page
+                         :on-receive on-receive}
+                        {:str-name-table (str name-table "s_for_device")}))

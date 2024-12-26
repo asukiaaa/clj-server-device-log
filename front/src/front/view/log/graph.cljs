@@ -82,7 +82,7 @@
         on-receive (fn [logs _total] (set-logs logs))]
     (react/useEffect
      (fn []
-       (model.log/fetch-list {:str-where str-where :str-order str-order :on-receive on-receive})
+       (model.log/fetch-list-and-total {:str-where str-where :str-order str-order :on-receive on-receive})
        (fn []))
      #js [str-where str-order])
     [render-graphs (str str-where str-order config-renderer) logs config-renderer]))

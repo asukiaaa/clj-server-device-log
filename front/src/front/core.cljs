@@ -14,6 +14,7 @@
             [front.view.devices.create :as device.create]
             [front.view.devices.show :as device.show]
             [front.view.devices.edit :as device.edit]
+            [front.view.devices.raw-device-logs.index :as device.raw-device-log.index]
             [front.view.device-groups.index :as device-group.index]
             [front.view.device-groups.create :as device-group.create]
             [front.view.device-groups.show :as device-group.show]
@@ -50,8 +51,13 @@
           :children
           [{:index true :element (r/as-element [:f> device.index/core])}
            {:path "create" :element (r/as-element [:f> device.create/core])}
-           {:path ":id_device" :element (r/as-element [:f> device.show/core])}
-           {:path ":id_device/edit" :element (r/as-element [:f> device.edit/core])}]}
+           {:path ":id_device"
+            :children
+            [{:index true :element (r/as-element [:f> device.show/core])}
+             {:path "edit" :element (r/as-element [:f> device.edit/core])}
+             {:path "raw_device_logs"
+              :children
+              [{:index true :element (r/as-element [:f> device.raw-device-log.index/core])}]}]}]}
          {:path "device_groups"
           :children
           [{:index true :element (r/as-element [:f> device-group.index/core])}

@@ -35,10 +35,10 @@
 (defn build-error-messages [errors]
   (for [e errors] (:message e)))
 
-(defn fetch-list-and-total [{:keys [name-table str-keys-of-item on-receive limit page]}]
+(defn fetch-list-and-total [{:keys [name-table str-keys-of-item on-receive limit page str-params]}]
   (let [str-offset-limit-for-user (build-str-args-offset-limit-for-index limit page)
-        str-args-with-parenthesis (if (empty? str-offset-limit-for-user) ""
-                                      (format "(%s)" str-offset-limit-for-user))
+        str-params (if str-params (str str-params ", " str-offset-limit-for-user) str-offset-limit-for-user)
+        str-args-with-parenthesis (format "(%s)" str-params)
         query (format "{ %s %s { total list { %s } } }" name-table str-args-with-parenthesis str-keys-of-item)]
     #_(println :query query)
     (re-graph/query query () (fn [{:keys [data errors]}]
@@ -46,7 +46,7 @@
                                            (build-error-messages errors))))))
 
 (defn fetch-by-id [{:keys [name-table str-keys-of-item id on-receive]}]
-  (let [query (goog.string.format "{ %s (id: %d) { %s } }" name-table (escape-int id) str-keys-of-item)] 
+  (let [query (goog.string.format "{ %s (id: %d) { %s } }" name-table (escape-int id) str-keys-of-item)]
     (re-graph/query query () (fn [{:keys [data errors]}]
                                (on-receive (get data (keyword name-table))
                                            (build-error-messages errors))))))

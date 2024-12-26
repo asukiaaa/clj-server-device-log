@@ -4,6 +4,11 @@
 
 A project to practice of creating web server in clojure.
 
+# TODO
+
+Check devices are deleted if device group is deleted
+Check raw_device_logs are deleted if device is deleted
+
 ## Setup
 
 Install docker-compose
