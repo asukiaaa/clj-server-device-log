@@ -11,6 +11,7 @@ services:
       - .volumes/m2:/root/.m2
     ports:
       - "3000:3000"
+      - "59595:59595"
     environment:
       DATABASE_URL: mysql://mariadb:3306/server_practice?user=maria-user&password=maria-pass
     depends_on:

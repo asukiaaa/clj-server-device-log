@@ -4,7 +4,8 @@
             [clojure.tools.namespace.repl :refer [refresh]]))
 
 (defn run-dev-servers [& _args]
-  (nrepl.server/start-server :port 59595)
+  (nrepl.server/start-server :port 59595
+                             :bind "0.0.0.0")
   (core/run-relodable))
 
 (defn db-migrate-with-reloading []
