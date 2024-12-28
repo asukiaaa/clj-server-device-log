@@ -49,36 +49,36 @@
                  [:p (:name user)]]
                 [:div "no user"]))}))
 
-(defn device-logs [req]
-  (let [list-and-total (model-raw-device-log/get-list-with-total)
+#_(defn device-logs [req]
+    (let [list-and-total (model-raw-device-log/get-list-with-total)
         ;; total (:total list-and-total)
-        logs (:list list-and-total)]
-    {:status 200
-     :body (html5
-            [:div
-             [:h1 "device logs"]
-             [:table
-              [:thead [:tr [:th "id"] [:th "created_at"] [:th "action"]]]
-              [:tbody
-               (for [log logs]
-                 [:tr
-                  [:td (:id log)]
-                  [:td (:created_at log)]
-                  [:td [:a {:href (str "/device_logs/" (:id log))}
-                        "detail"]]])]]])}))
-
-(defn device-log [req]
-  (let [id (:id (:path-params req))
-        log (model-raw-device-log/get-by-id id)]
-    {:status 200
-     :body (html5
-            (if log
+          logs (:list list-and-total)]
+      {:status 200
+       :body (html5
               [:div
-               [:p (:id log)]
-               [:p [:pre {:style "overflow:auto"}
-                    (-> (:data log) json/read-json json/pprint-json with-out-str)]]
-               [:p (:created_at log)]]
-              [:div "no data"]))}))
+               [:h1 "device logs"]
+               [:table
+                [:thead [:tr [:th "id"] [:th "created_at"] [:th "action"]]]
+                [:tbody
+                 (for [log logs]
+                   [:tr
+                    [:td (:id log)]
+                    [:td (:created_at log)]
+                    [:td [:a {:href (str "/device_logs/" (:id log))}
+                          "detail"]]])]]])}))
+
+#_(defn device-log [req]
+    (let [id (:id (:path-params req))
+          log (model-raw-device-log/get-by-id id)]
+      {:status 200
+       :body (html5
+              (if log
+                [:div
+                 [:p (:id log)]
+                 [:p [:pre {:style "overflow:auto"}
+                      (-> (:data log) json/read-json json/pprint-json with-out-str)]]
+                 [:p (:created_at log)]]
+                [:div "no data"]))}))
 
 (defn handle-404 [req]
   {:status 404
