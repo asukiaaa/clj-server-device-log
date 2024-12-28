@@ -24,6 +24,12 @@
   (when-let [device-id (:device_id args)]
     (model-raw-device-log/get-list-with-total args {:str-where-and (format "device_id = %d" device-id)})))
 
+(defn raw-device-logs-for-device-group
+  [_ args _]
+  (println "args for raw-device-logs-for-device-group" args)
+  (when-let [device-group-id (:device_group_id args)]
+    (model-raw-device-log/get-list-with-total args {:str-where-and (format "device_group.id = %d" device-group-id)})))
+
 (defn login [context args _]
   (println "requested user login")
   #_(println "args for login" args)
@@ -148,6 +154,7 @@
 (def resolver-map
   {:Query/raw_device_logs raw-device-logs
    :Query/raw_device_logs_for_device raw-device-logs-for-device
+   :Query/raw_device_logs_for_device_group raw-device-logs-for-device-group
    :Query/users users
    :Query/user user
    :Query/devices devices-for-user

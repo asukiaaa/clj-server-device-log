@@ -5,6 +5,7 @@
 (defn match-bearer [req]
   (-> (:headers req)
       (get "authorization")
+      (or "")
       (str/split #" ")
       #_((fn [x] (println x) x))
       (last)

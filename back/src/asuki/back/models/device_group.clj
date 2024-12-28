@@ -42,13 +42,18 @@
           item (get-by-id id {:transaction t-con})]
       {:device_group item})))
 
-(defn get-list-with-total-for-user [params user-id]
+(defn- get-list-with-total-base [params & [{:keys [str-where]}]]
   (-> (model.util/build-query-get-index name-table)
-      (str (format " where user_id = %d" user-id))
+      (#(if-not (empty? str-where) (str % " where " str-where) %))
       (model.util/append-limit-offset-by-limit-page-params params)
-      model.util/get-list-with-total))
+      model.util/get-list-with-total
+      #_((fn [result]
+           (clojure.pprint/pprint (:list result))
+           (println (count (:list result)))
+           result))))
+
+(defn get-list-with-total-for-user [params user-id]
+  (get-list-with-total-base params {:str-where (format "user_id = %d" user-id)}))
 
 (defn get-list-with-total-for-admin [params]
-  (-> (model.util/build-query-get-index name-table)
-      (model.util/append-limit-offset-by-limit-page-params params)
-      model.util/get-list-with-total))
+  (get-list-with-total-base params))

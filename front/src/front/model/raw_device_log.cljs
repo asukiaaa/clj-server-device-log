@@ -4,7 +4,7 @@
             [front.model.util :as util :refer [escape-str]]))
 
 (def name-table "raw_device_log")
-(def keys-for-raw-device-logs [:id :created_at :data])
+(def keys-for-raw-device-logs [:id :device_id :device_name :created_at :data])
 (def str-keys-for-raw-device-logs (clojure.string/join " " (map name keys-for-raw-device-logs)))
 #_(def str-keys-for-raw-device-logs-with-device-id (str str-keys-for-device " device{id name}"))
 
@@ -48,7 +48,7 @@
                               :limit limit
                               :page page}))
 
-(defn fetch-list-and-total-for-device  [{:keys [id-device str-where str-order limit page on-receive]}]
+(defn fetch-list-and-total-for-device [{:keys [id-device str-where str-order limit page on-receive]}]
   (fetch-list-and-total {:str-where str-where
                          :str-order str-order
                          :limit limit
@@ -56,3 +56,12 @@
                          :on-receive on-receive}
                         {:str-name-table (str name-table "s_for_device")
                          :str-params (format "device_id: %d" id-device)}))
+
+(defn fetch-list-and-total-for-device-group [{:keys [id-device-group str-where str-order limit page on-receive]}]
+  (fetch-list-and-total {:str-where str-where
+                         :str-order str-order
+                         :limit limit
+                         :pate page
+                         :on-receive on-receive}
+                        {:str-name-table (str name-table "s_for_device_group")
+                         :str-params (format "device_group_id: %d" id-device-group)}))

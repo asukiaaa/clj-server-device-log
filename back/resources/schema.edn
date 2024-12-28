@@ -21,6 +21,8 @@
  {:RawDeviceLog
   {:fields
    {:id {:type (non-null Int)}
+    :device_id {:type Int}
+    :device_name {:type String}
     :data {:type String}
     :created_at {:type String}}}
   :ResponseRawDeviceLogListTotal
@@ -53,7 +55,6 @@
    {:id {:type (non-null Int)}
     :user_id {:type (non-null Int)}
     :name {:type String}
-    ; :devices {:type ResponseDeviceListTotal}
     :created_at {:type String}
     :updated_at {:type String}}}
   :ResponseDeviceGroupListTotal
@@ -95,6 +96,13 @@
     :raw_device_logs_for_device
     {:type ResponseRawDeviceLogListTotal
      :args {:device_id {:type Int}
+            :limit {:type Int}
+            :page {:type Int}
+            :where {:type String}
+            :order {:type String}}}
+    :raw_device_logs_for_device_group
+    {:type ResponseRawDeviceLogListTotal
+     :args {:device_group_id {:type Int}
             :limit {:type Int}
             :page {:type Int}
             :where {:type String}

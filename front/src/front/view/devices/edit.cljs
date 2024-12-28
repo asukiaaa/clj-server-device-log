@@ -41,7 +41,9 @@
                            :on-receive on-receive-response}))
         fetch-device-groups (fn [errors next]
                               (model.device-group/fetch-list-and-total
-                               {:on-receive (fn [list-and-total new-errors]
+                               {:limit 1000
+                                :page 0
+                                :on-receive (fn [list-and-total new-errors]
                                               (set-device-group-list-and-total list-and-total)
                                               (next (concat errors new-errors)))}))
         fetch-device (fn [errors next]

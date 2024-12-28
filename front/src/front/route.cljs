@@ -21,3 +21,5 @@
 (def device-group-create (str device-groups "/create"))
 (defn device-group-show [id] (str device-groups "/" id))
 (defn device-group-edit [id] (str (device-group-show id) "/edit"))
+(defn device-group-raw-device-logs [id-device-group]
+  (str (device-group-show id-device-group) "/raw_device_logs"))

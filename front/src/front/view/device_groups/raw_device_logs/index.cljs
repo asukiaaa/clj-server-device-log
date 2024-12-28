@@ -1,4 +1,4 @@
-(ns front.view.device-groups.index
+(ns front.view.device-groups.raw-device-logs.index
   (:require ["react" :as react]
             ["react-router-dom" :as router]
             [goog.string :refer [format]]
@@ -7,28 +7,30 @@
             [front.view.common.wrapper.fetching :as wrapper.fetching]
             [front.view.common.wrapper.show404 :as wrapper.show404]
             [front.view.util :as util]
-            [front.model.device-group :as model.device-group]))
+            [front.model.raw-device-log :as model.raw-device-log]))
 
-(defn render-device-group [device-group on-delete]
+(defn render-raw-device-log [raw-device-log on-delete]
   [:tr
-   [:td (:id device-group)]
-   #_[:td (:user_id device-group)]
-   [:td (:name device-group)]
-   [:td (:created_at device-group)]
-   [:td (:updated_at device-group)]
+   [:td (:id raw-device-log)]
+   [:td (:device_id raw-device-log) " " (:device_name raw-device-log)]
+   [:td (:data raw-device-log)]
+   [:td (:created_at raw-device-log)]
    [:td
-    [:> router/Link {:to (route/device-group-raw-device-logs (:id device-group))} "logs"]
+    #_[:> router/Link {:to (route/raw-device-log-show (:id raw-device-log))} "show"]
     " "
-    [:> router/Link {:to (route/device-group-show (:id device-group))} "show"]
+    #_[:> router/Link {:to (route/raw-device-log-edit (:id raw-device-log))} "edit"]
     " "
-    [:> router/Link {:to (route/device-group-edit (:id device-group))} "edit"]
-    " "
-    [:f> util/btn-confirm-delete
-     {:message-confirm (model.device-group/build-confirmation-message-for-deleting device-group)
-      :action-delete #(model.device-group/delete {:id (:id device-group) :on-receive on-delete})}]]])
+    #_[:f> util/btn-confirm-delete
+       {:message-confirm (model.raw-device-log/build-confirmation-message-for-deleting raw-device-log)
+        :action-delete #(model.raw-device-log/delete {:id (:id raw-device-log) :on-receive on-delete})}]]])
+
+#_(defn- page []
+    [:div "hi"])
 
 (defn-  page []
-  (let [location (router/useLocation)
+  (let [params (js->clj (router/useParams))
+        id-device-group (get params "id_device_group")
+        location (router/useLocation)
         [list-and-total set-list-and-total] (react/useState)
         info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
         received-list (:list list-and-total)
@@ -38,23 +40,28 @@
         number-limit (or (:limit query-params) 50)
         number-total-page (pagination/calc-total-page number-limit total)
         build-url-by-page
-        (fn [page] (format "%s?page=%d&limit=%d" route/device-groups page number-limit))
+        (fn [page] (format "%s?page=%d&limit=%d" (route/device-group-raw-device-logs id-device-group) page number-limit))
         load-list (fn []
                     (wrapper.fetching/start info-wrapper-fetching)
-                    (model.device-group/fetch-list-and-total
-                     {:limit number-limit
+                    (model.raw-device-log/fetch-list-and-total-for-device-group
+                     {:id-device-group id-device-group
+                      :limit number-limit
                       :page number-page
+                      :str-order "{}"
+                      :str-where "{}"
                       :on-receive (fn [result errors]
-                                    (println result)
                                     (set-list-and-total result)
-                                    (wrapper.fetching/finished info-wrapper-fetching errors))}))]
+                                    (wrapper.fetching/finished info-wrapper-fetching errors))}))
+        on-delete (fn [_data errors]
+                    (wrapper.fetching/set-errors info-wrapper-fetching errors)
+                    (when (empty? errors)
+                      (load-list)))]
     (react/useEffect
      (fn []
        (load-list)
        (fn []))
      #js [location])
     [:<>
-     [:> router/Link {:to route/device-group-create} "new"]
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer
@@ -64,15 +71,14 @@
          [:thead
           [:tr
            [:th "id"]
-           #_[:th "user_id"]
-           [:th "name"]
+           [:th "device"]
+           [:th "data"]
            [:th "created_at"]
-           [:th "updated_at"]
            [:th "actions"]]]
          [:tbody
           (for [item received-list]
             [:<> {:key (:id item)}
-             [:f> render-device-group item load-list]])]]
+             [:f> render-raw-device-log item on-delete]])]]
         [:f> pagination/core {:build-url build-url-by-page
                               :total-page number-total-page
                               :current-page number-page}]]})]))
