@@ -16,7 +16,7 @@
 (defn raw-device-logs
   [_ args _]
   (println "args for raw-device-logs" args)
-  (model-raw-device-log/get-list-with-total args {:str-where-and "device_id = NULL"}))
+  (model-raw-device-log/get-list-with-total args {:str-where-and "device_id IS NULL"}))
 
 (defn raw-device-logs-for-device
   [_ args _]

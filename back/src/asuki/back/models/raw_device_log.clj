@@ -129,22 +129,25 @@
   (or (get item "group_by") (get item "max")))
 
 (defn build-query-where [{:keys [where base-table-key str-where-and]}]
-  (when-not (or (nil? where) (empty? where))
-    #_(println "where" where)
-    (let [where-max-group-by (filter where-max-group-by? where)
-          where-normal (filter #(not (where-max-group-by? %)) where)]
-      (str "WHERE "
-           (when str-where-and (str str-where-and " AND "))
-           (join " AND "
-                 (filter seq
-                         [(join " AND "
-                                (for [[index item] (map-indexed vector where-max-group-by)]
-                                  #_(println "item" item)
-                                  (build-query-item-where-max-group-by index item {:base-table-key base-table-key})))
-                          (join " AND "
-                                (for [item where-normal]
-                                  #_(println "item" item)
-                                  (build-query-item-where item {:base-table-key base-table-key})))]))))))
+  (->>
+   [str-where-and
+    (when-not (or (nil? where) (empty? where))
+      (let [where-max-group-by (filter where-max-group-by? where)
+            where-normal (filter #(not (where-max-group-by? %)) where)]
+        (join " AND "
+              (filter seq
+                      [(join " AND "
+                             (for [[index item] (map-indexed vector where-max-group-by)]
+                               #_(println "item" item)
+                               (build-query-item-where-max-group-by index item {:base-table-key base-table-key})))
+                       (join " AND "
+                             (for [item where-normal]
+                               #_(println "item" item)
+                               (build-query-item-where item {:base-table-key base-table-key})))]))))]
+   (filter seq)
+   ((fn [and-list]
+      (when-not (empty? and-list)
+        (str "where " (join " AND " and-list)))))))
 
 (defn build-query-select-max-group-by [where-max-group-by {:keys [db-table-key base-table-key]}]
   #_(println "build-query-select-max-group-by" where-max-group-by)
@@ -168,7 +171,6 @@
       query)))
 
 (defn get-list-with-total [params & [{:keys [str-where-and]}]]
-  (println "get-list-with-total" params)
   (let [limit (or (:limit params) (:limit defaults))
         order (when-let [str-order (:order params)]
                 (json/read-str str-order))
