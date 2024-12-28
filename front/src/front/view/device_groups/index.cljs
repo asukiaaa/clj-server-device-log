@@ -45,7 +45,6 @@
                      {:limit number-limit
                       :page number-page
                       :on-receive (fn [result errors]
-                                    (println result)
                                     (set-list-and-total result)
                                     (wrapper.fetching/finished info-wrapper-fetching errors))}))]
     (react/useEffect

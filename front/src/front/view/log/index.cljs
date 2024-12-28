@@ -1,8 +1,8 @@
 (ns front.view.log.index
   (:require ["react" :as react]
             ["react-router-dom" :as router]
-            [front.view.log.graph :as log.graph]
-            [front.view.log.list :as log.list]
+            [front.view.util.raw-device-log.graph :as util.graph]
+            [front.view.util.raw-device-log.list :as util.list]
             [front.model.raw-device-log :as model.log]
             [front.view.common.wrapper.fetching :as wrapper.fetching]
             [front.view.util :as util :refer [build-state-info render-checkbox render-input render-textarea]]))
@@ -107,6 +107,6 @@
        [:div
         [:div.m-1 (str "requested " (str (:default info-limit)) " from " total)]
         (when (get-default-as-bool info-show-graph)
-          [:f> log.graph/render-graphs logs-key-fetched logs config-renderer])
+          [:f> util.graph/core logs-key-fetched logs config-renderer])
         (when (get-default-as-bool info-show-table)
-          [:f> log.list/render-table-logs logs config-renderer])]})]))
+          [:f> util.list/core logs config-renderer])]})]))

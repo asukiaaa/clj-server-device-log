@@ -14,7 +14,6 @@
    [:td (:id raw-device-log)]
    [:td (:data raw-device-log)]
    [:td (:created_at raw-device-log)]
-   [:td (:updated_at raw-device-log)]
    [:td
     #_[:> router/Link {:to (route/raw-device-log-show (:id raw-device-log))} "show"]
     " "
@@ -73,7 +72,6 @@
            [:th "id"]
            [:th "data"]
            [:th "created_at"]
-           [:th "updated_at"]
            [:th "actions"]]]
          [:tbody
           (for [item received-list]

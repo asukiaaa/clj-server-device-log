@@ -1,4 +1,4 @@
-(ns front.view.log.graph
+(ns front.view.util.raw-device-log.graph
   (:require
    ["chart.js" :as chart]
    ["date-fns"]
@@ -68,7 +68,7 @@
                                     :month "yyyy/MM"}}}}}}]
     [:f> render-graph-canvas config (str "graph-" val-key)]))
 
-(defn render-graphs [key logs config-renderer]
+(defn core [key logs config-renderer]
   [:div.container-fluid {:key key}
    (when-not (empty? logs)
      [:div.row
@@ -76,13 +76,3 @@
         [:<> {:key val-config}
          [:div.col-md-6
           [:f> render-graph logs val-config]]])])])
-
-(defn core [{:keys [str-where str-order config-renderer config-renderer-graph]}]
-  (let [[logs set-logs] (react/useState [])
-        on-receive (fn [logs _total] (set-logs logs))]
-    (react/useEffect
-     (fn []
-       (model.log/fetch-list-and-total {:str-where str-where :str-order str-order :on-receive on-receive})
-       (fn []))
-     #js [str-where str-order])
-    [render-graphs (str str-where str-order config-renderer) logs config-renderer]))

@@ -1,4 +1,4 @@
-(ns front.view.log.list
+(ns front.view.util.raw-device-log.list
   (:require [cljs-time.core :as t]
             [cljs-time.format :as tf]
             ["react" :as react]
@@ -65,7 +65,7 @@
          [:pre {:style {:overflow :auto :max-width (- window-width 40)}}
           (.stringify js/JSON (.parse js/JSON (:data log)) nil 2)]]])]))
 
-(defn render-table-logs [logs col-settings]
+(defn core [logs col-settings]
   [:table.table.table-sm
    [:thead
     [:tr
@@ -79,18 +79,3 @@
     (for [log logs]
       [:<> {:key (:id log)}
        [:f> component-device-log log col-settings]])]])
-
-(defn render-with-fetching [{:keys [str-where str-order col-settings]}]
-  (let [[total set-total] (react/useState 0)
-        [logs set-logs] (react/useState [])
-        on-receive (fn [received-logs received-total]
-                     (set-total received-total)
-                     (set-logs received-logs))]
-    (react/useEffect
-     (fn []
-       (model.log/fetch-list-and-total {:str-where str-where :str-order str-order :on-receive on-receive})
-       (fn []))
-     #js [str-where str-order])
-    [:div
-     [:div.m-1 "total: " total]
-     [render-table-logs logs col-settings]]))
