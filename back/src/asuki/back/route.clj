@@ -3,7 +3,7 @@
             [io.pedestal.http.body-params :refer [body-params]]
             [io.pedestal.http :refer [html-body]]
             [io.pedestal.http.route :as route :refer [url-for]]
-            [io.pedestal.interceptor :refer [interceptor]]
+            [clojure.java.io :as io]
             [jdbc-ring-session.core :refer [jdbc-store]]
             [ring.util.response :refer [redirect]]
             [hiccup.page :refer [html5]]
@@ -48,6 +48,12 @@
       #_(assoc :cookies {:some {:max-age 0}})
       (assoc :session nil)))
 
+(defn build-file-handler [path-dir]
+  (fn [request]
+    (let [path (-> request :path-info)]
+      {:status 200
+       :body (io/input-stream (str path-dir path))})))
+
 (def main
   #{["/" :get [html-body handlers/top] :route-name :top]
     ["/front" :get [html-body handlers/top] :route-name :front-dashboard]
@@ -68,6 +74,8 @@
        :route-name :show-device-log
        :constraints {:id #"[0-9]+"}]
     ["/graphql" :post (into [] (concat [interceptor-session] handler-graphql/core)) :route-name :graphql]
+    ["/css/*" :get (build-file-handler "../front/resources/public") :route-name :handle-css]
+    ["/out-cljs/*" :get (build-file-handler "../front/out-cljs/public") :route-name :handle-out-cljs]
     ["/api/raw_device_log"
      :post [(body-params) handlers/api-raw-device-log]
      :route-name :post-raw-device-log]
