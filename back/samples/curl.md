@@ -5,10 +5,10 @@ Example commands to post data.
 ## post with using device hash
 
 ```sh
-HASH_POST="device:1:aaaa"
-HOST=http://localhost:3000
 MACHINE_ID=`cat /etc/machine-id`
-curl -X POST ${HOST}/api/raw_device_log?key_post=${HASH_POST} \
+AUTHORIZATION_BEARER="device:1:aaaa"
+HOST=http://localhost:3000
+curl -X POST ${HOST}/api/raw_device_log \
    -H 'Content-Type: application/json' \
    -H "Authorization: Bearer ${AUTHORIZATION_BEARER}" \
    -d "{\"type\":\"test\",\"machine_id\":\"${MACHINE_ID}\"}"

@@ -1,12 +1,11 @@
 (ns asuki.back.handlers.util
-  (:require [clojure.string :as str]
-            [asuki.back.config :refer [key-auth]]))
+  (:require [clojure.string :as str]))
 
-(defn match-bearer [req]
+(defn get-bearer [req]
   (-> (:headers req)
       (get "authorization")
       (or "")
       (str/split #" ")
-      #_((fn [x] (println x) x))
-      (last)
-      (= key-auth)))
+      ((fn [arr]
+         (when (= (first arr) "Bearer")
+           (last arr))))))
