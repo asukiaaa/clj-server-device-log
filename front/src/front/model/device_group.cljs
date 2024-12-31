@@ -33,8 +33,8 @@
                       :on-receive on-receive}))
 
 (defn create [{:keys [name on-receive]}]
-  (let [str-params (goog.string.format "device_group: {name: \"%s\"}"
-                                       (util/escape-str name))]
+  (let [str-params (goog.string.format "device_group: {name: %s}"
+                                       (util/build-input-str-for-str name))]
     (util/create {:name-table (str name-table "_for_user")
                   :str-keys-receive (goog.string.format "%s { %s }"
                                                         name-table
@@ -43,9 +43,9 @@
                   :on-receive on-receive})))
 
 (defn update [{:keys [id name on-receive]}]
-  (let [str-params (goog.string.format "id: %d, device_group: {name: \"%s\"}"
-                                       (util/escape-int id)
-                                       (util/escape-str name))]
+  (let [str-params (goog.string.format "id: %s, device_group: {name: %s}"
+                                       (util/build-input-str-for-int id)
+                                       (util/build-input-str-for-str name))]
     (util/update {:name-table (str name-table "_for_user")
                   :str-keys-receive (goog.string.format "%s { %s }"
                                                         name-table
@@ -54,4 +54,4 @@
                   :on-receive on-receive})))
 
 (defn build-confirmation-message-for-deleting [device-group]
-  (str "delete device_groupp id:" (:id device-group) " name:" (:name device-group)))
+  (str "delete device_group id:" (:id device-group) " name:" (:name device-group)))

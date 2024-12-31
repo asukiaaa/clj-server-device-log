@@ -2,6 +2,7 @@
   (:refer-clojure :exclude [update])
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.core :refer [format]]
+            [clojure.string :as str]
             [asuki.back.config :refer [db-spec]]
             [asuki.back.models.util :as model.util]))
 
@@ -57,3 +58,11 @@
 
 (defn get-list-with-total-for-admin [params]
   (get-list-with-total-base params))
+
+(defn get-by-key-post [key-post]
+  (when-not (nil? key-post)
+    (let [[key id hash] (str/split key-post #":")
+          device (when (= key "device_group")
+                   (get-by-id id))]
+      (when (= hash (:hash_post device))
+        device))))

@@ -46,10 +46,17 @@
   ((:set-default info) val)
   ((:set-draft info) val))
 
-(defn render-errors [errors]
+(defn render-errors-as-alerts [errors]
   (when errors
-    (for [error errors]
-      [:div.invalid-feedback {:key error} error])))
+    [:<>
+     (for [error errors]
+       [:div.alert.alert-danger {:key error} error])]))
+
+(defn render-errors-for-input [errors]
+  (when errors
+    [:<>
+     (for [error errors]
+       [:div.invalid-feedback {:key error} error])]))
 
 (defn render-textarea [label {:keys [default set-draft errors]} error-message]
   [:div
@@ -58,7 +65,7 @@
    [:textarea.form-control.mb-1
     {:type :text :default-value default :key default :class (when errors :is-invalid)
      :on-change (fn [e] (set-draft (-> e .-target .-value)))}]
-   (render-errors errors)])
+   (render-errors-for-input errors)])
 
 (defn render-checkbox [label {:keys [draft set-draft]}]
   [:span

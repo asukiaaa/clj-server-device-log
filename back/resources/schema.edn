@@ -16,7 +16,16 @@
     :device_group_id {:type Int}}}
   :InputDeviceGroupCreateUpdate
   {:fields
-   {:name {:type String}}}}
+   {:name {:type String}}}
+  :InputDeviceGroupApiKeyCreate
+  {:fields
+   {:name {:type String}
+    :device_group_id {:type (non-null Int)}
+    :permission {:type String}}}
+  :InputDeviceGroupApiKeyUpdate
+  {:fields
+   {:name {:type String}
+    :permission {:type String}}}}
  :objects
  {:RawDeviceLog
   {:fields
@@ -61,6 +70,19 @@
   {:fields
    {:list {:type (list DeviceGroup)}
     :total {:type Int}}}
+  :DeviceGroupApiKey
+  {:fields
+   {:id {:type (non-null Int)}
+    :device_group_id {:type (non-null Int)}
+    :name {:type String}
+    :key_str {:type String}
+    :permission {:type String}
+    :created_at {:type String}
+    :updated_at {:type String}}}
+  :ResponseDeviceGroupApiKeyListTotal
+  {:fields
+   {:list {:type (list DeviceGroupApiKey)}
+    :total {:type Int}}}
   :ResponseDelete
   {:fields
    {:errors {:type String}}}
@@ -72,6 +94,10 @@
   {:fields
    {:errors {:type String}
     :device_group {:type DeviceGroup}}}
+  :ResponseDeviceGroupApiKeyCreateUpdate
+  {:fields
+   {:errors {:type String}
+    :device_group_api_key {:type DeviceGroupApiKey}}}
   :ResponseUserCreate
   {:fields
    {:errors {:type String}
@@ -125,6 +151,17 @@
     :device_group
     {:type DeviceGroup
      :args {:id {:type (non-null Int)}}}
+    :device_group_api_keys_for_device_group
+    {:type ResponseDeviceGroupApiKeyListTotal
+     :args {:device_group_id {:type (non-null Int)}
+            :limit {:type Int}
+            :page {:type Int}
+            :where {:type String}
+            :order {:type String}}}
+    :device_group_api_key_for_device_group
+    {:type DeviceGroupApiKey
+     :args {:id {:type (non-null Int)}
+            :device_group_id {:type (non-null Int)}}}
     :users
     {:type ResponseUserListTotal
      :args {:limit {:type Int}
@@ -133,7 +170,7 @@
             :order {:type String}}}
     :user
     {:type User
-     :args {:id {:type Int}}}
+     :args {:id {:type (non-null Int)}}}
     :user_loggedin {:type :User}}}
   :Mutation
   {:fields
@@ -167,6 +204,16 @@
      :args {:id {:type (non-null Int)}
             :device_group {:type InputDeviceGroupCreateUpdate}}}
     :device_group_for_user_delete
+    {:type ResponseDelete
+     :args {:id {:type (non-null Int)}}}
+    :device_group_api_key_for_user_create
+    {:type ResponseDeviceGroupApiKeyCreateUpdate
+     :args {:device_group_api_key {:type InputDeviceGroupApiKeyCreate}}}
+    :device_group_api_key_for_user_update
+    {:type ResponseDeviceGroupApiKeyCreateUpdate
+     :args {:id {:type (non-null Int)}
+            :device_group_api_key {:type InputDeviceGroupApiKeyUpdate}}}
+    :device_group_api_key_for_user_delete
     {:type ResponseDelete
      :args {:id {:type (non-null Int)}}}
     :login

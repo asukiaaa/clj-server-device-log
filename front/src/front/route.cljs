@@ -23,3 +23,11 @@
 (defn device-group-edit [id] (str (device-group-show id) "/edit"))
 (defn device-group-raw-device-logs [id-device-group]
   (str (device-group-show id-device-group) "/raw_device_logs"))
+(defn device-group-device-group-api-keys [id-device-group]
+  (str (device-group-show id-device-group) "/device_group_api_keys"))
+(defn device-group-device-group-api-key-create [id-device-group]
+  (str (device-group-device-group-api-keys id-device-group) "/create"))
+(defn device-group-device-group-api-key-show [id-device-group id-device-group-api-key]
+  (str (device-group-device-group-api-keys id-device-group) "/" id-device-group-api-key))
+(defn device-group-device-group-api-key-edit [id-device-group id-device-group-api-key]
+  (str (device-group-device-group-api-key-show id-device-group id-device-group-api-key) "/edit"))

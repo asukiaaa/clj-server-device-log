@@ -20,6 +20,10 @@
             [front.view.device-groups.show :as device-group.show]
             [front.view.device-groups.edit :as device-group.edit]
             [front.view.device-groups.raw-device-logs.index :as device-group.raw-device-log.index]
+            [front.view.device-groups.device-group-api-keys.index :as device-group.device-group-api-key.index]
+            [front.view.device-groups.device-group-api-keys.create :as device-group.device-group-api-key.create]
+            [front.view.device-groups.device-group-api-keys.show :as device-group.device-group-api-key.show]
+            [front.view.device-groups.device-group-api-keys.edit :as device-group.device-group-api-key.edit]
             [front.view.page404 :as page404]
             ["react-router-dom" :as router]))
 
@@ -35,39 +39,37 @@
       :id "user-loggedin"
       :loader layout/loader
       :shouldRevalidate (fn [] true)
-      :element (r/as-element [:f> layout/core])
-      :children
+      :element (r/as-element [:f> layout/core]) :children
       [{:index true :element (r/as-element [:f> log.index/core])}
-       {:path "front"
-        :children
+       {:path "front" :children
         [{:index true :element (r/as-element [:f> dashboard/core])}
          {:path "login" :element (r/as-element [:f> login/core])}
-         {:path "users"
-          :children
+         {:path "users" :children
           [{:index true :element (r/as-element [:f> user.index/core])}
            {:path "create" :element (r/as-element [:f> user.create/core])}
            {:path ":id_user" :element (r/as-element [:f> user.show/core])}
            {:path ":id_user/edit" :element (r/as-element [:f> user.edit/core])}]}
-         {:path "devices"
-          :children
+         {:path "devices" :children
           [{:index true :element (r/as-element [:f> device.index/core])}
            {:path "create" :element (r/as-element [:f> device.create/core])}
-           {:path ":id_device"
-            :children
+           {:path ":id_device" :children
             [{:index true :element (r/as-element [:f> device.show/core])}
              {:path "edit" :element (r/as-element [:f> device.edit/core])}
-             {:path "raw_device_logs"
-              :children
+             {:path "raw_device_logs" :children
               [{:index true :element (r/as-element [:f> device.raw-device-log.index/core])}]}]}]}
-         {:path "device_groups"
-          :children
+         {:path "device_groups" :children
           [{:index true :element (r/as-element [:f> device-group.index/core])}
            {:path "create" :element (r/as-element [:f> device-group.create/core])}
-           {:path ":id_device_group"
-            :children
+           {:path ":id_device_group" :children
             [{:index true :element (r/as-element [:f> device-group.show/core])}
              {:path "edit" :element (r/as-element [:f> device-group.edit/core])}
-             {:path "raw_device_logs" :element (r/as-element [:f> device-group.raw-device-log.index/core])}]}]}
+             {:path "raw_device_logs" :element (r/as-element [:f> device-group.raw-device-log.index/core])}
+             {:path "device_group_api_keys" :children
+              [{:index true :element (r/as-element [:f> device-group.device-group-api-key.index/core])}
+               {:path "create" :element (r/as-element [:f> device-group.device-group-api-key.create/core])}
+               {:path ":id_device_group_api_key" :children
+                [{:index true :element (r/as-element [:f> device-group.device-group-api-key.show/core])}
+                 {:path "edit" :element (r/as-element [:f> device-group.device-group-api-key.edit/core])}]}]}]}]}
          {:path "*" :element (r/as-element [:f> page404/core]) :status 404}]}]}])))
 
 (defonce root (rc/create-root (.getElementById js/document "app")))

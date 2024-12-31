@@ -3,6 +3,7 @@
             [asuki.back.models.user :as model.user]
             [asuki.back.models.device :as model.device]
             [asuki.back.models.device-group :as model.device-group]
+            [asuki.back.models.device-group-api-key :as model.device-group-api-key]
             [com.walmartlabs.lacinia.resolve :refer [resolve-as]]))
 
 (defn get-user-loggedin [context]
@@ -129,6 +130,43 @@
     (model.device-group/for-user-delete {:id (:id args)
                                          :id-user (:id user)})))
 
+(defn device-group-api-keys-for-device-group
+  [context args _]
+  (println "args for device-group-api-keys-for-device-group" args)
+  (let [user (get-user-loggedin context)]
+    (when-let [id-device-group (:device_group_id args)]
+      (model.device-group-api-key/get-list-with-total-for-user-and-device-group
+       args (:id user) id-device-group))))
+
+(defn device-group-api-key-for-device-group
+  [context args _]
+  (println "args for device-group-api-key-for-device-group" args)
+  (let [user (get-user-loggedin context)]
+    (when-let [id-device-group (:device_group_id args)]
+      (model.device-group-api-key/get-by-id-for-user-and-device-group
+       (:id args) (:id user) id-device-group))))
+
+(defn device-group-api-key-for-user-create [context args _]
+  (println "args device-group-api-key-for-user-create" args)
+  (let [user (get-user-loggedin context)
+        params (:device_group_api_key args)]
+    (model.device-group-api-key/create-for-user params (:id user))))
+
+(defn device-group-api-key-for-user-update [context args _]
+  (println "args device-group-api-key-for-user-update" args)
+  (let [user (get-user-loggedin context)
+        params (:device_group_api_key args)]
+    (model.device-group-api-key/update-for-user
+     {:params params
+      :id (:id args)
+      :id-user (:id user)})))
+
+(defn device-group-api-key-for-user-delete [context args _]
+  (println "args device-group-api-key-for-user-delete" args)
+  (let [user (get-user-loggedin context)]
+    (model.device-group-api-key/delete-for-user {:id (:id args)
+                                                 :id-user (:id user)})))
+
 (defn device-for-user-create [context args _]
   (println "args device-for-user-create" args)
   (let [user (get-user-loggedin context)
@@ -155,6 +193,8 @@
   {:Query/raw_device_logs raw-device-logs
    :Query/raw_device_logs_for_device raw-device-logs-for-device
    :Query/raw_device_logs_for_device_group raw-device-logs-for-device-group
+   :Query/device_group_api_keys_for_device_group device-group-api-keys-for-device-group
+   :Query/device_group_api_key_for_device_group device-group-api-key-for-device-group
    :Query/users users
    :Query/user user
    :Query/devices devices-for-user
@@ -171,5 +211,8 @@
    :Mutation/device_group_for_user_create device-group-for-user-create
    :Mutation/device_group_for_user_update device-group-for-user-update
    :Mutation/device_group_for_user_delete device-group-for-user-delete
+   :Mutation/device_group_api_key_for_user_create device-group-api-key-for-user-create
+   :Mutation/device_group_api_key_for_user_update device-group-api-key-for-user-update
+   :Mutation/device_group_api_key_for_user_delete device-group-api-key-for-user-delete
    :Mutation/login login
    :Mutation/logout logout})

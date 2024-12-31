@@ -1,6 +1,6 @@
 (ns front.model.util
   (:refer-clojure :exclude [update])
-  (:require [clojure.string :refer [escape]]
+  (:require [clojure.string :refer [escape join]]
             [goog.string :refer [format]]
             [re-graph.core :as re-graph]))
 
@@ -9,9 +9,9 @@
   (let [limit (if (int? limit) limit (js/parseInt limit))
         page (if (int? page) page (js/parseInt page))]
     (->> [(when (int? limit) (format "limit: %d" limit))
-          (when  (int? page) (format "page: %d" page))]
-         (filter  seq)
-         (clojure.string/join  ", "))))
+          (when (int? page) (format "page: %d" page))]
+         (filter seq)
+         (join ", "))))
 
 (defn escape-int [val]
   (when-not (nil? val)
@@ -42,12 +42,18 @@
         query (format "{ %s %s { total list { %s } } }" name-table str-args-with-parenthesis str-keys-of-item)]
     #_(println :query query)
     (re-graph/query query () (fn [{:keys [data errors]}]
+                               (when-not (empty? errors) (println :errors-for-fetch-list-and-total errors))
                                (on-receive (get data (keyword name-table))
                                            (build-error-messages errors))))))
 
-(defn fetch-by-id [{:keys [name-table str-keys-of-item id on-receive]}]
-  (let [query (goog.string.format "{ %s (id: %d) { %s } }" name-table (escape-int id) str-keys-of-item)]
+(defn fetch-by-id [{:keys [name-table str-keys-of-item id on-receive str-addigional-params]}]
+  (let [str-params (join ", " (filter seq
+                                      [(format "id: %s" (build-input-str-for-int id))
+                                       str-addigional-params]))
+        query (goog.string.format "{ %s (%s) { %s } }" name-table str-params str-keys-of-item)]
+    #_(println :query query)
     (re-graph/query query () (fn [{:keys [data errors]}]
+                               (when-not (empty? errors) (println :errors-for-fetch-by-id errors))
                                (on-receive (get data (keyword name-table))
                                            (build-error-messages errors))))))
 
@@ -56,7 +62,9 @@
                                   str-key-request
                                   str-input-params
                                   (or str-keys-receive ""))]
+    #_(println query)
     (re-graph/mutate query () (fn [{:keys [data errors]}]
+                                (when-not (empty? errors) (println :errors-for-mutation errors))
                                 (on-receive (get data (keyword str-key-request))
                                             (build-error-messages errors))))))
 
