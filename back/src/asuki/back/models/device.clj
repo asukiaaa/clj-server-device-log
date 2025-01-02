@@ -2,7 +2,7 @@
   (:refer-clojure :exclude [update])
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.core :refer [format]]
-            [clojure.string :as str]
+            [clojure.string :refer [split]]
             [asuki.back.models.device-group :as model.device-group]
             [asuki.back.config :refer [db-spec]]
             [asuki.back.models.util :as model.util]))
@@ -55,13 +55,16 @@
           (jdbc/delete! db-spec key-table ["id = ?" id])
           {})))))
 
-#_(defn create [params]
-    (jdbc/with-db-transaction [t-con db-spec]
-      (jdbc/insert! t-con key-table (filter-params params))
-      (let [id (-> (jdbc/query t-con "SELECT LAST_INSERT_ID()")
-                   first vals first)
-            item (get-by-id id {:transaction t-con})]
-        {:device item})))
+(defn assign-hash-post-to-params [params]
+  (assoc params :hash_post (model.util/build-random-str-alphabets-and-number 40)))
+
+(defn create [params]
+  (jdbc/with-db-transaction [t-con db-spec]
+    (jdbc/insert! t-con key-table (-> params assign-hash-post-to-params filter-params))
+    (let [id (-> (jdbc/query t-con "SELECT LAST_INSERT_ID()")
+                 first vals first)
+          item (get-by-id id {:transaction t-con})]
+      {:device item})))
 
 (defn create-for-user [params user-id]
   (jdbc/with-db-transaction [t-con db-spec]
@@ -71,7 +74,7 @@
         {:errors ["device group does not avairable"]}
         (do
           (jdbc/insert! t-con key-table (-> params
-                                            (assoc :hash_post (model.util/build-random-str-alphabets-and-number 40))
+                                            assign-hash-post-to-params
                                             filter-params))
           (let [id (-> (jdbc/query t-con "SELECT LAST_INSERT_ID()")
                        first vals first)
@@ -91,10 +94,12 @@
       model.util/get-list-with-total))
 
 (defn get-by-key-post [key-post]
-  (println :key-post key-post)
   (when-not (nil? key-post)
-    (let [[key id hash] (str/split key-post #":")
+    (let [[key id hash] (split key-post #":")
           device (when (= key "device")
                    (get-by-id id))]
       (when (= hash (:hash_post device))
         device))))
+
+(defn build-key-post [device]
+  (str "device:" (:id device) ":" (:hash_post device)))

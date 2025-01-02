@@ -116,3 +116,6 @@
          (when (js/confirm message-confirm) (action-delete)))
        :href ""}
    "delete"])
+
+(defn copy-to-clipboard [text]
+  (-> js/navigator .-clipboard (.writeText text)))

@@ -1,8 +1,23 @@
 # curl
 
-Example commands to post data.
+## device
 
-## post with using device hash
+Example commands to create device
+
+```sh
+AUTHORIZATION_BEARER="device_group:1:device_group_api_key:1:aaaa"
+HOST=http://localhost:3000
+curl -X POST ${HOST}/api/device \
+   -H 'Content-Type: application/json' \
+   -H "Authorization: Bearer ${AUTHORIZATION_BEARER}" \
+   -d "{\"device\":{\"name\":"0000999"}}"
+```
+
+## raw_device_log
+
+Example commands to post raw_device_log.
+
+### post with using device hash
 
 ```sh
 MACHINE_ID=`cat /etc/machine-id`
@@ -14,7 +29,7 @@ curl -X POST ${HOST}/api/raw_device_log \
    -d "{\"type\":\"test\",\"machine_id\":\"${MACHINE_ID}\"}"
 ```
 
-## post with using authorization bearer
+### post with using authorization bearer
 
 ```sh
 MACHINE_ID=`cat /etc/machine-id`

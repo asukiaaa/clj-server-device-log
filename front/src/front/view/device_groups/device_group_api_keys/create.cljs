@@ -5,7 +5,8 @@
             [front.route :as route]
             [front.model.device-group-api-key :as model.device-group-api-key]
             [front.view.common.wrapper.show404 :as wrapper.show404]
-            [front.view.util :as util]))
+            [front.view.util :as util]
+            [front.view.util.device-group-api-key.explanation :as util.explanation]))
 
 (defn- page []
   (let [params (js->clj (router/useParams))
@@ -34,6 +35,7 @@
       [util/render-errors-as-alerts (:errors state-info-system)]
       [util/render-input "name" state-info-name]
       [util/render-textarea "permission" state-info-permission]
+      [util.explanation/permission]
       [:a.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply} "apply"]]]))
 
 (defn core []

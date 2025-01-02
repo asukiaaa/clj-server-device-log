@@ -7,6 +7,15 @@
             [front.view.util :as util]
             [front.model.device-group-api-key :as model.device-group-api-key]))
 
+(defn- render-key-str [device-group-api-key]
+  [:<>
+   [:div
+    [:div (:key_str device-group-api-key)]
+    (let [key-post (model.device-group-api-key/build-key-post device-group-api-key)]
+      [:<>
+       [:pre.mb-0 key-post]
+       [:button.btn.btn-sm.btn-secondary {:on-click #(util/copy-to-clipboard key-post)} "copy"]])]])
+
 (defn- page []
   (let [params (js->clj (router/useParams))
         navigate (router/useNavigate)
@@ -49,7 +58,10 @@
            (for [key [:id :name :key_str :permission :created_at :updated_at]]
              [:tr {:key key}
               [:td key]
-              [:td (get item key)]])]]])})))
+              [:td
+               (cond
+                 (= key :key_str) (render-key-str item)
+                 :else (get item key))]])]]])})))
 
 (defn core []
   (wrapper.show404/wrapper

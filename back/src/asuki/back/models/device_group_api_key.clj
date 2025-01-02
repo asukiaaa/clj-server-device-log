@@ -3,7 +3,7 @@
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.core :refer [format]]
             [clojure.data.json :as json]
-            [clojure.string :refer [join]]
+            [clojure.string :refer [join split]]
             [asuki.back.config :refer [db-spec]]
             [asuki.back.models.util :as model.util]
             [asuki.back.models.device-group :as model.device-group]))
@@ -76,3 +76,17 @@
 
 (defn get-list-with-total-for-user-and-device-group [params id-user id-device-group]
   (get-list-with-total-base params {:str-where (format "%s.user_id = %d AND device_group_id = %d" model.device-group/name-table id-user id-device-group)}))
+
+(defn get-by-key-post [key-post]
+  (when-not (empty? key-post)
+    (let [[key-device-group id-device-group key-device-group-api-key id-device-group-api-key key-str] (split key-post #":")
+          device-group-api-key (when (and (= key-device-group "device_group")
+                                          (= key-device-group-api-key "device_group_api_key"))
+                                 (get-by-id id-device-group-api-key))]
+      (when (and (= key-str (:key_str device-group-api-key))
+                 (= id-device-group (str (:device_group_id device-group-api-key))))
+        device-group-api-key))))
+
+(defn has-permission-to-create-device [device-group-api-key]
+  (let [permission (json/read-json (:permission device-group-api-key))]
+    (:create_device permission)))

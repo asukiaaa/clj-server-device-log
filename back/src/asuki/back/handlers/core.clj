@@ -2,7 +2,8 @@
   (:require [clojure.data.json :as json]
             [hiccup.page :refer [html5]]
             [asuki.back.handlers.util :as handler-util]
-            [asuki.back.models.raw-device-log :as model-raw-device-log]
+            [asuki.back.models.raw-device-log :as model.raw-device-log]
+            [asuki.back.models.device-group-api-key :as model.device-group-api-key]
             [asuki.back.models.device :as model.device]
             [asuki.back.config :as config]))
 
@@ -86,15 +87,26 @@
    :body (html5
           [:div "404 not found"])})
 
-(defn api-raw-device-log [req]
-  (let [request-method (:request-method req)
-        str-bearer (handler-util/get-bearer req)
+(defn api-post-raw-device-log [req]
+  (let [str-bearer (handler-util/get-bearer req)
         matched-bearer (= str-bearer config/key-auth)
         device-to-post (model.device/get-by-key-post str-bearer)]
-    (when (and (= request-method :post)
-               (or matched-bearer device-to-post))
+    (when (or matched-bearer device-to-post)
       (let [body (:json-params req)]
-        (model-raw-device-log/create {:data (json/write-str body)
+        (model.raw-device-log/create {:data (json/write-str body)
                                       :device_id (:id device-to-post)}))
       {:status 200
        :body "ok"})))
+
+(defn api-post-device [req]
+  (let [str-bearer (handler-util/get-bearer req)
+        device-group-api-key (model.device-group-api-key/get-by-key-post str-bearer)]
+    (when (model.device-group-api-key/has-permission-to-create-device device-group-api-key)
+      (let [params (:json-params req)
+            id-device-group (:device_group_id device-group-api-key)
+            params-device (-> (:device params)
+                              (assoc :device_group_id id-device-group))
+            result (model.device/create params-device)
+            result (assoc result :key_post (model.device/build-key-post (:device result)))]
+        {:status 200
+         :body (json/write-str result)}))))

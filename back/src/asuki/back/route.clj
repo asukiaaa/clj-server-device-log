@@ -77,6 +77,9 @@
     ["/css/*" :get (build-file-handler "../front/resources/public") :route-name :handle-css]
     ["/out-cljs/*" :get (build-file-handler "../front/out-cljs/public") :route-name :handle-out-cljs]
     ["/api/raw_device_log"
-     :post [(body-params) handlers/api-raw-device-log]
-     :route-name :post-raw-device-log]
+     :post [(body-params) handlers/api-post-raw-device-log]
+     :route-name :api-post-raw-device-log]
+    ["/api/device"
+     :post [(body-params) handlers/api-post-device]
+     :route-name :api-post-device]
     ["/404" :get [html-body handlers/handle-404] :route-name :show-404]})
