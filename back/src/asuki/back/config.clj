@@ -22,3 +22,5 @@
 (defn build-for-ragtime []
   {:datastore (rjdbc/sql-database db-spec)
    :migrations (rjdbc/load-resources "migrations")})
+
+(def path-filestorage (or (System/getenv "PATH_FILESTORAGE") "../filestorage"))

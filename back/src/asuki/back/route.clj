@@ -82,4 +82,10 @@
     ["/api/device"
      :post [(body-params) handlers/api-post-device]
      :route-name :api-post-device]
+    ["/api/device_file"
+     :post [(middlewares/multipart-params) handlers/api-post-device-file]
+     :route-name :api-post-device-file]
+    ["/filestorage/*"
+     :get [interceptor-session (body-params) handlers/get-file-from-filestorage]
+     :route-name :get-file-fromfilestorage]
     ["/404" :get [html-body handlers/handle-404] :route-name :show-404]})

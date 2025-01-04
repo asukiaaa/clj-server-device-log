@@ -1,11 +1,14 @@
 (ns asuki.back.handlers.core
   (:require [clojure.data.json :as json]
+            [clojure.java.io :as io]
             [hiccup.page :refer [html5]]
             [asuki.back.handlers.util :as handler-util]
             [asuki.back.models.raw-device-log :as model.raw-device-log]
             [asuki.back.models.device-group-api-key :as model.device-group-api-key]
             [asuki.back.models.device :as model.device]
-            [asuki.back.config :as config]))
+            [asuki.back.models.device-file :as model.device-file]
+            [asuki.back.config :as config]
+            [asuki.back.handlers.util :as handler.util]))
 
 (defn top [req]
   {:status 200
@@ -110,3 +113,25 @@
             result (assoc result :key_post (model.device/build-key-post (:device result)))]
         {:status 200
          :body (json/write-str result)}))))
+
+(defn api-post-device-file [req]
+  (let [str-bearer (handler-util/get-bearer req)
+        device (model.device/get-by-key-post str-bearer)]
+    (when device
+      (let [id-device (:id device)
+            info-file (-> req :multipart-params (get "file"))
+            input-file (:tempfile info-file)
+            filename (:filename info-file)
+            path-file (model.device-file/create-file input-file filename id-device)
+            result {:file {:path path-file}}]
+        {:status 200
+         :body (json/write-str result)}))))
+
+(defn get-file-from-filestorage [request]
+  (let [path-url (-> request :path-info)
+        id-user (-> request :session :user handler.util/decode-user-in-session :id)
+        path-file (model.device-file/get-path-file-for-user path-url id-user)]
+    (if path-file
+      {:status 200
+       :body (io/input-stream path-file)}
+      {:status 404})))

@@ -1,5 +1,18 @@
 # curl
 
+## device file
+
+Example command to upload file for device
+
+```sh
+AUTHORIZATION_BEARER="device_group:1:device_group_api_key:1:aaaa"
+PATH_FILE="your-local/image.png"
+HOST=http://localhost:3000
+curl -X POST ${HOST}/api/device_file \
+   -H "Authorization: Bearer ${AUTHORIZATION_BEARER}" \
+   -F "file=@$PATH_FILE"
+```
+
 ## device
 
 Example commands to create device

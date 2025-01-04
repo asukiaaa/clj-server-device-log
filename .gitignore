@@ -20,3 +20,7 @@
 
 # system volumes for docker
 .volumes
+
+# filestorage for server
+filestorage/
+

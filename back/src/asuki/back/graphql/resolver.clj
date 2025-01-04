@@ -4,6 +4,7 @@
             [asuki.back.models.device :as model.device]
             [asuki.back.models.device-group :as model.device-group]
             [asuki.back.models.device-group-api-key :as model.device-group-api-key]
+            [asuki.back.models.device-file :as model.device-file]
             [com.walmartlabs.lacinia.resolve :refer [resolve-as]]))
 
 (defn get-user-loggedin [context]
@@ -167,6 +168,13 @@
     (model.device-group-api-key/delete-for-user {:id (:id args)
                                                  :id-user (:id user)})))
 
+(defn device-files-for-device
+  [context args _]
+  (println "args for device-files-for-device" args)
+  (let [user (get-user-loggedin context)
+        id-device (:device_id args)]
+    (model.device-file/get-list-with-total-for-user-device args (:id user) id-device)))
+
 (defn device-for-user-create [context args _]
   (println "args device-for-user-create" args)
   (let [user (get-user-loggedin context)
@@ -195,6 +203,7 @@
    :Query/raw_device_logs_for_device_group raw-device-logs-for-device-group
    :Query/device_group_api_keys_for_device_group device-group-api-keys-for-device-group
    :Query/device_group_api_key_for_device_group device-group-api-key-for-device-group
+   :Query/device_files_for_device device-files-for-device
    :Query/users users
    :Query/user user
    :Query/devices devices-for-user

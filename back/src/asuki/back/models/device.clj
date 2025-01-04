@@ -11,9 +11,10 @@
 (def key-table (keyword name-table))
 (def str-sql-select-for-device-group-columns "device_group.name device_group_name, device_group.user_id device_group_user_id")
 (defn build-item-for-device-group [item]
-  (let [device_group {:id (:device_group_id item) :name (:device_group_name item) :user_id (:device_group_user_id item)}
-        item (assoc item :device_group device_group)]
-    item))
+  (when-not (empty? item)
+    (let [device_group {:id (:device_group_id item) :name (:device_group_name item) :user_id (:device_group_user_id item)}
+          item (assoc item :device_group device_group)]
+      item)))
 
 (defn filter-params [params]
   (select-keys params [:name :device_group_id :hash_post]))

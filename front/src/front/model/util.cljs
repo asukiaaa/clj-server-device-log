@@ -46,10 +46,10 @@
                                (on-receive (get data (keyword name-table))
                                            (build-error-messages errors))))))
 
-(defn fetch-by-id [{:keys [name-table str-keys-of-item id on-receive str-addigional-params]}]
+(defn fetch-by-id [{:keys [name-table str-keys-of-item id on-receive str-additional-params]}]
   (let [str-params (join ", " (filter seq
                                       [(format "id: %s" (build-input-str-for-int id))
-                                       str-addigional-params]))
+                                       str-additional-params]))
         query (goog.string.format "{ %s (%s) { %s } }" name-table str-params str-keys-of-item)]
     #_(println :query query)
     (re-graph/query query () (fn [{:keys [data errors]}]
@@ -71,8 +71,7 @@
 (defn delete-by-id [{:keys [name-table id on-receive]}]
   (mutate-with-receive-params {:str-key-request (str name-table "_delete")
                                :on-receive on-receive
-                               :str-input-params (goog.string.format "id: %d"
-                                                                     (escape-int id))}))
+                               :str-input-params (goog.string.format "id: %s" (build-input-str-for-int id))}))
 
 (defn create [{:keys [name-table on-receive str-input-params str-keys-receive]}]
   (mutate-with-receive-params {:str-key-request (str name-table "_create")

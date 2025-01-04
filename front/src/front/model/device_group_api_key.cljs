@@ -8,12 +8,6 @@
 (def keys-for-table [:id :device_group_id :name :key_str :permission :created_at :updated_at])
 (def str-keys-for-table (clojure.string/join " " (map name keys-for-table)))
 
-(defn build-select-options-from-list-and-total [list-and-total]
-  (for [item (:list list-and-total)]
-    (let [id (:id item)
-          name (:name item)]
-      [id (str id " " name)])))
-
 (defn fetch-list-and-total-for-device-group [{:keys [id-device-group on-receive limit page]}]
   (util/fetch-list-and-total {:name-table (str name-table "s_for_device_group")
                               :str-keys-of-item str-keys-for-table
@@ -32,7 +26,7 @@
   (util/fetch-by-id {:name-table (str name-table "_for_device_group")
                      :str-keys-of-item str-keys-for-table
                      :id id-device-group-api-key
-                     :str-addigional-params (format "device_group_id: %s" (util/build-input-str-for-int id-device-group))
+                     :str-additional-params (format "device_group_id: %s" (util/build-input-str-for-int id-device-group))
                      :on-receive on-receive}))
 
 (defn delete [{:keys [id on-receive]}]

@@ -7,6 +7,7 @@ services:
     # command: bash -c "PORT=3000 java -jar back.jar"
     volumes:
       - ./back:/usr/src/app/back
+      - ./filestorage:/usr/src/app/filestorage
       - ./front:/usr/src/app/front
       - .volumes/m2:/root/.m2
     ports:

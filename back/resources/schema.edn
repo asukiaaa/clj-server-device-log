@@ -83,6 +83,14 @@
   {:fields
    {:list {:type (list DeviceGroupApiKey)}
     :total {:type Int}}}
+  :DeviceFile
+  {:fields
+   {:device_id {:type (non-null Int)}
+    :path {:type String}}}
+  :ResponseDeviceFileListTotal
+  {:fields
+   {:list {:type (list DeviceFile)}
+    :total {:type Int}}}
   :ResponseDelete
   {:fields
    {:errors {:type String}}}
@@ -162,6 +170,13 @@
     {:type DeviceGroupApiKey
      :args {:id {:type (non-null Int)}
             :device_group_id {:type (non-null Int)}}}
+    :device_files_for_device
+    {:type ResponseDeviceFileListTotal
+     :args {:device_id {:type (non-null Int)}
+            :limit {:type Int}
+            :page {:type Int}
+            :where {:type String}
+            :order {:type String}}}
     :users
     {:type ResponseUserListTotal
      :args {:limit {:type Int}

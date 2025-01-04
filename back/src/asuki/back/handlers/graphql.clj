@@ -2,13 +2,12 @@
   (:require [asuki.back.graphql.resolver :refer [resolver-map]]
             [clojure.edn :as edn]
             [clojure.java.io :as io]
-            [buddy.sign.jwt :as jwt]
             [com.walmartlabs.lacinia.pedestal2 :as p2]
             [com.walmartlabs.lacinia.pedestal :refer [inject]]
             [com.walmartlabs.lacinia.schema :as schema]
-            [com.walmartlabs.lacinia.util :as util]
+            [com.walmartlabs.lacinia.util :as lacinia.util]
             [asuki.back.models.user :as model.user]
-            [asuki.back.config :as config]
+            [asuki.back.handlers.util :as handler.util]
             [io.pedestal.interceptor :refer [interceptor]]))
 
 (defn build-schema []
@@ -16,7 +15,7 @@
     (let [schema (-> (io/resource "schema.edn")
                      slurp
                      edn/read-string
-                     (util/inject-resolvers resolver-map)
+                     (lacinia.util/inject-resolvers resolver-map)
                      schema/compile)]
       schema)
     (catch Exception e
@@ -60,16 +59,12 @@
         context
         (let [args-login (get-args-for-login context)
               user-loggedin-now
-              (when (not (empty? args-login))
-                (do (Thread/sleep 1000) ; wait to take tome for brute force attack
-                    (model.user/get-by-email-password (:email args-login) (:password args-login))))
-              user-in-session #_(-> context :request :session :user)
-              (try
-                (jwt/unsign (-> context :request :session :user) config/secret-for-session)
-                (catch Exception e (println "catched" (.getMessage e))))
-              user-loggedin (if (not (empty? user-loggedin-now))
-                              user-loggedin-now
-                              (model.user/get-by-id (:id user-in-session)))]
+              (when-not (empty? args-login)
+                (Thread/sleep 1000) ; wait to take tome for brute force attack
+                (model.user/get-by-email-password (:email args-login) (:password args-login)))
+              user-loggedin (or user-loggedin-now
+                                (handler.util/decode-and-find-user-in-session
+                                 (-> context :request :session :user)))]
           (cond-> context
             (not (empty? user-loggedin))
             (assoc-in [:request :lacinia-app-context :user-loggedin] user-loggedin)))))
@@ -78,10 +73,10 @@
       (let [session (-> context :request :session (or {}))]
         (if (has-query-of-logout? context)
           (assoc-in context [:response :session] (dissoc session :user))
-          (if-let [user (or (-> context :request :lacinia-app-context :user-loggedin))]
+          (if-let [user (-> context :request :lacinia-app-context :user-loggedin)]
             (assoc-in context [:response :session]
                       (assoc session :user
-                             (jwt/sign user config/secret-for-session)))
+                             (handler.util/encode-user-for-session user)))
             context))))}))
 
 (defn ^:private interceptors

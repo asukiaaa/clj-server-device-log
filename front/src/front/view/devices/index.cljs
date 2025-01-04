@@ -17,6 +17,8 @@
    [:td (:created_at device)]
    [:td (:updated_at device)]
    [:td
+    [:> router/Link {:to (route/device-device-files (:id device))} "files"]
+    " "
     [:> router/Link {:to (route/device-raw-device-logs (:id device))} "logs"]
     " "
     [:> router/Link {:to (route/device-show (:id device))} "show"]
