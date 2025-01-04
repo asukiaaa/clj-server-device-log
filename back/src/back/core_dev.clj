@@ -1,5 +1,5 @@
-(ns asuki.back.core-dev
-  (:require [asuki.back.core :as core]
+(ns back.core-dev
+  (:require [back.core :as core]
             [nrepl.server]))
 
 (defn run-dev-servers [& _args]

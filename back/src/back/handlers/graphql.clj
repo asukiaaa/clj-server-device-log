@@ -1,13 +1,13 @@
-(ns asuki.back.handlers.graphql
-  (:require [asuki.back.graphql.resolver :refer [resolver-map]]
+(ns back.handlers.graphql
+  (:require [back.graphql.resolver :refer [resolver-map]]
             [clojure.edn :as edn]
             [clojure.java.io :as io]
             [com.walmartlabs.lacinia.pedestal2 :as p2]
             [com.walmartlabs.lacinia.pedestal :refer [inject]]
             [com.walmartlabs.lacinia.schema :as schema]
             [com.walmartlabs.lacinia.util :as lacinia.util]
-            [asuki.back.models.user :as model.user]
-            [asuki.back.handlers.util :as handler.util]
+            [back.models.user :as model.user]
+            [back.handlers.util :as handler.util]
             [io.pedestal.interceptor :refer [interceptor]]))
 
 (defn build-schema []

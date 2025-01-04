@@ -1,11 +1,11 @@
-(ns asuki.back.models.device
+(ns back.models.device
   (:refer-clojure :exclude [update])
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.core :refer [format]]
             [clojure.string :refer [split]]
-            [asuki.back.models.device-group :as model.device-group]
-            [asuki.back.config :refer [db-spec]]
-            [asuki.back.models.util :as model.util]))
+            [back.models.device-group :as model.device-group]
+            [back.config :refer [db-spec]]
+            [back.models.util :as model.util]))
 
 (def name-table "device")
 (def key-table (keyword name-table))

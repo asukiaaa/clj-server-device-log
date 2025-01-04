@@ -1,10 +1,10 @@
-(ns asuki.back.graphql.resolver
-  (:require [asuki.back.models.raw-device-log :as model-raw-device-log]
-            [asuki.back.models.user :as model.user]
-            [asuki.back.models.device :as model.device]
-            [asuki.back.models.device-group :as model.device-group]
-            [asuki.back.models.device-group-api-key :as model.device-group-api-key]
-            [asuki.back.models.device-file :as model.device-file]
+(ns back.graphql.resolver
+  (:require [back.models.raw-device-log :as model-raw-device-log]
+            [back.models.user :as model.user]
+            [back.models.device :as model.device]
+            [back.models.device-group :as model.device-group]
+            [back.models.device-group-api-key :as model.device-group-api-key]
+            [back.models.device-file :as model.device-file]
             [com.walmartlabs.lacinia.resolve :refer [resolve-as]]))
 
 (defn get-user-loggedin [context]

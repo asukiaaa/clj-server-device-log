@@ -1,4 +1,4 @@
-(ns asuki.back.models.raw-device-log
+(ns back.models.raw-device-log
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.string :refer [join]]
             [clojure.core :refer [re-find re-matcher]]
@@ -6,8 +6,8 @@
             [clojure.walk :as walk]
             [clj-time.core :as t]
             [clj-time.format :as f]
-            [asuki.back.config :refer [db-spec]]
-            [asuki.back.models.util :as model.util]))
+            [back.config :refer [db-spec]]
+            [back.models.util :as model.util]))
 
 (def defaults
   {:limit 100

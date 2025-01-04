@@ -1,12 +1,12 @@
-(ns asuki.back.core
+(ns back.core
   (:gen-class)
   (:require [io.pedestal.http :as http]
             [io.pedestal.http.route :as route]
             [ns-tracker.core :refer [ns-tracker]]
             [ragtime.repl :as ragr]
-            [asuki.back.models.user :as user]
-            [asuki.back.config :as config]
-            [asuki.back.route :refer [main] :rename {main routes-main}]))
+            [back.models.user :as user]
+            [back.config :as config]
+            [back.route :refer [main] :rename {main routes-main}]))
 
 (def modified-namespaces (ns-tracker "src"))
 

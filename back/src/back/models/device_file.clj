@@ -1,12 +1,12 @@
-(ns asuki.back.models.device-file
+(ns back.models.device-file
   (:refer-clojure :exclude [update])
   (:require [clojure.java.io :as io]
             [clojure.core :refer [re-pattern re-seq]]
             [clojure.string :as str]
             [clj-time.core :as time]
             [clj-time.format :as time.format]
-            [asuki.back.config :refer [path-filestorage]]
-            [asuki.back.models.device :as model.device]))
+            [back.config :refer [path-filestorage]]
+            [back.models.device :as model.device]))
 
 (def timeformat-datetime-with-millis (time.format/formatter "yyyyMMdd-HHmmss-SSS"))
 (def path-url-filestorage "/filestorage")

@@ -1,5 +1,5 @@
-(ns asuki.back.route
-  (:require [asuki.back.handlers.core :as handlers]
+(ns back.route
+  (:require [back.handlers.core :as handlers]
             [io.pedestal.http.body-params :refer [body-params]]
             [io.pedestal.http :refer [html-body]]
             [io.pedestal.http.route :as route :refer [url-for]]
@@ -8,8 +8,8 @@
             [ring.util.response :refer [redirect]]
             [hiccup.page :refer [html5]]
             [io.pedestal.http.ring-middlewares :as middlewares]
-            [asuki.back.config :as config]
-            [asuki.back.handlers.graphql :as handler-graphql]))
+            [back.config :as config]
+            [back.handlers.graphql :as handler-graphql]))
 
 (def interceptor-session (middlewares/session {:store (jdbc-store config/db-spec)}))
 (def interceptors-common [(body-params)

@@ -1,4 +1,4 @@
-(ns asuki.back.config
+(ns back.config
   (:require [ragtime.jdbc :as rjdbc]))
 
 (def db-spec (or (System/getenv "DATABASE_URL")

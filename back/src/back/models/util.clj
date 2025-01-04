@@ -1,9 +1,9 @@
-(ns asuki.back.models.util
+(ns back.models.util
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.data.json :as json]
             [clojure.core :refer [format]]
             [clojure.string :refer [escape join]]
-            [asuki.back.config :refer [db-spec]]))
+            [back.config :refer [db-spec]]))
 
 (def ^:private str-alphabets-and-number "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 (def ^:private str-parentesis-and-special-chars ":[]\\/.,\"!#$%&'()-^")

@@ -1,11 +1,11 @@
-(ns asuki.back.models.user
+(ns back.models.user
   (:refer-clojure :exclude [update])
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.data.json :as json]
             [buddy.core.hash :as bhash]
             [buddy.core.codecs :as codecs]
-            [asuki.back.config :refer [db-spec]]
-            [asuki.back.models.util :as model.util]))
+            [back.config :refer [db-spec]]
+            [back.models.util :as model.util]))
 
 (defn delete [id]
   ; TODO prohibit deleting when who has device_group

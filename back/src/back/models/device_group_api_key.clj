@@ -1,12 +1,12 @@
-(ns asuki.back.models.device-group-api-key
+(ns back.models.device-group-api-key
   (:refer-clojure :exclude [update])
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.core :refer [format]]
             [clojure.data.json :as json]
             [clojure.string :refer [join split]]
-            [asuki.back.config :refer [db-spec]]
-            [asuki.back.models.util :as model.util]
-            [asuki.back.models.device-group :as model.device-group]))
+            [back.config :refer [db-spec]]
+            [back.models.util :as model.util]
+            [back.models.device-group :as model.device-group]))
 
 (def name-table "device_group_api_key")
 (def name-table-with-device-group (format "%s LEFT JOIN %s ON device_group_id = %s.id"

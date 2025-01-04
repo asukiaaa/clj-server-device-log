@@ -1,8 +1,8 @@
-(ns asuki.back.handlers.util
+(ns back.handlers.util
   (:require [clojure.string :as str]
             [buddy.sign.jwt :as jwt]
-            [asuki.back.config :as config]
-            [asuki.back.models.user :as model.user]))
+            [back.config :as config]
+            [back.models.user :as model.user]))
 
 (defn get-bearer [req]
   (-> (:headers req)
