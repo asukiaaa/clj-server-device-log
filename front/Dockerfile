@@ -1,4 +1,4 @@
-FROM clojure:openjdk-18-bullseye
+FROM clojure:tools-deps-bullseye
 # FROM node:17-bullseye
 # FROM debian:bullseye
 
@@ -12,10 +12,10 @@ RUN apt update
 # RUN bash ./linux-install-1.10.3.1075.sh
 
 # nodejs
-RUN apt install -y npm
-RUN npm install -g npm
+RUN apt install -y npm wget
 RUN npm install -g n
 RUN n stable
+RUN hash -r
 RUN npm install -g yarn
 
 # RUN useradd 1000
