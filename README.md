@@ -1,4 +1,4 @@
-# clj-server-practice
+# clj-server-device-log
 
 [{"key": "data","json_key":"camera_id","group_by":{"key":"created_at","order"}}]
 

@@ -1,4 +1,4 @@
-# clj-server-practice/back
+# back
 
 A project to practice of creating web server in clojure.
 

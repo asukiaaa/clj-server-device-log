@@ -1,4 +1,4 @@
-# cljs-reframe-practice
+# front
 
 Latest react version is 17 but reagent requires 16.
 
