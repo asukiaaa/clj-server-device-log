@@ -8,7 +8,9 @@
   (let [user-loggedin (util/get-user-loggedin)
         is-admin (model.user/admin? user-loggedin)]
     [:div.list-group
-     (when is-admin [:> router/Link {:to route/users :class "list-group-item list-group-item-action"} "users"])
-     [:> router/Link {:to route/device-groups :class "list-group-item list-group-item-action"} "device groups"]
-     [:> router/Link {:to route/devices :class "list-group-item list-group-item-action"} "devices"]
-     [:> router/Link {:to route/profile :class "list-group-item list-group-item-action"} "profile TODO"]]))
+     (for [[name url] (remove nil? [(when is-admin ["users" route/users])
+                                    ["device watch groups" route/device-watch-groups]
+                                    ["device groups" route/device-groups]
+                                    ["devices" route/devices]
+                                    #_["profile" route/profile]])]
+       [:> router/Link {:to url :class "list-group-item list-group-item-action"} name])]))

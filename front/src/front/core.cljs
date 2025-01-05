@@ -25,6 +25,10 @@
             [front.view.device-groups.device-group-api-keys.create :as device-group.device-group-api-key.create]
             [front.view.device-groups.device-group-api-keys.show :as device-group.device-group-api-key.show]
             [front.view.device-groups.device-group-api-keys.edit :as device-group.device-group-api-key.edit]
+            [front.view.device-watch-groups.index :as device-watch-group.index]
+            [front.view.device-watch-groups.create :as device-watch-group.create]
+            [front.view.device-watch-groups.show :as device-watch-group.show]
+            [front.view.device-watch-groups.edit :as device-watch-group.edit]
             [front.view.page404 :as page404]
             ["react-router-dom" :as router]))
 
@@ -72,6 +76,15 @@
                {:path ":id_device_group_api_key" :children
                 [{:index true :element (r/as-element [:f> device-group.device-group-api-key.show/core])}
                  {:path "edit" :element (r/as-element [:f> device-group.device-group-api-key.edit/core])}]}]}]}]}
+         {:path "device_watch_groups" :children
+          [{:index true :element (r/as-element [:f> device-watch-group.index/core])}
+           {:path "create" :element (r/as-element [:f> device-watch-group.create/core])}
+           {:path ":id_device_watch_group" :children
+            [{:index true :element (r/as-element [:f> device-watch-group.show/core])}
+             {:path "edit" :element (r/as-element [:f> device-watch-group.edit/core])}
+             #_{:path "devices" :element (r/as-element [:f> device-group.raw-device-log.index/core])}
+             #_{:path ":id_device_watch_group_device" :children
+                [{:index true :element (r/as-element [:f> device-group.device-group-api-key.index/core])}]}]}]}
          {:path "*" :element (r/as-element [:f> page404/core]) :status 404}]}]}])))
 
 (defonce root (rc/create-root (.getElementById js/document "app")))

@@ -1,0 +1,11 @@
+{:up
+ ["CREATE TABLE device_watch_group(
+   id SERIAL NOT NULL PRIMARY KEY UNIQUE,
+   owner_user_id BIGINT UNSIGNED NOT NULL,
+   CONSTRAINT fk_device_watch_group__owner_user_id FOREIGN KEY(owner_user_id) REFERENCES user(id),
+   name CHAR(255),
+   memo text,
+   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP);"]
+ :down
+ ["DROP TABLE device_watch_group;"]}

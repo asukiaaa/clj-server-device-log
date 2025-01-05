@@ -60,8 +60,8 @@
                   :str-input-params str-params
                   :on-receive on-receive})))
 
-(defn build-confirmation-message-for-deleting [device-group]
-  (str "delete " name-table " id:" (:id device-group) " name:" (:name device-group)))
+(defn build-confirmation-message-for-deleting [item]
+  (str "delete " name-table " id:" (:id item) " name:" (:name item)))
 
 (defn build-key-post [device-group-api-key]
-  (str "device_group:" (:device_group_id device-group-api-key) ":device_group_api_key:" (:id device-group-api-key) ":" (:key_str device-group-api-key)))
+  (str "device_group_api:" (:device_group_id device-group-api-key) ":device_group_api_key:" (:id device-group-api-key) ":" (:key_str device-group-api-key)))

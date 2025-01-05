@@ -9,6 +9,11 @@
 (def keys-for-user [:id :email :name :permission :created_at :updated_at])
 (def str-keys-for-user (clojure.string/join " " (map name keys-for-user)))
 
+(defn build-select-options-from-list-and-total [list-and-total]
+  (for [item (:list list-and-total)]
+    (let [id (:id item)]
+      [id (str id " " (:name item) " " (:email item))])))
+
 (defn admin? [user]
   (->> user :permission (.parse js/JSON) js->clj keywordize-keys :role (= "admin")))
 

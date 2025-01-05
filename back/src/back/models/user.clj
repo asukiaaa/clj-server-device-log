@@ -7,6 +7,8 @@
             [back.config :refer [db-spec]]
             [back.models.util :as model.util]))
 
+(def name-table "user")
+
 (defn delete [id]
   ; TODO prohibit deleting when who has device_group
   (jdbc/delete! db-spec :user ["id = ?" id]))
@@ -116,9 +118,7 @@
                            :permission "{\"role\": \"admin\"}"})))
 
 (defn get-list-with-total [args]
-  (-> (model.util/build-query-get-index "user")
-      (model.util/append-limit-offset-by-limit-page-params args)
-      model.util/get-list-with-total))
+  (model.util/get-list-with-total-with-building-query name-table args))
 
 (defn filter-for-session [user]
   (select-keys user [:id]))

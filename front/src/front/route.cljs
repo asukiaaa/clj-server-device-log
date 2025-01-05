@@ -32,3 +32,8 @@
   (str (device-group-device-group-api-keys id-device-group) "/" id-device-group-api-key))
 (defn device-group-device-group-api-key-edit [id-device-group id-device-group-api-key]
   (str (device-group-device-group-api-key-show id-device-group id-device-group-api-key) "/edit"))
+
+(def device-watch-groups (str front "/device_watch_groups"))
+(def device-watch-group-create (str device-watch-groups "/create"))
+(defn device-watch-group-show [id] (str device-watch-groups "/" id))
+(defn device-watch-group-edit [id] (str (device-watch-group-show id) "/edit"))

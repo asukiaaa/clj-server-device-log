@@ -65,14 +65,7 @@
               {:errors (json/write-str {:__system [(.getMessage ex)]})})))))))
 
 (defn- get-list-with-total-base [params & [{:keys [str-where]}]]
-  (-> (model.util/build-query-get-index name-table-with-device-group)
-      (#(if-not (empty? str-where) (str % " where " str-where) %))
-      (model.util/append-limit-offset-by-limit-page-params params)
-      model.util/get-list-with-total
-      #_((fn [result]
-           (clojure.pprint/pprint (:list result))
-           (println (count (:list result)))
-           result))))
+  (model.util/get-list-with-total-with-building-query name-table params {:str-where str-where}))
 
 (defn get-list-with-total-for-user-and-device-group [params id-user id-device-group]
   (get-list-with-total-base params {:str-where (format "%s.user_id = %d AND device_group_id = %d" model.device-group/name-table id-user id-device-group)}))

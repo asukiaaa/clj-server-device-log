@@ -90,9 +90,7 @@
       (model.util/get-list-with-total {:build-item build-item-for-device-group})))
 
 (defn get-list-with-total-for-admin [params]
-  (-> (model.util/build-query-get-index name-table)
-      (model.util/append-limit-offset-by-limit-page-params params)
-      model.util/get-list-with-total))
+  (model.util/get-list-with-total-with-building-query name-table params))
 
 (defn get-by-key-post [key-post]
   (when-not (nil? key-post)

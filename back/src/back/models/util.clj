@@ -51,3 +51,9 @@
 (defn get-by-id [id name-table & [{:keys [transaction]}]]
   (let [query (format "SELECT * FROM %s WHERE id = ?" name-table)]
     (first (jdbc/query (or transaction db-spec) [query id]))))
+
+(defn get-list-with-total-with-building-query [name-table params & [{:keys [str-where]}]]
+  (-> (build-query-get-index name-table)
+      (#(if-not (empty? str-where) (str % " where " str-where) %))
+      (append-limit-offset-by-limit-page-params params)
+      get-list-with-total))

@@ -44,14 +44,7 @@
       {:device_group item})))
 
 (defn- get-list-with-total-base [params & [{:keys [str-where]}]]
-  (-> (model.util/build-query-get-index name-table)
-      (#(if-not (empty? str-where) (str % " where " str-where) %))
-      (model.util/append-limit-offset-by-limit-page-params params)
-      model.util/get-list-with-total
-      #_((fn [result]
-           (clojure.pprint/pprint (:list result))
-           (println (count (:list result)))
-           result))))
+  (model.util/get-list-with-total-with-building-query name-table params {:str-where str-where}))
 
 (defn get-list-with-total-for-user [params user-id]
   (get-list-with-total-base params {:str-where (format "user_id = %d" user-id)}))

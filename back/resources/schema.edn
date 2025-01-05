@@ -25,7 +25,17 @@
   :InputDeviceGroupApiKeyUpdate
   {:fields
    {:name {:type String}
-    :permission {:type String}}}}
+    :permission {:type String}}}
+  :InputDeviceWatchGroupCreate
+  {:fields
+   {:owner_user_id {:type (non-null Int)}
+    :name {:type String}
+    :memo {:type String}}}
+  :InputDeviceWatchGroupUpdate
+  {:fields
+   {:owner_user_id {:type Int}
+    :name {:type String}
+    :memo {:type String}}}}
  :objects
  {:RawDeviceLog
   {:fields
@@ -91,6 +101,18 @@
   {:fields
    {:list {:type (list DeviceFile)}
     :total {:type Int}}}
+  :DeviceWatchGroup
+  {:fields
+   {:id {:type (non-null Int)}
+    :owner_user_id {:type (non-null Int)}
+    :name {:type String}
+    :memo {:type String}
+    :created_at {:type String}
+    :updated_at {:type String}}}
+  :ResponseDeviceWatchGroupListTotal
+  {:fields
+   {:list {:type (list DeviceWatchGroup)}
+    :total {:type Int}}}
   :ResponseDelete
   {:fields
    {:errors {:type String}}}
@@ -106,6 +128,10 @@
   {:fields
    {:errors {:type String}
     :device_group_api_key {:type DeviceGroupApiKey}}}
+  :ResponseDeviceWatchGroupCreateUpdate
+  {:fields
+   {:errors {:type String}
+    :device_watch_group {:type DeviceWatchGroup}}}
   :ResponseUserCreate
   {:fields
    {:errors {:type String}
@@ -177,6 +203,15 @@
             :page {:type Int}
             :where {:type String}
             :order {:type String}}}
+    :device_watch_groups
+    {:type ResponseDeviceWatchGroupListTotal
+     :args {:limit {:type Int}
+            :page {:type Int}
+            :where {:type String}
+            :order {:type String}}}
+    :device_watch_group
+    {:type DeviceWatchGroup
+     :args {:id {:type (non-null Int)}}}
     :users
     {:type ResponseUserListTotal
      :args {:limit {:type Int}
@@ -229,6 +264,16 @@
      :args {:id {:type (non-null Int)}
             :device_group_api_key {:type InputDeviceGroupApiKeyUpdate}}}
     :device_group_api_key_for_user_delete
+    {:type ResponseDelete
+     :args {:id {:type (non-null Int)}}}
+    :device_watch_group_create
+    {:type ResponseDeviceWatchGroupCreateUpdate
+     :args {:device_watch_group {:type InputDeviceWatchGroupCreate}}}
+    :device_watch_group_update
+    {:type ResponseDeviceWatchGroupCreateUpdate
+     :args {:id {:type (non-null Int)}
+            :device_watch_group {:type InputDeviceWatchGroupUpdate}}}
+    :device_watch_group_delete
     {:type ResponseDelete
      :args {:id {:type (non-null Int)}}}
     :login
