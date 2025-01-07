@@ -5,6 +5,7 @@
             [back.models.device-group :as model.device-group]
             [back.models.device-group-api-key :as model.device-group-api-key]
             [back.models.device-watch-group :as model.device-watch-group]
+            [back.models.device-watch-group-device :as model.device-watch-group-device]
             [back.models.device-file :as model.device-file]
             [com.walmartlabs.lacinia.resolve :refer [resolve-as]]))
 
@@ -209,6 +210,39 @@
         id (:id args)]
     (when (model.user/admin? user) (model.device-watch-group/delete id))))
 
+(defn device-watch-group-devices-for-device-watch-group
+  [context args _]
+  (println "args for device-watch-group-devices" args)
+  (when-let [user (get-user-loggedin context)]
+    (when (model.user/admin? user)
+      (model.device-watch-group-device/get-list-with-total-for-admin args))))
+
+(defn device-watch-group-device-for-device-watch-group
+  [context args _]
+  (println "args for device-watch-group-device" args)
+  (when-let [user (get-user-loggedin context)]
+    (when (model.user/admin? user)
+      (model.device-watch-group-device/get-by-id (:id args)))))
+
+(defn device-watch-group-device-create [context args _]
+  (println "args device-watch-group-device-create" args)
+  (let [user (get-user-loggedin context)
+        params (:device_watch_group_device args)]
+    (when (model.user/admin? user) (model.device-watch-group-device/create params))))
+
+(defn device-watch-group-device-update [context args _]
+  (println "args device-watch-group-device-update" args)
+  (let [user (get-user-loggedin context)
+        id (:id args)
+        params (:device_watch_group_device args)]
+    (when (model.user/admin? user) (model.device-watch-group-device/update id params))))
+
+(defn device-watch-group-device-delete [context args _]
+  (println "args device-watch-group-device-delete" args)
+  (let [user (get-user-loggedin context)
+        id (:id args)]
+    (when (model.user/admin? user) (model.device-watch-group-device/delete id))))
+
 (defn device-for-user-create [context args _]
   (println "args device-for-user-create" args)
   (let [user (get-user-loggedin context)
@@ -239,6 +273,8 @@
    :Query/device_group_api_key_for_device_group device-group-api-key-for-device-group
    :Query/device_watch_groups device-watch-groups
    :Query/device_watch_group device-watch-group
+   :Query/device_watch_group_devices_for_device_watch_group device-watch-group-devices-for-device-watch-group
+   :Query/device_watch_group_device_for_device_watch_group device-watch-group-device-for-device-watch-group
    :Query/device_files_for_device device-files-for-device
    :Query/users users
    :Query/user user
@@ -262,5 +298,8 @@
    :Mutation/device_watch_group_create device-watch-group-create
    :Mutation/device_watch_group_update device-watch-group-update
    :Mutation/device_watch_group_delete device-watch-group-delete
+   :Mutation/device_watch_group_device_create device-watch-group-device-create
+   :Mutation/device_watch_group_device_update device-watch-group-device-update
+   :Mutation/device_watch_group_device_delete device-watch-group-device-delete
    :Mutation/login login
    :Mutation/logout logout})

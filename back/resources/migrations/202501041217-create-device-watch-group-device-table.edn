@@ -1,0 +1,13 @@
+{:up
+ ["CREATE TABLE device_watch_group_device(
+   id SERIAL NOT NULL PRIMARY KEY UNIQUE,
+   device_watch_group_id BIGINT UNSIGNED NOT NULL,
+   CONSTRAINT fk_device_watch_group_device__device_watch_group_id FOREIGN KEY(device_watch_group_id) REFERENCES device_watch_group(id),
+   device_id BIGINT UNSIGNED NOT NULL,
+   CONSTRAINT fk_device_watch_group_device__device_id FOREIGN KEY(device_id) REFERENCES device(id),
+   name_device CHAR(255),
+   UNIQUE INDEX(device_id, device_watch_group_id),
+   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP);"]
+ :down
+ ["DROP TABLE device_watch_group_device;"]}

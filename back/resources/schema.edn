@@ -35,7 +35,15 @@
   {:fields
    {:owner_user_id {:type Int}
     :name {:type String}
-    :memo {:type String}}}}
+    :memo {:type String}}}
+  :InputDeviceWatchGroupDeviceCreate
+  {:fields
+   {:device_watch_group_id {:type (non-null Int)}
+    :device_id {:type (non-null Int)}
+    :name_device {:type String}}}
+  :InputDeviceWatchGroupDeviceUpdate
+  {:fields
+   {:name_device {:type String}}}}
  :objects
  {:RawDeviceLog
   {:fields
@@ -113,6 +121,18 @@
   {:fields
    {:list {:type (list DeviceWatchGroup)}
     :total {:type Int}}}
+  :DeviceWatchGroupDevice
+  {:fields
+   {:id {:type (non-null Int)}
+    :device_id {:type (non-null Int)}
+    :device_watch_group_id {:type (non-null Int)}
+    :name_device {:type String}
+    :created_at {:type String}
+    :updated_at {:type String}}}
+  :ResponseDeviceWatchGroupDeviceListTotal
+  {:fields
+   {:list {:type (list DeviceWatchGroupDevice)}
+    :total {:type Int}}}
   :ResponseDelete
   {:fields
    {:errors {:type String}}}
@@ -132,6 +152,10 @@
   {:fields
    {:errors {:type String}
     :device_watch_group {:type DeviceWatchGroup}}}
+  :ResponseDeviceWatchGroupDeviceCreateUpdate
+  {:fields
+   {:errors {:type String}
+    :device_watch_group_device {:type DeviceWatchGroupDevice}}}
   :ResponseUserCreate
   {:fields
    {:errors {:type String}
@@ -212,6 +236,17 @@
     :device_watch_group
     {:type DeviceWatchGroup
      :args {:id {:type (non-null Int)}}}
+    :device_watch_group_devices_for_device_watch_group
+    {:type ResponseDeviceWatchGroupDeviceListTotal
+     :args {:device_watch_group_id {:type (non-null Int)}
+            :limit {:type Int}
+            :page {:type Int}
+            :where {:type String}
+            :order {:type String}}}
+    :device_watch_group_device_for_device_watch_group
+    {:type DeviceWatchGroupDevice
+     :args {:id {:type (non-null Int)}
+            :device_watch_group_id {:type (non-null Int)}}}
     :users
     {:type ResponseUserListTotal
      :args {:limit {:type Int}
@@ -274,6 +309,16 @@
      :args {:id {:type (non-null Int)}
             :device_watch_group {:type InputDeviceWatchGroupUpdate}}}
     :device_watch_group_delete
+    {:type ResponseDelete
+     :args {:id {:type (non-null Int)}}}
+    :device_watch_group_device_create
+    {:type ResponseDeviceWatchGroupDeviceCreateUpdate
+     :args {:device_watch_group_device {:type InputDeviceWatchGroupDeviceCreate}}}
+    :device_watch_group_device_update
+    {:type ResponseDeviceWatchGroupDeviceCreateUpdate
+     :args {:id {:type (non-null Int)}
+            :device_watch_group_device {:type InputDeviceWatchGroupDeviceUpdate}}}
+    :device_watch_group_device_delete
     {:type ResponseDelete
      :args {:id {:type (non-null Int)}}}
     :login

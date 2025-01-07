@@ -22,6 +22,7 @@
 (def device-group-create (str device-groups "/create"))
 (defn device-group-show [id] (str device-groups "/" id))
 (defn device-group-edit [id] (str (device-group-show id) "/edit"))
+
 (defn device-group-raw-device-logs [id-device-group]
   (str (device-group-show id-device-group) "/raw_device_logs"))
 (defn device-group-device-group-api-keys [id-device-group]
@@ -37,3 +38,12 @@
 (def device-watch-group-create (str device-watch-groups "/create"))
 (defn device-watch-group-show [id] (str device-watch-groups "/" id))
 (defn device-watch-group-edit [id] (str (device-watch-group-show id) "/edit"))
+
+(defn device-watch-group-device-watch-group-devices [id-device-watch-group]
+  (str (device-watch-group-show id-device-watch-group) "/device_watch_group_devices"))
+(defn device-watch-group-device-watch-group-device-create [id-device-watch-group]
+  (str (device-watch-group-device-watch-group-devices id-device-watch-group) "/create"))
+(defn device-watch-group-device-watch-group-device-show [id-device-watch-group id-device-watch-group-device]
+  (str (device-watch-group-device-watch-group-devices id-device-watch-group) "/" id-device-watch-group-device))
+(defn device-watch-group-device-watch-group-device-edit [id-device-watch-group id-device-watch-group-device]
+  (str (device-watch-group-device-watch-group-device-show id-device-watch-group id-device-watch-group-device) "/edit"))
