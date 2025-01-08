@@ -36,7 +36,7 @@
       [:div
        [:div "device_watch_group_id"]
        [:div id-device-watch-group]]
-      [util/render-input "device name" state-info-display-name]
+      [util/render-input "display name" state-info-display-name]
       [util/render-input "device id" state-info-id-device]
       [:a.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply} "apply"]]]))
 
