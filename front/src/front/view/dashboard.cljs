@@ -13,4 +13,5 @@
                                     ["device groups" route/device-groups]
                                     ["devices" route/devices]
                                     #_["profile" route/profile]])]
-       [:> router/Link {:to url :class "list-group-item list-group-item-action"} name])]))
+       [:<> {:key name}
+        [:> router/Link {:to url :class "list-group-item list-group-item-action"} name]])]))
