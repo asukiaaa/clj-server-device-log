@@ -39,7 +39,6 @@
         (fn [page] (format "%s?page=%d&limit=%d" route/users page number-limit))
         load-list (fn []
                     (wrapper.fetching/start info-wrapper-fetching)
-                    (println number-limit number-page)
                     (model.user/fetch-list-and-total
                      {:limit number-limit
                       :page number-page
