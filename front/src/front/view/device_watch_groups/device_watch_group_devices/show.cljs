@@ -46,10 +46,14 @@
             [:th "key"]
             [:th "value"]]]
           [:tbody
-           (for [key [:id :display_name :device_id :device_watch_group_id :created_at :updated_at]]
+           (for [key [:id :display_name :device :device_watch_group_id :created_at :updated_at]]
              [:tr {:key key}
-              [:td key]
-              [:td (get item key)]])]]])})))
+              [:td (cond
+                     (= :device key) "device id name"
+                     :else key)]
+              [:td (cond
+                     (= :device key) (str (:device_id item) " " (:device_name item))
+                     :else (get item key))]])]]])})))
 
 (defn core []
   (wrapper.show404/wrapper

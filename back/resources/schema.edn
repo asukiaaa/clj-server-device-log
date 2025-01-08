@@ -127,6 +127,7 @@
     :device_id {:type (non-null Int)}
     :device_watch_group_id {:type (non-null Int)}
     :display_name {:type String}
+    :device_name {:type String}
     :created_at {:type String}
     :updated_at {:type String}}}
   :ResponseDeviceWatchGroupDeviceListTotal

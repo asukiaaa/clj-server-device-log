@@ -6,13 +6,18 @@
             [back.models.util :as model.util]))
 
 (def name-table "device_watch_group_device")
+(def name-table-with-device (str name-table " LEFT JOIN device ON device.id = device_id"))
 (def key-table (keyword name-table))
+(def str-keys-select-with-device-name (str name-table ".*, device.name as device_name"))
 
 (defn filter-params [params]
   (select-keys params [:display_name :device_id :device_watch_group_id]))
 
 (defn get-by-id [id & [{:keys [transaction]}]]
-  (model.util/get-by-id id name-table {:transaction transaction}))
+  (model.util/get-by-id id name-table-with-device
+                        {:transaction transaction
+                         :str-keys-select str-keys-select-with-device-name
+                         :str-key-id (str name-table ".id")}))
 
 (defn delete [id]
   (jdbc/delete! db-spec key-table ["id = ?" id]))
@@ -32,7 +37,7 @@
 
 (defn get-by-id-for-owner-user [id user-id & [{:keys [transaction]}]]
   (first (jdbc/query (or transaction db-spec)
-                     [(str "SELECT * FROM " name-table " WHERE id = ? AND owner_user_id = ?") id user-id])))
+                     [(str "SELECT " str-keys-select-with-device-name " FROM " name-table " WHERE id = ? AND owner_user_id = ?") id user-id])))
 
 (defn create [params]
   (jdbc/with-db-transaction [t-con db-spec]
@@ -43,7 +48,10 @@
       {key-table item})))
 
 (defn- get-list-with-total-base [params & [{:keys [str-where]}]]
-  (model.util/get-list-with-total-with-building-query name-table params {:str-where str-where}))
+  (model.util/get-list-with-total-with-building-query
+   name-table-with-device params
+   {:str-where str-where
+    :str-keys-select str-keys-select-with-device-name}))
 
 (defn get-list-with-total-for-owner-user [params user-id]
   (get-list-with-total-base params {:str-where (format "owner_user_id = %d" user-id)}))

@@ -5,7 +5,7 @@
             [front.model.util :as util]))
 
 (def name-table "device_watch_group_device")
-(def keys-for-table [:id :device_watch_group_id :display_name :device_id :created_at :updated_at])
+(def keys-for-table [:id :device_watch_group_id :display_name :device_id :device_name :created_at :updated_at])
 (def str-keys-for-table (clojure.string/join " " (map name keys-for-table)))
 
 (defn fetch-list-and-total-for-device-watch-group [{:keys [id-device-watch-group on-receive limit page]}]

@@ -13,7 +13,10 @@
   [:tr
    [:td (:id device-watch-group-device)]
    [:td (:display_name device-watch-group-device)]
-   [:td (:device_id device-watch-group-device)]
+   [:td
+    (:device_id device-watch-group-device)
+    " "
+    (:device_name device-watch-group-device)]
    [:td (:updated_at device-watch-group-device)]
    (let [id-device-watch-group (:device_watch_group_id device-watch-group-device)
          id-device-watch-group-device (:id device-watch-group-device)]
@@ -66,7 +69,7 @@
           [:tr
            [:th "id"]
            [:th "display name"]
-           [:th "device id"]
+           [:th "device id name"]
            [:th "updated_at"]
            [:th "actions"]]]
          [:tbody
