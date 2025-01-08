@@ -10,6 +10,11 @@
 (def key-table (keyword name-table))
 (def str-keys-select-with-device-name (str name-table ".*, device.name as device_name"))
 
+(defn build-query-device-ids-for-device-watch-group [id-device-watch-group]
+  (format "(SELECT device_id from %s WHERE device_watch_group_id = %s)"
+          name-table
+          id-device-watch-group))
+
 (defn filter-params [params]
   (select-keys params [:display_name :device_id :device_watch_group_id]))
 

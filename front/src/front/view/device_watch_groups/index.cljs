@@ -17,6 +17,8 @@
    [:td (:created_at device-watch-group)]
    [:td (:updated_at device-watch-group)]
    [:td
+    [:> router/Link {:to (route/device-watch-group-raw-device-logs (:id device-watch-group))} "logs"]
+    " "
     [:> router/Link {:to (route/device-watch-group-device-watch-group-devices (:id device-watch-group))} "devices"]
     " "
     [:> router/Link {:to (route/device-watch-group-show (:id device-watch-group))} "show"]

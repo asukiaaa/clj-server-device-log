@@ -192,6 +192,13 @@
             :page {:type Int}
             :where {:type String}
             :order {:type String}}}
+    :raw_device_logs_for_device_watch_group
+    {:type ResponseRawDeviceLogListTotal
+     :args {:device_watch_group_id {:type Int}
+            :limit {:type Int}
+            :page {:type Int}
+            :where {:type String}
+            :order {:type String}}}
     :devices
     {:type ResponseDeviceListTotal
      :args {:limit {:type Int}

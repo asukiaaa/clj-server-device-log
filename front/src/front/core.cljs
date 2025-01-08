@@ -33,6 +33,7 @@
             [front.view.device-watch-groups.device-watch-group-devices.create :as device-watch-group.device-watch-group-device.create]
             [front.view.device-watch-groups.device-watch-group-devices.show :as device-watch-group.device-watch-group-device.show]
             [front.view.device-watch-groups.device-watch-group-devices.edit :as device-watch-group.device-watch-group-device.edit]
+            [front.view.device-watch-groups.raw-device-logs.index :as device-watch-group.raw-device-log.index]
             [front.view.page404 :as page404]
             ["react-router-dom" :as router]))
 
@@ -91,7 +92,8 @@
                {:path "create" :element (r/as-element [:f> device-watch-group.device-watch-group-device.create/core])}
                {:path ":id_device_watch_group_device" :children
                 [{:index true :element (r/as-element [:f> device-watch-group.device-watch-group-device.show/core])}
-                 {:path "edit" :element (r/as-element [:f> device-watch-group.device-watch-group-device.edit/core])}]}]}]}]}
+                 {:path "edit" :element (r/as-element [:f> device-watch-group.device-watch-group-device.edit/core])}]}]}
+             {:path "raw_device_logs" :element (r/as-element [:f> device-watch-group.raw-device-log.index/core])}]}]}
          {:path "*" :element (r/as-element [:f> page404/core]) :status 404}]}]}])))
 
 (defonce root (rc/create-root (.getElementById js/document "app")))

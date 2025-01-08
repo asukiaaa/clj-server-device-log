@@ -34,6 +34,15 @@
   (when-let [device-group-id (:device_group_id args)]
     (model-raw-device-log/get-list-with-total args {:str-where-and (format "device_group.id = %d" device-group-id)})))
 
+(defn raw-device-logs-for-device-watch-group
+  [context args _]
+  (println "args for raw-device-logs-for-device-watch-group" args)
+  (when-let [user (get-user-loggedin context)]
+    (when (model.user/admin? user)
+      (when-let [id-device-watch-group (:device_watch_group_id args)]
+        (let [query-device-ids (model.device-watch-group-device/build-query-device-ids-for-device-watch-group id-device-watch-group)]
+          (model-raw-device-log/get-list-with-total args {:str-where-and (format "device_id IN %s" query-device-ids)}))))))
+
 (defn login [context args _]
   (println "requested user login")
   #_(println "args for login" args)
@@ -269,6 +278,7 @@
   {:Query/raw_device_logs raw-device-logs
    :Query/raw_device_logs_for_device raw-device-logs-for-device
    :Query/raw_device_logs_for_device_group raw-device-logs-for-device-group
+   :Query/raw_device_logs_for_device_watch_group raw-device-logs-for-device-watch-group
    :Query/device_group_api_keys_for_device_group device-group-api-keys-for-device-group
    :Query/device_group_api_key_for_device_group device-group-api-key-for-device-group
    :Query/device_watch_groups device-watch-groups

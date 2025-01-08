@@ -47,3 +47,6 @@
   (str (device-watch-group-device-watch-group-devices id-device-watch-group) "/" id-device-watch-group-device))
 (defn device-watch-group-device-watch-group-device-edit [id-device-watch-group id-device-watch-group-device]
   (str (device-watch-group-device-watch-group-device-show id-device-watch-group id-device-watch-group-device) "/edit"))
+
+(defn device-watch-group-raw-device-logs [id-device-watch-group]
+  (str (device-watch-group-show id-device-watch-group) "/raw_device_logs"))

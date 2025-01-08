@@ -1,4 +1,4 @@
-(ns front.view.devices.raw-device-logs.index
+(ns front.view.device-watch-groups.raw-device-logs.index
   (:require ["react" :as react]
             ["react-router-dom" :as router]
             [goog.string :refer [format]]
@@ -25,7 +25,7 @@
 
 (defn-  page []
   (let [params (js->clj (router/useParams))
-        id (get params "id_device")
+        id (get params "id_device_watch_group")
         location (router/useLocation)
         [list-and-total set-list-and-total] (react/useState)
         info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
@@ -36,11 +36,11 @@
         number-limit (or (:limit query-params) 50)
         number-total-page (pagination/calc-total-page number-limit total)
         build-url-by-page
-        (fn [page] (format "%s?page=%d&limit=%d" (route/device-raw-device-logs id) page number-limit))
+        (fn [page] (format "%s?page=%d&limit=%d" (route/device-watch-group-raw-device-logs id) page number-limit))
         load-list (fn []
                     (wrapper.fetching/start info-wrapper-fetching)
-                    (model.raw-device-log/fetch-list-and-total-for-device
-                     {:id-device id
+                    (model.raw-device-log/fetch-list-and-total-for-device-watch-group
+                     {:id-device-watch-group id
                       :limit number-limit
                       :page number-page
                       :str-order "{}"

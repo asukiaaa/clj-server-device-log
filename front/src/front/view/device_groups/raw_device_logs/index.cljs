@@ -24,9 +24,6 @@
        {:message-confirm (model.raw-device-log/build-confirmation-message-for-deleting raw-device-log)
         :action-delete #(model.raw-device-log/delete {:id (:id raw-device-log) :on-receive on-delete})}]]])
 
-#_(defn- page []
-    [:div "hi"])
-
 (defn-  page []
   (let [params (js->clj (router/useParams))
         id-device-group (get params "id_device_group")
