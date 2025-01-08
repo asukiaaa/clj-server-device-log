@@ -9,7 +9,7 @@
 (def key-table (keyword name-table))
 
 (defn filter-params [params]
-  (select-keys params [:name_device :device_id :device_watch_group_id]))
+  (select-keys params [:display_name :device_id :device_watch_group_id]))
 
 (defn get-by-id [id & [{:keys [transaction]}]]
   (model.util/get-by-id id name-table {:transaction transaction}))

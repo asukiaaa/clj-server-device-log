@@ -12,7 +12,7 @@
 (defn render-device-watch-group-device [device-watch-group-device on-delete]
   [:tr
    [:td (:id device-watch-group-device)]
-   [:td (:name_device device-watch-group-device)]
+   [:td (:display_name device-watch-group-device)]
    [:td (:device_id device-watch-group-device)]
    [:td (:updated_at device-watch-group-device)]
    (let [id-device-watch-group (:device_watch_group_id device-watch-group-device)
@@ -65,7 +65,7 @@
          [:thead
           [:tr
            [:th "id"]
-           [:th "name device"]
+           [:th "display name"]
            [:th "device id"]
            [:th "updated_at"]
            [:th "actions"]]]

@@ -5,7 +5,7 @@
             [front.model.util :as util]))
 
 (def name-table "device_watch_group_device")
-(def keys-for-table [:id :device_watch_group_id :name_device :device_id :created_at :updated_at])
+(def keys-for-table [:id :device_watch_group_id :display_name :device_id :created_at :updated_at])
 (def str-keys-for-table (clojure.string/join " " (map name keys-for-table)))
 
 (defn fetch-list-and-total-for-device-watch-group [{:keys [id-device-watch-group on-receive limit page]}]
@@ -34,10 +34,10 @@
                       :id id
                       :on-receive on-receive}))
 
-(defn create [{:keys [name-device id-device id-device-watch-group on-receive]}]
-  (let [str-params (format "%s: {name_device: %s, device_id: %s, device_watch_group_id: %s}"
+(defn create [{:keys [display-name id-device id-device-watch-group on-receive]}]
+  (let [str-params (format "%s: {display_name: %s, device_id: %s, device_watch_group_id: %s}"
                            name-table
-                           (util/build-input-str-for-str name-device)
+                           (util/build-input-str-for-str display-name)
                            (util/build-input-str-for-int id-device)
                            (util/build-input-str-for-int id-device-watch-group))]
     (util/create {:name-table name-table
@@ -47,11 +47,11 @@
                   :str-input-params str-params
                   :on-receive on-receive})))
 
-(defn update [{:keys [id name-device on-receive]}]
-  (let [str-params (format "id: %s, %s: {name_device: %s}"
+(defn update [{:keys [id display-name on-receive]}]
+  (let [str-params (format "id: %s, %s: {display_name: %s}"
                            (util/build-input-str-for-int id)
                            name-table
-                           (util/build-input-str-for-str name-device))]
+                           (util/build-input-str-for-str display-name))]
     (util/update {:name-table name-table
                   :str-keys-receive (format "%s { %s }"
                                             name-table

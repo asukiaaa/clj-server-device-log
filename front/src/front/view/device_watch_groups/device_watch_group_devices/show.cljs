@@ -46,7 +46,7 @@
             [:th "key"]
             [:th "value"]]]
           [:tbody
-           (for [key [:id :name_device :device_id :device_watch_group_id :created_at :updated_at]]
+           (for [key [:id :display_name :device_id :device_watch_group_id :created_at :updated_at]]
              [:tr {:key key}
               [:td key]
               [:td (get item key)]])]]])})))

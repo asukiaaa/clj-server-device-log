@@ -15,15 +15,15 @@
         navigate (router/useNavigate)
         [item set-item] (react/useState)
         state-info-system (util/build-state-info :__system #(react/useState))
-        state-info-name-device (util/build-state-info :name #(react/useState))
+        state-info-display-name (util/build-state-info :name #(react/useState))
         on-receive-item
         (fn [item]
           (set-item item)
-          (util/set-default-and-draft state-info-name-device (:name item)))
+          (util/set-default-and-draft state-info-display-name (:name item)))
         on-receive-response (fn [data]
                               (if-let [errors-str (:errors data)]
                                 (let [errors (keywordize-keys (js->clj (.parse js/JSON errors-str)))]
-                                  (doseq [state [state-info-system state-info-name-device]]
+                                  (doseq [state [state-info-system state-info-display-name]]
                                     (let [key (:key state)
                                           errors-for-key (get errors key)]
                                       ((:set-errors state) errors-for-key))))
@@ -31,7 +31,7 @@
                                   (navigate (route/device-watch-group-device-watch-group-device-show id-device-watch-group id)))))
         on-click-apply (fn [] (model.device-watch-group-device/update
                                {:id id-device-watch-group-device
-                                :name-device (:draft state-info-name-device)
+                                :display-name (:draft state-info-display-name)
                                 :on-receive on-receive-response}))
         info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))]
     (react/useEffect
@@ -54,7 +54,7 @@
          [:h1.h3.mx-2 "edit device watch group device"]
          [:form.form-control
           [util/render-errors-as-alerts (:errors state-info-system)]
-          [util/render-input "name device" state-info-name-device]
+          [util/render-input "name device" state-info-display-name]
           [:a.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply} "apply"]]])})))
 
 (defn core []

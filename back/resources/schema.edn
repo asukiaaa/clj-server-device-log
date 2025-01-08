@@ -40,10 +40,10 @@
   {:fields
    {:device_watch_group_id {:type (non-null Int)}
     :device_id {:type (non-null Int)}
-    :name_device {:type String}}}
+    :display_name {:type String}}}
   :InputDeviceWatchGroupDeviceUpdate
   {:fields
-   {:name_device {:type String}}}}
+   {:display_name {:type String}}}}
  :objects
  {:RawDeviceLog
   {:fields
@@ -126,7 +126,7 @@
    {:id {:type (non-null Int)}
     :device_id {:type (non-null Int)}
     :device_watch_group_id {:type (non-null Int)}
-    :name_device {:type String}
+    :display_name {:type String}
     :created_at {:type String}
     :updated_at {:type String}}}
   :ResponseDeviceWatchGroupDeviceListTotal
