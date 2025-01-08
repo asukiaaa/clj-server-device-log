@@ -65,7 +65,7 @@
               {:errors (json/write-str {:__system [(.getMessage ex)]})})))))))
 
 (defn- get-list-with-total-base [params & [{:keys [str-where]}]]
-  (model.util/get-list-with-total-with-building-query name-table params {:str-where str-where}))
+  (model.util/get-list-with-total-with-building-query name-table-with-device-group params {:str-where str-where}))
 
 (defn get-list-with-total-for-user-and-device-group [params id-user id-device-group]
   (get-list-with-total-base params {:str-where (format "%s.user_id = %d AND device_group_id = %d" model.device-group/name-table id-user id-device-group)}))
