@@ -6,10 +6,10 @@
             [front.view.common.wrapper.fetching :as wrapper.fetching]
             [front.view.util :as util :refer [build-state-info render-checkbox render-input render-textarea]]))
 
-(def defaults
-  {:str-renderer "[{\"key\": [\"data\", \"camera_id\"], \"badge\": [{\"text\": \"not wakeup\", \"when\": {\"key\": \"created_at\", \"action\": \"not-in-hours-24\"}}]}, {\"label\": \"battery\", \"key\": [\"data\", \"readonly_state\", \"volt_battery\"]}, {\"label\": \"panel\", \"key\": [\"data\", \"readonly_state\", \"volt_panel\"]}]"
-   :str-where "[{\"key\": \"created_at\", \"action\": \"in-hours-24\"}]"
-   :str-order "[{\"key\": [\"data\", \"camera_id\"], \"dir\": \"desc\"},{\"key\":\"created_at\",\"dir\":\"desc\"}]"
+(def map-page-default
+  {:str-renderer "[{\"key\":\"id\"},{\"key\":\"data\"},{\"key\":\"created_at\"}]"
+   :str-where "[]"
+   :str-order "[{\"key\":\"created_at\",\"dir\":\"desc\"}]"
    :show-graph "false"
    :show-table "true"
    :limit "100"})
@@ -22,8 +22,8 @@
         error-message (when is-invalid-json (try (parse-default-value) (catch js/Error e e)))]
     [parsed-value error-message]))
 
-(defn get-param-str [key query-params]
-  (or (get query-params key) (get defaults key)))
+(defn get-param-str [key query-params map-default]
+  (or (get query-params key) (get map-default key)))
 
 (defn set-all-val [val info]
   ((:set-draft info) val)
@@ -32,8 +32,9 @@
 (defn get-default-as-bool [info]
   (= "true" (:default info)))
 
-(defn core [fetch-list-and-total]
-  (let [location (router/useLocation)
+(defn core [fetch-list-and-total & {:keys [map-default]}]
+  (let [map-default (merge map-page-default map-default)
+        location (router/useLocation)
         info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
         fetching (:fetching info-wrapper-fetching)
         [logs set-logs] (react/useState)
@@ -52,7 +53,7 @@
         [_ parse-error-order] (parse-json (:default info-str-order))
         load-query-params #(let [query-params (util/read-query-params)]
                              (doseq [info arr-info]
-                               (-> (get-param-str (:key info) query-params)
+                               (-> (get-param-str (:key info) query-params map-default)
                                    (set-all-val info))))
         fetch-device-logs (fn [str-where str-order limit]
                             (let [logs-key (str str-where str-order limit)]
@@ -83,7 +84,6 @@
       (react/useEffect
        (fn []
          (when-not (or (empty? str-where) (empty? str-order))
-           #_(println "fetch logs" str-where str-order)
            (fetch-device-logs str-where str-order limit))
          (fn []))
        #js [str-where str-order limit]))

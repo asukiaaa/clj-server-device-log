@@ -12,5 +12,4 @@
     (for [i (range total-page)]
       [:li.page-item {:key (str "page" i)
                       :class (if (= i (int current-page)) "active" "")}
-       [:> router/Link {:to (build-url i) :class :page-link} (inc i)]
-       #_[:a.page-link {:href (build-url i)} (inc i)]])]])
+       [:> router/Link {:to (build-url i) :class :page-link} (inc i)]])]])

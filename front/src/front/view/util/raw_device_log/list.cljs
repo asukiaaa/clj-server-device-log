@@ -47,12 +47,10 @@
         window-width (. js/window -innerWidth)]
     [:<>
      [:tr
-      [:td id]
       (for [col col-settings]
         [:td {:key (model.log/get-label-from-col-config col)}
          (model.log/get-val-from-record log (get col "key") {:data data})
          (build-badge log col data id)])
-      [:td (:created_at log)]
       [:td [:a ;; .btn.btn-outline-primary.btn-sm
             {:href "#"
              :on-click (fn [e]
@@ -69,11 +67,9 @@
   [:table.table.table-sm
    [:thead
     [:tr
-     [:th "id"]
      (for [col col-settings]
        (let [label (model.log/get-label-from-col-config col)]
          [:th {:key label} label]))
-     [:th "created_at"]
      [:th "actions"]]]
    [:tbody
     (for [log logs]
