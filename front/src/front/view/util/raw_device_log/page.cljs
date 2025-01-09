@@ -1,9 +1,8 @@
-(ns front.view.log.index
+(ns front.view.util.raw-device-log.page
   (:require ["react" :as react]
             ["react-router-dom" :as router]
             [front.view.util.raw-device-log.graph :as util.graph]
             [front.view.util.raw-device-log.list :as util.list]
-            [front.model.raw-device-log :as model.log]
             [front.view.common.wrapper.fetching :as wrapper.fetching]
             [front.view.util :as util :refer [build-state-info render-checkbox render-input render-textarea]]))
 
@@ -33,7 +32,7 @@
 (defn get-default-as-bool [info]
   (= "true" (:default info)))
 
-(defn core []
+(defn core [fetch-list-and-total]
   (let [location (router/useLocation)
         info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
         fetching (:fetching info-wrapper-fetching)
@@ -58,7 +57,7 @@
         fetch-device-logs (fn [str-where str-order limit]
                             (let [logs-key (str str-where str-order limit)]
                               (wrapper.fetching/start info-wrapper-fetching)
-                              (model.log/fetch-list-and-total
+                              (fetch-list-and-total
                                {:str-order str-order
                                 :str-where str-where
                                 :limit limit
