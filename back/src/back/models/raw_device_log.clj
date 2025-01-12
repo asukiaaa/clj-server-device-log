@@ -172,6 +172,7 @@
 
 (defn get-list-with-total [params & [{:keys [str-where-and]}]]
   (let [limit (or (:limit params) (:limit defaults))
+        page (or (:page params) 0)
         order (when-let [str-order (:order params)]
                 (json/read-str str-order))
         where (when-let [w (:where params)] (json/read-str w))
@@ -182,7 +183,7 @@
         (build-query-select-max-group-by where-max-group-by
                                          {:db-table-key db-table-key
                                           :base-table-key base-table-key})
-        str-query (join " " ["SELECT SQL_CALC_FOUND_ROWS *, device.name device_name FROM" db-table-key "AS" base-table-key
+        str-query (join " " ["SELECT SQL_CALC_FOUND_ROWS rdl.*, device.name device_name FROM" db-table-key "AS" base-table-key
                              "LEFT JOIN device ON device.id = rdl.device_id"
                              "LEFT JOIN device_group ON device_group.id = device.device_group_id"
                              (when-not (empty? str-query-select-max-group-by) (str ", " str-query-select-max-group-by))
@@ -190,7 +191,8 @@
                                                  :base-table-key base-table-key
                                                  :str-where-and str-where-and})
                              (build-query-order order base-table-key)
-                             "LIMIT " limit])]
+                             "LIMIT" limit
+                             "OFFSET" (* limit page)])]
     (println "str-query " str-query)
     (model.util/get-list-with-total [str-query])
     #_(jdbc/with-db-transaction [db-transaction db-spec]

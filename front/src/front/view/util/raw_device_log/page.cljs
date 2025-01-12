@@ -4,6 +4,7 @@
             [front.view.util.raw-device-log.graph :as util.graph]
             [front.view.util.raw-device-log.list :as util.list]
             [front.view.common.wrapper.fetching :as wrapper.fetching]
+            [front.view.common.component.pagination :as pagination]
             [front.view.util :as util :refer [build-state-info render-checkbox render-input render-textarea]]))
 
 (def map-page-default
@@ -46,6 +47,9 @@
         info-str-order (build-state-info :str-order #(react/useState))
         info-show-graph (build-state-info :show-graph #(react/useState false))
         info-show-table (build-state-info :show-table #(react/useState true))
+        total-page (pagination/calc-total-page (:default info-limit) total)
+        query-params (util/read-query-params)
+        page-current (pagination/key-page query-params)
         arr-info [info-limit info-str-renderer info-str-order info-str-where info-show-graph info-show-table]
         [show-config set-show-config] (react/useState false)
         [config-renderer parse-error-config-renderer] (parse-json (:default info-str-renderer))
@@ -62,6 +66,7 @@
                                {:str-order str-order
                                 :str-where str-where
                                 :limit limit
+                                :page page-current
                                 :on-receive
                                 (fn [data errors]
                                   (set-logs (:list data))
@@ -71,6 +76,7 @@
         on-click-apply (fn []
                          (->> (for [info arr-info] [(:key info) (:draft info)])
                               (into (sorted-map))
+                              (#(assoc % pagination/key-page 0))
                               util/push-query-params)
                          (load-query-params))]
     (react/useEffect
@@ -86,7 +92,7 @@
          (when-not (or (empty? str-where) (empty? str-order))
            (fetch-device-logs str-where str-order limit))
          (fn []))
-       #js [str-where str-order limit]))
+       #js [str-where str-order limit page-current]))
     [:div
      [:a.btn.btn-outline-primary.btn-sm.m-2 {:on-click #(set-show-config (not show-config))}
       (if show-config "hide config" "show config")]
@@ -104,8 +110,10 @@
       {:info info-wrapper-fetching
        :renderer
        [:div
+        [:f> pagination/core {:total-page total-page}]
         [:div.m-1 (str "requested " (str (:default info-limit)) " from " total)]
         (when (get-default-as-bool info-show-graph)
           [:f> util.graph/core logs-key-fetched logs config-renderer])
         (when (get-default-as-bool info-show-table)
-          [:f> util.list/core logs config-renderer])]})]))
+          [:f> util.list/core logs config-renderer])
+        [:f> pagination/core {:total-page total-page}]]})]))
