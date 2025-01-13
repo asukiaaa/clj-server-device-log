@@ -117,7 +117,8 @@
         target-key-max (build-target-key {:key (:max keys)
                                           :table-key max-group-by-table-key
                                           :filter-key (fn [x] x)})
-        base-key-max (build-target-key (walk/keywordize-keys (get item "max")))
+        base-key-max (build-target-key (-> (walk/keywordize-keys (get item "max"))
+                                           (assoc :table-key base-table-key)))
         target-key-group-by (build-target-key {:key (:group-by keys)
                                                :table-key max-group-by-table-key
                                                :filter-key (fn [x] x)})
