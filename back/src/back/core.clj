@@ -47,7 +47,7 @@
 (defn -main [& args]
   (condp = (first args)
     "server-with-migration"
-    (fn []
+    (do
       (db-migrate)
       (start-server config/port))
     "server" (start-server config/port)
