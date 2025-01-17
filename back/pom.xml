@@ -26,6 +26,11 @@
   </scm>
   <dependencies>
     <dependency>
+      <groupId>buddy</groupId>
+      <artifactId>buddy-core</artifactId>
+      <version>1.11.423</version>
+    </dependency>
+    <dependency>
       <groupId>org.clojure</groupId>
       <artifactId>data.json</artifactId>
       <version>2.4.0</version>
@@ -38,22 +43,22 @@
     <dependency>
       <groupId>io.pedestal</groupId>
       <artifactId>pedestal.jetty</artifactId>
-      <version>0.5.10</version>
+      <version>0.6.3</version>
     </dependency>
     <dependency>
       <groupId>com.walmartlabs</groupId>
       <artifactId>lacinia-pedestal</artifactId>
-      <version>1.1</version>
+      <version>1.2</version>
     </dependency>
     <dependency>
       <groupId>io.pedestal</groupId>
       <artifactId>pedestal.service</artifactId>
-      <version>0.5.10</version>
+      <version>0.6.3</version>
     </dependency>
     <dependency>
       <groupId>com.walmartlabs</groupId>
       <artifactId>lacinia</artifactId>
-      <version>1.2-alpha-1</version>
+      <version>1.2.2</version>
     </dependency>
     <dependency>
       <groupId>clj-time</groupId>
@@ -66,6 +71,11 @@
       <version>0.9.4</version>
     </dependency>
     <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>2.0.13</version>
+    </dependency>
+    <dependency>
       <groupId>hiccup</groupId>
       <artifactId>hiccup</artifactId>
       <version>1.0.5</version>
@@ -73,17 +83,22 @@
     <dependency>
       <groupId>ns-tracker</groupId>
       <artifactId>ns-tracker</artifactId>
-      <version>0.4.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-nop</artifactId>
-      <version>2.0.12</version>
+      <version>1.0.0</version>
     </dependency>
     <dependency>
       <groupId>org.clojure</groupId>
       <artifactId>java.jdbc</artifactId>
       <version>0.7.12</version>
+    </dependency>
+    <dependency>
+      <groupId>jdbc-ring-session</groupId>
+      <artifactId>jdbc-ring-session</artifactId>
+      <version>1.5.4</version>
+    </dependency>
+    <dependency>
+      <groupId>buddy</groupId>
+      <artifactId>buddy-sign</artifactId>
+      <version>3.5.351</version>
     </dependency>
     <dependency>
       <groupId>org.mariadb.jdbc</groupId>
