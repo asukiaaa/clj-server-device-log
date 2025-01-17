@@ -34,6 +34,8 @@
             [front.view.device-watch-groups.device-watch-group-devices.show :as device-watch-group.device-watch-group-device.show]
             [front.view.device-watch-groups.device-watch-group-devices.edit :as device-watch-group.device-watch-group-device.edit]
             [front.view.device-watch-groups.raw-device-logs.index :as device-watch-group.raw-device-log.index]
+            [front.view.profile.index :as profile.index]
+            [front.view.profile.password-edit :as profile.password-edit]
             [front.view.page404 :as page404]
             ["react-router-dom" :as router]))
 
@@ -54,6 +56,9 @@
        {:path "front" :children
         [{:index true :element (r/as-element [:f> dashboard/core])}
          {:path "login" :element (r/as-element [:f> login/core])}
+         {:path "profile" :children
+          [{:index true :element (r/as-element [:f> profile.index/core])}
+           {:path "password_edit" :element (r/as-element [:f> profile.password-edit/core])}]}
          {:path "users" :children
           [{:index true :element (r/as-element [:f> user.index/core])}
            {:path "create" :element (r/as-element [:f> user.create/core])}

@@ -12,6 +12,6 @@
                                     ["device watch groups" route/device-watch-groups]
                                     ["device groups" route/device-groups]
                                     ["devices" route/devices]
-                                    #_["profile" route/profile]])]
+                                    ["profile" route/profile]])]
        [:<> {:key name}
         [:> router/Link {:to url :class "list-group-item list-group-item-action"} name]])]))

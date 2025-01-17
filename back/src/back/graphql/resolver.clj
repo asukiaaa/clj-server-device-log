@@ -252,6 +252,13 @@
         id (:id args)]
     (when (model.user/admin? user) (model.device-watch-group-device/delete id))))
 
+(defn password-mine-reset [context args _]
+  (println "args password-mine-reset" args)
+  (Thread/sleep 1000) ; wait to take tome for brute force attack
+  (let [user (get-user-loggedin context)]
+    (when-not (empty? user)
+      (model.user/reset-password (:id user) args))))
+
 (defn device-for-user-create [context args _]
   (println "args device-for-user-create" args)
   (let [user (get-user-loggedin context)
@@ -311,5 +318,6 @@
    :Mutation/device_watch_group_device_create device-watch-group-device-create
    :Mutation/device_watch_group_device_update device-watch-group-device-update
    :Mutation/device_watch_group_device_delete device-watch-group-device-delete
+   :Mutation/password_mine_reset password-mine-reset
    :Mutation/login login
    :Mutation/logout logout})

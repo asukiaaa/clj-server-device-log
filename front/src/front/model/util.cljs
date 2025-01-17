@@ -50,7 +50,7 @@
   (let [str-params (join ", " (filter seq
                                       [(format "id: %s" (build-input-str-for-int id))
                                        str-additional-params]))
-        query (goog.string.format "{ %s (%s) { %s } }" name-table str-params str-keys-of-item)]
+        query (format "{ %s (%s) { %s } }" name-table str-params str-keys-of-item)]
     #_(println :query query)
     (re-graph/query query () (fn [{:keys [data errors]}]
                                (when-not (empty? errors) (println :errors-for-fetch-by-id errors))
@@ -58,10 +58,10 @@
                                            (build-error-messages errors))))))
 
 (defn mutate-with-receive-params [{:keys [str-key-request on-receive str-input-params str-keys-receive]}]
-  (let [query (goog.string.format "{ %s( %s ) { errors %s } }"
-                                  str-key-request
-                                  str-input-params
-                                  (or str-keys-receive ""))]
+  (let [query (format "{ %s( %s ) { errors %s } }"
+                      str-key-request
+                      str-input-params
+                      (or str-keys-receive ""))]
     #_(println query)
     (re-graph/mutate query () (fn [{:keys [data errors]}]
                                 (when-not (empty? errors) (println :errors-for-mutation errors))
@@ -71,7 +71,7 @@
 (defn delete-by-id [{:keys [name-table id on-receive]}]
   (mutate-with-receive-params {:str-key-request (str name-table "_delete")
                                :on-receive on-receive
-                               :str-input-params (goog.string.format "id: %s" (build-input-str-for-int id))}))
+                               :str-input-params (format "id: %s" (build-input-str-for-int id))}))
 
 (defn create [{:keys [name-table on-receive str-input-params str-keys-receive]}]
   (mutate-with-receive-params {:str-key-request (str name-table "_create")
@@ -84,3 +84,11 @@
                                :on-receive on-receive
                                :str-input-params str-input-params
                                :str-keys-receive str-keys-receive}))
+
+(defn mutate-for-message [{:keys [key-field str-params on-receive]}]
+  (let [str-params (when-not (empty? str-params) (format "(%s)" str-params))
+        query (format "{ %s %s { errors message } }"
+                      (name key-field) str-params)]
+    (re-graph/mutate query () (fn [{:keys [data errors]}]
+                                (on-receive (key-field data)
+                                            (build-error-messages errors))))))

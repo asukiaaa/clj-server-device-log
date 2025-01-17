@@ -60,12 +60,12 @@
                   :on-receive on-receive})))
 
 (defn update [{:keys [id name email permission on-receive]}]
-  (let [query (goog.string.format "{ user_update(id: %d, user: { name: \"%s\", email: \"%s\", permission: \"%s\" }) { errors user { %s } } }"
-                                  (util/escape-int id)
-                                  (util/escape-str name)
-                                  (util/escape-str email)
-                                  (util/escape-str permission)
-                                  str-keys-for-user)]
+  (let [query (format "{ user_update(id: %d, user: { name: \"%s\", email: \"%s\", permission: \"%s\" }) { errors user { %s } } }"
+                      (util/escape-int id)
+                      (util/escape-str name)
+                      (util/escape-str email)
+                      (util/escape-str permission)
+                      str-keys-for-user)]
     (re-graph/mutate query () (fn [{:keys [data errors]}]
                                 #_(println data)
                                 (on-receive (:user_update data) (util/build-error-messages errors))))))
@@ -77,3 +77,11 @@
   (util/delete-by-id {:name-table "user"
                       :id id
                       :on-receive on-receive}))
+
+(defn reset-password-mine [{:keys [password password-new on-receive]}]
+  (util/mutate-for-message
+   {:key-field :password_mine_reset
+    :str-params (format "password: %s, password_new: %s"
+                        (util/build-input-str-for-str password)
+                        (util/build-input-str-for-str password-new))
+    :on-receive on-receive}))

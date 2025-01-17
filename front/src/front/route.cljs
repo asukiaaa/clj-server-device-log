@@ -5,6 +5,7 @@
 (def login (str front "/login"))
 
 (def profile (str front "/profile"))
+(def profile-password-edit (str profile "/password_edit"))
 
 (def users (str front "/users"))
 (def user-create (str users "/create"))

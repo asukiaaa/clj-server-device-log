@@ -1,7 +1,6 @@
 (ns front.view.device-watch-groups.index
   (:require ["react" :as react]
             ["react-router-dom" :as router]
-            [goog.string :refer [format]]
             [front.route :as route]
             [front.view.common.component.pagination :as pagination]
             [front.view.common.wrapper.fetching :as wrapper.fetching]
@@ -36,11 +35,9 @@
         received-list (:list list-and-total)
         total (:total list-and-total)
         query-params (util/read-query-params)
-        number-page (or (:page query-params) 0)
+        number-page (or (pagination/key-page query-params) 0)
         number-limit (or (:limit query-params) 50)
         number-total-page (pagination/calc-total-page number-limit total)
-        build-url-by-page
-        (fn [page] (format "%s?page=%d&limit=%d" route/device-watch-groups page number-limit))
         load-list (fn []
                     (wrapper.fetching/start info-wrapper-fetching)
                     (model.device-watch-group/fetch-list-and-total
@@ -74,9 +71,7 @@
           (for [item received-list]
             [:<> {:key (:id item)}
              [:f> render-device-watch-group item load-list]])]]
-        [:f> pagination/core {:build-url build-url-by-page
-                              :total-page number-total-page
-                              :current-page number-page}]]})]))
+        [:f> pagination/core {:total-page number-total-page}]]})]))
 
 (defn core []
   (wrapper.show404/wrapper

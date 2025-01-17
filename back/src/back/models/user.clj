@@ -47,7 +47,7 @@
     (let [parsed (model.util/parse-json permission)]
       (when-let [error (:error parsed)] [error]))))
 
-(defn validate-params-exept-for-password [errors params]
+(defn check-errors-of-params-exept-for-password [errors params]
   (reduce (fn [errors [key validate]]
             (if-let [error (validate (get params key))]
               (assoc errors key error)
@@ -62,18 +62,19 @@
   (let [key :__system]
     (append-error errors key message)))
 
-(defn validate-params-for-password [errors params]
-  (if-let [errors-for-password (validate-password (:password params))]
-    (assoc errors :password (concat (:password errors) errors-for-password))
-    errors))
+(defn check-errors-of-params-for-password [errors params & [{:keys [key-password]}]]
+  (let [key-password (or key-password :password)]
+    (if-let [errors-for-password (validate-password (key-password params))]
+      (assoc errors key-password (concat (key-password errors) errors-for-password))
+      errors)))
 
 (defn create-with-password [params]
   (jdbc/with-db-transaction [t-con db-spec]
     (let [email (:email params)
           user-in-db (get-by-email email {:transaction t-con})]
       (if-let [errors (cond-> (-> nil
-                                  (validate-params-exept-for-password params)
-                                  (validate-params-for-password params))
+                                  (check-errors-of-params-exept-for-password params)
+                                  (check-errors-of-params-for-password params))
                         (seq user-in-db) (append-error :email "User already exists"))]
         {:errors (json/write-str errors)}
         (let [password (:password params)
@@ -89,11 +90,10 @@
           {:user (get-by-email email {:transaction t-con})})))))
 
 (defn update [id params]
-  (println :update-user id params)
   (jdbc/with-db-transaction [t-con db-spec]
     (let [user-in-db (get-by-id id {:transaction t-con})]
       (if-let [errors (cond-> (-> nil
-                                  (validate-params-exept-for-password params))
+                                  (check-errors-of-params-exept-for-password params))
                         (empty? user-in-db) (append-system-error "User does not exist"))]
         {:errors (json/write-str errors)}
         (do
@@ -102,9 +102,12 @@
                         ["id = ?" id])
           {:user (get-by-id id {:transaction t-con})})))))
 
+(defn is-correct-password [user password]
+  (= (:hash user) (build-hash password (:salt user))))
+
 (defn get-by-email-password [email password]
   (when-let [user (get-by-email email)]
-    (when (= (:hash user) (build-hash password (:salt user)))
+    (when (is-correct-password user password)
       user)))
 
 (defn get-total-count []
@@ -122,3 +125,26 @@
 
 (defn filter-for-session [user]
   (select-keys user [:id]))
+
+(defn check-errors-is-correct-password [errors user password]
+  (let [key-password :password]
+    (if-not (is-correct-password user password)
+      (assoc errors key-password (concat (key-password errors) ["Invalid password"]))
+      errors)))
+
+(defn reset-password [id args]
+  (jdbc/with-db-transaction [t-con db-spec]
+    (let [password-current (:password args)
+          key-password-new :password_new
+          password-new (key-password-new args)
+          user (get-by-id id {:transaction t-con})]
+      (if-let [errors (cond-> (-> nil
+                                  (check-errors-is-correct-password user password-current)
+                                  (check-errors-of-params-for-password args {:key-password key-password-new}))
+                        (empty? user) (append-system-error "User does not exist"))]
+        {:errors (json/write-str errors)}
+        (do
+          (jdbc/update! t-con :user
+                        {:hash (build-hash password-new (:salt user))}
+                        ["id = ?" id])
+          {:message "ok"})))))

@@ -157,6 +157,10 @@
   {:fields
    {:errors {:type String}
     :device_watch_group_device {:type DeviceWatchGroupDevice}}}
+  :ResponseMessage
+  {:fields
+   {:errors {:type String}
+    :message {:type String}}}
   :ResponseUserCreate
   {:fields
    {:errors {:type String}
@@ -329,6 +333,10 @@
     :device_watch_group_device_delete
     {:type ResponseDelete
      :args {:id {:type (non-null Int)}}}
+    :password_mine_reset
+    {:type ResponseMessage
+     :args {:password {:type (non-null String)}
+            :password_new {:type (non-null String)}}}
     :login
     {:type User
      :args {:email {:type String}
