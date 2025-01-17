@@ -21,7 +21,7 @@
           (str (.-pathname url-object) (.-search url-object)))]
     [:nav {:aria-label "Page navigation"}
      (when (< 0 total-page)
-       [:ul.pagination
+       [:ul.pagination.mb-0
         (let [pages (if (< total-page 7)
                       (range total-page)
                       (let [page-block-left (- current-page num-pages-show-from-center)
