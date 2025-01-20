@@ -60,10 +60,9 @@
      (for [error errors]
        [:div.invalid-feedback {:key error} error])]))
 
-(defn render-textarea [label {:keys [default set-draft errors]} error-message]
+(defn render-textarea [label {:keys [default set-draft errors]}]
   [:div
    [:div label]
-   [:div (str error-message)]
    [:textarea.form-control.mb-1
     {:type :text :default-value default :key default :class (when errors :is-invalid)
      :on-change (fn [e] (set-draft (-> e .-target .-value)))}]
@@ -84,14 +83,12 @@
     [:label {:for key} label]]
    [:input.form-control
     {:id label
-     :class (str str-class-input (when errors :is-invalid))
+     :class (str str-class-input " " (when errors "is-invalid"))
      :value (or draft default)
      :disabled disabled
      :type type
      :on-change (fn [e] (set-draft (-> e .-target .-value)))}]
-   (when errors
-     (for [error errors]
-       [:div.invalid-feedback {:key error} error]))])
+   (render-errors-for-input errors)])
 
 (defn render-select [label {:keys [default key draft set-draft errors]} value-labels {:keys [type str-class-wrapper]}]
   [:div {:class str-class-wrapper}

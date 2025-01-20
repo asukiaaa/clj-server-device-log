@@ -45,6 +45,10 @@
 (defn filter-params-to-update [params]
   (select-keys params [:email :name :permission]))
 
+(defn validate-name [email]
+  (cond-> nil
+    (nil? email) (conj "required")))
+
 (defn validate-password [password]
   (cond-> nil
     (nil? password) (conj "required")
@@ -66,7 +70,8 @@
             (if-let [error (validate (get params key))]
               (assoc errors key error)
               errors))
-          errors {:email validate-email
+          errors {:name validate-name
+                  :email validate-email
                   :permission validate-permission}))
 
 (defn append-error [errors key message]

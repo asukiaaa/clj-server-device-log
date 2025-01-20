@@ -23,21 +23,24 @@
           (util/set-default-and-draft state-info-permission (:permission user)))
         on-receive-create-response
         (fn [data errors]
-          (when errors ((:set-draft state-info-system) errors))
-          (if-let [errors-str (:errors data)]
-            (let [errors (keywordize-keys (js->clj (.parse js/JSON errors-str)))]
-              (doseq [state [state-info-name state-info-email state-info-permission state-info-system]]
-                (let [key (:key state)
-                      errors-for-key (get errors key)]
-                  ((:set-errors state) errors-for-key))))
-            (when-let [id-user (-> data :user :id)]
-              (navigate (route/user-show id-user)))))
-        on-click-apply (fn [] (model.user/update
-                               {:id id-user
-                                :name (:draft state-info-name)
-                                :email (:draft state-info-email)
-                                :permission (:draft state-info-permission)
-                                :on-receive on-receive-create-response}))
+          (if (seq errors)
+            ((:set-draft state-info-system) errors)
+            (if-let [errors-str (:errors data)]
+              (let [errors (keywordize-keys (js->clj (.parse js/JSON errors-str)))]
+                (doseq [state [state-info-name state-info-email state-info-permission state-info-system]]
+                  (let [key (:key state)
+                        errors-for-key (get errors key)]
+                    ((:set-errors state) errors-for-key))))
+              (when-let [id-user (-> data :user :id)]
+                (navigate (route/user-show id-user))))))
+        on-click-apply (fn [e]
+                         (.preventDefault e)
+                         (model.user/update
+                          {:id id-user
+                           :name (:draft state-info-name)
+                           :email (:draft state-info-email)
+                           :permission (:draft state-info-permission)
+                           :on-receive on-receive-create-response}))
         info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))]
     (react/useEffect
      (fn []
@@ -58,7 +61,7 @@
           [util/render-input "name" state-info-name]
           [util/render-input "email" state-info-email]
           [util/render-textarea "permission" state-info-permission]
-          [:a.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply} "apply"]]])})))
+          [:button.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply} "apply"]]])})))
 
 (defn core []
   (wrapper.show404/wrapper

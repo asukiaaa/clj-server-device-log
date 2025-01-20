@@ -9,33 +9,39 @@
 
 (defn- page []
   (let [navigate (router/useNavigate)
+        state-info-system (util/build-state-info :__system #(react/useState))
         state-info-name (util/build-state-info :name #(react/useState))
         state-info-email (util/build-state-info :email #(react/useState))
         state-info-password (util/build-state-info :password #(react/useState))
         state-info-permission (util/build-state-info :permission #(react/useState))
-        on-receive (fn [data]
-                     (if-let [errors-str (:errors data)]
-                       (let [errors (keywordize-keys (js->clj (.parse js/JSON errors-str)))]
-                         (doseq [state [state-info-name state-info-email state-info-password state-info-permission]]
-                           (let [key (:key state)
-                                 errors-for-key (get errors key)]
-                             ((:set-errors state) errors-for-key))))
-                       (when-let [id-user (-> data :user :id)]
-                         (navigate (route/user-show id-user)))))
-        on-click-apply (fn [] (model.user/create
-                               {:name (:draft state-info-name)
-                                :email (:draft state-info-email)
-                                :password (:draft state-info-password)
-                                :permission (:draft state-info-permission)
-                                :on-receive on-receive}))]
+        on-receive (fn [data errors]
+                     (if (seq errors)
+                       ((:set-draft state-info-system) errors)
+                       (if-let [errors-str (:errors data)]
+                         (let [errors (keywordize-keys (js->clj (.parse js/JSON errors-str)))]
+                           (doseq [state [state-info-name state-info-email state-info-password state-info-permission]]
+                             (let [key (:key state)
+                                   errors-for-key (key errors)]
+                               ((:set-errors state) errors-for-key))))
+                         (when-let [id-user (-> data :user :id)]
+                           (navigate (route/user-show id-user))))))
+        on-click-apply (fn [e]
+                         (.preventDefault e)
+                         (model.user/create
+                          {:name (:draft state-info-name)
+                           :email (:draft state-info-email)
+                           :password (:draft state-info-password)
+                           :permission (:draft state-info-permission)
+                           :on-receive on-receive}))]
     [:div
      [:h1.h3.mx-2 "create user"]
      [:form.form-control
+      [util/render-errors-as-alerts (:errors state-info-system)]
       [util/render-input "name" state-info-name]
       [util/render-input "email" state-info-email]
       [util/render-input "password (10 chars or more)" state-info-password {:type :password}]
       [util/render-textarea "permission" state-info-permission]
-      [:a.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply} "apply"]]]))
+      [:button.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply} "apply"]]]))
 
 (defn core []
   (wrapper.show404/wrapper
