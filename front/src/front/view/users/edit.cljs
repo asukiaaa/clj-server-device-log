@@ -12,6 +12,7 @@
   (let [params (js->clj (router/useParams))
         id-user (get params "id_user")
         navigate (router/useNavigate)
+        state-info-system (util/build-state-info :__system #(react/useState))
         state-info-name (util/build-state-info :name #(react/useState))
         state-info-email (util/build-state-info :email #(react/useState))
         state-info-permission (util/build-state-info :permission #(react/useState))
@@ -21,10 +22,11 @@
           (util/set-default-and-draft state-info-name (:name user))
           (util/set-default-and-draft state-info-permission (:permission user)))
         on-receive-create-response
-        (fn [data]
+        (fn [data errors]
+          (when errors ((:set-draft state-info-system) errors))
           (if-let [errors-str (:errors data)]
             (let [errors (keywordize-keys (js->clj (.parse js/JSON errors-str)))]
-              (doseq [state [state-info-name state-info-email state-info-permission]]
+              (doseq [state [state-info-name state-info-email state-info-permission state-info-system]]
                 (let [key (:key state)
                       errors-for-key (get errors key)]
                   ((:set-errors state) errors-for-key))))
@@ -46,7 +48,6 @@
                                               (wrapper.fetching/finished info-wrapper-fetching errors))})
        (fn []))
      #js [])
-    (println :email (:default state-info-email))
     (wrapper.fetching/wrapper
      {:info info-wrapper-fetching
       :renderer

@@ -1,7 +1,7 @@
 (ns front.model.raw-device-log
   (:require [goog.string :refer [format]]
             clojure.string
-            [front.model.util :as util :refer [escape-str]]))
+            [front.model.util :as util :refer [build-input-str-for-str]]))
 
 (def name-table "raw_device_log")
 (def keys-for-raw-device-logs [:id :device_id :device_name :created_at :data])
@@ -42,8 +42,8 @@
   (util/fetch-list-and-total {:name-table (or str-name-table (str name-table "s"))
                               :str-keys-of-item str-keys-for-raw-device-logs
                               :str-params (str (if str-params (str str-params ", ") "")
-                                               (format "where: \"%s\", order: \"%s\""
-                                                       (escape-str str-where) (escape-str str-order)))
+                                               (format "where: %s, order: %s"
+                                                       (build-input-str-for-str str-where) (build-input-str-for-str str-order)))
                               :on-receive on-receive
                               :limit limit
                               :page page}))

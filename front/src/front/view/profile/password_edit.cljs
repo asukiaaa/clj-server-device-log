@@ -26,7 +26,7 @@
                 (let [key (:key state)
                       errors-for-key (get errors key)]
                   ((:set-errors state) errors-for-key))))
-            (navigate route/profile)))
+            (when-not (empty? (:message data)) (navigate route/profile))))
         on-click-apply (fn []
                          (let [errors-for-password-new-again
                                (if-not (= (:draft state-info-password-new) (:draft state-info-password-new-again))

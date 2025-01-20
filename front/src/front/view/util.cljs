@@ -5,10 +5,13 @@
 (defn get-user-loggedin []
   (router/useRouteLoaderData key-user-loggedin))
 
+(defn build-current-url-object []
+  (->> js/window.location.href
+       (new js/URL)))
+
 (defn push-query-params [query-params]
   ;; (println "push-url")
-  (let [url js/window.location.href
-        url-object (new js/URL url)
+  (let [url-object (build-current-url-object)
         url-search-params (.-searchParams url-object)]
     (doseq [[k v] query-params]
       #_(println "in for" k v)
@@ -20,8 +23,7 @@
 
 (defn read-query-params []
   ;; (println "read-params")
-  (let [url js/window.location.href
-        url-object (new js/URL url)
+  (let [url-object (build-current-url-object)
         url-search-params (.-searchParams url-object)]
     ;; (println "url is" url)
     ;; (println "url-object" url-object)

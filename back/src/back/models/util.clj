@@ -2,13 +2,14 @@
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.data.json :as json]
             [clojure.core :refer [format]]
+            [clj-time.format :as f]
             [clojure.string :refer [escape join]]
             [back.config :refer [db-spec]]))
 
 (def ^:private str-alphabets-and-number "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 (def ^:private str-parentesis-and-special-chars ":[]\\/.,\"!#$%&'()-^")
 
-(defn build-randomstr-complex [len]
+(defn build-random-str-complex [len]
   (apply str (repeatedly len #(rand-nth (str str-alphabets-and-number str-parentesis-and-special-chars)))))
 
 (defn build-random-str-alphabets-and-number [len]
@@ -59,3 +60,5 @@
       (#(if-not (empty? str-where) (str % " where " str-where) %))
       (append-limit-offset-by-limit-page-params params)
       get-list-with-total))
+
+(def time-format-yyyymmdd-hhmmss (f/formatter "YYYY-MM-dd HH:mm:ss"))

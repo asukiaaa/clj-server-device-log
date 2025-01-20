@@ -2,8 +2,11 @@
   (:refer-clojure :exclude [update])
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.data.json :as json]
+            [clojure.walk :refer [keywordize-keys]]
             [buddy.core.hash :as bhash]
             [buddy.core.codecs :as codecs]
+            [clj-time.core :as t]
+            [clj-time.format :as f]
             [back.config :refer [db-spec]]
             [back.models.util :as model.util]))
 
@@ -20,10 +23,21 @@
   (-> (str password salt) bhash/sha3-512 codecs/bytes->hex))
 
 (defn get-by-email [email & [{:keys [transaction]}]]
-  (first (jdbc/query (or transaction db-spec) ["SELECT * FROM user WHERE email = ?" email])))
+  (first (jdbc/query (or transaction db-spec) ["SELECT * FROM user WHERE email = ?" (model.util/escape-for-sql email)])))
 
 (defn get-by-id [id & [{:keys [transaction]}]]
   (model.util/get-by-id id "user" {:transaction transaction}))
+
+(defn get-by-id-and-hash-password-reset [id hash-password-reset & [{:keys [transaction]}]]
+  (let [user (get-by-id id {:transaction transaction})
+        info-password-reset (when-let [str-password-reset (:password_reset user)]
+                              (-> str-password-reset model.util/parse-json :parsed keywordize-keys))
+        time-until (when-let [str-until (:until info-password-reset)]
+                     (f/parse model.util/time-format-yyyymmdd-hhmmss str-until))]
+    (when (and (= hash-password-reset (:hash info-password-reset))
+               (not (nil? time-until))
+               (t/after? time-until (t/now)))
+      user)))
 
 (defn filter-params-to-create [params]
   (select-keys params [:email :name :permission]))
@@ -78,7 +92,7 @@
                         (seq user-in-db) (append-error :email "User already exists"))]
         {:errors (json/write-str errors)}
         (let [password (:password params)
-              salt (model.util/build-randomstr-complex 20)
+              salt (model.util/build-random-str-complex 20)
               hash (build-hash password salt)]
           ; (println salt hash)
           (jdbc/insert! t-con :user
@@ -132,7 +146,7 @@
       (assoc errors key-password (concat (key-password errors) ["Invalid password"]))
       errors)))
 
-(defn reset-password [id args]
+(defn reset-password-with-checking-current-password [id args]
   (jdbc/with-db-transaction [t-con db-spec]
     (let [password-current (:password args)
           key-password-new :password_new
@@ -147,4 +161,36 @@
           (jdbc/update! t-con :user
                         {:hash (build-hash password-new (:salt user))}
                         ["id = ?" id])
+          {:message "ok"})))))
+
+(defn create-hash-for-resetting-password [id]
+  (jdbc/with-db-transaction [t-con db-spec]
+    (let [user (get-by-id id {:transaction t-con})]
+      (if-let [errors (cond-> nil
+                        (empty? user) (append-system-error "User does not exist"))]
+        {:errors (json/write-str errors)}
+        (let [hash (model.util/build-random-str-alphabets-and-number 30)]
+          (jdbc/update! t-con :user
+                        {:password_reset (json/write-str
+                                          {:hash hash
+                                           :until (f/unparse model.util/time-format-yyyymmdd-hhmmss
+                                                             (t/plus (t/now) (t/hours 1)))})}
+                        ["id = ?" id])
+          {:hash hash})))))
+
+(defn reset-password-for-hash-user [args]
+  (jdbc/with-db-transaction [t-con db-spec]
+    (let [hash-password (:hash args)
+          password (:password args)
+          id-user (:id args)
+          user (get-by-id-and-hash-password-reset id-user hash-password {:transaction t-con})]
+      (if-let [errors (cond-> (-> nil
+                                  (check-errors-of-params-for-password args))
+                        (empty? user) (append-system-error "User does not exist"))]
+        {:errors (json/write-str errors)}
+        (do
+          (jdbc/update! t-con :user
+                        {:hash (build-hash password (:salt user))
+                         :password_reset nil}
+                        ["id = ?" id-user])
           {:message "ok"})))))

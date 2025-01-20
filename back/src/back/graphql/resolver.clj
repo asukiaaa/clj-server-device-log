@@ -72,6 +72,13 @@
      (when-let [id-user (:id args)]
        (model.user/get-by-id id-user)))))
 
+(defn user-for-resetting-password [context args _]
+  (println "args for user-for-resetting-password" args)
+  (let [id-user (:id args)
+        hash-password-reset (:hash args)]
+    (when-let [user (model.user/get-by-id-and-hash-password-reset id-user hash-password-reset)]
+      user)))
+
 (defn user-create [context args _]
   (println "handle user-create" (-> args :user :email))
   #_(println "args user-create" args)
@@ -252,12 +259,24 @@
         id (:id args)]
     (when (model.user/admin? user) (model.device-watch-group-device/delete id))))
 
+(defn hash-for-resetting-password-create [context args _]
+  (println "args hash-for-resetting-password-create" args)
+  (let [user (get-user-loggedin context)
+        id (:id args)]
+    (when (model.user/admin? user)
+      (model.user/create-hash-for-resetting-password id))))
+
+(defn password-for-hash-user-reset [context args _]
+  (println "args password-for-hash-user-reset" args)
+  (Thread/sleep 1000) ; wait to take tome for brute force attack
+  (model.user/reset-password-for-hash-user args))
+
 (defn password-mine-reset [context args _]
   (println "args password-mine-reset" args)
   (Thread/sleep 1000) ; wait to take tome for brute force attack
   (let [user (get-user-loggedin context)]
     (when-not (empty? user)
-      (model.user/reset-password (:id user) args))))
+      (model.user/reset-password-with-checking-current-password (:id user) args))))
 
 (defn device-for-user-create [context args _]
   (println "args device-for-user-create" args)
@@ -295,6 +314,7 @@
    :Query/device_files_for_device device-files-for-device
    :Query/users users
    :Query/user user
+   :Query/user_for_resetting_password user-for-resetting-password
    :Query/devices devices-for-user
    :Query/device device-for-user
    :Query/device_groups device-groups-for-user
@@ -318,6 +338,8 @@
    :Mutation/device_watch_group_device_create device-watch-group-device-create
    :Mutation/device_watch_group_device_update device-watch-group-device-update
    :Mutation/device_watch_group_device_delete device-watch-group-device-delete
+   :Mutation/hash_for_resetting_password_create hash-for-resetting-password-create
+   :Mutation/password_for_hash_user_reset password-for-hash-user-reset
    :Mutation/password_mine_reset password-mine-reset
    :Mutation/login login
    :Mutation/logout logout})

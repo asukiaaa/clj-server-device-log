@@ -91,8 +91,9 @@
       (seq hours-action)
       (join " " (let [[in-or-not-in str-hours] hours-action]
                   [target-key (if (= in-or-not-in "in") ">=" "<")
-                   (f/unparse (f/formatter "\"YYYY-MM-dd HH:mm:ss\"")
-                              (t/minus (t/now) (t/hours (Integer. str-hours))))]))
+                   (format "\"%s\""
+                           (f/unparse model.util/time-format-yyyymmdd-hhmmss
+                                      (t/minus (t/now) (t/hours (Integer. str-hours)))))]))
       :else (join " " [target-key target-action target-value]))))
 
 (defn build-query-item-where [params {:keys [base-table-key this-table-key]}]

@@ -10,6 +10,7 @@
             [front.view.users.create :as user.create]
             [front.view.users.show :as user.show]
             [front.view.users.edit :as user.edit]
+            [front.view.users.password-reset :as user.password-reset]
             [front.view.devices.index :as device.index]
             [front.view.devices.create :as device.create]
             [front.view.devices.show :as device.show]
@@ -62,8 +63,10 @@
          {:path "users" :children
           [{:index true :element (r/as-element [:f> user.index/core])}
            {:path "create" :element (r/as-element [:f> user.create/core])}
-           {:path ":id_user" :element (r/as-element [:f> user.show/core])}
-           {:path ":id_user/edit" :element (r/as-element [:f> user.edit/core])}]}
+           {:path ":id_user" :children
+            [{:index true :element (r/as-element [:f> user.show/core])}
+             {:path "edit" :element (r/as-element [:f> user.edit/core])}
+             {:path "password_reset/:hash_password_reset" :element (r/as-element [:f> user.password-reset/core])}]}]}
          {:path "devices" :children
           [{:index true :element (r/as-element [:f> device.index/core])}
            {:path "create" :element (r/as-element [:f> device.create/core])}

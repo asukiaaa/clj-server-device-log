@@ -12,7 +12,20 @@
         navigate (router/useNavigate)
         id-user (get params "id_user")
         [user set-user] (react/useState)
-        info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))]
+        [hash-to-reset-password set-hash-to-reset-password] (react/useState)
+        state-info-system (util/build-state-info :__system #(react/useState))
+        info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
+        [waiting-response set-waiting-response] (react/useState)
+        on-receive-hash-reset-password
+        (fn [data errors]
+          (when errors ((:set-draft state-info-system) errors))
+          (when-let [hash (:hash data)]
+            (set-hash-to-reset-password hash)))
+        create-link-to-reset-password
+        (fn []
+          (set-waiting-response true)
+          (model.user/create-hash-to-reset-password {:id-user id-user
+                                                     :on-receive on-receive-hash-reset-password}))]
     (react/useEffect
      (fn []
        (wrapper.fetching/start info-wrapper-fetching)
@@ -27,7 +40,19 @@
       :renderer
       (if (empty? user)
         [:div "no data"]
-        [:div
+        [:div.mt-1
+         (if (empty? hash-to-reset-password)
+           [:div
+            [:div.btn.btn-outline-primary
+             {:on-click create-link-to-reset-password
+              :class (when waiting-response "disable")}
+             "crete link to reset password"]]
+           (let [url-object (util/build-current-url-object)
+                 url (str (.-origin url-object) (route/user-password-reset id-user hash-to-reset-password))]
+             [:div
+              [:div.btn.btn-outline-primary {:on-click #(util/copy-to-clipboard url)}
+               "copy url to reset password"]
+              [:span url]]))
          [:> router/Link {:to route/users} "index"]
          " "
          [:> router/Link {:to (route/user-edit id-user)} "edit"]

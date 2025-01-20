@@ -12,7 +12,7 @@
         url (.-url request)
         uri (lamb.uri/uri url)
         path (:path uri)
-        show-login-page-when-not-loggedin (and (includes? path "/front") (not (includes? path route/login)))]
+        show-login-page-when-not-loggedin (route/show-login-page-when-not-loggedin path)]
   ; https://gist.github.com/pesterhazy/c4bab748214d2d59883e05339ce22a0f#asynchronous-conditionals
     (js/Promise.
      (fn [resolve _reject]
@@ -21,7 +21,8 @@
          (fn [user]
            (if user
              (resolve user)
-             (if show-login-page-when-not-loggedin
+             (resolve nil)
+             #_(if show-login-page-when-not-loggedin
                (let [query (:query uri)
                      path-afetr-login (str path "?" query)
                      encoded-path-after-login (js/escape path-afetr-login)]

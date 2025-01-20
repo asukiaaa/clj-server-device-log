@@ -1,4 +1,5 @@
-(ns front.route)
+(ns front.route
+  (:require [clojure.string :refer [includes?]]))
 
 (def front "/front")
 (def dashboard front)
@@ -11,6 +12,9 @@
 (def user-create (str users "/create"))
 (defn user-show [id] (str users "/" id))
 (defn user-edit [id] (str (user-show id) "/edit"))
+
+(defn user-password-reset [id hash]
+  (str (user-show id) "/password_reset/" hash))
 
 (def devices (str front "/devices"))
 (def device-create (str devices "/create"))
@@ -51,3 +55,8 @@
 
 (defn device-watch-group-raw-device-logs [id-device-watch-group]
   (str (device-watch-group-show id-device-watch-group) "/raw_device_logs"))
+
+(defn show-login-page-when-not-loggedin [path]
+  (and (includes? path front)
+       (not (includes? path login))
+       #_(not )))

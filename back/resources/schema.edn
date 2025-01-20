@@ -137,6 +137,10 @@
   :ResponseDelete
   {:fields
    {:errors {:type String}}}
+  :ResponseHashForPasswordResetCreate
+  {:fields
+   {:hash {:type String}
+    :errors {:type String}}}
   :ResponseDeviceCreateUpdate
   {:fields
    {:errors {:type String}
@@ -259,6 +263,10 @@
     {:type DeviceWatchGroupDevice
      :args {:id {:type (non-null Int)}
             :device_watch_group_id {:type (non-null Int)}}}
+    :user_for_resetting_password
+    {:type User
+     :args {:id {:type (non-null Int)}
+            :hash {:type (non-null String)}}}
     :users
     {:type ResponseUserListTotal
      :args {:limit {:type Int}
@@ -333,6 +341,14 @@
     :device_watch_group_device_delete
     {:type ResponseDelete
      :args {:id {:type (non-null Int)}}}
+    :hash_for_resetting_password_create
+    {:type ResponseHashForPasswordResetCreate
+     :args {:id {:type (non-null Int)}}}
+    :password_for_hash_user_reset
+    {:type ResponseMessage
+     :args {:id {:type (non-null Int)}
+            :hash {:type (non-null String)}
+            :password {:type (non-null String)}}}
     :password_mine_reset
     {:type ResponseMessage
      :args {:password {:type (non-null String)}
