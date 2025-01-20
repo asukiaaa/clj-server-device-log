@@ -56,7 +56,7 @@
   (let [require-url-password-reset "false"]
     (util/create {:name-table "user"
                   :str-input-params
-                  (format "user: { name: \"%s\", email: \"%s\", password: \"%s\", permission: \"%s\" }, requireUrlPasswordReset: %s"
+                  (format "user: { name: %s, email: %s, password: %s, permission: %s }, requireUrlPasswordReset: %s"
                           (util/build-input-str-for-str name)
                           (util/build-input-str-for-str email)
                           (util/build-input-str-for-str password)
@@ -67,7 +67,7 @@
                   :on-receive on-receive})))
 
 (defn update [{:keys [id name email permission on-receive]}]
-  (let [query (format "{ user_update(id: %d, user: { name: \"%s\", email: \"%s\", permission: \"%s\" }) { errors user { %s } } }"
+  (let [query (format "{ user_update(id: %d, user: { name: %s, email: %s, permission: %s }) { errors user { %s } } }"
                       (util/build-input-str-for-int id)
                       (util/build-input-str-for-str name)
                       (util/build-input-str-for-str email)

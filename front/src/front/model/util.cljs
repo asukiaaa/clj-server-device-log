@@ -69,18 +69,18 @@
                                             (build-error-messages errors))))))
 
 (defn delete-by-id [{:keys [name-table id on-receive]}]
-  (mutate-with-receive-params {:stt-field (str name-table "_delete")
+  (mutate-with-receive-params {:str-field (str name-table "_delete")
                                :on-receive on-receive
                                :str-input-params (format "id: %s" (build-input-str-for-int id))}))
 
 (defn create [{:keys [name-table on-receive str-input-params str-keys-receive]}]
-  (mutate-with-receive-params {:stt-field (str name-table "_create")
+  (mutate-with-receive-params {:str-field (str name-table "_create")
                                :on-receive on-receive
                                :str-input-params str-input-params
                                :str-keys-receive str-keys-receive}))
 
 (defn update [{:keys [name-table on-receive str-input-params str-keys-receive]}]
-  (mutate-with-receive-params {:stt-field (str name-table "_update")
+  (mutate-with-receive-params {:str-field (str name-table "_update")
                                :on-receive on-receive
                                :str-input-params str-input-params
                                :str-keys-receive str-keys-receive}))
