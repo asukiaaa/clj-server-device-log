@@ -66,7 +66,7 @@
                                 (handler.util/decode-and-find-user-in-session
                                  (-> context :request :session :user)))]
           (cond-> context
-            (not (empty? user-loggedin))
+            (seq user-loggedin)
             (assoc-in [:request :lacinia-app-context :user-loggedin] user-loggedin)))))
     :leave
     (fn [context]

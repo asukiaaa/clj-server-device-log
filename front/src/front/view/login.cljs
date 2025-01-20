@@ -2,7 +2,8 @@
   (:require ["react" :as react]
             [front.model.user :as user]
             ["react-router-dom" :as router]
-            [front.route :as route]))
+            [front.route :as route]
+            [front.view.util :as util]))
 
 (defn render-text-input [{:keys [default set-val label type]}]
   [:<>
@@ -13,26 +14,35 @@
 (defn core []
   (let [[search-params _set-search-params] (router/useSearchParams)
         path-afetr-login (or (.get search-params "path_after_login") route/dashboard)
-        [email set-email] (react/useState)
-        [password set-password] (react/useState)
+        state-info-email (util/build-state-info :email #(react/useState))
+        state-info-password (util/build-state-info :password #(react/useState))
+        [errors set-errors] (react/useState)
+        [waiting-response set-waiting-response] (react/useState)
         navigate (router/useNavigate)
         revalidator (router/useRevalidator)
-        on-receive #(when-not (empty? %)
-                      (do
-                        (.revalidate revalidator)
-                        (navigate path-afetr-login)))]
+        on-receive (fn [data]
+                     (set-waiting-response false)
+                     (if (empty? data)
+                       (set-errors ["email or password unmatch"])
+                       (do
+                         (.revalidate revalidator)
+                         (navigate path-afetr-login))))
+        on-click-login (fn [e]
+                         (.preventDefault e)
+                         (set-errors nil)
+                         (set-waiting-response true)
+                         (user/login {:email (:draft state-info-email)
+                                      :password (:draft state-info-password)
+                                      :on-receive on-receive}))]
     [:div
      [:div.row
       [:div.col-md-4.col-lg-4]
       [:form.col-md-4.col-lg-4
        [:h1 "Login"]
-       #_[:div "signup is not open now"]
-       [render-text-input {:set-val set-email :label "Email"}]
-       [render-text-input {:set-val set-password :label "Password" :type "password"}]
+       [util/render-errors-as-alerts errors]
+       [util/render-input "Email" state-info-email {:disabled waiting-response}]
+       [util/render-input "Password" state-info-password {:type :password :disabled waiting-response}]
        [:div.mt-2.align-right
-        [:input.btn.btn-outline-primary
-         {:type "button"
-          :on-click #(user/login {:email email
-                                  :password password
-                                  :on-receive on-receive})
-          :value "login"}]]]]]))
+        [:button.btn.btn-outline-primary
+         {:on-click on-click-login :class (when waiting-response :disabled)}
+         "login"]]]]]))

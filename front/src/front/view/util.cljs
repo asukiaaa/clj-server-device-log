@@ -78,22 +78,23 @@
      :on-change (fn [] (set-draft (if (= "true" draft) "false" "true")))}]
    [:label.p-2 {:for label} label]])
 
-(defn render-input [label {:keys [default key draft set-draft errors]} {:keys [type wrapper-class]}]
-  [:div {:class wrapper-class}
+(defn render-input [label {:keys [default key draft set-draft errors]} {:keys [type str-class-wrapper str-class-input disabled]}]
+  [:div {:class str-class-wrapper}
    [:div
     [:label {:for key} label]]
    [:input.form-control
     {:id label
-     :class (when errors :is-invalid)
+     :class (str str-class-input (when errors :is-invalid))
      :value (or draft default)
+     :disabled disabled
      :type type
      :on-change (fn [e] (set-draft (-> e .-target .-value)))}]
    (when errors
      (for [error errors]
        [:div.invalid-feedback {:key error} error]))])
 
-(defn render-select [label {:keys [default key draft set-draft errors]} value-labels {:keys [type wrapper-class]}]
-  [:div {:class wrapper-class}
+(defn render-select [label {:keys [default key draft set-draft errors]} value-labels {:keys [type str-class-wrapper]}]
+  [:div {:class str-class-wrapper}
    [:div
     [:label {:for key} label]]
    [:select.form-control

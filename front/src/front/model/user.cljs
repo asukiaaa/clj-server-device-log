@@ -18,7 +18,7 @@
   (->> user :permission (.parse js/JSON) js->clj keywordize-keys :role (= "admin")))
 
 (defn login [{:keys [email password on-receive]}]
-  (let [mutation (goog.string.format "{ login(email: \"%s\", password: \"%s\") { id email name } }"
+  (let [mutation (goog.string.format "{ login(email: %s password: %s) { id email name } }"
                                      (build-input-str-for-str email) (build-input-str-for-str password))]
     (re-graph/mutate mutation () (fn [{:keys [data errors]}]
                                    (on-receive (:login data) (util/build-error-messages errors))))))
