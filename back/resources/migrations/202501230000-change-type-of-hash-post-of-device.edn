@@ -1,0 +1,4 @@
+{:up
+ ["ALTER TABLE device MODIFY hash_post CHAR(255);"]
+ :down
+ ["ALTER TABLE device MODIFY hash_post TEXT;"]}

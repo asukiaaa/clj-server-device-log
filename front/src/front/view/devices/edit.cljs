@@ -33,7 +33,8 @@
                                       ((:set-errors state) errors-for-key))))
                                 (when-let [id (-> data :device :id)]
                                   (navigate (route/device-show id)))))
-        on-click-apply (fn []
+        on-click-apply (fn [e]
+                         (.preventDefault e)
                          (model.device/update
                           {:id id-item
                            :name (:draft state-info-name)
@@ -68,7 +69,7 @@
          [:form.form-control
           [util/render-input "name" state-info-name]
           [util/render-select "device_group_id" state-info-device-group-id (model.device-group/build-select-options-from-list-and-total device-group-list-and-total)]
-          [:a.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply} "apply"]]])})))
+          [:button.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply} "apply"]]])})))
 
 (defn core []
   (wrapper.show404/wrapper

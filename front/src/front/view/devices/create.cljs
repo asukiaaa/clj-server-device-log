@@ -25,10 +25,12 @@
                              ((:set-errors state) errors-for-key))))
                        (when-let [id (-> data :device :id)]
                          (navigate (route/device-show id)))))
-        on-click-apply (fn [] (model.device/create
-                               {:name (:draft state-info-name)
-                                :device_group_id (:draft state-info-device-group-id)
-                                :on-receive on-receive}))
+        on-click-apply (fn [e]
+                         (.preventDefault e)
+                         (model.device/create
+                          {:name (:draft state-info-name)
+                           :device_group_id (:draft state-info-device-group-id)
+                           :on-receive on-receive}))
         load-list (fn []
                     (wrapper.fetching/start info-wrapper-fetching)
                     (model.device-group/fetch-list-and-total
@@ -56,7 +58,7 @@
              (let [id (:id item)
                    name (:name item)]
                [id (str id " " name)]))]
-        [:a.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply} "apply"]]]})))
+        [:button.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply} "apply"]]]})))
 
 (defn core []
   (wrapper.show404/wrapper

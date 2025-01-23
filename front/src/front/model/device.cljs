@@ -54,6 +54,3 @@
 
 (defn build-confirmation-message-for-deleting [device]
   (str "delete " name-table " id:" (:id device) " name:" (:name device)))
-
-(defn build-key-post [device]
-  (str "device:" (:id device) ":" (:hash_post device)))

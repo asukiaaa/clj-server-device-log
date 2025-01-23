@@ -2,13 +2,12 @@
   (:require [clojure.data.json :as json]
             [clojure.java.io :as io]
             [hiccup.page :refer [html5]]
-            [back.handlers.util :as handler-util]
+            [back.handlers.util :as handler.util]
             [back.models.raw-device-log :as model.raw-device-log]
             [back.models.device-group-api-key :as model.device-group-api-key]
             [back.models.device :as model.device]
             [back.models.device-file :as model.device-file]
-            [back.config :as config]
-            [back.handlers.util :as handler.util]))
+            [back.config :as config]))
 
 (defn top [req]
   {:status 200
@@ -91,18 +90,18 @@
           [:div "404 not found"])})
 
 (defn api-post-raw-device-log [req]
-  (let [str-bearer (handler-util/get-bearer req)
+  (let [str-bearer (handler.util/get-bearer req)
         matched-bearer (= str-bearer config/key-auth)
-        device-to-post (model.device/get-by-key-post str-bearer)]
+        device-to-post (model.device/get-by-hash-post str-bearer)]
     (when (or matched-bearer device-to-post)
       (let [body (:json-params req)]
         (model.raw-device-log/create {:data (json/write-str body)
-                                      :device_id (:id device-to-post)}))
-      {:status 200
-       :body "ok"})))
+                                      :device_id (:id device-to-post)})
+        {:status 200
+         :body "ok"}))))
 
 (defn api-post-device [req]
-  (let [str-bearer (handler-util/get-bearer req)
+  (let [str-bearer (handler.util/get-bearer req)
         device-group-api-key (model.device-group-api-key/get-by-key-post str-bearer)]
     (when (model.device-group-api-key/has-permission-to-create-device device-group-api-key)
       (let [params (:json-params req)
@@ -110,13 +109,13 @@
             params-device (-> (:device params)
                               (assoc :device_group_id id-device-group))
             result (model.device/create params-device)
-            result (assoc result :key_post (model.device/build-key-post (:device result)))]
+            result (assoc result :hashy_post (-> result :device :hash_post))]
         {:status 200
          :body (json/write-str result)}))))
 
 (defn api-post-device-file [req]
-  (let [str-bearer (handler-util/get-bearer req)
-        device (model.device/get-by-key-post str-bearer)]
+  (let [str-bearer (handler.util/get-bearer req)
+        device (model.device/get-by-hash-post str-bearer)]
     (when device
       (let [id-device (:id device)
             info-file (-> req :multipart-params (get "file"))

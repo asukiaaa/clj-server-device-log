@@ -1,0 +1,4 @@
+{:up
+ ["ALTER TABLE device ADD UNIQUE device__hash_post(hash_post);"]
+ :down
+ ["ALTER TABLE device DROP INDEX device__hash_post;"]}

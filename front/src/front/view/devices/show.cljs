@@ -50,11 +50,6 @@
                (case key
                  :device_group (let [device-group (:device_group item)]
                                  (str device-group))
-                 :hash_post (let [hash (get item key)]
-                              [:<>
-                               [:div (str hash)]
-                               [:pre {:style {:margin-bottom 0}} (model.device/build-key-post item)]
-                               [:div "for /api/raw_device_log"]])
                  (get item key))]])]]])})))
 
 (defn core []

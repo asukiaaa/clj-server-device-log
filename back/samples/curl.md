@@ -5,7 +5,7 @@
 Example command to upload file for device
 
 ```sh
-AUTHORIZATION_BEARER="device_group:1:device_group_api_key:1:aaaa"
+AUTHORIZATION_BEARER="hash-post-of-device"
 PATH_FILE="your-local/image.png"
 HOST=http://localhost:3000
 curl -X POST ${HOST}/api/device_file \
@@ -18,7 +18,7 @@ curl -X POST ${HOST}/api/device_file \
 Example commands to create device
 
 ```sh
-AUTHORIZATION_BEARER="device_group:1:device_group_api_key:1:aaaa"
+AUTHORIZATION_BEARER="hash-post-of-device"
 HOST=http://localhost:3000
 curl -X POST ${HOST}/api/device \
    -H 'Content-Type: application/json' \
@@ -34,7 +34,7 @@ Example commands to post raw_device_log.
 
 ```sh
 MACHINE_ID=`cat /etc/machine-id`
-AUTHORIZATION_BEARER="device:1:aaaa"
+AUTHORIZATION_BEARER="hash-post-of-device"
 HOST=http://localhost:3000
 curl -X POST ${HOST}/api/raw_device_log \
    -H 'Content-Type: application/json' \

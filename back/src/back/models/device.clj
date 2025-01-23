@@ -2,7 +2,6 @@
   (:refer-clojure :exclude [update])
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.core :refer [format]]
-            [clojure.string :refer [split]]
             [back.models.device-group :as model.device-group]
             [back.config :refer [db-spec]]
             [back.models.util :as model.util]))
@@ -21,6 +20,12 @@
 
 (defn get-by-id [id & [{:keys [transaction]}]]
   (model.util/get-by-id id name-table {:transaction transaction}))
+
+(defn get-by-hash-post [hash-post & [{:keys [transaction]}]]
+  (when-not (empty? hash-post)
+    (let [query (format "SELECT * from %s WHERE hash_post = \"%s\"" name-table (model.util/escape-for-sql hash-post))
+          user (first (jdbc/query (or transaction db-spec) [query]))]
+      user)))
 
 (defn delete [id]
   ; TODO prohibit deleting when who has device
@@ -56,12 +61,19 @@
           (jdbc/delete! db-spec key-table ["id = ?" id])
           {})))))
 
-(defn assign-hash-post-to-params [params]
-  (assoc params :hash_post (model.util/build-random-str-alphabets-and-number 40)))
+(defn build-hash-post []
+  (model.util/build-random-str-alphabets-and-number 60))
+
+(defn assign-unique-hash-post-to-params [params transaction]
+  (let [hash (build-hash-post)
+        user (get-by-hash-post hash {:transaction transaction})]
+    (if (empty? user)
+      (assoc params :hash_post hash)
+      (assign-unique-hash-post-to-params params transaction))))
 
 (defn create [params]
   (jdbc/with-db-transaction [t-con db-spec]
-    (jdbc/insert! t-con key-table (-> params assign-hash-post-to-params filter-params))
+    (jdbc/insert! t-con key-table (-> params (assign-unique-hash-post-to-params t-con) filter-params))
     (let [id (-> (jdbc/query t-con "SELECT LAST_INSERT_ID()")
                  first vals first)
           item (get-by-id id {:transaction t-con})]
@@ -75,7 +87,7 @@
         {:errors ["device group does not avairable"]}
         (do
           (jdbc/insert! t-con key-table (-> params
-                                            assign-hash-post-to-params
+                                            (assign-unique-hash-post-to-params t-con)
                                             filter-params))
           (let [id (-> (jdbc/query t-con "SELECT LAST_INSERT_ID()")
                        first vals first)
@@ -91,14 +103,3 @@
 
 (defn get-list-with-total-for-admin [params]
   (model.util/get-list-with-total-with-building-query name-table params))
-
-(defn get-by-key-post [key-post]
-  (when-not (nil? key-post)
-    (let [[key id hash] (split key-post #":")
-          device (when (= key "device")
-                   (get-by-id id))]
-      (when (= hash (:hash_post device))
-        device))))
-
-(defn build-key-post [device]
-  (str "device:" (:id device) ":" (:hash_post device)))
