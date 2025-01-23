@@ -18,12 +18,12 @@ curl -X POST ${HOST}/api/device_file \
 Example commands to create device
 
 ```sh
-AUTHORIZATION_BEARER="hash-post-of-device"
+AUTHORIZATION_BEARER="key-str-of-device-group-api-key"
 HOST=http://localhost:3000
 curl -X POST ${HOST}/api/device \
    -H 'Content-Type: application/json' \
    -H "Authorization: Bearer ${AUTHORIZATION_BEARER}" \
-   -d "{\"device\":{\"name\":"0000999"}}"
+   -d "{\"device\":{\"name\":\"0000999\"}}"
 ```
 
 ## raw_device_log

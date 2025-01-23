@@ -1,0 +1,4 @@
+{:up
+ ["ALTER TABLE device_group_api_key ADD UNIQUE device_group_api_key__key_str(key_str);"]
+ :down
+ ["ALTER TABLE device_group_api_key DROP INDEX device_group_api_key__key_str;"]}

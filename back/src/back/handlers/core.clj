@@ -102,7 +102,7 @@
 
 (defn api-post-device [req]
   (let [str-bearer (handler.util/get-bearer req)
-        device-group-api-key (model.device-group-api-key/get-by-key-post str-bearer)]
+        device-group-api-key (model.device-group-api-key/get-by-key-str str-bearer)]
     (when (model.device-group-api-key/has-permission-to-create-device device-group-api-key)
       (let [params (:json-params req)
             id-device-group (:device_group_id device-group-api-key)

@@ -24,11 +24,13 @@
                              ((:set-errors state) errors-for-key))))
                        (when-let [id (-> data :device_group_api_key :id)]
                          (navigate (route/device-group-device-group-api-key-show id-device-group id)))))
-        on-click-apply (fn [] (model.device-group-api-key/create
-                               {:name (:draft state-info-name)
-                                :permission (:draft state-info-permission)
-                                :id-device-group id-device-group
-                                :on-receive on-receive}))]
+        on-click-apply (fn [e]
+                         (.preventDefault e)
+                         (model.device-group-api-key/create
+                          {:name (:draft state-info-name)
+                           :permission (:draft state-info-permission)
+                           :id-device-group id-device-group
+                           :on-receive on-receive}))]
     [:div
      [:h1.h3.mx-2 "create device group api key"]
      [:form.form-control
@@ -36,7 +38,7 @@
       [util/render-input "name" state-info-name]
       [util/render-textarea "permission" state-info-permission]
       [util.explanation/permission]
-      [:a.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply} "apply"]]]))
+      [:button.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply} "apply"]]]))
 
 (defn core []
   (wrapper.show404/wrapper
