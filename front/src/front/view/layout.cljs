@@ -45,12 +45,13 @@
        [:> bs/Navbar.Brand {:to "/" :as router/Link} "device logs"]
        [:> bs/Navbar.Toggle]
        [:> bs/Navbar.Collapse {:class :justify-content-end}
-        (if (nil? user)
-          [:> bs/Nav.Link {:to route/login :as router/Link} "Login"]
-          [:<>
-           [:> bs/Nav.Link {:to route/dashboard :as router/Link} util.label/dashboard]
-           [:> bs/NavDropdown {:title (:name user) :id "nav-dropdown" :align :end}
-            [:> bs/NavDropdown.Item {:to route/profile :as router/Link} util.label/profile]
-            [:> bs/NavDropdown.Divider]
-            [:> bs/NavDropdown.Item {:on-click logout :href route/logout} util.label/logout]]])]]]
+        [:> bs/Nav
+         (if (nil? user)
+           [:> bs/Nav.Link {:to route/login :as router/Link} "Login"]
+           [:<>
+            [:> bs/Nav.Link {:to route/dashboard :as router/Link} util.label/dashboard]
+            [:> bs/NavDropdown {:title (:name user) :id "nav-dropdown" :align :end}
+             [:> bs/NavDropdown.Item {:to route/profile :as router/Link} util.label/profile]
+             [:> bs/NavDropdown.Divider]
+             [:> bs/NavDropdown.Item {:on-click logout :href route/logout} util.label/logout]]])]]]]
      [:> router/Outlet]]))
