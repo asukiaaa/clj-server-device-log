@@ -5,6 +5,8 @@
             [front.route :as route]
             [front.view.common.wrapper.show404 :as wrapper.show404]
             [front.view.util :as util]
+            [front.view.util.breadcrumb :as breadcrumb]
+            [front.view.util.label :as util.label]
             [front.model.user :as model.user]))
 
 (defn- page []
@@ -38,21 +40,24 @@
                               {:password (:draft state-info-password)
                                :password-new (:draft state-info-password-new)
                                :on-receive on-receive-password-reset}))))]
-    (if (empty? user)
-      [:div "no data"]
-      [:div
-       [:form.form-control
-        [util/render-errors-as-alerts (:errors state-info-system)]
-        (let [show-password (:draft state-info-show-password)
-              type-for-password (if (= show-password "true") :text :password)]
-          [:<>
-           [util/render-input "password" state-info-password {:type type-for-password}]
-           [util/render-input "new password" state-info-password-new {:type type-for-password}]
-           [util/render-input "new password again" state-info-password-new-again {:type type-for-password}]])
-        [:div [util/render-checkbox "show password" state-info-show-password]]
-        [:a.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply
-                                         :class (when waiting-response "disabled")}
-         "apply"]]])))
+    [:<>
+     [:f> breadcrumb/core [{:label util.label/profile :path route/profile}
+                           {:label util.label/password-edit}]]
+     (if (empty? user)
+       [:div "no data"]
+       [:div
+        [:form.form-control
+         [util/render-errors-as-alerts (:errors state-info-system)]
+         (let [show-password (:draft state-info-show-password)
+               type-for-password (if (= show-password "true") :text :password)]
+           [:<>
+            [util/render-input "password" state-info-password {:type type-for-password}]
+            [util/render-input "new password" state-info-password-new {:type type-for-password}]
+            [util/render-input "new password again" state-info-password-new-again {:type type-for-password}]])
+         [:div [util/render-checkbox "show password" state-info-show-password]]
+         [:a.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply
+                                          :class (when waiting-response "disabled")}
+          "apply"]]])]))
 
 (defn core []
   (wrapper.show404/wrapper

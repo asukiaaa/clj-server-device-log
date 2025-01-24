@@ -14,3 +14,4 @@
 (def edit "Edit")
 (def create "Create")
 (def delete "Delete")
+(def password-edit "Edit password")

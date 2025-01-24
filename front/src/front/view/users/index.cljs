@@ -53,7 +53,7 @@
        (fn []))
      #js [location])
     [:<>
-     [:f> breadcrumb/core [{:label "Users"}]]
+     [:f> breadcrumb/core [{:label util.label/users}]]
      [:> router/Link {:to route/user-create} util.label/create]
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
