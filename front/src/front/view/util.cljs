@@ -1,5 +1,6 @@
 (ns front.view.util
-  (:require ["react-router-dom" :as router]))
+  (:require ["react-router-dom" :as router]
+            [front.view.util.label :as util.label]))
 
 (def key-user-loggedin "user-loggedin")
 (defn get-user-loggedin []
@@ -115,7 +116,7 @@
          (.preventDefault e)
          (when (js/confirm message-confirm) (action-delete)))
        :href ""}
-   "delete"])
+   util.label/delete])
 
 (defn copy-to-clipboard [text]
   (-> js/navigator .-clipboard (.writeText text)))

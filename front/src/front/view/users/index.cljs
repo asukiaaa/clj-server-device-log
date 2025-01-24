@@ -7,7 +7,9 @@
             [front.view.common.wrapper.fetching :as wrapper.fetching]
             [front.view.common.wrapper.show404 :as wrapper.show404]
             [front.view.util :as util]
-            [front.model.user :as model.user]))
+            [front.model.user :as model.user]
+            [front.view.util.label :as util.label]
+            [front.view.util.breadcrumb :as breadcrumb]))
 
 (defn render-user [user on-delete]
   [:tr
@@ -51,7 +53,8 @@
        (fn []))
      #js [location])
     [:<>
-     [:> router/Link {:to route/user-create} "new"]
+     [:f> breadcrumb/core [{:label "Users"}]]
+     [:> router/Link {:to route/user-create} util.label/create]
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer

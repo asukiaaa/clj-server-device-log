@@ -5,6 +5,8 @@
             [front.view.common.wrapper.show404 :as wrapper.show404]
             [front.view.common.wrapper.fetching :as wrapper.fetching]
             [front.view.util :as util]
+            [front.view.util.breadcrumb :as breadcrumb]
+            [front.view.util.label :as util.label]
             [front.model.user :as model.user]))
 
 (defn- page []
@@ -35,42 +37,43 @@
                                               (wrapper.fetching/finished info-wrapper-fetching errors))})
        (fn []))
      #js [])
-    (wrapper.fetching/wrapper
-     {:info info-wrapper-fetching
-      :renderer
-      (if (empty? user)
-        [:div "no data"]
-        [:div.mt-1
-         (if (empty? hash-to-reset-password)
-           [:div
-            [:div.btn.btn-outline-primary
-             {:on-click create-link-to-reset-password
-              :class (when waiting-response "disable")}
-             "crete link to reset password"]]
-           (let [url-object (util/build-current-url-object)
-                 url (str (.-origin url-object) (route/user-password-reset id-user hash-to-reset-password))]
-             [:div
-              [:div.btn.btn-outline-primary {:on-click #(util/copy-to-clipboard url)}
-               "copy url to reset password"]
-              [:span url]]))
-         [:> router/Link {:to route/users} "index"]
-         " "
-         [:> router/Link {:to (route/user-edit id-user)} "edit"]
-         " "
-         [:f> util/btn-confirm-delete
-          {:message-confirm (model.user/build-confirmation-message-for-deleting user)
-           :action-delete #(model.user/delete {:id (:id user)
-                                               :on-receive (fn [] (navigate route/users))})}]
-         [:table.table.table-sm
-          [:thead
-           [:tr
-            [:th "key"]
-            [:th "value"]]]
-          [:tbody
-           (for [key [:id :email :name :permission :created_at :updated_at]]
-             [:tr {:key key}
-              [:td key]
-              [:td (get user key)]])]]])})))
+    [:<>
+     [:f> breadcrumb/core [{:label util.label/users :path route/users}
+                           {:label (or (:name user) util.label/no-data)}]]
+     (wrapper.fetching/wrapper
+      {:info info-wrapper-fetching
+       :renderer
+       (if (empty? user)
+         [:div util.label/no-data]
+         [:div
+          (if (empty? hash-to-reset-password)
+            [:div
+             [:div.btn.btn-outline-primary
+              {:on-click create-link-to-reset-password
+               :class (when waiting-response "disable")}
+              "crete link to reset password"]]
+            (let [url-object (util/build-current-url-object)
+                  url (str (.-origin url-object) (route/user-password-reset id-user hash-to-reset-password))]
+              [:div
+               [:div.btn.btn-outline-primary {:on-click #(util/copy-to-clipboard url)}
+                "copy url to reset password"]
+               [:span url]]))
+          [:> router/Link {:to (route/user-edit id-user)} util.label/edit]
+          " "
+          [:f> util/btn-confirm-delete
+           {:message-confirm (model.user/build-confirmation-message-for-deleting user)
+            :action-delete #(model.user/delete {:id (:id user)
+                                                :on-receive (fn [] (navigate route/users))})}]
+          [:table.table.table-sm
+           [:thead
+            [:tr
+             [:th "key"]
+             [:th "value"]]]
+           [:tbody
+            (for [key [:id :email :name :permission :created_at :updated_at]]
+              [:tr {:key key}
+               [:td key]
+               [:td (get user key)]])]]])})]))
 
 (defn core []
   (wrapper.show404/wrapper

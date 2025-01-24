@@ -6,18 +6,22 @@
             [front.model.user :as model.user]
             [front.view.common.wrapper.show404 :as wrapper.show404]
             [front.view.common.wrapper.fetching :as wrapper.fetching]
+            [front.view.util.breadcrumb :as breadcrumb]
+            [front.view.util.label :as util.label]
             [front.view.util :as util]))
 
 (defn- page []
   (let [params (js->clj (router/useParams))
         id-user (get params "id_user")
         navigate (router/useNavigate)
+        [user set-user] (react/useState)
         state-info-system (util/build-state-info :__system #(react/useState))
         state-info-name (util/build-state-info :name #(react/useState))
         state-info-email (util/build-state-info :email #(react/useState))
         state-info-permission (util/build-state-info :permission #(react/useState))
         on-receive-user
         (fn [user]
+          (set-user user)
           (util/set-default-and-draft state-info-email (:email user))
           (util/set-default-and-draft state-info-name (:name user))
           (util/set-default-and-draft state-info-permission (:permission user)))
@@ -51,17 +55,22 @@
                                               (wrapper.fetching/finished info-wrapper-fetching errors))})
        (fn []))
      #js [])
-    (wrapper.fetching/wrapper
-     {:info info-wrapper-fetching
-      :renderer
-      (if (empty? (:default state-info-email))
-        [:div "no data"]
-        [:div
-         [:form.form-control
-          [util/render-input "name" state-info-name]
-          [util/render-input "email" state-info-email]
-          [util/render-textarea "permission" state-info-permission]
-          [:button.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply} "apply"]]])})))
+    [:<>
+     [:f> breadcrumb/core [{:label util.label/users :path route/users}
+                           {:label (or (:name user) util.label/no-data) :path (route/user-show id-user)}
+                           {:label util.label/edit}]]
+     (wrapper.fetching/wrapper
+      {:info info-wrapper-fetching
+       :renderer
+       (if (empty? (:default state-info-email))
+         [:div
+          "no data"]
+         [:div
+          [:form.form-control
+           [util/render-input "name" state-info-name]
+           [util/render-input "email" state-info-email]
+           [util/render-textarea "permission" state-info-permission]
+           [:button.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply} "apply"]]])})]))
 
 (defn core []
   (wrapper.show404/wrapper

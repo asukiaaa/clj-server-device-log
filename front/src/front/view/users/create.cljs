@@ -5,6 +5,8 @@
             [front.route :as route]
             [front.model.user :as model.user]
             [front.view.common.wrapper.show404 :as wrapper.show404]
+            [front.view.util.breadcrumb :as breadcrumb]
+            [front.view.util.label :as util.label]
             [front.view.util :as util]))
 
 (defn- page []
@@ -34,6 +36,7 @@
                            :permission (:draft state-info-permission)
                            :on-receive on-receive}))]
     [:div
+     [:f> breadcrumb/core [{:label util.label/users :path route/users} {:label util.label/create}]]
      [:h1.h3.mx-2 "create user"]
      [:form.form-control
       [util/render-errors-as-alerts (:errors state-info-system)]
