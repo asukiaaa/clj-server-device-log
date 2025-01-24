@@ -8,7 +8,7 @@
    (if (empty? links)
      [:span util.label/dashboard]
      [:<>
-      [:> router/Link {:to route/dashboard :is-active false} util.label/dashboard]
+      [:> router/Link {:to route/dashboard} util.label/dashboard]
       (for [link links]
         (let [path (:path link)
               label (:label link)]
