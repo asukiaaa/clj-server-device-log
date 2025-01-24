@@ -4,6 +4,7 @@
 (def front "/front")
 (def dashboard front)
 (def login (str front "/login"))
+(def logout (str front "/logout"))
 
 (def profile (str front "/profile"))
 (def profile-password-edit (str profile "/password_edit"))

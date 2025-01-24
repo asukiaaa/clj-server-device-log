@@ -1,10 +1,11 @@
 (ns front.view.layout
   (:require ["react-router-dom" :as router]
+            ["react-bootstrap" :as bs]
             [clojure.walk :refer [keywordize-keys]]
-            [clojure.string :refer [includes?]]
             [lambdaisland.uri :as lamb.uri]
             [front.model.user :as model.user]
             [front.route :as route]
+            [front.view.util.label :as util.label]
             [front.view.util :as util]))
 
 (defn loader [js-params]
@@ -23,27 +24,33 @@
              (resolve user)
              (resolve nil)
              #_(if show-login-page-when-not-loggedin
-               (let [query (:query uri)
-                     path-afetr-login (str path "?" query)
-                     encoded-path-after-login (js/escape path-afetr-login)]
-                 (resolve (router/redirect (str route/login "?path_after_login=" encoded-path-after-login))))
-               (resolve nil))))})))))
+                 (let [query (:query uri)
+                       path-afetr-login (str path "?" query)
+                       encoded-path-after-login (js/escape path-afetr-login)]
+                   (resolve (router/redirect (str route/login "?path_after_login=" encoded-path-after-login))))
+                 (resolve nil))))})))))
 
 (defn core []
   (let [navigate (router/useNavigate)
         revalidator (router/useRevalidator)
         user (router/useRouteLoaderData util/key-user-loggedin)
-        logout (fn [] (model.user/logout {:on-receive (fn []
-                                                        (.revalidate revalidator)
-                                                        (navigate route/login))}))]
+        logout (fn [e]
+                 (.preventDefault e)
+                 (model.user/logout {:on-receive (fn []
+                                                   (.revalidate revalidator)
+                                                   (navigate route/login))}))]
     [:div
-     [:nav.navbar.bg-body-tertiary.border-bottom
-      [:div.container-fluid
-       [:> router/Link {:to "/" :class "navbar-brand text-dark"} "device logs"]
-       [:ul.nav.justify-content-end
+     [:> bs/Navbar {:bg :light :data-bs-theme :light}
+      [:> bs/Container {:fluid true}
+       [:> bs/Navbar.Brand {:to "/" :as router/Link} "device logs"]
+       [:> bs/Navbar.Toggle]
+       [:> bs/Navbar.Collapse {:class :justify-content-end}
         (if (nil? user)
-          [:li.nav-item [:> router/Link {:to route/login :class "nav-link"} "Login"]]
+          [:> bs/Nav.Link {:to route/login :as router/Link} "Login"]
           [:<>
-           [:li.nav-item [:> router/Link {:to route/dashboard :class "nav-link"} "Dashboard"]]
-           [:li.nav-item [:a {:on-click logout :class "nav-link"} "Logout"]]])]]]
+           [:> bs/Nav.Link {:to route/dashboard :as router/Link} util.label/dashboard]
+           [:> bs/NavDropdown {:title (:name user) :id "nav-dropdown" :align :end}
+            [:> bs/NavDropdown.Item {:to route/profile :as router/Link} util.label/profile]
+            [:> bs/NavDropdown.Divider]
+            [:> bs/NavDropdown.Item {:on-click logout :href route/logout} util.label/logout]]])]]]
      [:> router/Outlet]]))
