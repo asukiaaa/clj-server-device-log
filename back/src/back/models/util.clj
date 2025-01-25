@@ -15,11 +15,10 @@
 (defn build-random-str-alphabets-and-number [len]
   (apply str (repeatedly len #(rand-nth str-alphabets-and-number))))
 
-(defn get-list-with-total [query-get-records & [{:keys [build-item]}]]
-  (println :query-get-records query-get-records)
-  (jdbc/with-db-transaction [db-transaction db-spec]
-    (let [items (jdbc/query db-transaction query-get-records)
-          total (-> (jdbc/query db-transaction "SELECT FOUND_ROWS()") first vals first)
+(defn get-list-with-total [query-get-records & [{:keys [build-item transaction]}]]
+  (jdbc/with-db-transaction [transaction (or transaction db-spec)]
+    (let [items (jdbc/query transaction query-get-records)
+          total (-> (jdbc/query transaction "SELECT FOUND_ROWS()") first vals first)
           items (if (nil? build-item) items (map build-item items))]
       {:list items
        :total total})))

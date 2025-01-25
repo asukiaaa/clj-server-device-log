@@ -37,7 +37,6 @@
                            :on-receive on-receive}))]
     [:div
      [:f> breadcrumb/core [{:label util.label/users :path route/users} {:label util.label/create}]]
-     [:h1.h3.mx-2 "create user"]
      [:form.form-control
       [util/render-errors-as-alerts (:errors state-info-system)]
       [util/render-input "name" state-info-name]

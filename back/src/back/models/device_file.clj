@@ -49,8 +49,8 @@
          (split-at limit)
          first)))
 
-(defn get-list-with-total-for-user-device [params id-user id-device]
-  (when-let [device (model.device/get-by-id-for-user id-device id-user)]
+(defn get-list-with-total-for-user-device [params id-user id-device & [{:keys [transaction]}]]
+  (when-let [device (model.device/get-by-id-for-user id-device id-user {:transaction transaction})]
     (let [list-files (->> (build-dir-for-device (:id device)) io/file file-seq
                           (map (fn [item] (when (.isFile item) (.getPath item))))
                           (remove nil?)
@@ -60,7 +60,8 @@
                   (#(split-list-by-page-params % params))
                   (map (fn [path-url] {:path path-url
                                        :device_id (get-id-device-from-path-url path-url)})))
-       :total (count list-files)})))
+       :total (count list-files)
+       :device device})))
 
 (defn get-path-file-for-user [path-url id-user]
   (let [id-device (get-id-device-from-path-url path-url)

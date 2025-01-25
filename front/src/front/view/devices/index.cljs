@@ -7,30 +7,38 @@
             [front.view.common.wrapper.fetching :as wrapper.fetching]
             [front.view.common.wrapper.show404 :as wrapper.show404]
             [front.view.util :as util]
+            [front.view.util.breadcrumb :as breadcrumb]
+            [front.view.util.label :as util.label]
+            [front.model.user :as model.user]
             [front.model.device :as model.device]))
 
-(defn render-device [device on-delete]
+(defn render-device [device on-delete user]
   [:tr
    [:td (:id device)]
    [:td (:name device)]
    [:td (-> device :device_group :name)]
+   [:td (-> device :user_team :name)]
    [:td (:created_at device)]
    [:td (:updated_at device)]
    [:td
-    [:> router/Link {:to (route/device-device-files (:id device))} "files"]
+
+    [:> router/Link {:to (route/device-show (:id device))} util.label/show]
     " "
-    [:> router/Link {:to (route/device-raw-device-logs (:id device))} "logs"]
+    (when (model.user/admin? user)
+      [:<>
+       [:> router/Link {:to (route/device-edit (:id device))} util.label/edit]
+       " "
+       [:f> util/btn-confirm-delete
+        {:message-confirm (model.device/build-confirmation-message-for-deleting device)
+         :action-delete #(model.device/delete {:id (:id device) :on-receive on-delete})}]
+       " "])
+    [:> router/Link {:to (route/device-device-files (:id device))} util.label/files]
     " "
-    [:> router/Link {:to (route/device-show (:id device))} "show"]
-    " "
-    [:> router/Link {:to (route/device-edit (:id device))} "edit"]
-    " "
-    [:f> util/btn-confirm-delete
-     {:message-confirm (model.device/build-confirmation-message-for-deleting device)
-      :action-delete #(model.device/delete {:id (:id device) :on-receive on-delete})}]]])
+    [:> router/Link {:to (route/device-raw-device-logs (:id device))} util.label/logs]]])
 
 (defn-  page []
   (let [location (router/useLocation)
+        user (util/get-user-loggedin)
         [list-and-total set-list-and-total] (react/useState)
         info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
         received-list (:list list-and-total)
@@ -59,7 +67,9 @@
        (fn []))
      #js [location])
     [:<>
-     [:> router/Link {:to route/device-create} "new"]
+     [:f> breadcrumb/core [{:label util.label/devices}]]
+     (when (model.user/admin? user)
+       [:> router/Link {:to route/device-create} util.label/create])
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer
@@ -71,13 +81,14 @@
            [:th "id"]
            [:th "name"]
            [:th "device_group"]
+           [:th "user_team"]
            [:th "created_at"]
            [:th "updated_at"]
            [:th "actions"]]]
          [:tbody
           (for [item received-list]
             [:<> {:key (:id item)}
-             [:f> render-device item on-delete]])]]
+             [:f> render-device item on-delete user]])]]
         [:f> pagination/core {:build-url build-url-by-page
                               :total-page number-total-page
                               :current-page number-page}]]})]))

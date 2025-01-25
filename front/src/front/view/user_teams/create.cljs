@@ -7,6 +7,8 @@
             [front.model.user :as model.user]
             [front.view.common.wrapper.fetching :as wrapper.fetching]
             [front.view.common.wrapper.show404 :as wrapper.show404]
+            [front.view.util.breadcrumb :as breadcrumb]
+            [front.view.util.label :as util.label]
             [front.view.util :as util]))
 
 (defn- page []
@@ -50,17 +52,19 @@
        (load-list)
        (fn []))
      #js [])
-    (wrapper.fetching/wrapper
-     {:info info-wrapper-fetching
-      :renderer
-      [:div
-       [:h1.h3.mx-2 "create device watch group"]
-       [:form.form-control
-        [util/render-errors-as-alerts (:errors state-info-system)]
-        [util/render-input "name" state-info-name {:disabled waiting-response}]
-        [util/render-textarea "memo" state-info-memo {:disabled waiting-response}]
-        [util/render-select "owner user id" state-info-id-owner-user (model.user/build-select-options-from-list-and-total user-list-and-total) {:disabled waiting-response}]
-        [:button.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply :disabled waiting-response} "apply"]]]})))
+    [:<>
+     [:f> breadcrumb/core [{:label util.label/user-teams :path route/user-teams}
+                           {:label util.label/create}]]
+     (wrapper.fetching/wrapper
+      {:info info-wrapper-fetching
+       :renderer
+       [:div
+        [:form.form-control
+         [util/render-errors-as-alerts (:errors state-info-system)]
+         [util/render-input "name" state-info-name {:disabled waiting-response}]
+         [util/render-textarea "memo" state-info-memo {:disabled waiting-response}]
+         [util/render-select "owner user id" state-info-id-owner-user (model.user/build-select-options-from-list-and-total user-list-and-total) {:disabled waiting-response}]
+         [:button.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply :disabled waiting-response} "apply"]]]})]))
 
 (defn core []
   (wrapper.show404/wrapper

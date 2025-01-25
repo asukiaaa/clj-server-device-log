@@ -3,7 +3,7 @@
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.core :refer [format]]
             [clojure.data.json :as json]
-            [clojure.string :refer [join split]]
+            [clojure.string :refer [join]]
             [back.config :refer [db-spec]]
             [back.models.util :as model.util]
             [back.models.device-group :as model.device-group]))

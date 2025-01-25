@@ -7,6 +7,8 @@
             [front.view.common.wrapper.fetching :as wrapper.fetching]
             [front.view.common.wrapper.show404 :as wrapper.show404]
             [front.view.util :as util]
+            [front.view.util.breadcrumb :as breadcrumb]
+            [front.view.util.label :as util.label]
             [front.model.device-file :as model.device-file]))
 
 (defn render-device [device-file]
@@ -21,8 +23,9 @@
 
 (defn-  page []
   (let [params (js->clj (router/useParams))
-        id-device (get params "id_device")
+        id-device (get params "device_id")
         location (router/useLocation)
+        [device set-device] (react/useState)
         [list-and-total set-list-and-total] (react/useState)
         info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
         received-list (:list list-and-total)
@@ -41,6 +44,7 @@
                       :id-device id-device
                       :on-receive (fn [result errors]
                                     (set-list-and-total result)
+                                    (set-device (:device result))
                                     (wrapper.fetching/finished info-wrapper-fetching errors))}))]
     (react/useEffect
      (fn []
@@ -48,6 +52,10 @@
        (fn []))
      #js [location])
     [:<>
+     [:f> breadcrumb/core
+      [{:label util.label/devices :path route/devices}
+       {:label (util.label/device device) :path (route/device-show id-device)}
+       {:label util.label/files}]]
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer

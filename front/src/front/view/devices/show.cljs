@@ -5,12 +5,16 @@
             [front.view.common.wrapper.show404 :as wrapper.show404]
             [front.view.common.wrapper.fetching :as wrapper.fetching]
             [front.view.util :as util]
-            [front.model.device :as model.device]))
+            [front.view.util.breadcrumb :as breadcrumb]
+            [front.view.util.label :as util.label]
+            [front.model.device :as model.device]
+            [front.model.user :as model.user]))
 
 (defn- page []
   (let [params (js->clj (router/useParams))
+        user (util/get-user-loggedin)
         navigate (router/useNavigate)
-        id (get params "id_device")
+        id (get params "device_id")
         [item set-item] (react/useState)
         info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))]
     (react/useEffect
@@ -23,34 +27,43 @@
                        (wrapper.fetching/finished info-wrapper-fetching errors))})
        (fn []))
      #js [])
-    (wrapper.fetching/wrapper
-     {:info info-wrapper-fetching
-      :renderer
-      (if (empty? item)
-        [:div "no data"]
-        [:div
-         [:> router/Link {:to route/devices} "index"]
-         " "
-         [:> router/Link {:to (route/device-edit id)} "edit"]
-         " "
-         [:f> util/btn-confirm-delete
-          {:message-confirm (model.device/build-confirmation-message-for-deleting item)
-           :action-delete #(model.device/delete {:id (:id item)
-                                                 :on-receive (fn [] (navigate route/devices))})}]
-         [:table.table.table-sm
-          [:thead
-           [:tr
-            [:th "key"]
-            [:th "value"]]]
-          [:tbody
-           (for [key [:id :name :hash_post :device_group :created_at :updated_at]]
-             [:tr {:key key}
-              [:td key]
-              [:td
-               (case key
-                 :device_group (let [device-group (:device_group item)]
-                                 (str device-group))
-                 (get item key))]])]]])})))
+    [:<>
+     [:f> breadcrumb/core [{:label util.label/devices :path route/devices}
+                           {:label (util.label/device item)}]]
+     (wrapper.fetching/wrapper
+      {:info info-wrapper-fetching
+       :renderer
+       (if (empty? item)
+         [:div "no data"]
+         [:div
+          (when (model.user/admin? user)
+            [:<>
+             [:> router/Link {:to (route/device-edit id)} util.label/edit]
+             " "
+             [:f> util/btn-confirm-delete
+              {:message-confirm (model.device/build-confirmation-message-for-deleting item)
+               :action-delete #(model.device/delete {:id (:id item)
+                                                     :on-receive (fn [] (navigate route/devices))})}]
+             " "])
+          [:> router/Link {:to (route/device-device-files (:id item))} util.label/files]
+          " "
+          [:> router/Link {:to (route/device-raw-device-logs (:id item))} util.label/logs]
+          [:table.table.table-sm
+           [:thead
+            [:tr
+             [:th "key"]
+             [:th "value"]]]
+           [:tbody
+            (for [key [:id :name :hash_post :device_group :user_team :created_at :updated_at]]
+              [:tr {:key key}
+               [:td key]
+               [:td
+                (cond
+                  (or (= key :device_group) (= key :user_team))
+                  (let [device-group (key item)]
+                    (str device-group))
+                  :else
+                  (str (get item key)))]])]]])})]))
 
 (defn core []
   (wrapper.show404/wrapper

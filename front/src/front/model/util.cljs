@@ -35,11 +35,15 @@
 (defn build-error-messages [errors]
   (for [e errors] (:message e)))
 
-(defn fetch-list-and-total [{:keys [name-table str-keys-of-item on-receive limit page str-params]}]
+(defn fetch-list-and-total [{:keys [name-table str-keys-of-item on-receive limit page str-params str-additional-field]}]
   (let [str-offset-limit-for-user (build-str-args-offset-limit-for-index limit page)
         str-params (if str-params (str str-params ", " str-offset-limit-for-user) str-offset-limit-for-user)
         str-args-with-parenthesis (format "(%s)" str-params)
-        query (format "{ %s %s { total list { %s } } }" name-table str-args-with-parenthesis str-keys-of-item)]
+        query (format "{ %s %s { total list { %s } %s } }"
+                      name-table
+                      str-args-with-parenthesis
+                      str-keys-of-item
+                      (or str-additional-field ""))]
     #_(println :query query)
     (re-graph/query query () (fn [{:keys [data errors]}]
                                (when-not (empty? errors) (println :errors-for-fetch-list-and-total errors))

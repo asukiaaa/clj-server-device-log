@@ -67,7 +67,6 @@
        (if (empty? item)
          [:div "no data"]
          [:div
-          [:h1.h3.mx-2 "edit device owner group"]
           [:form.form-control
            [util/render-errors-as-alerts (:errors state-info-system)]
            [util/render-input "name" state-info-name {:disabled waiting-response}]

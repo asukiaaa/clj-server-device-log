@@ -1,6 +1,7 @@
 (ns front.model.raw-device-log
   (:require [goog.string :refer [format]]
             clojure.string
+            [front.model.device :as model.device]
             [front.model.util :as util :refer [build-input-str-for-str]]))
 
 (def name-table "raw_device_log")
@@ -38,9 +39,10 @@
         json-key (when-not (string? val-key) (rest val-key))]
     (get-by-json-key target-field json-key)))
 
-(defn fetch-list-and-total [{:keys [str-where str-order limit page on-receive]} & {:keys [str-name-table str-params]}]
+(defn fetch-list-and-total [{:keys [str-where str-order limit page on-receive str-additional-field]} & [{:keys [str-name-table str-params]}]]
   (util/fetch-list-and-total {:name-table (or str-name-table (str name-table "s"))
                               :str-keys-of-item str-keys-for-raw-device-logs
+                              :str-additional-field str-additional-field
                               :str-params (str (if str-params (str str-params ", ") "")
                                                (format "where: %s, order: %s"
                                                        (build-input-str-for-str str-where) (build-input-str-for-str str-order)))
@@ -51,6 +53,7 @@
 (defn fetch-list-and-total-for-device [{:keys [id-device str-where str-order limit page on-receive]}]
   (fetch-list-and-total {:str-where str-where
                          :str-order str-order
+                         :str-additional-field model.device/str-table-and-keys
                          :limit limit
                          :pate page
                          :on-receive on-receive}

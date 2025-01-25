@@ -23,7 +23,8 @@
   :InputDeviceCreateUpdate
   {:fields
    {:name {:type String}
-    :device_group_id {:type Int}}}
+    :device_group_id {:type Int}
+    :user_team_id {:type Int}}}
   :InputDeviceGroupCreateUpdate
   {:fields
    {:name {:type String}}}
@@ -66,6 +67,11 @@
   {:fields
    {:list {:type (list :RawDeviceLog)}
     :total {:type Int}}}
+  :ResponseRawDeviceLogForDeviceListTotal
+  {:fields
+   {:list {:type (list :RawDeviceLog)}
+    :total {:type Int}
+    :device {:type Device}}}
   :User
   {:fields
    {:id {:type (non-null Int)}
@@ -90,9 +96,11 @@
   {:fields
    {:id {:type (non-null Int)}
     :device_group_id {:type (non-null Int)}
+    :user_team_id {:type Int}
     :name {:type String}
     :hash_post {:type String}
     :device_group {:type DeviceGroup}
+    :user_team {:type UserTeam}
     :created_at {:type String}
     :updated_at {:type String}}}
   :ResponseDeviceListTotal
@@ -127,10 +135,11 @@
   {:fields
    {:device_id {:type (non-null Int)}
     :path {:type String}}}
-  :ResponseDeviceFileListTotal
+  :ResponseDeviceFileForDeviceListTotal
   {:fields
    {:list {:type (list DeviceFile)}
-    :total {:type Int}}}
+    :total {:type Int}
+    :device {:type Device}}}
   :DeviceWatchGroup
   {:fields
    {:id {:type (non-null Int)}
@@ -213,7 +222,7 @@
             :where {:type String}
             :order {:type String}}}
     :raw_device_logs_for_device
-    {:type ResponseRawDeviceLogListTotal
+    {:type ResponseRawDeviceLogForDeviceListTotal
      :args {:device_id {:type Int}
             :limit {:type Int}
             :page {:type Int}
@@ -263,7 +272,7 @@
      :args {:id {:type (non-null Int)}
             :device_group_id {:type (non-null Int)}}}
     :device_files_for_device
-    {:type ResponseDeviceFileListTotal
+    {:type ResponseDeviceFileForDeviceListTotal
      :args {:device_id {:type (non-null Int)}
             :limit {:type Int}
             :page {:type Int}
@@ -336,14 +345,14 @@
     :user_team_delete
     {:type ResponseDelete
      :args {:id {:type (non-null Int)}}}
-    :device_for_user_create
+    :device_create
     {:type ResponseDeviceCreateUpdate
      :args {:device {:type InputDeviceCreateUpdate}}}
-    :device_for_user_update
+    :device_update
     {:type ResponseDeviceCreateUpdate
      :args {:id {:type (non-null Int)}
             :device {:type InputDeviceCreateUpdate}}}
-    :device_for_user_delete
+    :device_delete
     {:type ResponseDelete
      :args {:id {:type (non-null Int)}}}
     :device_group_for_user_create

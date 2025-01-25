@@ -19,9 +19,9 @@
    [:td (:created_at user)]
    [:td (:updated_at user)]
    [:td
-    [:> router/Link {:to (route/user-show (:id user))} "show"]
+    [:> router/Link {:to (route/user-show (:id user))} util.label/show]
     " "
-    [:> router/Link {:to (route/user-edit (:id user))} "edit"]
+    [:> router/Link {:to (route/user-edit (:id user))} util.label/edit]
     " "
     [:f> util/btn-confirm-delete
      {:message-confirm (model.user/build-confirmation-message-for-deleting user)

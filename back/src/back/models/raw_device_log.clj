@@ -172,7 +172,7 @@
       (println "query for select-max-group-by" query)
       query)))
 
-(defn get-list-with-total [params & [{:keys [str-where-and]}]]
+(defn get-list-with-total [params & [{:keys [str-where-and transaction]}]]
   (let [limit (or (:limit params) (:limit defaults))
         page (or (:page params) 0)
         order (when-let [str-order (:order params)]
@@ -195,11 +195,8 @@
                              (build-query-order order base-table-key)
                              "LIMIT" limit
                              "OFFSET" (* limit page)])]
-    (println "str-query " str-query)
-    (model.util/get-list-with-total [str-query])
-    #_(jdbc/with-db-transaction [db-transaction db-spec]
-        {:records (jdbc/query db-transaction str-query)
-         :total (-> (jdbc/query db-transaction "SELECT FOUND_ROWS()") first vals first)})))
+    (println "str-query " str-query transaction)
+    (model.util/get-list-with-total [str-query] {:transaction transaction})))
 
 (defn get-by-id [id]
   (first (jdbc/query db-spec ["select * from raw_device_log where id = ?" id])))

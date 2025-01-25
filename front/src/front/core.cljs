@@ -80,7 +80,7 @@
          {:path "devices" :children
           [{:index true :element (r/as-element [:f> device.index/core])}
            {:path "create" :element (r/as-element [:f> device.create/core])}
-           {:path ":id_device" :children
+           {:path ":device_id" :children
             [{:index true :element (r/as-element [:f> device.show/core])}
              {:path "edit" :element (r/as-element [:f> device.edit/core])}
              {:path "raw_device_logs" :children

@@ -33,7 +33,7 @@
 (defn get-default-as-bool [info]
   (= "true" (:default info)))
 
-(defn core [fetch-list-and-total & {:keys [map-default]}]
+(defn core [fetch-list-and-total & {:keys [map-default on-receive]}]
   (let [map-default (merge map-page-default map-default)
         location (router/useLocation)
         info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
@@ -69,6 +69,8 @@
                                 :page page-current
                                 :on-receive
                                 (fn [data errors]
+                                  #_(on-receive "hoi")
+                                  (when-not (nil? on-receive) (on-receive data))
                                   (set-logs (:list data))
                                   (set-total (:total data))
                                   (set-logs-key-fetched logs-key)

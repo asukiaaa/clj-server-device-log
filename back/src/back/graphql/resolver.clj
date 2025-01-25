@@ -1,5 +1,7 @@
 (ns back.graphql.resolver
-  (:require [back.models.raw-device-log :as model-raw-device-log]
+  (:require [clojure.java.jdbc :as jdbc]
+            [back.config :refer [db-spec]]
+            [back.models.raw-device-log :as model-raw-device-log]
             [back.models.user :as model.user]
             [back.models.user-team :as model.user-team]
             [back.models.device :as model.device]
@@ -24,10 +26,17 @@
   (model-raw-device-log/get-list-with-total args {:str-where-and "device_id IS NULL"}))
 
 (defn raw-device-logs-for-device
-  [_ args _]
+  [context args _]
   (println "args for raw-device-logs-for-device" args)
-  (when-let [device-id (:device_id args)]
-    (model-raw-device-log/get-list-with-total args {:str-where-and (format "device_id = %d" device-id)})))
+  (when-let [id-device (:device_id args)]
+    (jdbc/with-db-transaction [transaction db-spec]
+      (let [user (get-user-loggedin context)]
+        (when-let [device (model.device/get-by-id-for-user id-device (:id user) {:transaction transaction})]
+          (-> (model-raw-device-log/get-list-with-total
+               args
+               {:str-where-and (format "device_id = %d" id-device)
+                :transaction transaction})
+              (assoc :device device)))))))
 
 (defn raw-device-logs-for-device-group
   [_ args _]
@@ -151,7 +160,7 @@
         id (:id args)]
     (when (model.user/admin? user) (model.user-team/delete id))))
 
-(defn devices-for-user [context args _]
+(defn devices [context args _]
   (let [user (get-user-loggedin context)]
     (model.device/get-list-with-total-for-user args (:id user))))
 
@@ -312,27 +321,30 @@
     (when-not (empty? user)
       (model.user/reset-password-with-checking-current-password (:id user) args))))
 
-(defn device-for-user-create [context args _]
-  (println "args device-for-user-create" args)
+(defn device-create [context args _]
+  (println "args device-create" args)
   (let [user (get-user-loggedin context)
         params_device_group (:device args)]
-    (model.device/create-for-user params_device_group (:id user))))
+    (when (model.user/admin? user)
+      (model.device/create-for-user params_device_group (:id user)))))
 
-(defn device-for-user [context args _]
-  (println "args device-for-user" args)
+(defn device [context args _]
+  (println "args device" args)
   (let [user (get-user-loggedin context)]
     (model.device/get-by-id-for-user (:id args) (:id user))))
 
-(defn device-for-user-update [context args _]
-  (println "args device-for-user-update" args)
+(defn device-update [context args _]
+  (println "args device-update" args)
   (let [user (get-user-loggedin context)
         params (-> args :device)]
-    (model.device/for-user-update {:id (:id args) :id-user (:id user) :params params})))
+    (when (model.user/admin? user)
+      (model.device/for-user-update {:id (:id args) :id-user (:id user) :params params}))))
 
-(defn device-for-user-delete [context args _]
-  (println "args device-for-user-delete" args)
+(defn device-delete [context args _]
+  (println "args device-delete" args)
   (let [user (get-user-loggedin context)]
-    (model.device/for-user-delete {:id (:id args) :id-user (:id user)})))
+    (when (model.user/admin? user)
+      (model.device/for-user-delete {:id (:id args) :id-user (:id user)}))))
 
 (def resolver-map
   {:Query/raw_device_logs raw-device-logs
@@ -351,8 +363,8 @@
    :Query/user_teams user-teams
    :Query/user_team user-team
    :Query/user_for_resetting_password user-for-resetting-password
-   :Query/devices devices-for-user
-   :Query/device device-for-user
+   :Query/devices devices
+   :Query/device device
    :Query/device_groups device-groups-for-user
    :Query/device_group device-group-for-user
    :Query/user_loggedin user-loggedin
@@ -362,9 +374,9 @@
    :Mutation/user_team_create user-team-create
    :Mutation/user_team_update user-team-update
    :Mutation/user_team_delete user-team-delete
-   :Mutation/device_for_user_create device-for-user-create
-   :Mutation/device_for_user_update device-for-user-update
-   :Mutation/device_for_user_delete device-for-user-delete
+   :Mutation/device_create device-create
+   :Mutation/device_update device-update
+   :Mutation/device_delete device-delete
    :Mutation/device_group_for_user_create device-group-for-user-create
    :Mutation/device_group_for_user_update device-group-for-user-update
    :Mutation/device_group_for_user_delete device-group-for-user-delete
