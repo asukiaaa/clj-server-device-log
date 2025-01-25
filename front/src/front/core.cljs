@@ -11,6 +11,10 @@
             [front.view.users.show :as user.show]
             [front.view.users.edit :as user.edit]
             [front.view.users.password-reset :as user.password-reset]
+            [front.view.user-teams.index :as user-team.index]
+            [front.view.user-teams.create :as user-team.create]
+            [front.view.user-teams.show :as user-team.show]
+            [front.view.user-teams.edit :as user-team.edit]
             [front.view.devices.index :as device.index]
             [front.view.devices.create :as device.create]
             [front.view.devices.show :as device.show]
@@ -67,6 +71,12 @@
             [{:index true :element (r/as-element [:f> user.show/core])}
              {:path "edit" :element (r/as-element [:f> user.edit/core])}
              {:path "password_reset/:hash_password_reset" :element (r/as-element [:f> user.password-reset/core])}]}]}
+         {:path "user_teams" :children
+          [{:index true :element (r/as-element [:f> user-team.index/core])}
+           {:path "create" :element (r/as-element [:f> user-team.create/core])}
+           {:path ":user_team_id" :children
+            [{:index true :element (r/as-element [:f> user-team.show/core])}
+             {:path "edit" :element (r/as-element [:f> user-team.edit/core])}]}]}
          {:path "devices" :children
           [{:index true :element (r/as-element [:f> device.index/core])}
            {:path "create" :element (r/as-element [:f> device.create/core])}

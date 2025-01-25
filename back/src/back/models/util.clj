@@ -55,6 +55,14 @@
         query (format "SELECT %s FROM %s WHERE %s = ?" str-keys-select name-table str-key-id)]
     (first (jdbc/query (or transaction db-spec) [query id]))))
 
+(defn create [key-table params]
+  (jdbc/with-db-transaction [t-con db-spec]
+    (jdbc/insert! t-con key-table params)
+    (let [id (-> (jdbc/query t-con "SELECT LAST_INSERT_ID()")
+                 first vals first)
+          item (get-by-id #_"(SELECT LAST_INSERT_ID())" id (name key-table) {:transaction t-con})]
+      item)))
+
 (defn get-list-with-total-with-building-query [name-table params & [{:keys [str-where str-keys-select]}]]
   (-> (build-query-get-index name-table {:str-keys-select str-keys-select})
       (#(if-not (empty? str-where) (str % " where " str-where) %))

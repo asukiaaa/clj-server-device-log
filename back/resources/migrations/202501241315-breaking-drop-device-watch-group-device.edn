@@ -1,0 +1,4 @@
+{:up
+ ["DROP TABLE device_watch_group_device"]
+ :down
+ ["rollbacking for this is not supported"]}

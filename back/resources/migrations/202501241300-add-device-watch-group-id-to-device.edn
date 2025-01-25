@@ -1,0 +1,10 @@
+{:up
+ ["ALTER TABLE device
+   ADD COLUMN device_owner_team_id BIGINT UNSIGNED AFTER device_group_id,
+   ADD CONSTRAINT fk_device__device_owner_team_id
+   FOREIGN KEY(device_owner_team_id) REFERENCES device_owner_team(id)"
+  "UPDATE device set device_owner_team_id =
+   (SELECT device_watch_group_device.device_watch_group_id FROM device_watch_group_device
+   WHERE device.id = device_watch_group_device.device_id)"]
+ :down
+ ["ALTER TABLE device DROP CONSTRAINT fk_device__device_owner_team_id, DROP COLUMN device_owner_team_id"]}

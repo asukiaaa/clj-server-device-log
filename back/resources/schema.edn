@@ -10,6 +10,16 @@
    {:email {:type String}
     :name {:type String}
     :permission {:type String}}}
+  :InputUserTeamCreate
+  {:fields
+   {:owner_user_id {:type (non-null Int)}
+    :name {:type String}
+    :memo {:type String}}}
+  :InputUserTeamUpdate
+  {:fields
+   {:owner_user_id {:type Int}
+    :name {:type String}
+    :memo {:type String}}}
   :InputDeviceCreateUpdate
   {:fields
    {:name {:type String}
@@ -64,6 +74,18 @@
     :permission {:type String}
     :created_at {:type String}
     :updated_at {:type String}}}
+  :UserTeam
+  {:fields
+   {:id {:type (non-null Int)}
+    :owner_user_id {:type (non-null Int)}
+    :name {:type String}
+    :memo {:type String}
+    :created_at {:type String}
+    :updated_at {:type String}}}
+  :ResponseUserTeamListTotal
+  {:fields
+   {:list {:type (list UserTeam)}
+    :total {:type Int}}}
   :Device
   {:fields
    {:id {:type (non-null Int)}
@@ -178,6 +200,10 @@
   {:fields
    {:list {:type (list User)}
     :total {:type Int}}}
+  :ResponseUserTeamCreateUpdate
+  {:fields
+   {:errors {:type String}
+    :user_team {:type UserTeam}}}
   :Query
   {:fields
    {:raw_device_logs
@@ -276,6 +302,15 @@
     :user
     {:type User
      :args {:id {:type (non-null Int)}}}
+    :user_teams
+    {:type ResponseUserTeamListTotal
+     :args {:limit {:type Int}
+            :page {:type Int}
+            :where {:type String}
+            :order {:type String}}}
+    :user_team
+    {:type UserTeam
+     :args {:id {:type (non-null Int)}}}
     :user_loggedin {:type :User}}}
   :Mutation
   {:fields
@@ -289,6 +324,16 @@
             :user {:type InputUserUpdate}
             :requireUrlPasswordReset {:type Boolean}}}
     :user_delete
+    {:type ResponseDelete
+     :args {:id {:type (non-null Int)}}}
+    :user_team_create
+    {:type ResponseUserTeamCreateUpdate
+     :args {:user_team {:type InputUserTeamCreate}}}
+    :user_team_update
+    {:type ResponseUserTeamCreateUpdate
+     :args {:id {:type (non-null Int)}
+            :user_team {:type InputUserTeamCreate}}}
+    :user_team_delete
     {:type ResponseDelete
      :args {:id {:type (non-null Int)}}}
     :device_for_user_create

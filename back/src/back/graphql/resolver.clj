@@ -1,6 +1,7 @@
 (ns back.graphql.resolver
   (:require [back.models.raw-device-log :as model-raw-device-log]
             [back.models.user :as model.user]
+            [back.models.user-team :as model.user-team]
             [back.models.device :as model.device]
             [back.models.device-group :as model.device-group]
             [back.models.device-group-api-key :as model.device-group-api-key]
@@ -116,6 +117,39 @@
      (let [user-id (:id args)]
        (model.user/delete user-id)
        user-id))))
+
+(defn user-teams
+  [context args _]
+  (println "args for user-teams" args)
+  (when-let [user (get-user-loggedin context)]
+    (when (model.user/admin? user)
+      (model.user-team/get-list-with-total-for-admin args))))
+
+(defn user-team
+  [context args _]
+  (println "args for user-team" args)
+  (when-let [user (get-user-loggedin context)]
+    (when (model.user/admin? user)
+      (model.user-team/get-by-id (:id args)))))
+
+(defn user-team-create [context args _]
+  (println "args user-team-create" args)
+  (let [user (get-user-loggedin context)
+        params (:user_team args)]
+    (when (model.user/admin? user) (model.user-team/create params))))
+
+(defn user-team-update [context args _]
+  (println "args user-team-update" args)
+  (let [user (get-user-loggedin context)
+        id (:id args)
+        params (:user_team args)]
+    (when (model.user/admin? user) (model.user-team/update id params))))
+
+(defn user-team-delete [context args _]
+  (println "args user-team-delete" args)
+  (let [user (get-user-loggedin context)
+        id (:id args)]
+    (when (model.user/admin? user) (model.user-team/delete id))))
 
 (defn devices-for-user [context args _]
   (let [user (get-user-loggedin context)]
@@ -314,6 +348,8 @@
    :Query/device_files_for_device device-files-for-device
    :Query/users users
    :Query/user user
+   :Query/user_teams user-teams
+   :Query/user_team user-team
    :Query/user_for_resetting_password user-for-resetting-password
    :Query/devices devices-for-user
    :Query/device device-for-user
@@ -323,6 +359,9 @@
    :Mutation/user_create user-create
    :Mutation/user_update user-update
    :Mutation/user_delete user-delete
+   :Mutation/user_team_create user-team-create
+   :Mutation/user_team_update user-team-update
+   :Mutation/user_team_delete user-team-delete
    :Mutation/device_for_user_create device-for-user-create
    :Mutation/device_for_user_update device-for-user-update
    :Mutation/device_for_user_delete device-for-user-delete

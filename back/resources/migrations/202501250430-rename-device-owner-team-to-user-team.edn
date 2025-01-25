@@ -1,0 +1,10 @@
+{:up
+ ["RENAME TABLE device_owner_team to user_team"
+  "ALTER TABLE user_team
+   DROP FOREIGN KEY fk_device_owner_team__owner_user_id,
+   ADD CONSTRAINT fk_user_team__owner_user_id FOREIGN KEY(owner_user_id) REFERENCES user(id)"]
+ :down
+ ["RENAME TABLE user_team to device_owner_team"
+  "ALTER TABLE device_owner_team
+   DROP FOREIGN KEY fk_user_team__owner_user_id,
+   ADD CONSTRAINT fk_device_owner_team__owner_user_id FOREIGN KEY(owner_user_id) REFERENCES user(id)"]}

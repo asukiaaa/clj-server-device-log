@@ -17,6 +17,11 @@
 (defn user-password-reset [id hash]
   (str (user-show id) "/password_reset/" hash))
 
+(def user-teams (str front "/user_teams"))
+(def user-team-create (str user-teams "/create"))
+(defn user-team-show [id] (str user-teams "/" id))
+(defn user-team-edit [id] (str (user-team-show id) "/edit"))
+
 (def devices (str front "/devices"))
 (def device-create (str devices "/create"))
 (defn device-show [id] (str devices "/" id))

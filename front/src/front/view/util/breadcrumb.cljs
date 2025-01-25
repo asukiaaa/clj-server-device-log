@@ -12,7 +12,7 @@
       (for [link links]
         (let [path (:path link)
               label (:label link)]
-          [:<> {:key path}
+          [:<> {:key (or path label)}
            [:span " > "]
            (if (empty? path)
              [:span label]
