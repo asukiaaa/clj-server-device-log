@@ -13,7 +13,7 @@
 (def name-table "user")
 
 (defn delete [id]
-  ; TODO prohibit deleting when who has device_group
+  ; TODO prohibit deleting when who has device-type
   (jdbc/delete! db-spec :user ["id = ?" id]))
 
 (defn admin? [user]

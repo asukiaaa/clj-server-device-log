@@ -16,7 +16,7 @@
       (for [[name url] (remove nil? [(when is-admin [util.label/users route/users])
                                      [util.label/user-teams route/user-teams]
                                      ["device watch groups" route/device-watch-groups]
-                                     ["device groups" route/device-groups]
+                                     [util.label/device-types route/device-types]
                                      [util.label/devices route/devices]
                                      [util.label/profile route/profile]])]
         [:<> {:key name}

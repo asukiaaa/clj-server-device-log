@@ -187,7 +187,7 @@
                                           :base-table-key base-table-key})
         str-query (join " " ["SELECT SQL_CALC_FOUND_ROWS rdl.*, device.name device_name FROM" db-table-key "AS" base-table-key
                              "LEFT JOIN device ON device.id = rdl.device_id"
-                             "LEFT JOIN device_group ON device_group.id = device.device_group_id"
+                             "LEFT JOIN device_type ON device_type.id = device.device_type_id"
                              (when-not (empty? str-query-select-max-group-by) (str ", " str-query-select-max-group-by))
                              (build-query-where {:where where
                                                  :base-table-key base-table-key

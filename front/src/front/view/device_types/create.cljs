@@ -1,10 +1,12 @@
-(ns front.view.device-groups.create
+(ns front.view.device-types.create
   (:require ["react" :as react]
             ["react-router-dom" :as router]
             [clojure.walk :refer [keywordize-keys]]
             [front.route :as route]
-            [front.model.device-group :as model.device-group]
+            [front.model.device-type :as model.device-type]
             [front.view.common.wrapper.show404 :as wrapper.show404]
+            [front.view.util.breadcrumb :as breadcrumb]
+            [front.view.util.label :as util.label]
             [front.view.util :as util]))
 
 (defn- page []
@@ -17,16 +19,20 @@
                            (let [key (:key state)
                                  errors-for-key (get errors key)]
                              ((:set-errors state) errors-for-key))))
-                       (when-let [id (-> data :device_group :id)]
-                         (navigate (route/device-group-show id)))))
-        on-click-apply (fn [] (model.device-group/create
-                               {:name (:draft state-info-name)
-                                :on-receive on-receive}))]
+                       (when-let [id (-> data model.device-type/key-table :id)]
+                         (navigate (route/device-type-show id)))))
+        on-click-apply
+        (fn [e]
+          (.preventDefault e)
+          (model.device-type/create
+           {:name (:draft state-info-name)
+            :on-receive on-receive}))]
     [:div
-     [:h1.h3.mx-2 "create device group"]
+     [:f> breadcrumb/core [{:label util.label/device-types :path route/device-types}
+                           {:label util.label/create}]]
      [:form.form-control
       [util/render-input "name" state-info-name]
-      [:a.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply} "apply"]]]))
+      [:button.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply} util.label/create]]]))
 
 (defn core []
   (wrapper.show404/wrapper

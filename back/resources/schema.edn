@@ -23,17 +23,17 @@
   :InputDeviceCreateUpdate
   {:fields
    {:name {:type String}
-    :device_group_id {:type Int}
+    :device_type_id {:type Int}
     :user_team_id {:type Int}}}
-  :InputDeviceGroupCreateUpdate
+  :InputDeviceTypeCreateUpdate
   {:fields
    {:name {:type String}}}
-  :InputDeviceGroupApiKeyCreate
+  :InputDeviceTypeApiKeyCreate
   {:fields
    {:name {:type String}
-    :device_group_id {:type (non-null Int)}
+    :device_type_id {:type (non-null Int)}
     :permission {:type String}}}
-  :InputDeviceGroupApiKeyUpdate
+  :InputDeviceTypeApiKeyUpdate
   {:fields
    {:name {:type String}
     :permission {:type String}}}
@@ -72,6 +72,11 @@
    {:list {:type (list :RawDeviceLog)}
     :total {:type Int}
     :device {:type Device}}}
+  :ResponseRawDeviceLogForDeviceTypeListTotal
+  {:fields
+   {:list {:type (list :RawDeviceLog)}
+    :total {:type Int}
+    :device_type {:type DeviceType}}}
   :User
   {:fields
    {:id {:type (non-null Int)}
@@ -95,11 +100,11 @@
   :Device
   {:fields
    {:id {:type (non-null Int)}
-    :device_group_id {:type (non-null Int)}
+    :device_type_id {:type (non-null Int)}
     :user_team_id {:type Int}
     :name {:type String}
     :hash_post {:type String}
-    :device_group {:type DeviceGroup}
+    :device_type {:type DeviceType}
     :user_team {:type UserTeam}
     :created_at {:type String}
     :updated_at {:type String}}}
@@ -107,30 +112,31 @@
   {:fields
    {:list {:type (list Device)}
     :total {:type Int}}}
-  :DeviceGroup
+  :DeviceType
   {:fields
    {:id {:type (non-null Int)}
     :user_id {:type (non-null Int)}
     :name {:type String}
     :created_at {:type String}
     :updated_at {:type String}}}
-  :ResponseDeviceGroupListTotal
+  :ResponseDeviceTypeListTotal
   {:fields
-   {:list {:type (list DeviceGroup)}
+   {:list {:type (list DeviceType)}
     :total {:type Int}}}
-  :DeviceGroupApiKey
+  :DeviceTypeApiKey
   {:fields
    {:id {:type (non-null Int)}
-    :device_group_id {:type (non-null Int)}
+    :device_type_id {:type (non-null Int)}
     :name {:type String}
     :key_str {:type String}
     :permission {:type String}
     :created_at {:type String}
     :updated_at {:type String}}}
-  :ResponseDeviceGroupApiKeyListTotal
+  :ResponseDeviceTypeApiKeyForDeviceTypeListTotal
   {:fields
-   {:list {:type (list DeviceGroupApiKey)}
-    :total {:type Int}}}
+   {:list {:type (list DeviceTypeApiKey)}
+    :total {:type Int}
+    :device_type {:type DeviceType}}}
   :DeviceFile
   {:fields
    {:device_id {:type (non-null Int)}
@@ -176,14 +182,14 @@
   {:fields
    {:errors {:type String}
     :device {:type Device}}}
-  :ResponseDeviceGroupCreateUpdate
+  :ResponseDeviceTypeCreateUpdate
   {:fields
    {:errors {:type String}
-    :device_group {:type DeviceGroup}}}
-  :ResponseDeviceGroupApiKeyCreateUpdate
+    :device_type {:type DeviceType}}}
+  :ResponseDeviceTypeApiKeyCreateUpdate
   {:fields
    {:errors {:type String}
-    :device_group_api_key {:type DeviceGroupApiKey}}}
+    :device_type_api_key {:type DeviceTypeApiKey}}}
   :ResponseDeviceWatchGroupCreateUpdate
   {:fields
    {:errors {:type String}
@@ -228,9 +234,9 @@
             :page {:type Int}
             :where {:type String}
             :order {:type String}}}
-    :raw_device_logs_for_device_group
-    {:type ResponseRawDeviceLogListTotal
-     :args {:device_group_id {:type Int}
+    :raw_device_logs_for_device_type
+    {:type ResponseRawDeviceLogForDeviceTypeListTotal
+     :args {:device_type_id {:type Int}
             :limit {:type Int}
             :page {:type Int}
             :where {:type String}
@@ -251,26 +257,26 @@
     :device
     {:type Device
      :args {:id {:type (non-null Int)}}}
-    :device_groups
-    {:type ResponseDeviceGroupListTotal
+    :device_types
+    {:type ResponseDeviceTypeListTotal
      :args {:limit {:type Int}
             :page {:type Int}
             :where {:type String}
             :order {:type String}}}
-    :device_group
-    {:type DeviceGroup
+    :device_type
+    {:type DeviceType
      :args {:id {:type (non-null Int)}}}
-    :device_group_api_keys_for_device_group
-    {:type ResponseDeviceGroupApiKeyListTotal
-     :args {:device_group_id {:type (non-null Int)}
+    :device_type_api_keys_for_device_type
+    {:type ResponseDeviceTypeApiKeyForDeviceTypeListTotal
+     :args {:device_type_id {:type (non-null Int)}
             :limit {:type Int}
             :page {:type Int}
             :where {:type String}
             :order {:type String}}}
-    :device_group_api_key_for_device_group
-    {:type DeviceGroupApiKey
+    :device_type_api_key_for_device_type
+    {:type DeviceTypeApiKey
      :args {:id {:type (non-null Int)}
-            :device_group_id {:type (non-null Int)}}}
+            :device_type_id {:type (non-null Int)}}}
     :device_files_for_device
     {:type ResponseDeviceFileForDeviceListTotal
      :args {:device_id {:type (non-null Int)}
@@ -355,24 +361,24 @@
     :device_delete
     {:type ResponseDelete
      :args {:id {:type (non-null Int)}}}
-    :device_group_for_user_create
-    {:type ResponseDeviceGroupCreateUpdate
-     :args {:device_group {:type InputDeviceGroupCreateUpdate}}}
-    :device_group_for_user_update
-    {:type ResponseDeviceGroupCreateUpdate
+    :device_type_create
+    {:type ResponseDeviceTypeCreateUpdate
+     :args {:device_type {:type InputDeviceTypeCreateUpdate}}}
+    :device_type_update
+    {:type ResponseDeviceTypeCreateUpdate
      :args {:id {:type (non-null Int)}
-            :device_group {:type InputDeviceGroupCreateUpdate}}}
-    :device_group_for_user_delete
+            :device_type {:type InputDeviceTypeCreateUpdate}}}
+    :device_type_delete
     {:type ResponseDelete
      :args {:id {:type (non-null Int)}}}
-    :device_group_api_key_for_user_create
-    {:type ResponseDeviceGroupApiKeyCreateUpdate
-     :args {:device_group_api_key {:type InputDeviceGroupApiKeyCreate}}}
-    :device_group_api_key_for_user_update
-    {:type ResponseDeviceGroupApiKeyCreateUpdate
+    :device_type_api_key_create
+    {:type ResponseDeviceTypeApiKeyCreateUpdate
+     :args {:device_type_api_key {:type InputDeviceTypeApiKeyCreate}}}
+    :device_type_api_key_update
+    {:type ResponseDeviceTypeApiKeyCreateUpdate
      :args {:id {:type (non-null Int)}
-            :device_group_api_key {:type InputDeviceGroupApiKeyUpdate}}}
-    :device_group_api_key_for_user_delete
+            :device_type_api_key {:type InputDeviceTypeApiKeyUpdate}}}
+    :device_type_api_key_delete
     {:type ResponseDelete
      :args {:id {:type (non-null Int)}}}
     :device_watch_group_create

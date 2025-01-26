@@ -2,6 +2,7 @@
   (:require [goog.string :refer [format]]
             clojure.string
             [front.model.device :as model.device]
+            [front.model.device-type :as model.device-type]
             [front.model.util :as util :refer [build-input-str-for-str]]))
 
 (def name-table "raw_device_log")
@@ -53,21 +54,21 @@
 (defn fetch-list-and-total-for-device [{:keys [id-device str-where str-order limit page on-receive]}]
   (fetch-list-and-total {:str-where str-where
                          :str-order str-order
-                         :str-additional-field model.device/str-table-and-keys
-                         :limit limit
+                         :str-additional-field model.device/str-table-and-keys                         :limit limit
                          :pate page
                          :on-receive on-receive}
                         {:str-name-table (str name-table "s_for_device")
                          :str-params (format "device_id: %d" id-device)}))
 
-(defn fetch-list-and-total-for-device-group [{:keys [id-device-group str-where str-order limit page on-receive]}]
+(defn fetch-list-and-total-for-device-type [{:keys [id-device-type str-where str-order limit page on-receive]}]
   (fetch-list-and-total {:str-where str-where
                          :str-order str-order
+                         :str-additional-field model.device-type/str-table-and-keys
                          :limit limit
                          :pate page
                          :on-receive on-receive}
-                        {:str-name-table (str name-table "s_for_device_group")
-                         :str-params (format "device_group_id: %d" id-device-group)}))
+                        {:str-name-table (str name-table "s_for_device_type")
+                         :str-params (format "device_type_id: %d" id-device-type)}))
 
 (defn fetch-list-and-total-for-device-watch-group [{:keys [id-device-watch-group str-where str-order limit page on-receive]}]
   (fetch-list-and-total {:str-where str-where

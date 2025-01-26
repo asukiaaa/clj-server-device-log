@@ -21,15 +21,15 @@
             [front.view.devices.edit :as device.edit]
             [front.view.devices.device-files.index :as device.device-files.index]
             [front.view.devices.raw-device-logs.index :as device.raw-device-log.index]
-            [front.view.device-groups.index :as device-group.index]
-            [front.view.device-groups.create :as device-group.create]
-            [front.view.device-groups.show :as device-group.show]
-            [front.view.device-groups.edit :as device-group.edit]
-            [front.view.device-groups.raw-device-logs.index :as device-group.raw-device-log.index]
-            [front.view.device-groups.device-group-api-keys.index :as device-group.device-group-api-key.index]
-            [front.view.device-groups.device-group-api-keys.create :as device-group.device-group-api-key.create]
-            [front.view.device-groups.device-group-api-keys.show :as device-group.device-group-api-key.show]
-            [front.view.device-groups.device-group-api-keys.edit :as device-group.device-group-api-key.edit]
+            [front.view.device-types.index :as device-type.index]
+            [front.view.device-types.create :as device-type.create]
+            [front.view.device-types.show :as device-type.show]
+            [front.view.device-types.edit :as device-type.edit]
+            [front.view.device-types.raw-device-logs.index :as device-type.raw-device-log.index]
+            [front.view.device-types.device-type-api-keys.index :as device-type.device-type-api-key.index]
+            [front.view.device-types.device-type-api-keys.create :as device-type.device-type-api-key.create]
+            [front.view.device-types.device-type-api-keys.show :as device-type.device-type-api-key.show]
+            [front.view.device-types.device-type-api-keys.edit :as device-type.device-type-api-key.edit]
             [front.view.device-watch-groups.index :as device-watch-group.index]
             [front.view.device-watch-groups.create :as device-watch-group.create]
             [front.view.device-watch-groups.show :as device-watch-group.show]
@@ -86,19 +86,19 @@
              {:path "raw_device_logs" :children
               [{:index true :element (r/as-element [:f> device.raw-device-log.index/core])}]}
              {:path "device_files" :element (r/as-element [:f> device.device-files.index/core])}]}]}
-         {:path "device_groups" :children
-          [{:index true :element (r/as-element [:f> device-group.index/core])}
-           {:path "create" :element (r/as-element [:f> device-group.create/core])}
-           {:path ":id_device_group" :children
-            [{:index true :element (r/as-element [:f> device-group.show/core])}
-             {:path "edit" :element (r/as-element [:f> device-group.edit/core])}
-             {:path "raw_device_logs" :element (r/as-element [:f> device-group.raw-device-log.index/core])}
-             {:path "device_group_api_keys" :children
-              [{:index true :element (r/as-element [:f> device-group.device-group-api-key.index/core])}
-               {:path "create" :element (r/as-element [:f> device-group.device-group-api-key.create/core])}
-               {:path ":id_device_group_api_key" :children
-                [{:index true :element (r/as-element [:f> device-group.device-group-api-key.show/core])}
-                 {:path "edit" :element (r/as-element [:f> device-group.device-group-api-key.edit/core])}]}]}]}]}
+         {:path "device_types" :children
+          [{:index true :element (r/as-element [:f> device-type.index/core])}
+           {:path "create" :element (r/as-element [:f> device-type.create/core])}
+           {:path ":device_type_id" :children
+            [{:index true :element (r/as-element [:f> device-type.show/core])}
+             {:path "edit" :element (r/as-element [:f> device-type.edit/core])}
+             {:path "raw_device_logs" :element (r/as-element [:f> device-type.raw-device-log.index/core])}
+             {:path "device_type_api_keys" :children
+              [{:index true :element (r/as-element [:f> device-type.device-type-api-key.index/core])}
+               {:path "create" :element (r/as-element [:f> device-type.device-type-api-key.create/core])}
+               {:path ":device_type_api_key_id" :children
+                [{:index true :element (r/as-element [:f> device-type.device-type-api-key.show/core])}
+                 {:path "edit" :element (r/as-element [:f> device-type.device-type-api-key.edit/core])}]}]}]}]}
          {:path "device_watch_groups" :children
           [{:index true :element (r/as-element [:f> device-watch-group.index/core])}
            {:path "create" :element (r/as-element [:f> device-watch-group.create/core])}

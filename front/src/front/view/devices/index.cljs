@@ -16,7 +16,7 @@
   [:tr
    [:td (:id device)]
    [:td (:name device)]
-   [:td (-> device :device_group :name)]
+   [:td (-> device :device_type :name)]
    [:td (-> device :user_team :name)]
    [:td (:created_at device)]
    [:td (:updated_at device)]
@@ -80,7 +80,7 @@
           [:tr
            [:th "id"]
            [:th "name"]
-           [:th "device_group"]
+           [:th "device_type"]
            [:th "user_team"]
            [:th "created_at"]
            [:th "updated_at"]

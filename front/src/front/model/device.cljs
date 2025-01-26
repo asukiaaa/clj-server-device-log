@@ -2,15 +2,16 @@
   (:refer-clojure :exclude [update])
   (:require goog.string
             [clojure.string :refer [join]]
+            [front.model.device-type :as model.device-type]
             [front.model.util :as util]))
 
 (def name-table "device")
-(def keys-for-device [:id :device_group_id :user_team_id :name :hash_post :created_at :updated_at])
+(def keys-for-device [:id :device_type_id :user_team_id :name :hash_post :created_at :updated_at])
 (def str-keys-for-device (join " " (map name keys-for-device)))
 (def str-keys-for-device-with-peripherals
   (join " "
         [str-keys-for-device
-         "device_group{id name user_id}"
+         model.device-type/str-table-and-keys
          "user_team{id name owner_user_id}"]))
 (def str-table-and-keys
   (goog.string.format "%s {%s}"
@@ -36,10 +37,10 @@
                       :id id
                       :on-receive on-receive}))
 
-(defn create [{:keys [name device_group_id user_team_id on-receive]}]
-  (let [str-params (goog.string.format "%s: {device_group_id: %s, user_team_id: %s name: %s}"
+(defn create [{:keys [name device_type_id user_team_id on-receive]}]
+  (let [str-params (goog.string.format "%s: {device_type_id: %s, user_team_id: %s name: %s}"
                                        name-table
-                                       (util/build-input-str-for-int device_group_id)
+                                       (util/build-input-str-for-int device_type_id)
                                        (util/build-input-str-for-int user_team_id)
                                        (util/build-input-str-for-str name))]
     (util/create {:name-table name-table
@@ -47,11 +48,11 @@
                   :str-input-params str-params
                   :on-receive on-receive})))
 
-(defn update [{:keys [id name device_group_id user_team_id on-receive]}]
-  (let [str-params (goog.string.format "id: %s, %s: {device_group_id: %s, user_team_id: %s, name: %s}"
+(defn update [{:keys [id name device_type_id user_team_id on-receive]}]
+  (let [str-params (goog.string.format "id: %s, %s: {device_type_id: %s, user_team_id: %s, name: %s}"
                                        (util/build-input-str-for-int id)
                                        name-table
-                                       (util/build-input-str-for-int device_group_id)
+                                       (util/build-input-str-for-int device_type_id)
                                        (util/build-input-str-for-int user_team_id)
                                        (util/build-input-str-for-str name))]
     (util/update {:name-table name-table

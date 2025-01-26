@@ -1,11 +1,11 @@
-(ns back.models.device-group
+(ns back.models.device-type
   (:refer-clojure :exclude [update])
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.core :refer [format]]
             [back.config :refer [db-spec]]
             [back.models.util :as model.util]))
 
-(def name-table "device_group")
+(def name-table "device_type")
 (def key-table (keyword name-table))
 
 (defn filter-params [params]
@@ -24,7 +24,7 @@
 (defn for-user-update [{:keys [id id-user params]}]
   (jdbc/with-db-transaction [t-con db-spec]
     (jdbc/update! db-spec key-table params ["id = ? AND user_id = ?" id id-user])
-    {:device_group (get-by-id id {:transaction t-con})}))
+    {key-table (get-by-id id {:transaction t-con})}))
 
 (defn for-user-delete [{:keys [id id-user]}]
   ; TODO prohibit deleting when who has device
@@ -32,7 +32,7 @@
 
 (defn get-by-id-for-user [id user-id & [{:keys [transaction]}]]
   (first (jdbc/query (or transaction db-spec)
-                     ["SELECT * FROM device_group WHERE id = ? AND user_id = ?" id user-id])))
+                     ["SELECT * FROM device_type WHERE id = ? AND user_id = ?" id user-id])))
 
 (defn create [params]
   (jdbc/with-db-transaction [t-con db-spec]
@@ -40,7 +40,7 @@
     (let [id (-> (jdbc/query t-con "SELECT LAST_INSERT_ID()")
                  first vals first)
           item (get-by-id id {:transaction t-con})]
-      {:device_group item})))
+      {key-table item})))
 
 (defn- get-list-with-total-base [params & [{:keys [str-where]}]]
   (model.util/get-list-with-total-with-building-query name-table params {:str-where str-where}))

@@ -5,8 +5,8 @@
             [back.models.user :as model.user]
             [back.models.user-team :as model.user-team]
             [back.models.device :as model.device]
-            [back.models.device-group :as model.device-group]
-            [back.models.device-group-api-key :as model.device-group-api-key]
+            [back.models.device-type :as model.device-type]
+            [back.models.device-type-api-key :as model.device-type-api-key]
             [back.models.device-watch-group :as model.device-watch-group]
             [back.models.device-watch-group-device :as model.device-watch-group-device]
             [back.models.device-file :as model.device-file]
@@ -38,11 +38,17 @@
                 :transaction transaction})
               (assoc :device device)))))))
 
-(defn raw-device-logs-for-device-group
-  [_ args _]
-  (println "args for raw-device-logs-for-device-group" args)
-  (when-let [device-group-id (:device_group_id args)]
-    (model-raw-device-log/get-list-with-total args {:str-where-and (format "device_group.id = %d" device-group-id)})))
+(defn raw-device-logs-for-device-type
+  [context args _]
+  (println "args for raw-device-logs-for-device-type" args)
+  (let [id-device-type (:device_type_id args)
+        user (get-user-loggedin context)
+        id-user (:id user)]
+    (jdbc/with-db-transaction [transaction db-spec]
+      (when-let [device-type (model.device-type/get-by-id-for-user id-device-type id-user {:transaction transaction})]
+        (-> (model-raw-device-log/get-list-with-total args {:str-where-and (format "device_type.id = %d" id-device-type)
+                                                            :transaction transaction})
+            (assoc model.device-type/key-table device-type))))))
 
 (defn raw-device-logs-for-device-watch-group
   [context args _]
@@ -164,70 +170,73 @@
   (let [user (get-user-loggedin context)]
     (model.device/get-list-with-total-for-user args (:id user))))
 
-(defn device-groups-for-user [context args _]
+(defn device-types [context args _]
   (let [user (get-user-loggedin context)]
-    (model.device-group/get-list-with-total-for-user args (:id user))))
+    (model.device-type/get-list-with-total-for-user args (:id user))))
 
-(defn device-group-for-user [context args _]
+(defn device-type [context args _]
   (let [user (get-user-loggedin context)]
-    (model.device-group/get-by-id-for-user (:id args) (:id user))))
+    (model.device-type/get-by-id-for-user (:id args) (:id user))))
 
-(defn device-group-for-user-create [context args _]
-  (println "args device-group-for-user-create" args)
+(defn device-type-create [context args _]
+  (println "args device-type-create" args)
   (let [user (get-user-loggedin context)
-        params_device_group (-> (:device_group args)
-                                (assoc :user_id (:id user)))]
-    (model.device-group/create params_device_group)))
+        params_device_type (-> (:device_type args)
+                               (assoc :user_id (:id user)))]
+    (model.device-type/create params_device_type)))
 
-(defn device-group-for-user-update [context args _]
-  (println "args device-group-for-user-create" args)
+(defn device-type-update [context args _]
+  (println "args device-type-create" args)
   (let [user (get-user-loggedin context)]
-    (model.device-group/for-user-update {:id (:id args)
-                                         :id-user (:id user)
-                                         :params (:device_group args)})))
+    (model.device-type/for-user-update {:id (:id args)
+                                        :id-user (:id user)
+                                        :params (:device_type args)})))
 
-(defn device-group-for-user-delete [context args _]
-  (println "args device-group-for-user-delete" args)
+(defn device-type-delete [context args _]
+  (println "args device-type-delete" args)
   (let [user (get-user-loggedin context)]
-    (model.device-group/for-user-delete {:id (:id args)
-                                         :id-user (:id user)})))
+    (model.device-type/for-user-delete {:id (:id args)
+                                        :id-user (:id user)})))
 
-(defn device-group-api-keys-for-device-group
+(defn device-type-api-keys-for-device-type
   [context args _]
-  (println "args for device-group-api-keys-for-device-group" args)
-  (let [user (get-user-loggedin context)]
-    (when-let [id-device-group (:device_group_id args)]
-      (model.device-group-api-key/get-list-with-total-for-user-and-device-group
-       args (:id user) id-device-group))))
+  (println "args for device-type-api-keys-for-device-type" args)
+  (let [user (get-user-loggedin context)
+        id-user (:id user)]
+    (when-let [id-device-type (:device_type_id args)]
+      (when-let [device-type (model.device-type/get-by-id-for-user id-device-type id-user)]
+        (-> (model.device-type-api-key/get-list-with-total-for-user-and-device-type
+             args id-user id-device-type)
+            (assoc model.device-type/key-table device-type))))))
 
-(defn device-group-api-key-for-device-group
+(defn device-type-api-key-for-device-type
   [context args _]
-  (println "args for device-group-api-key-for-device-group" args)
+  (println "args for device-type-api-key-for-device-type" args)
   (let [user (get-user-loggedin context)]
-    (when-let [id-device-group (:device_group_id args)]
-      (model.device-group-api-key/get-by-id-for-user-and-device-group
-       (:id args) (:id user) id-device-group))))
+    (when-let [id-device-type (:device_type_id args)]
+      (model.device-type-api-key/get-by-id-for-user-and-device-type
+       (:id args) (:id user) id-device-type))))
 
-(defn device-group-api-key-for-user-create [context args _]
-  (println "args device-group-api-key-for-user-create" args)
+(defn device-type-api-key-create [context args _]
+  (println "args device-type-api-key-create" args)
   (let [user (get-user-loggedin context)
-        params (:device_group_api_key args)]
-    (model.device-group-api-key/create-for-user params (:id user))))
+        params (:device_type_api_key args)]
+    (model.device-type-api-key/create-for-user params (:id user))))
 
-(defn device-group-api-key-for-user-update [context args _]
-  (println "args device-group-api-key-for-user-update" args)
+(defn device-type-api-key-update [context args _]
+  (println "args device-type-api-key-update" args)
   (let [user (get-user-loggedin context)
-        params (:device_group_api_key args)]
-    (model.device-group-api-key/update-for-user
+        params (:device_type_api_key args)]
+    (model.device-type-api-key/update-for-user
      {:params params
       :id (:id args)
       :id-user (:id user)})))
 
-(defn device-group-api-key-for-user-delete [context args _]
-  (println "args device-group-api-key-for-user-delete" args)
+(defn device-type-api-key-delete [context args _]
+  (println "args device-type-api-key-delete" args)
   (let [user (get-user-loggedin context)]
-    (model.device-group-api-key/delete-for-user {:id (:id args)
-                                                 :id-user (:id user)})))
+    (model.device-type-api-key/delete-for-user {:id (:id args)
+                                                :id-user (:id user)})))
 
 (defn device-files-for-device
   [context args _]
@@ -324,9 +333,9 @@
 (defn device-create [context args _]
   (println "args device-create" args)
   (let [user (get-user-loggedin context)
-        params_device_group (:device args)]
+        params_device_type (:device args)]
     (when (model.user/admin? user)
-      (model.device/create-for-user params_device_group (:id user)))))
+      (model.device/create-for-user params_device_type (:id user)))))
 
 (defn device [context args _]
   (println "args device" args)
@@ -349,10 +358,10 @@
 (def resolver-map
   {:Query/raw_device_logs raw-device-logs
    :Query/raw_device_logs_for_device raw-device-logs-for-device
-   :Query/raw_device_logs_for_device_group raw-device-logs-for-device-group
+   :Query/raw_device_logs_for_device_type raw-device-logs-for-device-type
    :Query/raw_device_logs_for_device_watch_group raw-device-logs-for-device-watch-group
-   :Query/device_group_api_keys_for_device_group device-group-api-keys-for-device-group
-   :Query/device_group_api_key_for_device_group device-group-api-key-for-device-group
+   :Query/device_type_api_keys_for_device_type device-type-api-keys-for-device-type
+   :Query/device_type_api_key_for_device_type device-type-api-key-for-device-type
    :Query/device_watch_groups device-watch-groups
    :Query/device_watch_group device-watch-group
    :Query/device_watch_group_devices_for_device_watch_group device-watch-group-devices-for-device-watch-group
@@ -365,8 +374,8 @@
    :Query/user_for_resetting_password user-for-resetting-password
    :Query/devices devices
    :Query/device device
-   :Query/device_groups device-groups-for-user
-   :Query/device_group device-group-for-user
+   :Query/device_types device-types
+   :Query/device_type device-type
    :Query/user_loggedin user-loggedin
    :Mutation/user_create user-create
    :Mutation/user_update user-update
@@ -377,12 +386,12 @@
    :Mutation/device_create device-create
    :Mutation/device_update device-update
    :Mutation/device_delete device-delete
-   :Mutation/device_group_for_user_create device-group-for-user-create
-   :Mutation/device_group_for_user_update device-group-for-user-update
-   :Mutation/device_group_for_user_delete device-group-for-user-delete
-   :Mutation/device_group_api_key_for_user_create device-group-api-key-for-user-create
-   :Mutation/device_group_api_key_for_user_update device-group-api-key-for-user-update
-   :Mutation/device_group_api_key_for_user_delete device-group-api-key-for-user-delete
+   :Mutation/device_type_create device-type-create
+   :Mutation/device_type_update device-type-update
+   :Mutation/device_type_delete device-type-delete
+   :Mutation/device_type_api_key_create device-type-api-key-create
+   :Mutation/device_type_api_key_update device-type-api-key-update
+   :Mutation/device_type_api_key_delete device-type-api-key-delete
    :Mutation/device_watch_group_create device-watch-group-create
    :Mutation/device_watch_group_update device-watch-group-update
    :Mutation/device_watch_group_delete device-watch-group-delete

@@ -4,7 +4,7 @@
             [hiccup.page :refer [html5]]
             [back.handlers.util :as handler.util]
             [back.models.raw-device-log :as model.raw-device-log]
-            [back.models.device-group-api-key :as model.device-group-api-key]
+            [back.models.device-type-api-key :as model.device-type-api-key]
             [back.models.device :as model.device]
             [back.models.device-file :as model.device-file]
             [back.config :as config]))
@@ -102,12 +102,12 @@
 
 (defn api-post-device [req]
   (let [str-bearer (handler.util/get-bearer req)
-        device-group-api-key (model.device-group-api-key/get-by-key-str str-bearer)]
-    (when (model.device-group-api-key/has-permission-to-create-device device-group-api-key)
+        device-type-api-key (model.device-type-api-key/get-by-key-str str-bearer)]
+    (when (model.device-type-api-key/has-permission-to-create-device device-type-api-key)
       (let [params (:json-params req)
-            id-device-group (:device_group_id device-group-api-key)
+            id-device-type (:device_type_id device-type-api-key)
             params-device (-> (:device params)
-                              (assoc :device_group_id id-device-group))
+                              (assoc :device_type_id id-device-type))
             result (model.device/create params-device)
             result (assoc result :hashy_post (-> result :device :hash_post))]
         {:status 200

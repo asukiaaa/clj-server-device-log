@@ -4,7 +4,7 @@
             [clojure.walk :refer [keywordize-keys]]
             [front.route :as route]
             [front.model.device :as model.device]
-            [front.model.device-group :as model.device-group]
+            [front.model.device-type :as model.device-type]
             [front.model.user-team :as model.user-team]
             [front.view.common.wrapper.show404 :as wrapper.show404]
             [front.view.util.breadcrumb :as breadcrumb]
@@ -16,13 +16,13 @@
   (let [params (js->clj (router/useParams))
         id-item (get params "device_id")
         navigate (router/useNavigate)
-        [device-group-list-and-total set-device-group-list-and-total] (react/useState)
+        [device-type-list-and-total set-device-type-list-and-total] (react/useState)
         [user-team-list-and-total set-user-team-list-and-total] (react/useState)
         [item set-item] (react/useState)
         state-info-name (util/build-state-info :name #(react/useState))
-        state-info-device-group-id (util/build-state-info :device_group_id #(react/useState))
+        state-info-device-type-id (util/build-state-info :device_type_id #(react/useState))
         state-info-user-team-id (util/build-state-info :user_team_id #(react/useState))
-        arr-state-info [state-info-name state-info-device-group-id state-info-user-team-id]
+        arr-state-info [state-info-name state-info-device-type-id state-info-user-team-id]
         on-receive-item
         (fn [item]
           (set-item item)
@@ -57,13 +57,13 @@
             :on-receive (fn [list-and-total new-errors]
                           (set-user-team-list-and-total list-and-total)
                           (next (concat errors new-errors)))}))
-        fetch-device-groups
+        fetch-device-types
         (fn [errors next]
-          (model.device-group/fetch-list-and-total
+          (model.device-type/fetch-list-and-total
            {:limit 1000
             :page 0
             :on-receive (fn [list-and-total new-errors]
-                          (set-device-group-list-and-total list-and-total)
+                          (set-device-type-list-and-total list-and-total)
                           (next (concat errors new-errors)))}))
         fetch-device
         (fn [errors next]
@@ -75,7 +75,7 @@
     (react/useEffect
      (fn []
        (wrapper.fetching/start info-wrapper-fetching)
-       (fetch-device-groups
+       (fetch-device-types
         nil
         (fn [errors]
           (fetch-device
@@ -99,12 +99,12 @@
          [:div "no data"]
          [:div
           [:form.form-control
-           [util/render-input "name" state-info-name]
-           [util/render-select "device group id" state-info-device-group-id
-            (model.device-group/build-select-options-from-list-and-total device-group-list-and-total)]
-           [util/render-select "user team id" state-info-user-team-id
+           [util/render-input util.label/name state-info-name]
+           [util/render-select util.label/device-type-item state-info-device-type-id
+            (model.device-type/build-select-options-from-list-and-total device-type-list-and-total)]
+           [util/render-select util.label/user-team state-info-user-team-id
             (model.user-team/build-select-options-from-list-and-total user-team-list-and-total)]
-           [:button.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply} "apply"]]])})]))
+           [:button.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply} util.label/edit]]])})]))
 
 (defn core []
   (wrapper.show404/wrapper

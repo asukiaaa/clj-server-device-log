@@ -1,4 +1,4 @@
-(ns front.view.device-groups.device-group-api-keys.index
+(ns front.view.device-types.index
   (:require ["react" :as react]
             ["react-router-dom" :as router]
             [goog.string :refer [format]]
@@ -7,27 +7,32 @@
             [front.view.common.wrapper.fetching :as wrapper.fetching]
             [front.view.common.wrapper.show404 :as wrapper.show404]
             [front.view.util :as util]
-            [front.model.device-group-api-key :as model.device-group-api-key]))
+            [front.view.util.breadcrumb :as breadcrumb]
+            [front.view.util.label :as util.label]
+            [front.model.device-type :as model.device-type]))
 
-(defn render-device-group-api-key [device-group-api-key on-delete]
+(defn render-device-type [device-type on-delete]
   [:tr
-   [:td (:id device-group-api-key)]
-   [:td (:name device-group-api-key)]
-   [:td (:permission device-group-api-key)]
-   [:td (:updated_at device-group-api-key)]
+   [:td (:id device-type)]
+   #_[:td (:user_id device-type)]
+   [:td (:name device-type)]
+   #_[:td (:created_at device-type)]
+   [:td (:updated_at device-type)]
    [:td
-    [:> router/Link {:to (route/device-group-device-group-api-key-show (:device_group_id device-group-api-key) (:id device-group-api-key))} "show"]
+    [:> router/Link {:to (route/device-type-show (:id device-type))} util.label/show]
     " "
-    [:> router/Link {:to (route/device-group-device-group-api-key-edit (:device_group_id device-group-api-key) (:id device-group-api-key))} "edit"]
+    [:> router/Link {:to (route/device-type-edit (:id device-type))} util.label/edit]
     " "
     [:f> util/btn-confirm-delete
-     {:message-confirm (model.device-group-api-key/build-confirmation-message-for-deleting device-group-api-key)
-      :action-delete #(model.device-group-api-key/delete {:id (:id device-group-api-key) :on-receive on-delete})}]]])
+     {:message-confirm (model.device-type/build-confirmation-message-for-deleting device-type)
+      :action-delete #(model.device-type/delete {:id (:id device-type) :on-receive on-delete})}]
+    " "
+    [:> router/Link {:to (route/device-type-device-type-api-keys (:id device-type))} util.label/api-keys]
+    " "
+    [:> router/Link {:to (route/device-type-raw-device-logs (:id device-type))} util.label/logs]]])
 
 (defn-  page []
-  (let [params (js->clj (router/useParams))
-        id-device-group (get params "id_device_group")
-        location (router/useLocation)
+  (let [location (router/useLocation)
         [list-and-total set-list-and-total] (react/useState)
         info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
         received-list (:list list-and-total)
@@ -37,13 +42,12 @@
         number-limit (or (:limit query-params) 50)
         number-total-page (pagination/calc-total-page number-limit total)
         build-url-by-page
-        (fn [page] (format "%s?page=%d&limit=%d" route/device-group-device-group-api-keys page number-limit))
+        (fn [page] (format "%s?page=%d&limit=%d" route/device-types page number-limit))
         load-list (fn []
                     (wrapper.fetching/start info-wrapper-fetching)
-                    (model.device-group-api-key/fetch-list-and-total-for-device-group
+                    (model.device-type/fetch-list-and-total
                      {:limit number-limit
                       :page number-page
-                      :id-device-group id-device-group
                       :on-receive (fn [result errors]
                                     (set-list-and-total result)
                                     (wrapper.fetching/finished info-wrapper-fetching errors))}))]
@@ -53,7 +57,8 @@
        (fn []))
      #js [location])
     [:<>
-     [:> router/Link {:to (route/device-group-device-group-api-key-create id-device-group)} "new"]
+     [:f> breadcrumb/core [{:label util.label/device-types}]]
+     [:> router/Link {:to route/device-type-create} util.label/create]
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer
@@ -63,14 +68,15 @@
          [:thead
           [:tr
            [:th "id"]
+           #_[:th "user_id"]
            [:th "name"]
-           [:th "permission"]
+           #_[:th "created_at"]
            [:th "updated_at"]
            [:th "actions"]]]
          [:tbody
           (for [item received-list]
             [:<> {:key (:id item)}
-             [:f> render-device-group-api-key item load-list]])]]
+             [:f> render-device-type item load-list]])]]
         [:f> pagination/core {:build-url build-url-by-page
                               :total-page number-total-page
                               :current-page number-page}]]})]))

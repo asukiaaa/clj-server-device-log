@@ -1,0 +1,12 @@
+{:up
+ ["RENAME TABLE device_group to device_type"
+  "ALTER TABLE device
+   RENAME COLUMN device_group_id TO device_type_id,
+   DROP FOREIGN KEY fk_device_device_group,
+   ADD CONSTRAINT fk_device__device_type_id FOREIGN KEY(device_type_id) REFERENCES device_type(id)"]
+ :down
+ ["RENAME TABLE device_type to device_group"
+  "ALTER TABLE device
+   RENAME COLUMN device_type_id TO device_group_id,
+   DROP FOREIGN KEY fk_device__device_type_id,
+   ADD CONSTRAINT fk_device_device_group FOREIGN KEY(device_group_id) REFERENCES device_group(id)"]}

@@ -3,25 +3,25 @@
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.core :refer [format]]
             [clojure.string :refer [join]]
-            [back.models.device-group :as model.device-group]
+            [back.models.device-type :as model.device-type]
             [back.config :refer [db-spec]]
             [back.models.util :as model.util]))
 
 (def name-table "device")
 (def key-table (keyword name-table))
-(def str-sql-select-for-device-group-columns "device_group.name device_group_name, device_group.user_id device_group_user_id")
+(def str-sql-select-for-device-type-columns "device_type.name device_type_name, device_type.user_id device_type_user_id")
 (def str-sql-select-for-user-team-columns "user_team.name user_team_name, user_team.owner_user_id user_team_owner_user_id")
 (def str-join-tables
-  (join " " ["INNER JOIN device_group ON device_group_id = device_group.id"
+  (join " " ["INNER JOIN device_type ON device_type_id = device_type.id"
              "LEFT JOIN user_team ON user_team_id = user_team.id"]))
 
-(defn build-item-for-device-group [item]
+(defn build-item-for-device-type [item]
   (if (empty? item)
     item
-    (let [device_group {:id (:device_group_id item)
-                        :name (:device_group_name item)
-                        :user_id (:device_group_user_id item)}
-          item (assoc item :device_group device_group)]
+    (let [device_type {:id (:device_type_id item)
+                        :name (:device_type_name item)
+                        :user_id (:device_type_user_id item)}
+          item (assoc item :device_type device_type)]
       item)))
 
 (defn build-item-for-user-team [item]
@@ -35,11 +35,11 @@
 
 (defn build-item [item]
   (-> item
-      build-item-for-device-group
+      build-item-for-device-type
       build-item-for-user-team))
 
 (defn filter-params [params]
-  (select-keys params [:name :device_group_id :user_team_id]))
+  (select-keys params [:name :device_type_id :user_team_id]))
 
 (defn get-by-id [id & [{:keys [transaction]}]]
   (model.util/get-by-id id name-table {:transaction transaction}))
@@ -58,8 +58,8 @@
   (jdbc/update! db-spec key-table params ["id = ?" id]))
 
 (defn get-by-id-for-user [id user-id & [{:keys [transaction]}]]
-  (let [query (format "SELECT device.*, %s, %s FROM device %s WHERE device.id = ? AND device_group.user_id = ?"
-                      str-sql-select-for-device-group-columns
+  (let [query (format "SELECT device.*, %s, %s FROM device %s WHERE device.id = ? AND device_type.user_id = ?"
+                      str-sql-select-for-device-type-columns
                       str-sql-select-for-user-team-columns
                       str-join-tables)
         item (first (jdbc/query (or transaction db-spec) [query id user-id]))
@@ -104,9 +104,9 @@
 
 (defn create-for-user [params user-id]
   (jdbc/with-db-transaction [t-con db-spec]
-    (let [device-group-id (:device_group_id params)
-          device-group (model.device-group/get-by-id-for-user device-group-id user-id {:transaction t-con})]
-      (if (empty? device-group)
+    (let [device-type-id (:device_type_id params)
+          device-type (model.device-type/get-by-id-for-user device-type-id user-id {:transaction t-con})]
+      (if (empty? device-type)
         {:errors ["device group does not avairable"]}
         (do
           (jdbc/insert! t-con key-table (-> params
@@ -119,10 +119,10 @@
 
 (defn get-list-with-total-for-user [params user-id]
   (-> (model.util/build-query-get-index
-       name-table {:str-keys-select (str "device.*, " str-sql-select-for-device-group-columns
+       name-table {:str-keys-select (str "device.*, " str-sql-select-for-device-type-columns
                                          ", " str-sql-select-for-user-team-columns)})
       (str " " str-join-tables)
-      (str (format " WHERE device_group.user_id = %d" user-id))
+      (str (format " WHERE device_type.user_id = %d" user-id))
       (model.util/append-limit-offset-by-limit-page-params params)
       (model.util/get-list-with-total {:build-item build-item})))
 
