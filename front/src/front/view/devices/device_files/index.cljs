@@ -1,64 +1,30 @@
 (ns front.view.devices.device-files.index
   (:require ["react" :as react]
             ["react-router-dom" :as router]
-            [goog.string :refer [format]]
             [front.route :as route]
-            [front.view.common.component.pagination :as pagination]
-            [front.view.common.wrapper.fetching :as wrapper.fetching]
+            [front.model.device-file :as model.device-file]
             [front.view.common.wrapper.show404 :as wrapper.show404]
-            [front.view.util :as util]
             [front.view.util.breadcrumb :as breadcrumb]
-            [front.view.util.device-file.card :as file.card]
-            [front.view.util.label :as util.label]
-            [front.model.device-file :as model.device-file]))
+            [front.view.util.device-file.page :as file.page]
+            [front.view.util.label :as util.label]))
 
 (defn-  page []
   (let [params (js->clj (router/useParams))
         id-device (get params "device_id")
-        location (router/useLocation)
         [device set-device] (react/useState)
-        [list-and-total set-list-and-total] (react/useState)
-        info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
-        received-list (:list list-and-total)
-        total (:total list-and-total)
-        query-params (util/read-query-params)
-        number-page (or (:page query-params) 0)
-        number-limit (or (:limit query-params) 50)
-        number-total-page (pagination/calc-total-page number-limit total)
-        build-url-by-page
-        (fn [page] (format "%s?page=%d&limit=%d" (route/device-device-files id-device) page number-limit))
-        load-list (fn []
-                    (wrapper.fetching/start info-wrapper-fetching)
-                    (model.device-file/fetch-list-and-total-for-device
-                     {:limit number-limit
-                      :page number-page
-                      :id-device id-device
-                      :on-receive (fn [result errors]
-                                    (set-list-and-total result)
-                                    (set-device (:device result))
-                                    (wrapper.fetching/finished info-wrapper-fetching errors))}))]
-    (react/useEffect
-     (fn []
-       (load-list)
-       (fn []))
-     #js [location])
+        on-receive
+        (fn [result _errors]
+          (set-device (:device result)))
+        fetch-list-and-total
+        (fn [params]
+          (model.device-file/fetch-list-and-total-for-device
+           (assoc params :id-device id-device)))]
     [:<>
      [:f> breadcrumb/core
       [{:label util.label/devices :path route/devices}
        {:label (util.label/device-item device) :path (route/device-show id-device)}
        {:label util.label/files}]]
-     (wrapper.fetching/wrapper
-      {:info info-wrapper-fetching
-       :renderer
-       [:<>
-        [:div "total " total]
-        [:div {:style {:width "100%" :overflow :auto}}
-         (for [item received-list]
-           [:<> {:key (:path item)}
-            [:f> file.card/core item]])]
-        [:f> pagination/core {:build-url build-url-by-page
-                              :total-page number-total-page
-                              :current-page number-page}]]})]))
+     [:f> file.page/core fetch-list-and-total {:on-receive on-receive}]]))
 
 (defn core []
   (wrapper.show404/wrapper

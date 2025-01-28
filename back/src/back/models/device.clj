@@ -50,10 +50,11 @@
   (model.util/get-by-id id name-table {:transaction transaction}))
 
 (defn get-list-by-ids [ids & [{:keys [transaction]}]]
-  (let [query (format "SELECT * from %s WHERE id IN %s"
-                         name-table
-                         (format "(%s)" (join "," ids)))]
-    (jdbc/query (or transaction db-spec) query)))
+  (when-not (empty? ids)
+    (let [query (format "SELECT * from %s WHERE id IN %s"
+                        name-table
+                        (format "(%s)" (join "," ids)))]
+      (jdbc/query (or transaction db-spec) query))))
 
 (defn get-by-hash-post [hash-post & [{:keys [transaction]}]]
   (when-not (empty? hash-post)

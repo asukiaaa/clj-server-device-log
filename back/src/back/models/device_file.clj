@@ -88,19 +88,29 @@
 (defn- assign-info-to-list [list-files {:keys [transaction]}]
   (let [ids-device (->> list-files (map :device_id) distinct)
         devices (model.device/get-list-by-ids ids-device {:transaction transaction})
-        map-id-device (into {} (for [device devices] [(:id device) device]))
-        arr-info-file (->> list-files
-                           (map #(assign-info-to-item-from-map % {:map-id-device map-id-device})))]
-    arr-info-file))
+        map-id-device (into {} (for [device devices] [(:id device) device]))]
+    (->> list-files
+         (map #(assign-info-to-item-from-map % {:map-id-device map-id-device})))))
+
+(defn split-by-params [list-files params]
+  (let [{:keys [limit page]} params]
+    (->> list-files
+         (split-at (* limit page))
+         second
+         (split-at limit)
+         first)))
 
 (defn get-list-with-total-for-user-device [params id-user id-device & [{:keys [transaction]}]]
   (when-let [device (model.device/get-by-id-for-user id-device id-user {:transaction transaction})]
     (let [list-files (->> (get-path-files-for-device (:id device))
                           (map build-info-map-from-path-file)
                           (sort-by :created_at)
-                          reverse)]
-      {:list (assign-info-to-list list-files {:transaction transaction})
-       :total (count list-files)
+                          reverse)
+          total (count list-files)]
+      {:list (-> list-files
+                 (split-by-params params)
+                 (assign-info-to-list {:transaction transaction}))
+       :total total
        :device device})))
 
 (defn get-path-file-for-user [path-url id-user]
