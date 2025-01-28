@@ -10,13 +10,13 @@
 (defn build-str-keys-for-table [& [{:keys [without-device]}]]
   (join " "
         [(join " " (map name keys-for-table))
-         (when-not without-device model.device/str-table-and-keys)]))
+         (when-not without-device (model.device/build-str-table-and-keys))]))
 
 (defn fetch-list-and-total-for-device [{:keys [id-device on-receive limit page]}]
   (util/fetch-list-and-total {:name-table (str name-table "s_for_device")
                               :str-keys-of-item (build-str-keys-for-table #_{:without-device true})
                               :str-params (format "device_id: %s" (util/build-input-str-for-int id-device))
-                              :str-additional-field model.device/str-table-and-keys
+                              :str-additional-field (model.device/build-str-table-and-keys)
                               :on-receive on-receive
                               :limit limit
                               :page page}))

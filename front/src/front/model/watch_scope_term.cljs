@@ -12,7 +12,7 @@
 (defn fetch-list-and-total-for-watch-scope [{:keys [id-watch-scope on-receive limit page]}]
   (util/fetch-list-and-total {:name-table (str name-table "s_for_watch_scope")
                               :str-keys-of-item str-keys-for-table
-                              :str-additional-field model.watch-scope/str-table-and-keys
+                              :str-additional-field (model.watch-scope/build-str-table-and-keys)
                               :on-receive on-receive
                               :str-params (format "watch_scope_id: %s" (util/build-input-str-for-int id-watch-scope))
                               :limit limit

@@ -16,7 +16,7 @@
    {:name-table (str name-table "s_for_device_type")
     :str-keys-of-item str-keys-for-table
     :on-receive on-receive
-    :str-additional-field model.device-type/str-table-and-keys
+    :str-additional-field (model.device-type/build-str-table-and-keys)
     :str-params (format "device_type_id: %s" (util/build-input-str-for-int id-device-type))
     :limit limit
     :page page}))

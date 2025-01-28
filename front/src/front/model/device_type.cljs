@@ -8,7 +8,7 @@
 (def key-table (keyword name-table))
 (def keys-for-table [:id :user_id :name :created_at :updated_at])
 (def str-keys-for-table (clojure.string/join " " (map name keys-for-table)))
-(def str-table-and-keys
+(defn build-str-table-and-keys []
   (goog.string.format "%s { %s }"
                       name-table
                       str-keys-for-table))
@@ -42,7 +42,7 @@
                                        name-table
                                        (util/build-input-str-for-str name))]
     (util/create {:name-table name-table
-                  :str-keys-receive str-table-and-keys
+                  :str-keys-receive (build-str-table-and-keys)
                   :str-input-params str-params
                   :on-receive on-receive})))
 
@@ -52,7 +52,7 @@
                                        name-table
                                        (util/build-input-str-for-str name))]
     (util/update {:name-table name-table
-                  :str-keys-receive str-table-and-keys
+                  :str-keys-receive (build-str-table-and-keys)
                   :str-input-params str-params
                   :on-receive on-receive})))
 

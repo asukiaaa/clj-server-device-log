@@ -54,7 +54,8 @@
 (defn fetch-list-and-total-for-device [{:keys [id-device str-where str-order limit page on-receive]}]
   (fetch-list-and-total {:str-where str-where
                          :str-order str-order
-                         :str-additional-field model.device/str-table-and-keys                         :limit limit
+                         :str-additional-field (model.device/build-str-table-and-keys)
+                         :limit limit
                          :pate page
                          :on-receive on-receive}
                         {:str-name-table (str name-table "s_for_device")
@@ -63,7 +64,7 @@
 (defn fetch-list-and-total-for-device-type [{:keys [id-device-type str-where str-order limit page on-receive]}]
   (fetch-list-and-total {:str-where str-where
                          :str-order str-order
-                         :str-additional-field model.device-type/str-table-and-keys
+                         :str-additional-field (model.device-type/build-str-table-and-keys)
                          :limit limit
                          :pate page
                          :on-receive on-receive}
