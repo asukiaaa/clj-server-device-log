@@ -1,5 +1,5 @@
 (ns front.view.util.label
-  (:refer-clojure :exclude [name update]))
+  (:refer-clojure :exclude [name next update]))
 
 (def logout "Logout")
 (def login "Login")
@@ -38,6 +38,7 @@
 (def files "Files")
 (def id "ID")
 (def logs "Logs")
+(def next "Next")
 (def no-file-to-show "No file to show")
 (def password "Password")
 (def password-again "Password again")
