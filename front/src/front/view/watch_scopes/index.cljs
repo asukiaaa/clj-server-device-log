@@ -1,32 +1,34 @@
-(ns front.view.device-watch-groups.index
+(ns front.view.watch-scopes.index
   (:require ["react" :as react]
             ["react-router-dom" :as router]
             [front.route :as route]
+            [front.model.watch-scope :as model.watch-scope]
             [front.view.common.component.pagination :as pagination]
             [front.view.common.wrapper.fetching :as wrapper.fetching]
             [front.view.common.wrapper.show404 :as wrapper.show404]
-            [front.view.util :as util]
-            [front.model.device-watch-group :as model.device-watch-group]))
+            [front.view.util.label :as util.label]
+            [front.view.util.breadcrumb :as breadcrumb]
+            [front.view.util :as util]))
 
-(defn render-device-watch-group [device-watch-group on-delete]
+(defn render-watch-scope [watch-scope on-delete]
   [:tr
-   [:td (:id device-watch-group)]
-   #_[:td (:user_id device-watch-group)]
-   [:td (:name device-watch-group)]
-   [:td (:created_at device-watch-group)]
-   [:td (:updated_at device-watch-group)]
+   [:td (:id watch-scope)]
+   #_[:td (:user_id watch-scope)]
+   [:td (:name watch-scope)]
+   [:td (:created_at watch-scope)]
+   [:td (:updated_at watch-scope)]
    [:td
-    [:> router/Link {:to (route/device-watch-group-raw-device-logs (:id device-watch-group))} "logs"]
+    [:> router/Link {:to (route/watch-scope-show (:id watch-scope))} util.label/show]
     " "
-    [:> router/Link {:to (route/device-watch-group-device-watch-group-devices (:id device-watch-group))} "devices"]
-    " "
-    [:> router/Link {:to (route/device-watch-group-show (:id device-watch-group))} "show"]
-    " "
-    [:> router/Link {:to (route/device-watch-group-edit (:id device-watch-group))} "edit"]
+    [:> router/Link {:to (route/watch-scope-edit (:id watch-scope))} util.label/edit]
     " "
     [:f> util/btn-confirm-delete
-     {:message-confirm (model.device-watch-group/build-confirmation-message-for-deleting device-watch-group)
-      :action-delete #(model.device-watch-group/delete {:id (:id device-watch-group) :on-receive on-delete})}]]])
+     {:message-confirm (model.watch-scope/build-confirmation-message-for-deleting watch-scope)
+      :action-delete #(model.watch-scope/delete {:id (:id watch-scope) :on-receive on-delete})}]
+    " "
+    [:> router/Link {:to (route/watch-scope-raw-device-logs (:id watch-scope))} util.label/logs]
+    " "
+    [:> router/Link {:to (route/watch-scope-watch-scope-terms (:id watch-scope))} util.label/terms]]])
 
 (defn-  page []
   (let [location (router/useLocation)
@@ -40,7 +42,7 @@
         number-total-page (pagination/calc-total-page number-limit total)
         load-list (fn []
                     (wrapper.fetching/start info-wrapper-fetching)
-                    (model.device-watch-group/fetch-list-and-total
+                    (model.watch-scope/fetch-list-and-total
                      {:limit number-limit
                       :page number-page
                       :on-receive (fn [result errors]
@@ -52,7 +54,8 @@
        (fn []))
      #js [location])
     [:<>
-     [:> router/Link {:to route/device-watch-group-create} "new"]
+     [:f> breadcrumb/core [{:label util.label/watch-scopes}]]
+     [:> router/Link {:to route/watch-scope-create} util.label/create]
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer
@@ -70,7 +73,7 @@
          [:tbody
           (for [item received-list]
             [:<> {:key (:id item)}
-             [:f> render-device-watch-group item load-list]])]]
+             [:f> render-watch-scope item load-list]])]]
         [:f> pagination/core {:total-page number-total-page}]]})]))
 
 (defn core []

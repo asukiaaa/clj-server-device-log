@@ -1,18 +1,20 @@
-(ns front.model.device-watch-group-device
+(ns front.model.watch-scope-term
   (:refer-clojure :exclude [update])
   (:require [goog.string :refer [format]]
             clojure.string
+            [front.model.watch-scope :as model.watch-scope]
             [front.model.util :as util]))
 
-(def name-table "device_watch_group_device")
-(def keys-for-table [:id :device_watch_group_id :display_name :device_id :device_name :created_at :updated_at])
+(def name-table "watch_scope_term")
+(def keys-for-table [:id :watch_scope_id :device_id :time_from :time_until :created_at :updated_at])
 (def str-keys-for-table (clojure.string/join " " (map name keys-for-table)))
 
-(defn fetch-list-and-total-for-device-watch-group [{:keys [id-device-watch-group on-receive limit page]}]
-  (util/fetch-list-and-total {:name-table (str name-table "s_for_device_watch_group")
+(defn fetch-list-and-total-for-watch-scope [{:keys [id-watch-scope on-receive limit page]}]
+  (util/fetch-list-and-total {:name-table (str name-table "s_for_watch_scope")
                               :str-keys-of-item str-keys-for-table
+                              :str-additional-field model.watch-scope/str-table-and-keys
                               :on-receive on-receive
-                              :str-params (format "device_watch_group_id: %s" (util/build-input-str-for-int id-device-watch-group))
+                              :str-params (format "watch_scope_id: %s" (util/build-input-str-for-int id-watch-scope))
                               :limit limit
                               :page page}))
 
@@ -22,11 +24,11 @@
                        :id id
                        :on-receive on-receive}))
 
-(defn fetch-by-id-for-device-watch-group [{:keys [id id-device-watch-group on-receive]}]
-  (util/fetch-by-id {:name-table (str name-table "_for_device_watch_group")
+(defn fetch-by-id-for-watch-scope [{:keys [id id-watch-scope on-receive]}]
+  (util/fetch-by-id {:name-table (str name-table "_for_watch_scope")
                      :str-keys-of-item str-keys-for-table
                      :id id
-                     :str-additional-params (format "device_watch_group_id: %s" (util/build-input-str-for-int id-device-watch-group))
+                     :str-additional-params (format "watch_scope_id: %s" (util/build-input-str-for-int id-watch-scope))
                      :on-receive on-receive}))
 
 (defn delete [{:keys [id on-receive]}]
@@ -34,12 +36,12 @@
                       :id id
                       :on-receive on-receive}))
 
-(defn create [{:keys [display-name id-device id-device-watch-group on-receive]}]
-  (let [str-params (format "%s: {display_name: %s, device_id: %s, device_watch_group_id: %s}"
+(defn create [{:keys [display-name id-device id-watch-scope on-receive]}]
+  (let [str-params (format "%s: {display_name: %s, device_id: %s, watch_scope_id: %s}"
                            name-table
                            (util/build-input-str-for-str display-name)
                            (util/build-input-str-for-int id-device)
-                           (util/build-input-str-for-int id-device-watch-group))]
+                           (util/build-input-str-for-int id-watch-scope))]
     (util/create {:name-table name-table
                   :str-keys-receive (format "%s { %s }"
                                             name-table

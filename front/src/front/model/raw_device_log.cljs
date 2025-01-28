@@ -70,11 +70,11 @@
                         {:str-name-table (str name-table "s_for_device_type")
                          :str-params (format "device_type_id: %d" id-device-type)}))
 
-(defn fetch-list-and-total-for-device-watch-group [{:keys [id-device-watch-group str-where str-order limit page on-receive]}]
+(defn fetch-list-and-total-for-watch-scope [{:keys [id-watch-scope str-where str-order limit page on-receive]}]
   (fetch-list-and-total {:str-where str-where
                          :str-order str-order
                          :limit limit
                          :pate page
                          :on-receive on-receive}
-                        {:str-name-table (str name-table "s_for_device_watch_group")
-                         :str-params (format "device_watch_group_id: %d" id-device-watch-group)}))
+                        {:str-name-table (str name-table "s_for_watch_scope")
+                         :str-params (format "watch_scope_id: %d" id-watch-scope)}))

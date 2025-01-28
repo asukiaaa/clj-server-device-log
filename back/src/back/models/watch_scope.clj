@@ -1,28 +1,18 @@
-(ns back.models.device-watch-group-device
+(ns back.models.watch-scope
   (:refer-clojure :exclude [update])
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.core :refer [format]]
             [back.config :refer [db-spec]]
             [back.models.util :as model.util]))
 
-(def name-table "device_watch_group_device")
-(def name-table-with-device (str name-table " LEFT JOIN device ON device.id = device_id"))
+(def name-table "watch_scope")
 (def key-table (keyword name-table))
-(def str-keys-select-with-device-name (str name-table ".*, device.name as device_name"))
-
-(defn build-query-device-ids-for-device-watch-group [id-device-watch-group]
-  (format "(SELECT device_id from %s WHERE device_watch_group_id = %s)"
-          name-table
-          id-device-watch-group))
 
 (defn filter-params [params]
-  (select-keys params [:display_name :device_id :device_watch_group_id]))
+  (select-keys params [:name :user_team_id]))
 
 (defn get-by-id [id & [{:keys [transaction]}]]
-  (model.util/get-by-id id name-table-with-device
-                        {:transaction transaction
-                         :str-keys-select str-keys-select-with-device-name
-                         :str-key-id (str name-table ".id")}))
+  (model.util/get-by-id id name-table {:transaction transaction}))
 
 (defn delete [id]
   (jdbc/delete! db-spec key-table ["id = ?" id]))
@@ -42,7 +32,7 @@
 
 (defn get-by-id-for-owner-user [id user-id & [{:keys [transaction]}]]
   (first (jdbc/query (or transaction db-spec)
-                     [(str "SELECT " str-keys-select-with-device-name " FROM " name-table " WHERE id = ? AND owner_user_id = ?") id user-id])))
+                     [(str "SELECT * FROM " name-table " WHERE id = ? AND owner_user_id = ?") id user-id])))
 
 (defn create [params]
   (jdbc/with-db-transaction [t-con db-spec]
@@ -53,13 +43,10 @@
       {key-table item})))
 
 (defn- get-list-with-total-base [params & [{:keys [str-where]}]]
-  (model.util/get-list-with-total-with-building-query
-   name-table-with-device params
-   {:str-where str-where
-    :str-keys-select str-keys-select-with-device-name}))
+  (model.util/get-list-with-total-with-building-query name-table params {:str-where str-where}))
 
-(defn get-list-with-total-for-owner-user [params user-id]
-  (get-list-with-total-base params {:str-where (format "owner_user_id = %d" user-id)}))
+(defn get-list-with-total-for-user-team [params user-team-id]
+  (get-list-with-total-base params {:str-where (format "user_team_id = %d" user-team-id)}))
 
-(defn get-list-with-total-for-admin [params]
+(defn get-list-with-total [params]
   (get-list-with-total-base params))

@@ -45,22 +45,22 @@
 (defn device-type-device-type-api-key-edit [id-device-type id-device-type-api-key]
   (str (device-type-device-type-api-key-show id-device-type id-device-type-api-key) "/edit"))
 
-(def device-watch-groups (str front "/device_watch_groups"))
-(def device-watch-group-create (str device-watch-groups "/create"))
-(defn device-watch-group-show [id] (str device-watch-groups "/" id))
-(defn device-watch-group-edit [id] (str (device-watch-group-show id) "/edit"))
+(def watch-scopes (str front "/watch_scopes"))
+(def watch-scope-create (str watch-scopes "/create"))
+(defn watch-scope-show [id] (str watch-scopes "/" id))
+(defn watch-scope-edit [id] (str (watch-scope-show id) "/edit"))
 
-(defn device-watch-group-device-watch-group-devices [id-device-watch-group]
-  (str (device-watch-group-show id-device-watch-group) "/device_watch_group_devices"))
-(defn device-watch-group-device-watch-group-device-create [id-device-watch-group]
-  (str (device-watch-group-device-watch-group-devices id-device-watch-group) "/create"))
-(defn device-watch-group-device-watch-group-device-show [id-device-watch-group id-device-watch-group-device]
-  (str (device-watch-group-device-watch-group-devices id-device-watch-group) "/" id-device-watch-group-device))
-(defn device-watch-group-device-watch-group-device-edit [id-device-watch-group id-device-watch-group-device]
-  (str (device-watch-group-device-watch-group-device-show id-device-watch-group id-device-watch-group-device) "/edit"))
+(defn watch-scope-watch-scope-terms [id-watch-scope]
+  (str (watch-scope-show id-watch-scope) "/watch_scope_terms"))
+(defn watch-scope-watch-scope-term-create [id-watch-scope]
+  (str (watch-scope-watch-scope-terms id-watch-scope) "/create"))
+(defn watch-scope-watch-scope-term-show [id-watch-scope id-watch-scope-term]
+  (str (watch-scope-watch-scope-terms id-watch-scope) "/" id-watch-scope-term))
+(defn watch-scope-watch-scope-term-edit [id-watch-scope id-watch-scope-term]
+  (str (watch-scope-watch-scope-term-show id-watch-scope id-watch-scope-term) "/edit"))
 
-(defn device-watch-group-raw-device-logs [id-device-watch-group]
-  (str (device-watch-group-show id-device-watch-group) "/raw_device_logs"))
+(defn watch-scope-raw-device-logs [id-watch-scope]
+  (str (watch-scope-show id-watch-scope) "/raw_device_logs"))
 
 (defn show-login-page-when-not-loggedin [path]
   (and (includes? path front)

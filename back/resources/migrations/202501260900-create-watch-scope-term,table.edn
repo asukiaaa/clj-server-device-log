@@ -1,0 +1,13 @@
+{:up
+ ["CREATE TABLE watch_scope_term(
+   id SERIAL NOT NULL PRIMARY KEY UNIQUE,
+   watch_scope_id BIGINT UNSIGNED NOT NULL,
+   CONSTRAINT fk_watch_scope_term__watch_scope_id FOREIGN KEY(watch_scope_id) REFERENCES watch_scope(id),
+   device_id BIGINT UNSIGNED NOT NULL,
+   CONSTRAINT fk_watch_scope_term__device_id FOREIGN KEY(device_id) REFERENCES device(id),
+   time_from TIMESTAMP,
+   time_until TIMESTAMP,
+   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP);"]
+ :down
+ ["DROP TABLE watch_scope_term;"]}

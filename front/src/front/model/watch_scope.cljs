@@ -1,12 +1,17 @@
-(ns front.model.device-watch-group
+(ns front.model.watch-scope
   (:refer-clojure :exclude [update])
   (:require goog.string
             clojure.string
             [front.model.util :as util]))
 
-(def name-table "device_watch_group")
-(def keys-for-table [:id :owner_user_id :name :memo :created_at :updated_at])
+(def name-table "watch_scope")
+(def key-table (keyword name-table))
+(def keys-for-table [:id :user_team_id :name :created_at :updated_at])
 (def str-keys-for-table (clojure.string/join " " (map name keys-for-table)))
+(def str-table-and-keys
+  (goog.string.format "%s {%s}"
+                      name-table
+                      str-keys-for-table))
 
 (defn build-select-options-from-list-and-total [list-and-total]
   (for [item (:list list-and-total)]
@@ -32,12 +37,11 @@
                       :id id
                       :on-receive on-receive}))
 
-(defn create [{:keys [name memo id-owner-user on-receive]}]
-  (let [str-params (goog.string.format "%s: {name: %s, memo: %s, owner_user_id: %s}"
+(defn create [{:keys [name user_team_id on-receive]}]
+  (let [str-params (goog.string.format "%s: {name: %s, user_team_id: %s}"
                                        name-table
                                        (util/build-input-str-for-str name)
-                                       (util/build-input-str-for-str memo)
-                                       (util/build-input-str-for-int id-owner-user))]
+                                       (util/build-input-str-for-int user_team_id))]
     (util/create {:name-table name-table
                   :str-keys-receive (goog.string.format "%s { %s }"
                                                         name-table
@@ -45,13 +49,11 @@
                   :str-input-params str-params
                   :on-receive on-receive})))
 
-(defn update [{:keys [id name memo id-owner-user on-receive]}]
-  (let [str-params (goog.string.format "id: %s, %s: {name: %s, memo: %s, owner_user_id: %s}"
+(defn update [{:keys [id name on-receive]}]
+  (let [str-params (goog.string.format "id: %s, %s: {name: %s}"
                                        (util/build-input-str-for-int id)
                                        name-table
-                                       (util/build-input-str-for-str name)
-                                       (util/build-input-str-for-str memo)
-                                       (util/build-input-str-for-int id-owner-user))]
+                                       (util/build-input-str-for-str name))]
     (util/update {:name-table name-table
                   :str-keys-receive (goog.string.format "%s { %s }"
                                                         name-table

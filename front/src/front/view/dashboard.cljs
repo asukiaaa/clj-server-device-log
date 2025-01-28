@@ -15,7 +15,7 @@
      [:div.list-group
       (for [[name url] (remove nil? [(when is-admin [util.label/users route/users])
                                      [util.label/user-teams route/user-teams]
-                                     ["device watch groups" route/device-watch-groups]
+                                     [util.label/watch-scopes route/watch-scopes]
                                      [util.label/device-types route/device-types]
                                      [util.label/devices route/devices]
                                      [util.label/profile route/profile]])]

@@ -37,24 +37,24 @@
   {:fields
    {:name {:type String}
     :permission {:type String}}}
-  :InputDeviceWatchGroupCreate
+  :InputWatchScopeCreate
   {:fields
-   {:owner_user_id {:type (non-null Int)}
-    :name {:type String}
-    :memo {:type String}}}
-  :InputDeviceWatchGroupUpdate
+   {:user_team_id {:type (non-null Int)}
+    :name {:type String}}}
+  :InputWatchScopeUpdate
   {:fields
-   {:owner_user_id {:type Int}
-    :name {:type String}
-    :memo {:type String}}}
-  :InputDeviceWatchGroupDeviceCreate
+   {:user_team_id {:type Int}
+    :name {:type String}}}
+  :InputWatchScopeTermCreate
   {:fields
-   {:device_watch_group_id {:type (non-null Int)}
+   {:watch_scope_id {:type (non-null Int)}
     :device_id {:type (non-null Int)}
-    :display_name {:type String}}}
-  :InputDeviceWatchGroupDeviceUpdate
+    :time_from {:type String}
+    :time_until {:type String}}}
+  :InputWatchScopeTermUpdate
   {:fields
-   {:display_name {:type String}}}}
+   {:time_from {:type String}
+    :time_until {:type String}}}}
  :objects
  {:RawDeviceLog
   {:fields
@@ -146,31 +146,31 @@
    {:list {:type (list DeviceFile)}
     :total {:type Int}
     :device {:type Device}}}
-  :DeviceWatchGroup
+  :WatchScope
   {:fields
    {:id {:type (non-null Int)}
-    :owner_user_id {:type (non-null Int)}
+    :user_team_id {:type (non-null Int)}
     :name {:type String}
-    :memo {:type String}
     :created_at {:type String}
     :updated_at {:type String}}}
-  :ResponseDeviceWatchGroupListTotal
+  :ResponseWatchScopeListTotal
   {:fields
-   {:list {:type (list DeviceWatchGroup)}
+   {:list {:type (list WatchScope)}
     :total {:type Int}}}
-  :DeviceWatchGroupDevice
+  :WatchScopeTerm
   {:fields
    {:id {:type (non-null Int)}
     :device_id {:type (non-null Int)}
-    :device_watch_group_id {:type (non-null Int)}
-    :display_name {:type String}
-    :device_name {:type String}
+    :watch_scope_id {:type (non-null Int)}
+    :time_from {:type String}
+    :time_until {:type String}
     :created_at {:type String}
     :updated_at {:type String}}}
-  :ResponseDeviceWatchGroupDeviceListTotal
+  :ResponseWatchScopeTermForWatchScopeListTotal
   {:fields
-   {:list {:type (list DeviceWatchGroupDevice)}
-    :total {:type Int}}}
+   {:list {:type (list WatchScopeTerm)}
+    :total {:type Int}
+    :watch_scope {:type WatchScope}}}
   :ResponseDelete
   {:fields
    {:errors {:type String}}}
@@ -190,14 +190,14 @@
   {:fields
    {:errors {:type String}
     :device_type_api_key {:type DeviceTypeApiKey}}}
-  :ResponseDeviceWatchGroupCreateUpdate
+  :ResponseWatchScopeCreateUpdate
   {:fields
    {:errors {:type String}
-    :device_watch_group {:type DeviceWatchGroup}}}
-  :ResponseDeviceWatchGroupDeviceCreateUpdate
+    :watch_scope {:type WatchScope}}}
+  :ResponseWatchScopeTermCreateUpdate
   {:fields
    {:errors {:type String}
-    :device_watch_group_device {:type DeviceWatchGroupDevice}}}
+    :watch_scope_term {:type WatchScopeTerm}}}
   :ResponseMessage
   {:fields
    {:errors {:type String}
@@ -241,9 +241,9 @@
             :page {:type Int}
             :where {:type String}
             :order {:type String}}}
-    :raw_device_logs_for_device_watch_group
+    :raw_device_logs_for_watch_scope
     {:type ResponseRawDeviceLogListTotal
-     :args {:device_watch_group_id {:type Int}
+     :args {:watch_scope_id {:type Int}
             :limit {:type Int}
             :page {:type Int}
             :where {:type String}
@@ -284,26 +284,26 @@
             :page {:type Int}
             :where {:type String}
             :order {:type String}}}
-    :device_watch_groups
-    {:type ResponseDeviceWatchGroupListTotal
+    :watch_scopes
+    {:type ResponseWatchScopeListTotal
      :args {:limit {:type Int}
             :page {:type Int}
             :where {:type String}
             :order {:type String}}}
-    :device_watch_group
-    {:type DeviceWatchGroup
+    :watch_scope
+    {:type WatchScope
      :args {:id {:type (non-null Int)}}}
-    :device_watch_group_devices_for_device_watch_group
-    {:type ResponseDeviceWatchGroupDeviceListTotal
-     :args {:device_watch_group_id {:type (non-null Int)}
+    :watch_scope_terms_for_watch_scope
+    {:type ResponseWatchScopeTermForWatchScopeListTotal
+     :args {:watch_scope_id {:type (non-null Int)}
             :limit {:type Int}
             :page {:type Int}
             :where {:type String}
             :order {:type String}}}
-    :device_watch_group_device_for_device_watch_group
-    {:type DeviceWatchGroupDevice
+    :watch_scope_term_for_watch_scope
+    {:type WatchScopeTerm
      :args {:id {:type (non-null Int)}
-            :device_watch_group_id {:type (non-null Int)}}}
+            :watch_scope_id {:type (non-null Int)}}}
     :user_for_resetting_password
     {:type User
      :args {:id {:type (non-null Int)}
@@ -381,24 +381,24 @@
     :device_type_api_key_delete
     {:type ResponseDelete
      :args {:id {:type (non-null Int)}}}
-    :device_watch_group_create
-    {:type ResponseDeviceWatchGroupCreateUpdate
-     :args {:device_watch_group {:type InputDeviceWatchGroupCreate}}}
-    :device_watch_group_update
-    {:type ResponseDeviceWatchGroupCreateUpdate
+    :watch_scope_create
+    {:type ResponseWatchScopeCreateUpdate
+     :args {:watch_scope {:type InputWatchScopeCreate}}}
+    :watch_scope_update
+    {:type ResponseWatchScopeCreateUpdate
      :args {:id {:type (non-null Int)}
-            :device_watch_group {:type InputDeviceWatchGroupUpdate}}}
-    :device_watch_group_delete
+            :watch_scope {:type InputWatchScopeUpdate}}}
+    :watch_scope_delete
     {:type ResponseDelete
      :args {:id {:type (non-null Int)}}}
-    :device_watch_group_device_create
-    {:type ResponseDeviceWatchGroupDeviceCreateUpdate
-     :args {:device_watch_group_device {:type InputDeviceWatchGroupDeviceCreate}}}
-    :device_watch_group_device_update
-    {:type ResponseDeviceWatchGroupDeviceCreateUpdate
+    :watch_scope_term_create
+    {:type ResponseWatchScopeTermCreateUpdate
+     :args {:watch_scope_term {:type InputWatchScopeTermCreate}}}
+    :watch_scope_term_update
+    {:type ResponseWatchScopeTermCreateUpdate
      :args {:id {:type (non-null Int)}
-            :device_watch_group_device {:type InputDeviceWatchGroupDeviceUpdate}}}
-    :device_watch_group_device_delete
+            :watch_scope_term {:type InputWatchScopeTermUpdate}}}
+    :watch_scope_term_delete
     {:type ResponseDelete
      :args {:id {:type (non-null Int)}}}
     :hash_for_resetting_password_create

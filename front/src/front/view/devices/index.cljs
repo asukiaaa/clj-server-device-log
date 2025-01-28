@@ -16,10 +16,12 @@
   [:tr
    [:td (:id device)]
    [:td (:name device)]
-   [:td (-> device :device_type :name)]
-   [:td (-> device :user_team :name)]
-   [:td (:created_at device)]
-   [:td (:updated_at device)]
+   [:td [:> router/Link {:to (route/device-type-show (-> device :device_type :id))}
+         (-> device :device_type :name)]]
+   [:td [:> router/Link {:to (route/user-team-show (-> device :user_team :id))}
+         (-> device :user_team :name)]]
+   #_[:td (:created_at device)]
+   #_[:td (:updated_at device)]
    [:td
 
     [:> router/Link {:to (route/device-show (:id device))} util.label/show]
@@ -82,8 +84,8 @@
            [:th "name"]
            [:th "device_type"]
            [:th "user_team"]
-           [:th "created_at"]
-           [:th "updated_at"]
+           #_[:th "created_at"]
+           #_[:th "updated_at"]
            [:th "actions"]]]
          [:tbody
           (for [item received-list]

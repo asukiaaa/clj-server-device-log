@@ -44,5 +44,5 @@
 (defn get-list-with-total-for-owner-user [params user-id]
   (get-list-with-total-base params {:str-where (format "owner_user_id = %d" user-id)}))
 
-(defn get-list-with-total-for-admin [params]
+(defn get-list-with-total [params]
   (get-list-with-total-base params))

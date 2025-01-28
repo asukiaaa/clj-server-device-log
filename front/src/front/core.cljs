@@ -30,15 +30,15 @@
             [front.view.device-types.device-type-api-keys.create :as device-type.device-type-api-key.create]
             [front.view.device-types.device-type-api-keys.show :as device-type.device-type-api-key.show]
             [front.view.device-types.device-type-api-keys.edit :as device-type.device-type-api-key.edit]
-            [front.view.device-watch-groups.index :as device-watch-group.index]
-            [front.view.device-watch-groups.create :as device-watch-group.create]
-            [front.view.device-watch-groups.show :as device-watch-group.show]
-            [front.view.device-watch-groups.edit :as device-watch-group.edit]
-            [front.view.device-watch-groups.device-watch-group-devices.index :as device-watch-group.device-watch-group-device.index]
-            [front.view.device-watch-groups.device-watch-group-devices.create :as device-watch-group.device-watch-group-device.create]
-            [front.view.device-watch-groups.device-watch-group-devices.show :as device-watch-group.device-watch-group-device.show]
-            [front.view.device-watch-groups.device-watch-group-devices.edit :as device-watch-group.device-watch-group-device.edit]
-            [front.view.device-watch-groups.raw-device-logs.index :as device-watch-group.raw-device-log.index]
+            [front.view.watch-scopes.index :as watch-scope.index]
+            [front.view.watch-scopes.create :as watch-scope.create]
+            [front.view.watch-scopes.show :as watch-scope.show]
+            [front.view.watch-scopes.edit :as watch-scope.edit]
+            [front.view.watch-scopes.watch-scope-terms.index :as watch-scope.watch-scope-term.index]
+            [front.view.watch-scopes.watch-scope-terms.create :as watch-scope.watch-scope-term.create]
+            [front.view.watch-scopes.watch-scope-terms.show :as watch-scope.watch-scope-term.show]
+            [front.view.watch-scopes.watch-scope-terms.edit :as watch-scope.watch-scope-term.edit]
+            [front.view.watch-scopes.raw-device-logs.index :as watch-scope.raw-device-log.index]
             [front.view.profile.index :as profile.index]
             [front.view.profile.password-edit :as profile.password-edit]
             [front.view.page404 :as page404]
@@ -99,19 +99,19 @@
                {:path ":device_type_api_key_id" :children
                 [{:index true :element (r/as-element [:f> device-type.device-type-api-key.show/core])}
                  {:path "edit" :element (r/as-element [:f> device-type.device-type-api-key.edit/core])}]}]}]}]}
-         {:path "device_watch_groups" :children
-          [{:index true :element (r/as-element [:f> device-watch-group.index/core])}
-           {:path "create" :element (r/as-element [:f> device-watch-group.create/core])}
-           {:path ":id_device_watch_group" :children
-            [{:index true :element (r/as-element [:f> device-watch-group.show/core])}
-             {:path "edit" :element (r/as-element [:f> device-watch-group.edit/core])}
-             {:path "device_watch_group_devices" :children
-              [{:index true :element (r/as-element [:f> device-watch-group.device-watch-group-device.index/core])}
-               {:path "create" :element (r/as-element [:f> device-watch-group.device-watch-group-device.create/core])}
-               {:path ":id_device_watch_group_device" :children
-                [{:index true :element (r/as-element [:f> device-watch-group.device-watch-group-device.show/core])}
-                 {:path "edit" :element (r/as-element [:f> device-watch-group.device-watch-group-device.edit/core])}]}]}
-             {:path "raw_device_logs" :element (r/as-element [:f> device-watch-group.raw-device-log.index/core])}]}]}
+         {:path "watch_scopes" :children
+          [{:index true :element (r/as-element [:f> watch-scope.index/core])}
+           {:path "create" :element (r/as-element [:f> watch-scope.create/core])}
+           {:path ":watch_scope_id" :children
+            [{:index true :element (r/as-element [:f> watch-scope.show/core])}
+             {:path "edit" :element (r/as-element [:f> watch-scope.edit/core])}
+             {:path "watch_scope_terms" :children
+              [{:index true :element (r/as-element [:f> watch-scope.watch-scope-term.index/core])}
+               {:path "create" :element (r/as-element [:f> watch-scope.watch-scope-term.create/core])}
+               {:path ":watch_scope_term_id" :children
+                [{:index true :element (r/as-element [:f> watch-scope.watch-scope-term.show/core])}
+                 {:path "edit" :element (r/as-element [:f> watch-scope.watch-scope-term.edit/core])}]}]}
+             {:path "raw_device_logs" :element (r/as-element [:f> watch-scope.raw-device-log.index/core])}]}]}
          {:path "*" :element (r/as-element [:f> page404/core]) :status 404}]}]}])))
 
 (defonce root (rc/create-root (.getElementById js/document "app")))

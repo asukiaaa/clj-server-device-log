@@ -62,10 +62,10 @@
           item (get-by-id #_"(SELECT LAST_INSERT_ID())" id (name key-table) {:transaction t-con})]
       item)))
 
-(defn get-list-with-total-with-building-query [name-table params & [{:keys [str-where str-keys-select]}]]
+(defn get-list-with-total-with-building-query [name-table params & [{:keys [str-where str-keys-select transaction]}]]
   (-> (build-query-get-index name-table {:str-keys-select str-keys-select})
       (#(if-not (empty? str-where) (str % " where " str-where) %))
       (append-limit-offset-by-limit-page-params params)
-      get-list-with-total))
+      (get-list-with-total {:transaction transaction})))
 
 (def time-format-yyyymmdd-hhmmss (f/formatter "YYYY-MM-dd HH:mm:ss"))

@@ -1,15 +1,15 @@
-(ns front.view.device-watch-groups.device-watch-group-devices.create
+(ns front.view.watch-scopes.watch-scope-terms.create
   (:require ["react" :as react]
             ["react-router-dom" :as router]
             [clojure.walk :refer [keywordize-keys]]
             [front.route :as route]
-            [front.model.device-watch-group-device :as model.device-watch-group-device]
+            [front.model.watch-scope-term :as model.watch-scope-term]
             [front.view.common.wrapper.show404 :as wrapper.show404]
             [front.view.util :as util]))
 
 (defn- page []
   (let [params (js->clj (router/useParams))
-        id-device-watch-group (get params "id_device_watch_group")
+        id-watch-scope (get params "watch_scope_id")
         navigate (router/useNavigate)
         state-info-display-name (util/build-state-info :name #(react/useState))
         state-info-id-device (util/build-state-info :permission #(react/useState))
@@ -22,20 +22,20 @@
                            (let [key (:key state)
                                  errors-for-key (get errors key)]
                              ((:set-errors state) errors-for-key))))
-                       (when-let [id (-> data :device_watch_group_device :id)]
-                         (navigate (route/device-watch-group-device-watch-group-device-show id-device-watch-group id)))))
-        on-click-apply (fn [] (model.device-watch-group-device/create
+                       (when-let [id (-> data :watch_scope_term :id)]
+                         (navigate (route/watch-scope-watch-scope-term-show id-watch-scope id)))))
+        on-click-apply (fn [] (model.watch-scope-term/create
                                {:display-name (:draft state-info-display-name)
                                 :id-device (:draft state-info-id-device)
-                                :id-device-watch-group id-device-watch-group
+                                :id-watch-scope id-watch-scope
                                 :on-receive on-receive}))]
     [:div
      [:h1.h3.mx-2 "create device watch group device"]
      [:form.form-control
       [util/render-errors-as-alerts (:errors state-info-system)]
       [:div
-       [:div "device_watch_group_id"]
-       [:div id-device-watch-group]]
+       [:div "watch_scope_id"]
+       [:div id-watch-scope]]
       [util/render-input "display name" state-info-display-name]
       [util/render-input "device id" state-info-id-device]
       [:a.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply} "apply"]]]))

@@ -7,8 +7,8 @@
             [back.models.device :as model.device]
             [back.models.device-type :as model.device-type]
             [back.models.device-type-api-key :as model.device-type-api-key]
-            [back.models.device-watch-group :as model.device-watch-group]
-            [back.models.device-watch-group-device :as model.device-watch-group-device]
+            [back.models.watch-scope :as model.watch-scope]
+            [back.models.watch-scope-term :as model.watch-scope-term]
             [back.models.device-file :as model.device-file]
             [com.walmartlabs.lacinia.resolve :refer [resolve-as]]))
 
@@ -50,13 +50,13 @@
                                                             :transaction transaction})
             (assoc model.device-type/key-table device-type))))))
 
-(defn raw-device-logs-for-device-watch-group
+(defn raw-device-logs-for-watch-scope
   [context args _]
-  (println "args for raw-device-logs-for-device-watch-group" args)
+  (println "args for raw-device-logs-for-watch-scope" args)
   (when-let [user (get-user-loggedin context)]
     (when (model.user/admin? user)
-      (when-let [id-device-watch-group (:device_watch_group_id args)]
-        (let [query-device-ids (model.device-watch-group-device/build-query-device-ids-for-device-watch-group id-device-watch-group)]
+      (when-let [id-watch-scope (:watch_scope_id args)]
+        (let [query-device-ids (model.watch-scope-term/build-query-device-ids-for-watch-scope id-watch-scope)]
           (model-raw-device-log/get-list-with-total args {:str-where-and (format "device_id IN %s" query-device-ids)}))))))
 
 (defn login [context args _]
@@ -138,7 +138,7 @@
   (println "args for user-teams" args)
   (when-let [user (get-user-loggedin context)]
     (when (model.user/admin? user)
-      (model.user-team/get-list-with-total-for-admin args))))
+      (model.user-team/get-list-with-total args))))
 
 (defn user-team
   [context args _]
@@ -245,71 +245,75 @@
         id-device (:device_id args)]
     (model.device-file/get-list-with-total-for-user-device args (:id user) id-device)))
 
-(defn device-watch-groups
+(defn watch-scopes
   [context args _]
-  (println "args for device-watch-groups" args)
+  (println "args for watch-scopes" args)
   (when-let [user (get-user-loggedin context)]
     (when (model.user/admin? user)
-      (model.device-watch-group/get-list-with-total-for-admin args))))
+      (model.watch-scope/get-list-with-total args))))
 
-(defn device-watch-group
+(defn watch-scope
   [context args _]
-  (println "args for device-watch-group" args)
+  (println "args for watch-scope" args)
   (when-let [user (get-user-loggedin context)]
     (when (model.user/admin? user)
-      (model.device-watch-group/get-by-id (:id args)))))
+      (model.watch-scope/get-by-id (:id args)))))
 
-(defn device-watch-group-create [context args _]
-  (println "args device-watch-group-create" args)
+(defn watch-scope-create [context args _]
+  (println "args watch-scope-create" args)
   (let [user (get-user-loggedin context)
-        params (:device_watch_group args)]
-    (when (model.user/admin? user) (model.device-watch-group/create params))))
+        params (:watch_scope args)]
+    (when (model.user/admin? user) (model.watch-scope/create params))))
 
-(defn device-watch-group-update [context args _]
-  (println "args device-watch-group-update" args)
+(defn watch-scope-update [context args _]
+  (println "args watch-scope-update" args)
   (let [user (get-user-loggedin context)
         id (:id args)
-        params (:device_watch_group args)]
-    (when (model.user/admin? user) (model.device-watch-group/update id params))))
+        params (:watch_scope args)]
+    (when (model.user/admin? user) (model.watch-scope/update id params))))
 
-(defn device-watch-group-delete [context args _]
-  (println "args device-watch-group-delete" args)
+(defn watch-scope-delete [context args _]
+  (println "args watch-scope-delete" args)
   (let [user (get-user-loggedin context)
         id (:id args)]
-    (when (model.user/admin? user) (model.device-watch-group/delete id))))
+    (when (model.user/admin? user) (model.watch-scope/delete id))))
 
-(defn device-watch-group-devices-for-device-watch-group
+(defn watch-scope-terms-for-watch-scope
   [context args _]
-  (println "args for device-watch-group-devices" args)
+  (println "args for watch-scope-terms" args)
   (when-let [user (get-user-loggedin context)]
     (when (model.user/admin? user)
-      (model.device-watch-group-device/get-list-with-total-for-admin args))))
+      (jdbc/with-db-transaction [transaction db-spec]
+        (when-let [id-watch-scope (:watch_scope_id args)]
+          (when-let [watch-scope (model.watch-scope/get-by-id id-watch-scope {:transaction transaction})]
+            (-> (model.watch-scope-term/get-list-with-total args {:transaction transaction})
+                (assoc model.watch-scope/key-table watch-scope))))))))
 
-(defn device-watch-group-device-for-device-watch-group
+(defn watch-scope-term-for-watch-scope
   [context args _]
-  (println "args for device-watch-group-device" args)
+  (println "args for watch-scope-term" args)
   (when-let [user (get-user-loggedin context)]
     (when (model.user/admin? user)
-      (model.device-watch-group-device/get-by-id (:id args)))))
+      (model.watch-scope-term/get-by-id (:id args)))))
 
-(defn device-watch-group-device-create [context args _]
-  (println "args device-watch-group-device-create" args)
+(defn watch-scope-term-create [context args _]
+  (println "args watch-scope-term-create" args)
   (let [user (get-user-loggedin context)
-        params (:device_watch_group_device args)]
-    (when (model.user/admin? user) (model.device-watch-group-device/create params))))
+        params (:watch_scope_term args)]
+    (when (model.user/admin? user) (model.watch-scope-term/create params))))
 
-(defn device-watch-group-device-update [context args _]
-  (println "args device-watch-group-device-update" args)
+(defn watch-scope-term-update [context args _]
+  (println "args watch-scope-term-update" args)
   (let [user (get-user-loggedin context)
         id (:id args)
-        params (:device_watch_group_device args)]
-    (when (model.user/admin? user) (model.device-watch-group-device/update id params))))
+        params (:watch_scope_term args)]
+    (when (model.user/admin? user) (model.watch-scope-term/update id params))))
 
-(defn device-watch-group-device-delete [context args _]
-  (println "args device-watch-group-device-delete" args)
+(defn watch-scope-term-delete [context args _]
+  (println "args watch-scope-term-delete" args)
   (let [user (get-user-loggedin context)
         id (:id args)]
-    (when (model.user/admin? user) (model.device-watch-group-device/delete id))))
+    (when (model.user/admin? user) (model.watch-scope-term/delete id))))
 
 (defn hash-for-resetting-password-create [context args _]
   (println "args hash-for-resetting-password-create" args)
@@ -359,13 +363,13 @@
   {:Query/raw_device_logs raw-device-logs
    :Query/raw_device_logs_for_device raw-device-logs-for-device
    :Query/raw_device_logs_for_device_type raw-device-logs-for-device-type
-   :Query/raw_device_logs_for_device_watch_group raw-device-logs-for-device-watch-group
+   :Query/raw_device_logs_for_watch_scope raw-device-logs-for-watch-scope
    :Query/device_type_api_keys_for_device_type device-type-api-keys-for-device-type
    :Query/device_type_api_key_for_device_type device-type-api-key-for-device-type
-   :Query/device_watch_groups device-watch-groups
-   :Query/device_watch_group device-watch-group
-   :Query/device_watch_group_devices_for_device_watch_group device-watch-group-devices-for-device-watch-group
-   :Query/device_watch_group_device_for_device_watch_group device-watch-group-device-for-device-watch-group
+   :Query/watch_scopes watch-scopes
+   :Query/watch_scope watch-scope
+   :Query/watch_scope_terms_for_watch_scope watch-scope-terms-for-watch-scope
+   :Query/watch_scope_term_for_watch_scope watch-scope-term-for-watch-scope
    :Query/device_files_for_device device-files-for-device
    :Query/users users
    :Query/user user
@@ -392,12 +396,12 @@
    :Mutation/device_type_api_key_create device-type-api-key-create
    :Mutation/device_type_api_key_update device-type-api-key-update
    :Mutation/device_type_api_key_delete device-type-api-key-delete
-   :Mutation/device_watch_group_create device-watch-group-create
-   :Mutation/device_watch_group_update device-watch-group-update
-   :Mutation/device_watch_group_delete device-watch-group-delete
-   :Mutation/device_watch_group_device_create device-watch-group-device-create
-   :Mutation/device_watch_group_device_update device-watch-group-device-update
-   :Mutation/device_watch_group_device_delete device-watch-group-device-delete
+   :Mutation/watch_scope_create watch-scope-create
+   :Mutation/watch_scope_update watch-scope-update
+   :Mutation/watch_scope_delete watch-scope-delete
+   :Mutation/watch_scope_term_create watch-scope-term-create
+   :Mutation/watch_scope_term_update watch-scope-term-update
+   :Mutation/watch_scope_term_delete watch-scope-term-delete
    :Mutation/hash_for_resetting_password_create hash-for-resetting-password-create
    :Mutation/password_for_hash_user_reset password-for-hash-user-reset
    :Mutation/password_mine_reset password-mine-reset

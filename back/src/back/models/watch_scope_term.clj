@@ -1,18 +1,28 @@
-(ns back.models.device-watch-group
+(ns back.models.watch-scope-term
   (:refer-clojure :exclude [update])
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.core :refer [format]]
             [back.config :refer [db-spec]]
             [back.models.util :as model.util]))
 
-(def name-table "device_watch_group")
+(def name-table "watch_scope_term")
+#_(def name-table-with-device (str name-table " LEFT JOIN device ON device.id = device_id"))
 (def key-table (keyword name-table))
+#_(def str-keys-select-with-device-name (str name-table ".*, device.name as device_name"))
+
+(defn build-query-device-ids-for-watch-scope [id-watch-scope]
+  (format "(SELECT device_id from %s WHERE watch_scope_id = %s)"
+          name-table
+          id-watch-scope))
 
 (defn filter-params [params]
-  (select-keys params [:name :owner_user_id :memo]))
+  (select-keys params [:device_id :watch_scope_id :from :until]))
 
 (defn get-by-id [id & [{:keys [transaction]}]]
-  (model.util/get-by-id id name-table {:transaction transaction}))
+  (model.util/get-by-id id name-table
+                        {:transaction transaction
+                         ;:str-keys-select str-keys-select-with-device-name
+                         :str-key-id (str name-table ".id")}))
 
 (defn delete [id]
   (jdbc/delete! db-spec key-table ["id = ?" id]))
@@ -42,11 +52,16 @@
           item (get-by-id id {:transaction t-con})]
       {key-table item})))
 
-(defn- get-list-with-total-base [params & [{:keys [str-where]}]]
-  (model.util/get-list-with-total-with-building-query name-table params {:str-where str-where}))
+(defn- get-list-with-total-base [params & [{:keys [str-where transaction]}]]
+  (model.util/get-list-with-total-with-building-query
+   name-table params
+   {:str-where str-where
+    ;:str-keys-select str-keys-select-with-device-name
+    :transaction transaction}))
 
-(defn get-list-with-total-for-owner-user [params user-id]
-  (get-list-with-total-base params {:str-where (format "owner_user_id = %d" user-id)}))
+#_(defn get-list-with-total-for-user-team [params user-team-id & [{:keys [transaction]}]]
+    (get-list-with-total-base params {:str-where (format "user_team_id = %d" user-team-id)
+                                      :transaction transaction}))
 
-(defn get-list-with-total-for-admin [params]
-  (get-list-with-total-base params))
+(defn get-list-with-total [params & [{:keys [transaction]}]]
+  (get-list-with-total-base params {:transaction transaction}))
