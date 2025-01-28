@@ -3,11 +3,10 @@
 HOST=localhost
 PORT=59595 # select port of server
 
-echo "
 #_(require '[clojure.tools.namespace.repl :refer [refresh]])
 #_(refresh)
-(require '[back.core :as core])
-(core/db-rollback)
-" | clj -Sdeps '{:deps {nrepl/nrepl {:mvn/version "1.3.0"}}}' \
+
+echo "(require '[back.core :as core])(core/db-rollback)" \
+  | clj -Sdeps '{:deps {nrepl/nrepl {:mvn/version "1.3.0"}}}' \
   -M -m nrepl.cmdline \
   --connect --host $HOST --port $PORT
