@@ -8,18 +8,9 @@
             [front.view.common.wrapper.show404 :as wrapper.show404]
             [front.view.util :as util]
             [front.view.util.breadcrumb :as breadcrumb]
+            [front.view.util.device-file.card :as file.card]
             [front.view.util.label :as util.label]
             [front.model.device-file :as model.device-file]))
-
-(defn render-device [device-file]
-  (let [width 200
-        height 150
-        path-url (:path device-file)]
-    [:div.card.m-2 {:style {:float :left :width width}}
-     [:img.card-img-top {:src path-url
-                         :style {:object-fit :contain
-                                 :width width :height height}}]
-     [:div.card-body path-url]]))
 
 (defn-  page []
   (let [params (js->clj (router/useParams))
@@ -54,7 +45,7 @@
     [:<>
      [:f> breadcrumb/core
       [{:label util.label/devices :path route/devices}
-       {:label (util.label/device device) :path (route/device-show id-device)}
+       {:label (util.label/device-item device) :path (route/device-show id-device)}
        {:label util.label/files}]]
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
@@ -64,7 +55,7 @@
         [:div {:style {:width "100%" :overflow :auto}}
          (for [item received-list]
            [:<> {:key (:path item)}
-            [:f> render-device item]])]
+            [:f> file.card/core item]])]
         [:f> pagination/core {:build-url build-url-by-page
                               :total-page number-total-page
                               :current-page number-page}]]})]))

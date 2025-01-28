@@ -19,8 +19,8 @@
   (if (empty? item)
     item
     (let [device_type {:id (:device_type_id item)
-                        :name (:device_type_name item)
-                        :user_id (:device_type_user_id item)}
+                       :name (:device_type_name item)
+                       :user_id (:device_type_user_id item)}
           item (assoc item :device_type device_type)]
       item)))
 
@@ -38,11 +38,22 @@
       build-item-for-device-type
       build-item-for-user-team))
 
+(defn build-sql-ids-for-user-teams [sql-id-user-team]
+  (format "(SELECT id FROM %s WHERE user_team_id IN %s)"
+          name-table
+          sql-id-user-team))
+
 (defn filter-params [params]
   (select-keys params [:name :device_type_id :user_team_id]))
 
 (defn get-by-id [id & [{:keys [transaction]}]]
   (model.util/get-by-id id name-table {:transaction transaction}))
+
+(defn get-list-by-ids [ids & [{:keys [transaction]}]]
+  (let [query (format "SELECT * from %s WHERE id IN %s"
+                         name-table
+                         (format "(%s)" (join "," ids)))]
+    (jdbc/query (or transaction db-spec) query)))
 
 (defn get-by-hash-post [hash-post & [{:keys [transaction]}]]
   (when-not (empty? hash-post)

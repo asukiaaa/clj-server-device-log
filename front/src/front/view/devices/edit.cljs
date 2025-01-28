@@ -89,7 +89,7 @@
      #js [])
     [:<>
      [:f> breadcrumb/core [{:label util.label/devices :path route/devices}
-                           {:label (util.label/device item)
+                           {:label (util.label/device-item item)
                             :path (when item (route/device-show id-item))}
                            {:label util.label/edit}]]
      (wrapper.fetching/wrapper
@@ -100,7 +100,7 @@
          [:div
           [:form.form-control
            [util/render-input util.label/name state-info-name]
-           [util/render-select util.label/device-type-item state-info-device-type-id
+           [util/render-select util.label/device-type state-info-device-type-id
             (model.device-type/build-select-options-from-list-and-total device-type-list-and-total)]
            [util/render-select util.label/user-team state-info-user-team-id
             (model.user-team/build-select-options-from-list-and-total user-team-list-and-total)]

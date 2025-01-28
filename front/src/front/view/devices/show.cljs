@@ -29,7 +29,7 @@
      #js [])
     [:<>
      [:f> breadcrumb/core [{:label util.label/devices :path route/devices}
-                           {:label (util.label/device item)}]]
+                           {:label (util.label/device-item item)}]]
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer
@@ -54,14 +54,20 @@
              [:th "key"]
              [:th "value"]]]
            [:tbody
-            (for [key [:id :name :hash_post :device_group :user_team :created_at :updated_at]]
+            (for [key [:id :name :hash_post :device_type :user_team :created_at :updated_at]]
               [:tr {:key key}
                [:td key]
                [:td
                 (cond
-                  (or (= key :device_group) (= key :user_team))
-                  (let [device-group (key item)]
-                    (str device-group))
+                  (or (= key :device_type) (= key :user_team))
+                  (let [val (key item)]
+                    (str (:id val) " " (:name val)))
+                  (= key :hash_post)
+                  (let [api-key (key item)]
+                    [:<>
+                     [:div (str api-key)]
+                     [:div
+                      [:f> util/link-to-copy-to-clipboard api-key]]])
                   :else
                   (str (get item key)))]])]]])})]))
 

@@ -1,5 +1,6 @@
 (ns front.view.util
-  (:require ["react-router-dom" :as router]
+  (:require ["react" :as react]
+            ["react-router-dom" :as router]
             [front.view.util.label :as util.label]))
 
 (def key-user-loggedin "user-loggedin")
@@ -122,3 +123,15 @@
 
 (defn copy-to-clipboard [text]
   (-> js/navigator .-clipboard (.writeText text)))
+
+(defn link-to-copy-to-clipboard [text]
+  (let [[clicked set-clicked] (react/useState)
+        on-click
+        (fn [e]
+          (.preventDefault e)
+          (set-clicked true)
+          (copy-to-clipboard text))]
+    [:<>
+     (if clicked
+       [:span util.label/copied]
+       [:a {:href "#" :on-click on-click} util.label/copy])]))

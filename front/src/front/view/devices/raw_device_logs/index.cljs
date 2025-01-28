@@ -16,7 +16,7 @@
     [:<>
      [:f> breadcrumb/core
       [{:label util.label/devices :path route/devices}
-       {:label (util.label/device device) :path (route/device-show id-device)}
+       {:label (util.label/device-item device) :path (route/device-show id-device)}
        {:label util.label/logs}]]
      (raw-device-log.page/core
       #(model.raw-device-log/fetch-list-and-total-for-device
