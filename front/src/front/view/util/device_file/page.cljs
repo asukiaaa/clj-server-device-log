@@ -2,6 +2,7 @@
   (:require ["react" :as react]
             ["react-router-dom" :as router]
             ["react-bootstrap" :as bs]
+            [front.route :as route]
             [front.view.common.component.pagination :as pagination]
             [front.view.common.wrapper.fetching :as wrapper.fetching]
             [front.view.util.device-file.card :as file.card]
@@ -57,7 +58,11 @@
     [:<>
      [:> bs/Modal {:show (seq item-on-modal) :size :xl :onHide #(set-item-in-modal nil)}
       [:> bs/Modal.Header {:closeButton true}
-       [:div (:created_at item-on-modal)]]
+       (let [device (-> item-on-modal :device)]
+         [:div
+          [:> router/Link {:to (route/device-device-files (:id device))} (util.label/device-item device)]
+          " "
+          (:created_at item-on-modal)])]
       [:> bs/Modal.Body {:class :p-0}
        [:img {:src (:path item-on-modal)
               :style {:object-fit :contain
@@ -69,7 +74,7 @@
        :renderer
        [:<>
         element-pagination
-        [:div "total " total]
+        [:div.ms-2 "total " total]
         [:div {:style {:width "100%" :overflow :auto}}
          (for [item received-list]
            [:<> {:key (:path item)}
