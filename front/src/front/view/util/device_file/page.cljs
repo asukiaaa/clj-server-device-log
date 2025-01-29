@@ -49,7 +49,18 @@
                                      (remove nil?)
                                      first)
                 next-item (get list index-next-item)]
-            (set-item-in-modal next-item)))]
+            (set-item-in-modal next-item)))
+        on-click-prev
+        (fn []
+          (let [list (:list list-and-total)
+                path-current (:path item-on-modal)
+                index-prev-item (->> (for [[index item] (map-indexed vector list)]
+                                       (when (= (:path item) path-current)
+                                         (dec index)))
+                                     (remove nil?)
+                                     first)
+                prev-item (get list index-prev-item)]
+            (set-item-in-modal prev-item)))]
     (react/useEffect
      (fn []
        (load-list)
@@ -68,6 +79,8 @@
               :style {:object-fit :contain
                       :width "100%"}}]]
       [:> bs/Modal.Footer
+       #_[:> bs/Button {:on-click #(set-item-in-modal nil)} util.label/close]
+       [:> bs/Button {:on-click on-click-prev} util.label/prev]
        [:> bs/Button {:on-click on-click-next} util.label/next]]]
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching

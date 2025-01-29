@@ -11,7 +11,7 @@
         id-device (:device_id device-file)
         device (:device device-file)]
     [:div.card.m-2 {:style {:float :left :width width}}
-     [:a {:on-click (fn [e] (.preventDefault e) (when on-click-image (on-click-image device-file)))}
+     [:a {:href "#" :on-click (fn [e] (.preventDefault e) (when on-click-image (on-click-image device-file)))}
       [:img.card-img-top {:src path-url
                           :style {:object-fit :contain
                                   :width width :height height}}]]
