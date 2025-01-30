@@ -76,6 +76,7 @@
           (:created_at item-on-modal)])]
       [:> bs/Modal.Body {:class :p-0}
        [:img {:src (:path item-on-modal)
+              :key (:path item-on-modal)
               :style {:object-fit :contain
                       :width "100%"}}]]
       [:> bs/Modal.Footer
