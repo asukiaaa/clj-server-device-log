@@ -20,12 +20,12 @@
             [front.view.devices.show :as device.show]
             [front.view.devices.edit :as device.edit]
             [front.view.devices.device-files.index :as device.device-files.index]
-            [front.view.devices.raw-device-logs.index :as device.raw-device-log.index]
+            [front.view.devices.device-logs.index :as device.device-log.index]
             [front.view.device-types.index :as device-type.index]
             [front.view.device-types.create :as device-type.create]
             [front.view.device-types.show :as device-type.show]
             [front.view.device-types.edit :as device-type.edit]
-            [front.view.device-types.raw-device-logs.index :as device-type.raw-device-log.index]
+            [front.view.device-types.device-logs.index :as device-type.device-log.index]
             [front.view.device-types.device-type-api-keys.index :as device-type.device-type-api-key.index]
             [front.view.device-types.device-type-api-keys.create :as device-type.device-type-api-key.create]
             [front.view.device-types.device-type-api-keys.show :as device-type.device-type-api-key.show]
@@ -38,7 +38,7 @@
             [front.view.watch-scopes.watch-scope-terms.create :as watch-scope.watch-scope-term.create]
             [front.view.watch-scopes.watch-scope-terms.show :as watch-scope.watch-scope-term.show]
             [front.view.watch-scopes.watch-scope-terms.edit :as watch-scope.watch-scope-term.edit]
-            [front.view.watch-scopes.raw-device-logs.index :as watch-scope.raw-device-log.index]
+            [front.view.watch-scopes.device-logs.index :as watch-scope.device-log.index]
             [front.view.profile.index :as profile.index]
             [front.view.profile.password-edit :as profile.password-edit]
             [front.view.page404 :as page404]
@@ -83,8 +83,8 @@
            {:path ":device_id" :children
             [{:index true :element (r/as-element [:f> device.show/core])}
              {:path "edit" :element (r/as-element [:f> device.edit/core])}
-             {:path "raw_device_logs" :children
-              [{:index true :element (r/as-element [:f> device.raw-device-log.index/core])}]}
+             {:path "device_logs" :children
+              [{:index true :element (r/as-element [:f> device.device-log.index/core])}]}
              {:path "device_files" :element (r/as-element [:f> device.device-files.index/core])}]}]}
          {:path "device_types" :children
           [{:index true :element (r/as-element [:f> device-type.index/core])}
@@ -92,7 +92,7 @@
            {:path ":device_type_id" :children
             [{:index true :element (r/as-element [:f> device-type.show/core])}
              {:path "edit" :element (r/as-element [:f> device-type.edit/core])}
-             {:path "raw_device_logs" :element (r/as-element [:f> device-type.raw-device-log.index/core])}
+             {:path "device_logs" :element (r/as-element [:f> device-type.device-log.index/core])}
              {:path "device_type_api_keys" :children
               [{:index true :element (r/as-element [:f> device-type.device-type-api-key.index/core])}
                {:path "create" :element (r/as-element [:f> device-type.device-type-api-key.create/core])}
@@ -111,7 +111,7 @@
                {:path ":watch_scope_term_id" :children
                 [{:index true :element (r/as-element [:f> watch-scope.watch-scope-term.show/core])}
                  {:path "edit" :element (r/as-element [:f> watch-scope.watch-scope-term.edit/core])}]}]}
-             {:path "raw_device_logs" :element (r/as-element [:f> watch-scope.raw-device-log.index/core])}]}]}
+             {:path "device_logs" :element (r/as-element [:f> watch-scope.device-log.index/core])}]}]}
          {:path "*" :element (r/as-element [:f> page404/core]) :status 404}]}]}])))
 
 (defonce root (rc/create-root (.getElementById js/document "app")))

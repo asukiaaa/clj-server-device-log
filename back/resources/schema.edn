@@ -56,25 +56,25 @@
    {:time_from {:type String}
     :time_until {:type String}}}}
  :objects
- {:RawDeviceLog
+ {:DeviceLog
   {:fields
    {:id {:type (non-null Int)}
     :device_id {:type Int}
     :device_name {:type String}
     :data {:type String}
     :created_at {:type String}}}
-  :ResponseRawDeviceLogListTotal
+  :ResponseDeviceLogListTotal
   {:fields
-   {:list {:type (list :RawDeviceLog)}
+   {:list {:type (list :DeviceLog)}
     :total {:type Int}}}
-  :ResponseRawDeviceLogForDeviceListTotal
+  :ResponseDeviceLogForDeviceListTotal
   {:fields
-   {:list {:type (list :RawDeviceLog)}
+   {:list {:type (list :DeviceLog)}
     :total {:type Int}
     :device {:type Device}}}
-  :ResponseRawDeviceLogForDeviceTypeListTotal
+  :ResponseDeviceLogForDeviceTypeListTotal
   {:fields
-   {:list {:type (list :RawDeviceLog)}
+   {:list {:type (list :DeviceLog)}
     :total {:type Int}
     :device_type {:type DeviceType}}}
   :User
@@ -223,28 +223,28 @@
     :user_team {:type UserTeam}}}
   :Query
   {:fields
-   {:raw_device_logs
-    {:type ResponseRawDeviceLogListTotal
+   {:device_logs
+    {:type ResponseDeviceLogListTotal
      :args {:limit {:type Int}
             :page {:type Int}
             :where {:type String}
             :order {:type String}}}
-    :raw_device_logs_for_device
-    {:type ResponseRawDeviceLogForDeviceListTotal
+    :device_logs_for_device
+    {:type ResponseDeviceLogForDeviceListTotal
      :args {:device_id {:type Int}
             :limit {:type Int}
             :page {:type Int}
             :where {:type String}
             :order {:type String}}}
-    :raw_device_logs_for_device_type
-    {:type ResponseRawDeviceLogForDeviceTypeListTotal
+    :device_logs_for_device_type
+    {:type ResponseDeviceLogForDeviceTypeListTotal
      :args {:device_type_id {:type Int}
             :limit {:type Int}
             :page {:type Int}
             :where {:type String}
             :order {:type String}}}
-    :raw_device_logs_for_watch_scope
-    {:type ResponseRawDeviceLogListTotal
+    :device_logs_for_watch_scope
+    {:type ResponseDeviceLogListTotal
      :args {:watch_scope_id {:type Int}
             :limit {:type Int}
             :page {:type Int}

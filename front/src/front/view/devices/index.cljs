@@ -36,7 +36,7 @@
        " "])
     [:> router/Link {:to (route/device-device-files (:id device))} util.label/files]
     " "
-    [:> router/Link {:to (route/device-raw-device-logs (:id device))} util.label/logs]]])
+    [:> router/Link {:to (route/device-device-logs (:id device))} util.label/logs]]])
 
 (defn-  page []
   (let [location (router/useLocation)

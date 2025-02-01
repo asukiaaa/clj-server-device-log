@@ -1,8 +1,8 @@
-(ns front.view.util.raw-device-log.page
+(ns front.view.util.device-log.page
   (:require ["react" :as react]
             ["react-router-dom" :as router]
-            [front.view.util.raw-device-log.graph :as util.graph]
-            [front.view.util.raw-device-log.list :as util.list]
+            [front.view.util.device-log.graph :as util.graph]
+            [front.view.util.device-log.list :as util.list]
             [front.view.common.wrapper.fetching :as wrapper.fetching]
             [front.view.common.component.pagination :as pagination]
             [front.view.util :as util :refer [build-state-info render-checkbox render-input render-textarea]]))

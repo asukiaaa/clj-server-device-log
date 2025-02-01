@@ -18,7 +18,7 @@
    #_[:td (:created_at user-team)]
    [:td (:updated_at user-team)]
    [:td
-    ;; [:> router/Link {:to (route/user-team-raw-device-logs (:id user-team))} "logs"]
+    ;; [:> router/Link {:to (route/user-team-device-logs (:id user-team))} "logs"]
     ;; " "
     ;; [:> router/Link {:to (route/user-team-user-team-devices (:id user-team))} "devices"]
     ;; " "

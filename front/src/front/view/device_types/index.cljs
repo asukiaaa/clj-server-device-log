@@ -29,7 +29,7 @@
     " "
     [:> router/Link {:to (route/device-type-device-type-api-keys (:id device-type))} util.label/api-keys]
     " "
-    [:> router/Link {:to (route/device-type-raw-device-logs (:id device-type))} util.label/logs]]])
+    [:> router/Link {:to (route/device-type-device-logs (:id device-type))} util.label/logs]]])
 
 (defn-  page []
   (let [location (router/useLocation)

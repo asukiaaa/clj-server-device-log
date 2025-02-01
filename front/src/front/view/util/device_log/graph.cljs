@@ -1,10 +1,10 @@
-(ns front.view.util.raw-device-log.graph
+(ns front.view.util.device-log.graph
   (:require
    ["chart.js" :as chart]
    ["date-fns"]
    ["chartjs-adapter-date-fns"]
    ["react" :as react]
-   [front.model.raw-device-log :as model.log]))
+   [front.model.device-log :as model.log]))
 
 #_(js/require "chart.js")
 #_(js/require "moment")

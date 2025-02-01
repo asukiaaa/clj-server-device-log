@@ -1,10 +1,10 @@
-(ns front.view.devices.raw-device-logs.index
+(ns front.view.devices.device-logs.index
   (:require ["react" :as react]
             ["react-router-dom" :as router]
             [front.route :as route]
-            [front.model.raw-device-log :as model.raw-device-log]
+            [front.model.device-log :as model.device-log]
             [front.view.common.wrapper.show404 :as wrapper.show404]
-            [front.view.util.raw-device-log.page :as raw-device-log.page]
+            [front.view.util.device-log.page :as device-log.page]
             [front.view.util.breadcrumb :as breadcrumb]
             [front.view.util.label :as util.label]))
 
@@ -18,8 +18,8 @@
       [{:label util.label/devices :path route/devices}
        {:label (util.label/device-item device) :path (route/device-show id-device)}
        {:label util.label/logs}]]
-     (raw-device-log.page/core
-      #(model.raw-device-log/fetch-list-and-total-for-device
+     (device-log.page/core
+      #(model.device-log/fetch-list-and-total-for-device
         (assoc % :id-device id-device))
       {:map-default {:str-where "[]"}
        :on-receive on-receive})]))

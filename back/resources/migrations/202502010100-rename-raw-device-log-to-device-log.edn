@@ -1,0 +1,10 @@
+{:up
+ ["RENAME TABLE raw_device_log to device_log"
+  "ALTER TABLE device_log
+   DROP FOREIGN KEY fk_device_raw_device_log ,
+   ADD CONSTRAINT fk_device_log__device_id FOREIGN KEY(device_id) REFERENCES device(id)"]
+ :down
+ ["RENAME TABLE device_log to raw_device_log"
+  "ALTER TABLE raw_device_log
+   DROP FOREIGN KEY fk_device_log__device_id,
+   ADD CONSTRAINT fk_device_raw_device_log FOREIGN KEY(device_id) REFERENCES device(id)"]}

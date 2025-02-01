@@ -1,9 +1,9 @@
-(ns front.view.util.raw-device-log.list
+(ns front.view.util.device-log.list
   (:require [cljs-time.core :as t]
             [cljs-time.format :as tf]
             ["react" :as react]
             [goog.string]
-            [front.model.raw-device-log :as model.log]))
+            [front.model.device-log :as model.log]))
 
 (defn build-badge-item [record badge data id]
   (let [req-when (get badge "when")

@@ -26,7 +26,7 @@
 (def device-create (str devices "/create"))
 (defn device-show [id] (str devices "/" id))
 (defn device-edit [id] (str (device-show id) "/edit"))
-(defn device-raw-device-logs [id-device] (str (device-show id-device) "/raw_device_logs"))
+(defn device-device-logs [id-device] (str (device-show id-device) "/device_logs"))
 (defn device-device-files [id] (str (device-show id) "/device_files"))
 
 (def device-types (str front "/device_types"))
@@ -34,8 +34,8 @@
 (defn device-type-show [id] (str device-types "/" id))
 (defn device-type-edit [id] (str (device-type-show id) "/edit"))
 
-(defn device-type-raw-device-logs [id-device-type]
-  (str (device-type-show id-device-type) "/raw_device_logs"))
+(defn device-type-device-logs [id-device-type]
+  (str (device-type-show id-device-type) "/device_logs"))
 (defn device-type-device-type-api-keys [id-device-type]
   (str (device-type-show id-device-type) "/device_type_api_keys"))
 (defn device-type-device-type-api-key-create [id-device-type]
@@ -59,8 +59,8 @@
 (defn watch-scope-watch-scope-term-edit [id-watch-scope id-watch-scope-term]
   (str (watch-scope-watch-scope-term-show id-watch-scope id-watch-scope-term) "/edit"))
 
-(defn watch-scope-raw-device-logs [id-watch-scope]
-  (str (watch-scope-show id-watch-scope) "/raw_device_logs"))
+(defn watch-scope-device-logs [id-watch-scope]
+  (str (watch-scope-show id-watch-scope) "/device_logs"))
 
 (defn show-login-page-when-not-loggedin [path]
   (and (includes? path front)

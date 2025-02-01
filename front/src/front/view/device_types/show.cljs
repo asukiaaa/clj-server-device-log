@@ -43,7 +43,7 @@
           " "
           [:> router/Link {:to (route/device-type-device-type-api-keys (:id item))} util.label/api-keys]
           " "
-          [:> router/Link {:to (route/device-type-raw-device-logs (:id item))} util.label/logs]
+          [:> router/Link {:to (route/device-type-device-logs (:id item))} util.label/logs]
 
           [:table.table.table-sm
            [:thead

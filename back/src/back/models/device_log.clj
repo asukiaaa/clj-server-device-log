@@ -1,4 +1,4 @@
-(ns back.models.raw-device-log
+(ns back.models.device-log
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.string :refer [join]]
             [clojure.core :refer [re-find re-matcher]]
@@ -178,15 +178,15 @@
         order (when-let [str-order (:order params)]
                 (json/read-str str-order))
         where (when-let [w (:where params)] (json/read-str w))
-        db-table-key "raw_device_log"
-        base-table-key "rdl"
+        db-table-key "device_log"
+        base-table-key "dl"
         where-max-group-by (filter where-max-group-by? where)
         str-query-select-max-group-by
         (build-query-select-max-group-by where-max-group-by
                                          {:db-table-key db-table-key
                                           :base-table-key base-table-key})
-        str-query (join " " ["SELECT SQL_CALC_FOUND_ROWS rdl.*, device.name device_name FROM" db-table-key "AS" base-table-key
-                             "LEFT JOIN device ON device.id = rdl.device_id"
+        str-query (join " " ["SELECT SQL_CALC_FOUND_ROWS dl.*, device.name device_name FROM" db-table-key "AS" base-table-key
+                             "LEFT JOIN device ON device.id = dl.device_id"
                              "LEFT JOIN device_type ON device_type.id = device.device_type_id"
                              (when-not (empty? str-query-select-max-group-by) (str ", " str-query-select-max-group-by))
                              (build-query-where {:where where
@@ -199,7 +199,7 @@
     (model.util/get-list-with-total [str-query] {:transaction transaction})))
 
 (defn get-by-id [id]
-  (first (jdbc/query db-spec ["select * from raw_device_log where id = ?" id])))
+  (first (jdbc/query db-spec ["select * from device_log where id = ?" id])))
 
 (defn create [params]
-  (jdbc/insert! db-spec :raw_device_log params))
+  (jdbc/insert! db-spec :device_log params))

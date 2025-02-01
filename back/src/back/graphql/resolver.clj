@@ -1,7 +1,7 @@
 (ns back.graphql.resolver
   (:require [clojure.java.jdbc :as jdbc]
             [back.config :refer [db-spec]]
-            [back.models.raw-device-log :as model-raw-device-log]
+            [back.models.device-log :as model-device-log]
             [back.models.user :as model.user]
             [back.models.user-team :as model.user-team]
             [back.models.device :as model.device]
@@ -20,44 +20,44 @@
     (fn-to-handle)
     (resolve-as nil {:message "no permission to handle"})))
 
-(defn raw-device-logs
+(defn device-logs
   [_ args _]
-  (println "args for raw-device-logs" args)
-  (model-raw-device-log/get-list-with-total args {:str-where-and "device_id IS NULL"}))
+  (println "args for device-logs" args)
+  (model-device-log/get-list-with-total args {:str-where-and "device_id IS NULL"}))
 
-(defn raw-device-logs-for-device
+(defn device-logs-for-device
   [context args _]
-  (println "args for raw-device-logs-for-device" args)
+  (println "args for device-logs-for-device" args)
   (when-let [id-device (:device_id args)]
     (jdbc/with-db-transaction [transaction db-spec]
       (let [user (get-user-loggedin context)]
         (when-let [device (model.device/get-by-id-for-user id-device (:id user) {:transaction transaction})]
-          (-> (model-raw-device-log/get-list-with-total
+          (-> (model-device-log/get-list-with-total
                args
                {:str-where-and (format "device_id = %d" id-device)
                 :transaction transaction})
               (assoc :device device)))))))
 
-(defn raw-device-logs-for-device-type
+(defn device-logs-for-device-type
   [context args _]
-  (println "args for raw-device-logs-for-device-type" args)
+  (println "args for device-logs-for-device-type" args)
   (let [id-device-type (:device_type_id args)
         user (get-user-loggedin context)
         id-user (:id user)]
     (jdbc/with-db-transaction [transaction db-spec]
       (when-let [device-type (model.device-type/get-by-id-for-user id-device-type id-user {:transaction transaction})]
-        (-> (model-raw-device-log/get-list-with-total args {:str-where-and (format "device_type.id = %d" id-device-type)
+        (-> (model-device-log/get-list-with-total args {:str-where-and (format "device_type.id = %d" id-device-type)
                                                             :transaction transaction})
             (assoc model.device-type/key-table device-type))))))
 
-(defn raw-device-logs-for-watch-scope
+(defn device-logs-for-watch-scope
   [context args _]
-  (println "args for raw-device-logs-for-watch-scope" args)
+  (println "args for device-logs-for-watch-scope" args)
   (when-let [user (get-user-loggedin context)]
     (when (model.user/admin? user)
       (when-let [id-watch-scope (:watch_scope_id args)]
         (let [query-device-ids (model.watch-scope-term/build-query-device-ids-for-watch-scope id-watch-scope)]
-          (model-raw-device-log/get-list-with-total args {:str-where-and (format "device_id IN %s" query-device-ids)}))))))
+          (model-device-log/get-list-with-total args {:str-where-and (format "device_id IN %s" query-device-ids)}))))))
 
 (defn login [context args _]
   (println "requested user login")
@@ -370,10 +370,10 @@
       (model.device/for-user-delete {:id (:id args) :id-user (:id user)}))))
 
 (def resolver-map
-  {:Query/raw_device_logs raw-device-logs
-   :Query/raw_device_logs_for_device raw-device-logs-for-device
-   :Query/raw_device_logs_for_device_type raw-device-logs-for-device-type
-   :Query/raw_device_logs_for_watch_scope raw-device-logs-for-watch-scope
+  {:Query/device_logs device-logs
+   :Query/device_logs_for_device device-logs-for-device
+   :Query/device_logs_for_device_type device-logs-for-device-type
+   :Query/device_logs_for_watch_scope device-logs-for-watch-scope
    :Query/device_type_api_keys_for_device_type device-type-api-keys-for-device-type
    :Query/device_type_api_key_for_device_type device-type-api-key-for-device-type
    :Query/watch_scopes watch-scopes

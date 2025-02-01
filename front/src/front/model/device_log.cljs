@@ -1,14 +1,14 @@
-(ns front.model.raw-device-log
+(ns front.model.device-log
   (:require [goog.string :refer [format]]
             clojure.string
             [front.model.device :as model.device]
             [front.model.device-type :as model.device-type]
             [front.model.util :as util :refer [build-input-str-for-str]]))
 
-(def name-table "raw_device_log")
-(def keys-for-raw-device-logs [:id :device_id :device_name :created_at :data])
-(def str-keys-for-raw-device-logs (clojure.string/join " " (map name keys-for-raw-device-logs)))
-#_(def str-keys-for-raw-device-logs-with-device-id (str str-keys-for-device " device{id name}"))
+(def name-table "device_log")
+(def keys-for-device-logs [:id :device_id :device_name :created_at :data])
+(def str-keys-for-device-logs (clojure.string/join " " (map name keys-for-device-logs)))
+#_(def str-keys-for-device-logs-with-device-id (str str-keys-for-device " device{id name}"))
 
 (defn get-by-json-key [data json-key]
   (when-not (nil? data)
@@ -42,7 +42,7 @@
 
 (defn fetch-list-and-total [{:keys [str-where str-order limit page on-receive str-additional-field]} & [{:keys [str-name-table str-params]}]]
   (util/fetch-list-and-total {:name-table (or str-name-table (str name-table "s"))
-                              :str-keys-of-item str-keys-for-raw-device-logs
+                              :str-keys-of-item str-keys-for-device-logs
                               :str-additional-field str-additional-field
                               :str-params (str (if str-params (str str-params ", ") "")
                                                (format "where: %s, order: %s"

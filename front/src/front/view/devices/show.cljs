@@ -47,7 +47,7 @@
              " "])
           [:> router/Link {:to (route/device-device-files (:id item))} util.label/files]
           " "
-          [:> router/Link {:to (route/device-raw-device-logs (:id item))} util.label/logs]
+          [:> router/Link {:to (route/device-device-logs (:id item))} util.label/logs]
           [:table.table.table-sm
            [:thead
             [:tr
