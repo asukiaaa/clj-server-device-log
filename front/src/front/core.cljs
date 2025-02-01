@@ -67,7 +67,7 @@
          {:path "users" :children
           [{:index true :element (r/as-element [:f> user.index/core])}
            {:path "create" :element (r/as-element [:f> user.create/core])}
-           {:path ":id_user" :children
+           {:path ":user_id" :children
             [{:index true :element (r/as-element [:f> user.show/core])}
              {:path "edit" :element (r/as-element [:f> user.edit/core])}
              {:path "password_reset/:hash_password_reset" :element (r/as-element [:f> user.password-reset/core])}]}]}

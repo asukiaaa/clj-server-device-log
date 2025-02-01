@@ -10,7 +10,7 @@
 
 (defn- page []
   (let [params (js->clj (router/useParams))
-        id-user (get params "id_user")
+        id-user (get params "user_id")
         hash-password-reset (get params "hash_password_reset")
         state-info-system (util/build-state-info :__system #(react/useState))
         state-info-id-user (util/build-state-info :id_user #(react/useState))

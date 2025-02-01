@@ -12,7 +12,7 @@
 
 (defn- page []
   (let [params (js->clj (router/useParams))
-        id-user (get params "id_user")
+        id-user (get params "user_id")
         navigate (router/useNavigate)
         [user set-user] (react/useState)
         state-info-system (util/build-state-info :__system #(react/useState))
