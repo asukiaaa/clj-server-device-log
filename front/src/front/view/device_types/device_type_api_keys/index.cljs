@@ -83,7 +83,7 @@
            [:th util.label/permission]
            [:th util.label/api-key]
            [:th util.label/updated-at]
-           [:th util.label/actions]]]
+           [:th util.label/action]]]
          [:tbody
           (for [item received-list]
             [:<> {:key (:id item)}

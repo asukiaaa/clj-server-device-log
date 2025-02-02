@@ -80,38 +80,71 @@
      :on-change (fn [] (set-draft (if (= "true" draft) "false" "true")))}]
    [:label.p-2 {:for label} label]])
 
-(defn render-input [label {:keys [default key draft set-draft errors]} {:keys [type str-class-wrapper str-class-input disabled]}]
-  [:div {:class str-class-wrapper}
-   [:div
-    [:label {:for key} label]]
-   [:input.form-control
-    {:id label
-     :class (str str-class-input " " (when errors "is-invalid"))
-     :value (or draft default)
-     :disabled disabled
-     :type type
-     :on-change (fn [e] (set-draft (-> e .-target .-value)))}]
-   (render-errors-for-input errors)])
 
-(defn render-select [label {:keys [default key draft set-draft errors]} value-labels & [{:keys [type str-class-wrapper disabled]}]]
-  [:div {:class str-class-wrapper}
-   [:div
-    [:label {:for key} label]]
-   [:select.form-control
-    {:id label
-     :name key
-     :disabled disabled
-     :class (when errors :is-invalid)
-     :default-value (or draft default)
-     :type type
-     :on-change (fn [e] (set-draft (-> e .-target .-value)))}
-    [:option ""]
-    (let [value-selected (or draft default)]
-      (for [[value label] value-labels]
-        [:option {:value value :key value} label (= value value-selected)]))]
-   (when errors
-     (for [error errors]
-       [:div.invalid-feedback {:key error} error]))])
+(defn build-item-values [{:keys [default key draft errors]} keys-assoc-in]
+  {:item-default (if keys-assoc-in (get-in default keys-assoc-in) default)
+   :item-draft (if keys-assoc-in (get-in draft keys-assoc-in) draft)
+   :item-errors  (if keys-assoc-in (get-in errors keys-assoc-in) errors)
+   :item-key (if keys-assoc-in (str keys-assoc-in) key)})
+
+(defn assign-to-draft [value {:keys [set-draft draft]} keys-assoc-in]
+  (println value keys-assoc-in set-draft)
+  (set-draft (if keys-assoc-in
+               (assoc-in draft keys-assoc-in value)
+               value)))
+
+(defn render-input [label state-info {:keys [type str-class-wrapper str-class-input disabled keys-assoc-in]}]
+  (let [{:keys [item-default item-draft item-errors item-key]} (build-item-values state-info keys-assoc-in)]
+    #_[:input.form-control
+       {:id label
+        :name item-key
+        :class (str str-class-input " " (when item-errors "is-invalid"))
+        :value (or item-draft item-default)
+        :disabled disabled
+        :type type
+        :on-change
+        (fn [e]
+          (let [value (-> e .-target .-value)]
+            (assign-to-draft value state-info keys-assoc-in)))}]
+    [:div {:class str-class-wrapper}
+     (when label
+       [:div
+        [:label {:for item-key} label]])
+     [:input.form-control
+      {:id label
+       :name item-key
+       :class (str str-class-input " " (when item-errors "is-invalid"))
+       :value (or item-draft item-default)
+       :disabled disabled
+       :type type
+       :on-change
+       (fn [e]
+         (let [value (-> e .-target .-value)]
+           (assign-to-draft value state-info keys-assoc-in)))}]
+     (render-errors-for-input item-errors)]))
+
+(defn render-select [label state-info value-labels & [{:keys [type str-class-wrapper disabled on-blur keys-assoc-in]}]]
+  (let [{:keys [item-default item-draft item-errors item-key]} (build-item-values state-info keys-assoc-in)]
+    [:div {:class str-class-wrapper}
+     [:div
+      [:label {:for item-key} label]]
+     [:select.form-control
+      {:id label
+       :name item-key
+       :disabled disabled
+       :class (when item-errors :is-invalid)
+       :default-value item-default
+       :type type
+       :on-blur #(when on-blur (on-blur))
+       :on-change
+       (fn [e]
+         (let [value (-> e .-target .-value)]
+           (assign-to-draft value state-info keys-assoc-in)))}
+      [:option ""]
+      (let [value-selected (or item-draft item-default)]
+        (for [[value label] value-labels]
+          [:option {:value value :key value} label (= value value-selected)]))]
+     (render-errors-for-input item-errors)]))
 
 (defn btn-confirm-delete [{:keys [message-confirm action-delete]}]
   [:a {:on-click

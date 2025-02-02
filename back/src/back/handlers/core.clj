@@ -96,7 +96,7 @@
     (when (or matched-bearer device-to-post)
       (let [body (:json-params req)]
         (model.device-log/create {:data (json/write-str body)
-                                      :device_id (:id device-to-post)})
+                                  :device_id (:id device-to-post)})
         {:status 200
          :body "ok"}))))
 

@@ -138,5 +138,14 @@
       (model.util/append-limit-offset-by-limit-page-params params)
       (model.util/get-list-with-total {:build-item build-item})))
 
+(defn get-list-with-total-for-user-team [params id-user-team & [{:keys [transaction]}]]
+  (-> (model.util/build-query-get-index
+       name-table {:str-keys-select (str "device.*, " str-sql-select-for-device-type-columns
+                                         ", " str-sql-select-for-user-team-columns)})
+      (str " " str-join-tables)
+      (str (format " WHERE device.user_team_id = %d" id-user-team))
+      (model.util/append-limit-offset-by-limit-page-params params)
+      (model.util/get-list-with-total {:build-item build-item :transaction transaction})))
+
 (defn get-list-with-total-for-admin [params]
   (model.util/get-list-with-total-with-building-query name-table params))

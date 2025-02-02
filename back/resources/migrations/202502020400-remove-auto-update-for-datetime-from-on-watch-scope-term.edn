@@ -1,0 +1,6 @@
+{:up
+ ["ALTER TABLE watch_scope_term
+   CHANGE datetime_from datetime_from TIMESTAMP NULL DEFAULT NULL"]
+ :down
+ ["ALTER TABLE watch_scope_term
+   CHANGE datetime_from datetime_from TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"]}

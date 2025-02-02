@@ -34,13 +34,13 @@
   (first (jdbc/query (or transaction db-spec)
                      [(str "SELECT * FROM " name-table " WHERE id = ? AND owner_user_id = ?") id user-id])))
 
-(defn create [params]
-  (jdbc/with-db-transaction [t-con db-spec]
+(defn create [params & [{:keys [transaction]}]]
+  (jdbc/with-db-transaction [t-con (or transaction db-spec)]
     (jdbc/insert! t-con key-table (filter-params params))
     (let [id (-> (jdbc/query t-con "SELECT LAST_INSERT_ID()")
                  first vals first)
           item (get-by-id id {:transaction t-con})]
-      {key-table item})))
+      item)))
 
 (defn- get-list-with-total-base [params & [{:keys [str-where]}]]
   (model.util/get-list-with-total-with-building-query name-table params {:str-where str-where}))

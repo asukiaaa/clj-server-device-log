@@ -170,6 +170,15 @@
   (let [user (get-user-loggedin context)]
     (model.device/get-list-with-total-for-user args (:id user))))
 
+(defn devices-for-user-team [context args _]
+  (println "args devices-for-user-team" args)
+  (jdbc/with-db-transaction [transaction db-spec]
+    (let [user (get-user-loggedin context)
+          id-user-team (:user_team_id args)
+          user-team (model.user-team/get-by-id-for-owner-user id-user-team (:id user) {:transaction transaction})
+          list-and-total (when user-team (model.device/get-list-with-total-for-user-team args id-user-team {:transaction transaction}))]
+      list-and-total)))
+
 (defn device-types [context args _]
   (let [user (get-user-loggedin context)]
     (model.device-type/get-list-with-total-for-user args (:id user))))
@@ -252,7 +261,7 @@
     (let [user (get-user-loggedin context)
           sql-ids-user-team (model.user-team/build-sql-ids-for-user (:id user))
           sql-ids-devices (model.device/build-sql-ids-for-user-teams sql-ids-user-team)
-          list-and-total  (model.device-file/get-list-with-total-latest-each-device args sql-ids-devices {:transaction transaction})]
+          list-and-total (model.device-file/get-list-with-total-latest-each-device args sql-ids-devices {:transaction transaction})]
       list-and-total)))
 
 (defn watch-scopes
@@ -271,9 +280,17 @@
 
 (defn watch-scope-create [context args _]
   (println "args watch-scope-create" args)
-  (let [user (get-user-loggedin context)
-        params (:watch_scope args)]
-    (when (model.user/admin? user) (model.watch-scope/create params))))
+  (jdbc/with-db-transaction [transaction db-spec]
+    (let [user (get-user-loggedin context)
+          params (:watch_scope args)
+          id-user-team (:user_team_id params)
+          user-team (if (model.user/admin? user)
+                      (model.user-team/get-by-id id-user-team {:transaction transaction})
+                      (model.user-team/get-by-id-for-owner-user id-user-team (:id user) {:transaction transaction}))]
+      (when user-team
+        (let [watch-scope (model.watch-scope/create params {:transaction transaction})]
+          (model.watch-scope-term/create-list-for-watch-scope (:terms params) (:id watch-scope) {:transaction transaction})
+          {model.watch-scope/key-table watch-scope})))))
 
 (defn watch-scope-update [context args _]
   (println "args watch-scope-update" args)
@@ -387,8 +404,9 @@
    :Query/user_teams user-teams
    :Query/user_team user-team
    :Query/user_for_resetting_password user-for-resetting-password
-   :Query/devices devices
    :Query/device device
+   :Query/devices devices
+   :Query/devices_for_user_team devices-for-user-team
    :Query/device_types device-types
    :Query/device_type device-type
    :Query/user_loggedin user-loggedin

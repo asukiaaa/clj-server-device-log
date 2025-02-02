@@ -10,6 +10,9 @@
 (def key-table (keyword name-table))
 #_(def str-keys-select-with-device-name (str name-table ".*, device.name as device_name"))
 
+(defn filter-params [params]
+  (select-keys params [:id :device_id :watch_scope_id :datetime_from :datetime_until]))
+
 (defn build-query-device-ids-for-watch-scope [id-watch-scope]
   (format "(SELECT device_id from %s WHERE watch_scope_id = %s)"
           name-table
@@ -51,6 +54,16 @@
                  first vals first)
           item (get-by-id id {:transaction t-con})]
       {key-table item})))
+
+(defn create-list-for-watch-scope [terms id-watch-scope & [{:keys [transaction]}]]
+  (let [params (for [term terms] (-> term filter-params (assoc :watch_scope_id id-watch-scope)))]
+    (jdbc/insert-multi! (or transaction db-spec) key-table params)))
+
+(defn get-list-for-watch-scope [id-watch-scope & [{:keys [transaction]}]]
+  (jdbc/query (or transaction db-spec)
+              (format "SELECT * FROM %s WHERE watch_scope_id = %d"
+                      name-table
+                      id-watch-scope)))
 
 (defn- get-list-with-total-base [params & [{:keys [str-where transaction]}]]
   (model.util/get-list-with-total-with-building-query

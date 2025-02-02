@@ -1,0 +1,8 @@
+{:up
+ ["ALTER TABLE watch_scope_term
+   RENAME COLUMN time_from TO datetime_from,
+   RENAME COLUMN time_until TO datetime_until"]
+ :down
+ ["ALTER TABLE watch_scope_term
+   RENAME COLUMN datetime_from TO time_from,
+   RENAME COLUMN datetime_until TO time_until"]}

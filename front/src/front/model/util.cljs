@@ -4,6 +4,14 @@
             [goog.string :refer [format]]
             [re-graph.core :as re-graph]))
 
+(defn build-select-options-from-list-and-total [list-and-total keys-show]
+  (for [item (:list list-and-total)]
+    (let [id (:id item)
+          value (->> (for [key-show keys-show]
+                       (key-show item))
+                     (remove nil?) first str)]
+      [id value])))
+
 (defn build-str-args-offset-limit-for-index [limit page]
   #_(println :build-args :limit limit (int? limit) :page page (int? page))
   (let [limit (if (int? limit) limit (js/parseInt limit))

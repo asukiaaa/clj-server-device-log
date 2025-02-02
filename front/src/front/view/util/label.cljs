@@ -1,5 +1,5 @@
 (ns front.view.util.label
-  (:refer-clojure :exclude [name next update]))
+  (:refer-clojure :exclude [name next time update]))
 
 (def logout "Logout")
 (def login "Login")
@@ -17,7 +17,8 @@
            first
            (#(or % no-data))))))
 
-(def actions "Actions")
+(def action "Action")
+(def add-term "Add term")
 (def api-keys "API keys")
 (def api-key "API key")
 (defn api-key-item [item] (show-key item [:name :id]))
@@ -28,6 +29,7 @@
 (def created-at "Created at")
 (def dashboard "Dashboard")
 (def delete "Delete")
+(def device "Device")
 (def devices "Devices")
 (defn device-item [device] (show-key device [:name :id]))
 (def device-types "Device types")
@@ -37,6 +39,7 @@
 (def edit "Edit")
 (def email "Email")
 (def files "Files")
+(def from "From")
 (def id "ID")
 (def logs "Logs")
 (def next "Next")
@@ -50,6 +53,8 @@
 (def show "Show")
 (def term "Term")
 (def terms "Terms")
+(def time "Time")
+(def until "Until")
 (def update "Update")
 (def updated-at "Updated at")
 (defn user [user] (show-key user [:name :email :id]))

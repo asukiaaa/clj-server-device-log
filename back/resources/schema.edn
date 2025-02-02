@@ -40,21 +40,28 @@
   :InputWatchScopeCreate
   {:fields
    {:user_team_id {:type (non-null Int)}
-    :name {:type String}}}
+    :name {:type String}
+    :terms {:type (list InputWatchScopeTermOnWatchScope)}}}
   :InputWatchScopeUpdate
   {:fields
    {:user_team_id {:type Int}
-    :name {:type String}}}
+    :name {:type String}
+    :terms {:type (list InputWatchScopeTermOnWatchScope)}}}
   :InputWatchScopeTermCreate
   {:fields
    {:watch_scope_id {:type (non-null Int)}
     :device_id {:type (non-null Int)}
-    :time_from {:type String}
-    :time_until {:type String}}}
+    :datetime_from {:type String}
+    :datetime_until {:type String}}}
+  :InputWatchScopeTermOnWatchScope
+  {:fields
+   {:device_id {:type (non-null Int)}
+    :datetime_from {:type String}
+    :datetime_until {:type String}}}
   :InputWatchScopeTermUpdate
   {:fields
-   {:time_from {:type String}
-    :time_until {:type String}}}}
+   {:datetime_from {:type String}
+    :datetime_until {:type String}}}}
  :objects
  {:DeviceLog
   {:fields
@@ -152,6 +159,7 @@
   {:fields
    {:id {:type (non-null Int)}
     :user_team_id {:type (non-null Int)}
+    :terms {:type (list WatchScopeTerm)}
     :name {:type String}
     :created_at {:type String}
     :updated_at {:type String}}}
@@ -164,10 +172,16 @@
    {:id {:type (non-null Int)}
     :device_id {:type (non-null Int)}
     :watch_scope_id {:type (non-null Int)}
-    :time_from {:type String}
-    :time_until {:type String}
+    :datetime_from {:type String}
+    :datetime_until {:type String}
     :created_at {:type String}
     :updated_at {:type String}}}
+  :WatchScopeTermOnWatchScope
+  {:fields
+   {:id {:type Int}
+    :device_id {:type (non-null Int)}
+    :datetime_from {:type String}
+    :datetime_until {:type String}}}
   :ResponseWatchScopeTermForWatchScopeListTotal
   {:fields
    {:list {:type (list WatchScopeTerm)}
@@ -253,6 +267,13 @@
     :devices
     {:type ResponseDeviceListTotal
      :args {:limit {:type Int}
+            :page {:type Int}
+            :where {:type String}
+            :order {:type String}}}
+    :devices_for_user_team
+    {:type ResponseDeviceListTotal
+     :args {:user_team_id {:type Int}
+            :limit {:type Int}
             :page {:type Int}
             :where {:type String}
             :order {:type String}}}
