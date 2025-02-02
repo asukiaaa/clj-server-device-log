@@ -1,7 +1,7 @@
-(ns back.models.raw-device-log-test
+(ns back.models.device-log-test
   (:require [clojure.test :refer :all]
             [clojure.string :refer [includes?]]
-            [back.models.raw-device-log :refer :all]))
+            [back.models.device-log :refer :all]))
 
 #_(deftest a-test
     (testing "FIXME, I fail."

@@ -47,7 +47,7 @@
     (jdbc/with-db-transaction [transaction db-spec]
       (when-let [device-type (model.device-type/get-by-id-for-user id-device-type id-user {:transaction transaction})]
         (-> (model-device-log/get-list-with-total args {:str-where-and (format "device_type.id = %d" id-device-type)
-                                                            :transaction transaction})
+                                                        :transaction transaction})
             (assoc model.device-type/key-table device-type))))))
 
 (defn device-logs-for-watch-scope

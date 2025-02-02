@@ -3,7 +3,7 @@
             [clojure.java.io :as io]
             [hiccup.page :refer [html5]]
             [back.handlers.util :as handler.util]
-            [back.models.raw-device-log :as model.raw-device-log]
+            [back.models.device-log :as model.device-log]
             [back.models.device-type-api-key :as model.device-type-api-key]
             [back.models.device :as model.device]
             [back.models.device-file :as model.device-file]
@@ -54,7 +54,7 @@
                 [:div "no user"]))}))
 
 #_(defn device-logs [req]
-    (let [list-and-total (model-raw-device-log/get-list-with-total)
+    (let [list-and-total (model-device-log/get-list-with-total)
         ;; total (:total list-and-total)
           logs (:list list-and-total)]
       {:status 200
@@ -73,7 +73,7 @@
 
 #_(defn device-log [req]
     (let [id (:id (:path-params req))
-          log (model-raw-device-log/get-by-id id)]
+          log (model-device-log/get-by-id id)]
       {:status 200
        :body (html5
               (if log
@@ -89,13 +89,13 @@
    :body (html5
           [:div "404 not found"])})
 
-(defn api-post-raw-device-log [req]
+(defn api-post-device-log [req]
   (let [str-bearer (handler.util/get-bearer req)
         matched-bearer (= str-bearer config/key-auth)
         device-to-post (model.device/get-by-hash-post str-bearer)]
     (when (or matched-bearer device-to-post)
       (let [body (:json-params req)]
-        (model.raw-device-log/create {:data (json/write-str body)
+        (model.device-log/create {:data (json/write-str body)
                                       :device_id (:id device-to-post)})
         {:status 200
          :body "ok"}))))
