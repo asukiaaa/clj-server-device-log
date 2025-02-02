@@ -92,7 +92,7 @@
 (defn api-post-device-log [req]
   (let [str-bearer (handler.util/get-bearer req)
         matched-bearer (= str-bearer config/key-auth)
-        device-to-post (model.device/get-by-hash-post str-bearer)]
+        device-to-post (model.device/get-by-key-str str-bearer)]
     (when (or matched-bearer device-to-post)
       (let [body (:json-params req)]
         (model.device-log/create {:data (json/write-str body)
@@ -109,13 +109,13 @@
             params-device (-> (:device params)
                               (assoc :device_type_id id-device-type))
             result (model.device/create params-device)
-            result (assoc result :hashy_post (-> result :device :hash_post))]
+            result (assoc result :hashy_post (-> result :device :key_str))]
         {:status 200
          :body (json/write-str result)}))))
 
 (defn api-post-device-file [req]
   (let [str-bearer (handler.util/get-bearer req)
-        device (model.device/get-by-hash-post str-bearer)]
+        device (model.device/get-by-key-str str-bearer)]
     (when device
       (let [id-device (:id device)
             info-file (-> req :multipart-params (get "file"))

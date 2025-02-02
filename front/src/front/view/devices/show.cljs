@@ -54,7 +54,7 @@
              [:th "key"]
              [:th "value"]]]
            [:tbody
-            (for [key [:id :name :hash_post :device_type :user_team :created_at :updated_at]]
+            (for [key [:id :name :key_str :device_type :user_team :created_at :updated_at]]
               [:tr {:key key}
                [:td key]
                [:td
@@ -62,7 +62,7 @@
                   (or (= key :device_type) (= key :user_team))
                   (let [val (key item)]
                     (str (:id val) " " (:name val)))
-                  (= key :hash_post)
+                  (= key :key_str)
                   (let [api-key (key item)]
                     [:<>
                      [:div (str api-key)]

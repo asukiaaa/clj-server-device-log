@@ -1,0 +1,6 @@
+{:up
+ ["ALTER TABLE device
+   RENAME COLUMN hash_post TO key_str"]
+ :down
+ ["ALTER TABLE device
+   RENAME COLUMN key_str TO hash_post"]}

@@ -56,9 +56,9 @@
                         (format "(%s)" (join "," ids)))]
       (jdbc/query (or transaction db-spec) query))))
 
-(defn get-by-hash-post [hash-post & [{:keys [transaction]}]]
-  (when-not (empty? hash-post)
-    (let [query (format "SELECT * from %s WHERE hash_post = \"%s\"" name-table (model.util/escape-for-sql hash-post))
+(defn get-by-key-str [key-str & [{:keys [transaction]}]]
+  (when-not (empty? key-str)
+    (let [query (format "SELECT * from %s WHERE key_str = \"%s\"" name-table (model.util/escape-for-sql key-str))
           user (first (jdbc/query (or transaction db-spec) [query]))]
       user)))
 
@@ -96,19 +96,19 @@
           (jdbc/delete! db-spec key-table ["id = ?" id])
           {})))))
 
-(defn build-hash-post []
+(defn build-key-str []
   (model.util/build-random-str-alphabets-and-number 60))
 
-(defn assign-unique-hash-post-to-params [params transaction]
-  (let [hash (build-hash-post)
-        user (get-by-hash-post hash {:transaction transaction})]
+(defn assign-unique-key-str-to-params [params transaction]
+  (let [hash (build-key-str)
+        user (get-by-key-str hash {:transaction transaction})]
     (if (empty? user)
-      (assoc params :hash_post hash)
-      (assign-unique-hash-post-to-params params transaction))))
+      (assoc params :key_str hash)
+      (assign-unique-key-str-to-params params transaction))))
 
 (defn create [params]
   (jdbc/with-db-transaction [t-con db-spec]
-    (jdbc/insert! t-con key-table (-> params filter-params (assign-unique-hash-post-to-params t-con)))
+    (jdbc/insert! t-con key-table (-> params filter-params (assign-unique-key-str-to-params t-con)))
     (let [id (-> (jdbc/query t-con "SELECT LAST_INSERT_ID()")
                  first vals first)
           item (get-by-id id {:transaction t-con})]
@@ -123,7 +123,7 @@
         (do
           (jdbc/insert! t-con key-table (-> params
                                             filter-params
-                                            (assign-unique-hash-post-to-params t-con)))
+                                            (assign-unique-key-str-to-params t-con)))
           (let [id (-> (jdbc/query t-con "SELECT LAST_INSERT_ID()")
                        first vals first)
                 item (get-by-id id {:transaction t-con})]

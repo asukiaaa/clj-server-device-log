@@ -6,7 +6,7 @@
             [front.model.util :as util]))
 
 (def name-table "device")
-(def keys-for-device [:id :device_type_id :user_team_id :name :hash_post :created_at :updated_at])
+(def keys-for-device [:id :device_type_id :user_team_id :name :key_str :created_at :updated_at])
 (def str-keys-for-device (join " " (map name keys-for-device)))
 (defn build-str-keys-for-device-with-peripherals []
   (join " "

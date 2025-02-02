@@ -110,7 +110,7 @@
     :device_type_id {:type (non-null Int)}
     :user_team_id {:type Int}
     :name {:type String}
-    :hash_post {:type String}
+    :key_str {:type String}
     :device_type {:type DeviceType}
     :user_team {:type UserTeam}
     :created_at {:type String}
