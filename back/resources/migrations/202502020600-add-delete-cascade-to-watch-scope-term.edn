@@ -1,0 +1,8 @@
+{:up
+ ["ALTER TABLE watch_scope_term
+   DROP FOREIGN KEY fk_watch_scope_term__watch_scope_id,
+   ADD CONSTRAINT fk_watch_scope_term__watch_scope_id__cascade FOREIGN KEY(watch_scope_id) REFERENCES watch_scope(id) ON DELETE CASCADE"]
+ :down
+ ["ALTER TABLE watch_scope_term
+   DROP FOREIGN KEY fk_watch_scope_term__watch_scope_id__cascade,
+   ADD CONSTRAINT fk_watch_scope_term__watch_scope_id FOREIGN KEY(watch_scope_id) REFERENCES watch_scope(id)"]}
