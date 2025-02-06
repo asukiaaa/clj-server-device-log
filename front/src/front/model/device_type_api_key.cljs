@@ -6,7 +6,7 @@
             [front.model.util :as util]))
 
 (def name-table "device_type_api_key")
-(def keys-for-table [:id :device_type_id :name :key_str :permission :created_at :updated_at])
+(def keys-for-table [:id :device_type_id :name :permission :created_at :updated_at])
 (def str-keys-for-table (clojure.string/join " " (map name keys-for-table)))
 (def str-table-and-keys
   (format "%s { %s }" name-table str-keys-for-table))

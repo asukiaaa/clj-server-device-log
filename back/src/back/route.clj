@@ -77,7 +77,7 @@
     ["/css/*" :get (build-file-handler "../front/resources/public") :route-name :handle-css]
     ["/out-cljs/*" :get (build-file-handler "../front/out-cljs/public") :route-name :handle-out-cljs]
     ["/api/raw_device_log"
-     :post [(body-params) handlers/api-post-device-log]
+     :post [(body-params) handlers/api-post-device-log-old-auth]
      :route-name :api-post-raw-device-log]
     ["/api/device_log"
      :post [(body-params) handlers/api-post-device-log]

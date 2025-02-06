@@ -16,7 +16,19 @@
         navigate (router/useNavigate)
         id (get params "device_id")
         [item set-item] (react/useState)
-        info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))]
+        [fetching set-fetching] (react/useState)
+        [bearer set-bearer] (react/useState)
+        info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
+        fetch-bearer
+        (fn []
+          (set-fetching true)
+          (model.device/fetch-bearer-by-id
+           {:id id
+            :on-receive
+            (fn [item errors]
+              (set-bearer (:authorization_bearer item))
+              (set-fetching false)
+              (wrapper.fetching/finished info-wrapper-fetching errors))}))]
     (react/useEffect
      (fn []
        (wrapper.fetching/start info-wrapper-fetching)
@@ -54,7 +66,7 @@
              [:th "key"]
              [:th "value"]]]
            [:tbody
-            (for [key [:id :name :key_str :device_type :user_team :created_at :updated_at]]
+            (for [key [:id :name :authorization_bearer :device_type :user_team :created_at :updated_at]]
               [:tr {:key key}
                [:td key]
                [:td
@@ -62,12 +74,13 @@
                   (or (= key :device_type) (= key :user_team))
                   (let [val (key item)]
                     (str (:id val) " " (:name val)))
-                  (= key :key_str)
-                  (let [api-key (key item)]
-                    [:<>
-                     [:div (str api-key)]
-                     [:div
-                      [:f> util/link-to-copy-to-clipboard api-key]]])
+                  (= key :authorization_bearer)
+                  [:<>
+                   (if bearer
+                     [:f> util/link-to-copy-to-clipboard bearer]
+                     [:button.btn.btn-primary.btn-sm
+                      {:on-click fetch-bearer :disabled fetching}
+                      util.label/get-bearer])]
                   :else
                   (str (get item key)))]])]]])})]))
 

@@ -10,12 +10,6 @@
             [front.view.util.label :as util.label]
             [front.view.util :as util]))
 
-(defn- render-key-str [device-type-api-key]
-  (let [key-str (:key_str device-type-api-key)]
-    [:div
-     [:div key-str]
-     [:button.btn.btn-sm.btn-secondary {:on-click #(util/copy-to-clipboard key-str)} util.label/copy]]))
-
 (defn- page []
   (let [params (js->clj (router/useParams))
         navigate (router/useNavigate)
@@ -61,12 +55,13 @@
              [:th "key"]
              [:th "value"]]]
            [:tbody
-            (for [key [:id :name :key_str :permission :created_at :updated_at]]
+            (for [key [:id :name :authorization_bearer :permission :created_at :updated_at]]
               [:tr {:key key}
                [:td key]
                [:td
                 (cond
-                  (= key :key_str) (render-key-str item)
+                  (= key :authorization_bearer)
+                  [:div "TODO"]
                   :else (get item key))]])]]])})]))
 
 (defn core []

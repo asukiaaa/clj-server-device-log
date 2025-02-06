@@ -3,10 +3,11 @@
   (:require [goog.string :refer [format]]
             [clojure.string :refer [join]]
             [front.model.device-type :as model.device-type]
+            [front.model.util.authorization-bearer :as bearer]
             [front.model.util :as util]))
 
 (def name-table "device")
-(def keys-for-device [:id :device_type_id :user_team_id :name :key_str :created_at :updated_at])
+(def keys-for-device [:id :device_type_id :user_team_id :name :created_at :updated_at])
 (def str-keys-for-device (join " " (map name keys-for-device)))
 (defn build-str-keys-for-device-with-peripherals []
   (join " "
@@ -44,6 +45,12 @@
 (defn fetch-by-id [{:keys [id on-receive]}]
   (util/fetch-by-id {:name-table name-table
                      :str-keys-of-item (build-str-keys-for-device-with-peripherals)
+                     :id id
+                     :on-receive on-receive}))
+
+(defn fetch-bearer-by-id [{:keys [id on-receive]}]
+  (util/fetch-by-id {:name-table (format "authorization_bearer_for_%s" name-table)
+                     :str-keys-of-item bearer/str-keys
                      :id id
                      :on-receive on-receive}))
 

@@ -3,8 +3,11 @@
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.core :refer [format]]
             [clojure.string :refer [join]]
+            [clj-time.core :as cljt]
+            [clj-time.format :as cljt-format]
             [back.models.device-type :as model.device-type]
             [back.config :refer [db-spec]]
+            [back.util.encryption :as encryption]
             [back.models.util :as model.util]))
 
 (def name-table "device")
@@ -48,6 +51,19 @@
 
 (defn get-by-id [id & [{:keys [transaction]}]]
   (model.util/get-by-id id name-table {:transaction transaction}))
+
+(def format-datetime (cljt-format/formatter "yyyy-MM-dd HH:mm:ss"))
+
+(defn get-key-str-from-authorization-bearer [bearer]
+  (let [decoded-bearer (encryption/decode bearer)]
+    (-> decoded-bearer :device :key_str)))
+
+(defn get-authorizaton-bearer-by-id [id-device & [{:keys [transaction]}]]
+  (let [device (get-by-id id-device {:transaction transaction})
+        data-for-bearer {:device {:key_str (:key_str device)}
+                         :created_at (cljt-format/unparse format-datetime (cljt/now))}]
+    #_(println data-for-bearer)
+    (encryption/encode data-for-bearer)))
 
 (defn get-list-by-ids [ids & [{:keys [transaction]}]]
   (when-not (empty? ids)

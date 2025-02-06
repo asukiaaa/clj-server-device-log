@@ -7,7 +7,8 @@
             [back.models.device-type-api-key :as model.device-type-api-key]
             [back.models.device :as model.device]
             [back.models.device-file :as model.device-file]
-            [back.config :as config]))
+            [back.config :as config]
+            [back.util.encryption :as encryption]))
 
 (defn top [req]
   {:status 200
@@ -89,13 +90,24 @@
    :body (html5
           [:div "404 not found"])})
 
-(defn api-post-device-log [req]
+(defn api-post-device-log-old-auth [req]
   (let [str-bearer (handler.util/get-bearer req)
         matched-bearer (= str-bearer config/key-auth)
         device-to-post (model.device/get-by-key-str str-bearer)]
     (when (or matched-bearer device-to-post)
       (let [body (:json-params req)]
         (model.device-log/create {:data (json/write-str body)
+                                  :device_id (:id device-to-post)})
+        {:status 200
+         :body "ok"}))))
+
+(defn api-post-device-log [req]
+  (let [str-bearer (handler.util/get-bearer req)
+        device-to-post (model.device/get-by-key-str (model.device/get-key-str-from-authorization-bearer str-bearer))]
+    (when  device-to-post
+      (let [body (:json-params req)
+            data (:data body)]
+        (model.device-log/create {:data (json/write-str data)
                                   :device_id (:id device-to-post)})
         {:status 200
          :body "ok"}))))

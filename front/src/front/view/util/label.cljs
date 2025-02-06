@@ -19,6 +19,7 @@
 
 (def action "Action")
 (def add-term "Add term")
+(def authorization-bearer "Authorizatino bearer")
 (def api-keys "API keys")
 (def api-key "API key")
 (defn api-key-item [item] (show-key item [:name :id]))
@@ -40,6 +41,7 @@
 (def email "Email")
 (def files "Files")
 (def from "From")
+(def get-bearer "Get bearer")
 (def id "ID")
 (def logs "Logs")
 (def next "Next")

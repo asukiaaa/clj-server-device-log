@@ -110,7 +110,6 @@
     :device_type_id {:type (non-null Int)}
     :user_team_id {:type Int}
     :name {:type String}
-    :key_str {:type String}
     :device_type {:type DeviceType}
     :user_team {:type UserTeam}
     :created_at {:type String}
@@ -135,7 +134,6 @@
    {:id {:type (non-null Int)}
     :device_type_id {:type (non-null Int)}
     :name {:type String}
-    :key_str {:type String}
     :permission {:type String}
     :created_at {:type String}
     :updated_at {:type String}}}
@@ -182,6 +180,9 @@
     :device_id {:type (non-null Int)}
     :datetime_from {:type String}
     :datetime_until {:type String}}}
+  :ResponseAuthorizationBearer
+  {:fields
+   {:authorization_bearer {:type String}}}
   :ResponseWatchScopeTermForWatchScopeListTotal
   {:fields
    {:list {:type (list WatchScopeTerm)}
@@ -237,7 +238,10 @@
     :user_team {:type UserTeam}}}
   :Query
   {:fields
-   {:device_logs
+   {:authorization_bearer_for_device
+    {:type ResponseAuthorizationBearer
+     :args {:id {:type (non-null Int)}}}
+    :device_logs
     {:type ResponseDeviceLogListTotal
      :args {:limit {:type Int}
             :page {:type Int}

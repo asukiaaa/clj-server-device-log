@@ -386,8 +386,16 @@
     (when (model.user/admin? user)
       (model.device/for-user-delete {:id (:id args) :id-user (:id user)}))))
 
+(defn authorization-bearer-for-device [context args _]
+  (println "authorization-bearer-for-device")
+  (let [user (get-user-loggedin context)]
+    (when (model.user/admin? user)
+      (let [bearer (model.device/get-authorizaton-bearer-by-id (:id args))]
+        {:authorization_bearer bearer}))))
+
 (def resolver-map
-  {:Query/device_logs device-logs
+  {:Query/authorization_bearer_for_device authorization-bearer-for-device
+   :Query/device_logs device-logs
    :Query/device_logs_for_device device-logs-for-device
    :Query/device_logs_for_device_type device-logs-for-device-type
    :Query/device_logs_for_watch_scope device-logs-for-watch-scope

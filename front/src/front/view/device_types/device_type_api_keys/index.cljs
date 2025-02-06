@@ -17,12 +17,7 @@
    [:td (:id device-type-api-key)]
    [:td (:name device-type-api-key)]
    [:td (:permission device-type-api-key)]
-   [:td
-    [:a {:href "#"
-         :on-click
-         (fn [e]
-           (.preventDefault e)
-           (util/copy-to-clipboard (:key_str device-type-api-key)))} util.label/copy]]
+   [:td "TODO"]
    [:td (:updated_at device-type-api-key)]
    [:td
     [:> router/Link {:to (route/device-type-device-type-api-key-show (:device_type_id device-type-api-key) (:id device-type-api-key))} util.label/show]
@@ -81,7 +76,7 @@
            [:th util.label/id]
            [:th util.label/name]
            [:th util.label/permission]
-           [:th util.label/api-key]
+           [:th util.label/authorization-bearer]
            [:th util.label/updated-at]
            [:th util.label/action]]]
          [:tbody
