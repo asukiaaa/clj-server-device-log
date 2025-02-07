@@ -16,19 +16,12 @@
         navigate (router/useNavigate)
         id (get params "device_id")
         [item set-item] (react/useState)
-        [fetching set-fetching] (react/useState)
-        [bearer set-bearer] (react/useState)
         info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
-        fetch-bearer
-        (fn []
-          (set-fetching true)
-          (model.device/fetch-bearer-by-id
-           {:id id
-            :on-receive
-            (fn [item errors]
-              (set-bearer (:authorization_bearer item))
-              (set-fetching false)
-              (wrapper.fetching/finished info-wrapper-fetching errors))}))]
+        fetch-bearer #(model.device/fetch-authorization-bearer-by-id
+                       (merge % {:id id}))
+        on-fetched-bearer
+        (fn [bearer errors]
+          (wrapper.fetching/finished info-wrapper-fetching errors))]
     (react/useEffect
      (fn []
        (wrapper.fetching/start info-wrapper-fetching)
@@ -75,12 +68,7 @@
                   (let [val (key item)]
                     (str (:id val) " " (:name val)))
                   (= key :authorization_bearer)
-                  [:<>
-                   (if bearer
-                     [:f> util/link-to-copy-to-clipboard bearer]
-                     [:button.btn.btn-primary.btn-sm
-                      {:on-click fetch-bearer :disabled fetching}
-                      util.label/get-bearer])]
+                  [:f> util/button-to-fetch-authorization-bearer fetch-bearer {:on-fetched on-fetched-bearer}]
                   :else
                   (str (get item key)))]])]]])})]))
 

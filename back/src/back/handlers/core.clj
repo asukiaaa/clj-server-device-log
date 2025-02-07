@@ -7,8 +7,7 @@
             [back.models.device-type-api-key :as model.device-type-api-key]
             [back.models.device :as model.device]
             [back.models.device-file :as model.device-file]
-            [back.config :as config]
-            [back.util.encryption :as encryption]))
+            [back.config :as config]))
 
 (defn top [req]
   {:status 200
@@ -103,7 +102,7 @@
 
 (defn api-post-device-log [req]
   (let [str-bearer (handler.util/get-bearer req)
-        device-to-post (model.device/get-by-key-str (model.device/get-key-str-from-authorization-bearer str-bearer))]
+        device-to-post (model.device/get-by-authorization-bearer str-bearer)]
     (when  device-to-post
       (let [body (:json-params req)
             data (:data body)]
@@ -114,20 +113,21 @@
 
 (defn api-post-device [req]
   (let [str-bearer (handler.util/get-bearer req)
-        device-type-api-key (model.device-type-api-key/get-by-key-str str-bearer)]
+        device-type-api-key (model.device-type-api-key/get-by-authorization-bearer str-bearer)]
     (when (model.device-type-api-key/has-permission-to-create-device device-type-api-key)
       (let [params (:json-params req)
             id-device-type (:device_type_id device-type-api-key)
             params-device (-> (:device params)
                               (assoc :device_type_id id-device-type))
             result (model.device/create params-device)
-            result (assoc result :hashy_post (-> result :device :key_str))]
+            result (assoc result :authorization_bearer (model.device/build-authorization-bearer (-> result :device :key_str)))]
         {:status 200
          :body (json/write-str result)}))))
 
 (defn api-post-device-file [req]
   (let [str-bearer (handler.util/get-bearer req)
-        device (model.device/get-by-key-str str-bearer)]
+        device (or (model.device/get-by-key-str str-bearer) ; TODO remove after updating key on devices
+                   (model.device/get-by-authorization-bearer str-bearer))]
     (when device
       (let [id-device (:id device)
             info-file (-> req :multipart-params (get "file"))

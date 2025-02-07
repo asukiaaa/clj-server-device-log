@@ -3,6 +3,7 @@
   (:require [goog.string :refer [format]]
             clojure.string
             [front.model.device-type :as model.device-type]
+            [front.model.util.authorization-bearer :as bearer]
             [front.model.util :as util]))
 
 (def name-table "device_type_api_key")
@@ -32,6 +33,12 @@
                      :str-keys-of-item str-keys-for-table
                      :id id-device-type-api-key
                      :str-additional-params (format "device_type_id: %s" (util/build-input-str-for-int id-device-type))
+                     :on-receive on-receive}))
+
+(defn fetch-authorization-bearer-by-id [{:keys [id on-receive]}]
+  (util/fetch-by-id {:name-table (format "authorization_bearer_for_%s" name-table)
+                     :str-keys-of-item bearer/str-keys
+                     :id id
                      :on-receive on-receive}))
 
 (defn delete [{:keys [id on-receive]}]

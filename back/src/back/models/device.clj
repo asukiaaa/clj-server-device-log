@@ -52,18 +52,14 @@
 (defn get-by-id [id & [{:keys [transaction]}]]
   (model.util/get-by-id id name-table {:transaction transaction}))
 
-(def format-datetime (cljt-format/formatter "yyyy-MM-dd HH:mm:ss"))
-
-(defn get-key-str-from-authorization-bearer [bearer]
-  (let [decoded-bearer (encryption/decode bearer)]
-    (-> decoded-bearer :device :key_str)))
+(defn build-authorization-bearer [item]
+  (let [data-for-bearer {key-table {:key_str (:key_str item)}
+                         :created_at (cljt-format/unparse model.util/time-format-yyyymmdd-hhmmss (cljt/now))}]
+    (encryption/encode data-for-bearer)))
 
 (defn get-authorizaton-bearer-by-id [id-device & [{:keys [transaction]}]]
-  (let [device (get-by-id id-device {:transaction transaction})
-        data-for-bearer {:device {:key_str (:key_str device)}
-                         :created_at (cljt-format/unparse format-datetime (cljt/now))}]
-    #_(println data-for-bearer)
-    (encryption/encode data-for-bearer)))
+  (let [item (get-by-id id-device {:transaction transaction})]
+    (build-authorization-bearer item)))
 
 (defn get-list-by-ids [ids & [{:keys [transaction]}]]
   (when-not (empty? ids)
@@ -77,6 +73,11 @@
     (let [query (format "SELECT * from %s WHERE key_str = \"%s\"" name-table (model.util/escape-for-sql key-str))
           user (first (jdbc/query (or transaction db-spec) [query]))]
       user)))
+
+(defn get-by-authorization-bearer [bearer & [{:keys [transaction]}]]
+  (let [decoded-bearer (encryption/decode bearer)
+        key-str (-> decoded-bearer key-table :key_str)]
+    (get-by-key-str key-str {:transaction transaction})))
 
 (defn delete [id]
   ; TODO prohibit deleting when who has device

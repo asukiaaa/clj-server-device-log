@@ -1,18 +1,22 @@
 (ns back.models.device-type-api-key
   (:refer-clojure :exclude [update])
-  (:require [clojure.java.jdbc :as jdbc]
+  (:require [clj-time.core :as cljt]
+            [clj-time.format :as cljt-format]
+            [clojure.java.jdbc :as jdbc]
             [clojure.core :refer [format]]
             [clojure.data.json :as json]
             [clojure.string :refer [join]]
             [back.config :refer [db-spec]]
+            [back.models.device-type :as model.device-type]
             [back.models.util :as model.util]
-            [back.models.device-type :as model.device-type]))
+            [back.util.encryption :as encryption]))
 
 (def name-table "device_type_api_key")
-(def name-table-with-device-type (format "%s LEFT JOIN %s ON device_type_id = %s.id"
-                                          name-table
-                                          model.device-type/name-table
-                                          model.device-type/name-table))
+(def name-table-with-device-type
+  (format "%s LEFT JOIN %s ON device_type_id = %s.id"
+          name-table
+          model.device-type/name-table
+          model.device-type/name-table))
 (def key-table (keyword name-table))
 
 (defn filter-params [params]
@@ -21,10 +25,24 @@
 (defn get-by-id [id & [{:keys [transaction]}]]
   (model.util/get-by-id id name-table {:transaction transaction}))
 
+(defn build-authorization-bearer [item]
+  (let [data-for-bearer {key-table {:key_str (:key_str item)}
+                         :created_at (cljt-format/unparse model.util/time-format-yyyymmdd-hhmmss (cljt/now))}]
+    (encryption/encode data-for-bearer)))
+
+(defn get-authorizaton-bearer-by-id [id-device & [{:keys [transaction]}]]
+  (let [item (get-by-id id-device {:transaction transaction})]
+    (build-authorization-bearer item)))
+
 (defn get-by-key-str [key-str & [{:keys [transaction]}]]
   (when-not (empty? key-str)
     (let [query (format "SELECT * from %s WHERE key_str = \"%s\"" name-table (model.util/escape-for-sql key-str))]
       (first (jdbc/query (or transaction db-spec) [query])))))
+
+(defn get-by-authorization-bearer [bearer & [{:keys [transaction]}]]
+  (let [decoded-bearer (encryption/decode bearer)
+        key-str (-> decoded-bearer key-table :key_str)]
+    (get-by-key-str key-str {:transaction transaction})))
 
 (defn get-by-id-for-user-and-device-type [id-device-type-api-key id-user id-device-type & [{:keys [transaction]}]]
   (let [query (join " " ["SELECT * from" name-table-with-device-type "WHERE"

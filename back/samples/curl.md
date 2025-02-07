@@ -5,7 +5,7 @@
 Example command to upload file for device
 
 ```sh
-AUTHORIZATION_BEARER="key-str-of-device"
+AUTHORIZATION_BEARER="authorization-bearer-of-device"
 PATH_FILE="your-local/image.png"
 HOST=http://localhost:3000
 curl -X POST ${HOST}/api/device_file \
@@ -18,7 +18,7 @@ curl -X POST ${HOST}/api/device_file \
 Example commands to create device
 
 ```sh
-AUTHORIZATION_BEARER="key-str-of-device-group-api-key"
+AUTHORIZATION_BEARER="authorization-bearer-of-device-group-api-key"
 HOST=http://localhost:3000
 curl -X POST ${HOST}/api/device \
   -H 'Content-Type: application/json' \

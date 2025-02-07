@@ -241,6 +241,9 @@
    {:authorization_bearer_for_device
     {:type ResponseAuthorizationBearer
      :args {:id {:type (non-null Int)}}}
+    :authorization_bearer_for_device_type_api_key
+    {:type ResponseAuthorizationBearer
+     :args {:id {:type (non-null Int)}}}
     :device_logs
     {:type ResponseDeviceLogListTotal
      :args {:limit {:type Int}

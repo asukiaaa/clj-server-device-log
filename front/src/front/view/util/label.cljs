@@ -42,6 +42,7 @@
 (def files "Files")
 (def from "From")
 (def get-bearer "Get bearer")
+(def hide "Hide")
 (def id "ID")
 (def logs "Logs")
 (def next "Next")

@@ -2,10 +2,11 @@
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.data.json :as json]
             [clojure.core :refer [format]]
-            [clj-time.format :as f]
+            [clj-time.format :as cljt-format]
             [clojure.string :refer [escape join]]
             [back.config :refer [db-spec]]))
 
+(def time-format-yyyymmdd-hhmmss (cljt-format/formatter "YYYY-MM-dd HH:mm:ss"))
 (def ^:private str-alphabets-and-number "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 (def ^:private str-parentesis-and-special-chars ":[]\\/.,\"!#$%&'()-^")
 
@@ -67,5 +68,3 @@
       (#(if-not (empty? str-where) (str % " where " str-where) %))
       (append-limit-offset-by-limit-page-params params)
       (get-list-with-total {:transaction transaction})))
-
-(def time-format-yyyymmdd-hhmmss (f/formatter "YYYY-MM-dd HH:mm:ss"))

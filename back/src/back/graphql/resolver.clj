@@ -393,8 +393,16 @@
       (let [bearer (model.device/get-authorizaton-bearer-by-id (:id args))]
         {:authorization_bearer bearer}))))
 
+(defn authorization-bearer-for-device-type-api-key [context args _]
+  (println "authorization-bearer-for-device-type-api-key")
+  (let [user (get-user-loggedin context)]
+    (when (model.user/admin? user)
+      (let [bearer (model.device-type-api-key/get-authorizaton-bearer-by-id (:id args))]
+        {:authorization_bearer bearer}))))
+
 (def resolver-map
   {:Query/authorization_bearer_for_device authorization-bearer-for-device
+   :Query/authorization_bearer_for_device_type_api_key authorization-bearer-for-device-type-api-key
    :Query/device_logs device-logs
    :Query/device_logs_for_device device-logs-for-device
    :Query/device_logs_for_device_type device-logs-for-device-type

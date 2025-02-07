@@ -17,7 +17,11 @@
         id-device-type-api-key (get params "device_type_api_key_id")
         [device-type set-device-type] (react/useState)
         [item set-item] (react/useState)
-        info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))]
+        info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
+        fetch-bearer #(model.device-type-api-key/fetch-authorization-bearer-by-id (merge % {:id id-device-type-api-key}))
+        on-fetched-bearer
+        (fn [bearer errors]
+          (wrapper.fetching/finished info-wrapper-fetching errors))]
     (react/useEffect
      (fn []
        (wrapper.fetching/start info-wrapper-fetching)
@@ -61,7 +65,7 @@
                [:td
                 (cond
                   (= key :authorization_bearer)
-                  [:div "TODO"]
+                  [:f> util/button-to-fetch-authorization-bearer fetch-bearer {:on-fetched on-fetched-bearer}]
                   :else (get item key))]])]]])})]))
 
 (defn core []

@@ -157,7 +157,7 @@
 (defn copy-to-clipboard [text]
   (-> js/navigator .-clipboard (.writeText text)))
 
-(defn link-to-copy-to-clipboard [text]
+(defn button-to-copy-to-clipboard [text]
   (let [[clicked set-clicked] (react/useState)
         on-click
         (fn [e]
@@ -167,4 +167,31 @@
     [:<>
      (if clicked
        [:span util.label/copied]
-       [:a {:href "#" :on-click on-click} util.label/copy])]))
+       [:button.btn.btn-secondary.btn-sm {:on-click on-click} util.label/copy])]))
+
+(defn button-to-fetch-authorization-bearer [fetch-authorization-bearer & [{:keys [on-fetched]}]]
+  (let [[fetching set-fetching] (react/useState)
+        [bearer set-bearer] (react/useState)
+        [show set-show] (react/useState)
+        on-click
+        (fn []
+          (set-fetching true)
+          (fetch-authorization-bearer
+           {:on-receive
+            (fn [item errors]
+              (let [bearer (:authorization_bearer item)]
+                (set-bearer bearer)
+                (set-fetching false)
+                (when on-fetched (on-fetched bearer errors))))}))]
+    (if bearer
+      [:div
+       [:span.me-1
+        (if show
+          [:button.btn.btn-secondary.btn-sm {:on-click #(set-show false)} util.label/hide]
+          [:button.btn.btn-secondary.btn-sm {:on-click #(set-show true)} util.label/show])]
+       [:f> button-to-copy-to-clipboard bearer]
+       (when show
+         [:div bearer])]
+      [:button.btn.btn-secondary.btn-sm
+       {:on-click on-click :disabled fetching}
+       util.label/get-bearer])))

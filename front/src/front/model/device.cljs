@@ -48,7 +48,7 @@
                      :id id
                      :on-receive on-receive}))
 
-(defn fetch-bearer-by-id [{:keys [id on-receive]}]
+(defn fetch-authorization-bearer-by-id [{:keys [id on-receive]}]
   (util/fetch-by-id {:name-table (format "authorization_bearer_for_%s" name-table)
                      :str-keys-of-item bearer/str-keys
                      :id id
