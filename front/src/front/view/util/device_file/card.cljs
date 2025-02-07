@@ -1,6 +1,7 @@
 (ns front.view.util.device-file.card
   (:require ["react-router-dom" :as router]
             [front.route :as route]
+            [front.util.timezone :as util.timezone]
             [front.view.util.label :as util.label]))
 
 (defn core [device-file & [{:keys [without-device on-click-image]}]]
@@ -19,4 +20,4 @@
       (when-not without-device
         [:div
          [:> router/Link {:to (route/device-device-files id-device)} (util.label/device-item device)]])
-      [:div created-at]]]))
+      [:div (util.timezone/build-datetime-str-in-timezone created-at {:datetime-format util.timezone/date-fns-format-datetime-until-minutes-with-timezone})]]]))

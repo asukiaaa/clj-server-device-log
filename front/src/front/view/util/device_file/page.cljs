@@ -7,7 +7,8 @@
             [front.view.common.wrapper.fetching :as wrapper.fetching]
             [front.view.util.device-file.card :as file.card]
             [front.view.util :as util]
-            [front.view.util.label :as util.label]))
+            [front.view.util.label :as util.label]
+            [front.util.timezone :as util.timezone]))
 
 (defn core [fetch-list-and-total & [{:keys [on-receive]}]]
   (let [location (router/useLocation)
@@ -73,7 +74,9 @@
          [:div
           [:> router/Link {:to (route/device-device-files (:id device))} (util.label/device-item device)]
           " "
-          (:created_at item-on-modal)])]
+          (util.timezone/build-datetime-str-in-timezone
+           (:created_at item-on-modal)
+           {:datetime-format util.timezone/date-fns-format-datetime-until-minutes-with-timezone})])]
       [:> bs/Modal.Body {:class :p-0}
        [:img {:src (:path item-on-modal)
               :key (:path item-on-modal)

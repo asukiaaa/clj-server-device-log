@@ -1,8 +1,8 @@
 (ns front.view.util.device-log.list
   (:require [cljs-time.core :as t]
-            [cljs-time.format :as tf]
             ["react" :as react]
             [goog.string]
+            [front.util.timezone :as util.timezone]
             [front.model.device-log :as model.log]))
 
 (defn build-badge-item [record badge data id]
@@ -20,7 +20,7 @@
     (when (cond
             (seq hours-action)
             (let [[in-or-not-in str-hours] hours-action
-                  record-time (tf/parse (tf/formatter "YYYY-MM-dd HH:mm:ss.0") val)
+                  record-time (util.timezone/parse-datetime val) #_(tf/parse (tf/formatter "YYYY-MM-dd HH:mm:ss.SSS") val)
                   ;; formatter (tf/formatter "YYYY-MM-dd HH:mm:ss")
                   threshold-time (t/minus (t/now) (t/hours (js/parseInt str-hours)))]
               ;; (println (tf/unparse formatter threshold-time) (tf/unparse formatter record-time))

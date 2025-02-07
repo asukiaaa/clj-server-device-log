@@ -44,6 +44,7 @@
 (def get-bearer "Get bearer")
 (def hide "Hide")
 (def id "ID")
+(def invalid-date "Invalid date")
 (def logs "Logs")
 (def next "Next")
 (def no-file-to-show "No file to show")
