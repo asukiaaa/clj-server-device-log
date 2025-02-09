@@ -36,7 +36,7 @@
           date (parse str-datetime date-fns-format-with-timezone (TZDate.))
           date (when-not (isValid date)
                  (parse (str str-datetime " +0000") date-fns-format-with-timezone (TZDate.)))
-          str-timezone (or str-timezone "America/Los_Angeles" #_(get-from-browzer))]
+          str-timezone (or str-timezone (get-from-browzer))]
       #_(.log js/console date)
       #_(println (isValid date) (format date date-fns-format-with-timezone))
       (if (isValid date)

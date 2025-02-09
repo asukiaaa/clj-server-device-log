@@ -169,6 +169,7 @@
   {:fields
    {:id {:type (non-null Int)}
     :device_id {:type (non-null Int)}
+    :device {:type Device}
     :watch_scope_id {:type (non-null Int)}
     :datetime_from {:type String}
     :datetime_until {:type String}

@@ -276,7 +276,14 @@
   (println "args for watch-scope" args)
   (when-let [user (get-user-loggedin context)]
     (when (model.user/admin? user)
-      (model.watch-scope/get-by-id (:id args)))))
+      (jdbc/with-db-transaction [transaction db-spec]
+        (when-let [watch-scope (model.watch-scope/get-by-id (:id args) {:transaction transaction})]
+          (let [terms (model.watch-scope-term/get-list-for-watch-scope (:id watch-scope) {:transaction transaction})
+                devices (model.device/get-list-by-ids (map :device_id terms) {:transaction transaction})
+                map-device (into {} (for [device devices] [(:id device) device]))
+                terms (for [term terms]
+                        (assoc term :device (get map-device (:device_id term))))]
+            (assoc watch-scope :terms terms)))))))
 
 (defn watch-scope-create [context args _]
   (println "args watch-scope-create" args)

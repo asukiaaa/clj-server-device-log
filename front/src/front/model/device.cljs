@@ -4,14 +4,13 @@
             [clojure.string :refer [join]]
             [front.model.device-type :as model.device-type]
             [front.model.util.authorization-bearer :as bearer]
+            [front.model.util.device :as util.device]
             [front.model.util :as util]))
 
-(def name-table "device")
-(def keys-for-device [:id :device_type_id :user_team_id :name :created_at :updated_at])
-(def str-keys-for-device (join " " (map name keys-for-device)))
+(def name-table util.device/name-table)
 (defn build-str-keys-for-device-with-peripherals []
   (join " "
-        [str-keys-for-device
+        [util.device/str-keys-for-device
          (model.device-type/build-str-table-and-keys)
          "user_team{id name owner_user_id}"]))
 

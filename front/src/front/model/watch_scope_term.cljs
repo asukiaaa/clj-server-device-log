@@ -2,12 +2,12 @@
   (:refer-clojure :exclude [update])
   (:require [goog.string :refer [format]]
             clojure.string
+            [front.model.util.watch-scope-term :as util.watch-scope-term]
             [front.model.watch-scope :as model.watch-scope]
             [front.model.util :as util]))
 
-(def name-table "watch_scope_term")
-(def keys-for-table [:id :watch_scope_id :device_id :time_from :time_until :created_at :updated_at])
-(def str-keys-for-table (clojure.string/join " " (map name keys-for-table)))
+(def name-table util.watch-scope-term/name-table)
+(def str-keys-for-table util.watch-scope-term/str-keys-for-table)
 
 (defn fetch-list-and-total-for-watch-scope [{:keys [id-watch-scope on-receive limit page]}]
   (util/fetch-list-and-total {:name-table (str name-table "s_for_watch_scope")

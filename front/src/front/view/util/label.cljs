@@ -29,6 +29,10 @@
 (def create "Create")
 (def created-at "Created at")
 (def dashboard "Dashboard")
+(defn datetime-from-item [str-datetiem-from]
+  (str "from " str-datetiem-from))
+(defn datetime-until-item [str-datetiem-from]
+  (str "until " str-datetiem-from))
 (def delete "Delete")
 (def device "Device")
 (def devices "Devices")
@@ -48,6 +52,7 @@
 (def logs "Logs")
 (def next "Next")
 (def no-file-to-show "No file to show")
+(def no-term "No term")
 (def password "Password")
 (def password-again "Password again")
 (def password-edit "Edit password")
