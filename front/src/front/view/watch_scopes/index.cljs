@@ -26,9 +26,7 @@
      {:message-confirm (model.watch-scope/build-confirmation-message-for-deleting watch-scope)
       :action-delete #(model.watch-scope/delete {:id (:id watch-scope) :on-receive on-delete})}]
     " "
-    [:> router/Link {:to (route/watch-scope-device-logs (:id watch-scope))} util.label/logs]
-    " "
-    [:> router/Link {:to (route/watch-scope-watch-scope-terms (:id watch-scope))} util.label/terms]]])
+    [:> router/Link {:to (route/watch-scope-device-logs (:id watch-scope))} util.label/logs]]])
 
 (defn-  page []
   (let [location (router/useLocation)

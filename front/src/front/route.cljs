@@ -50,14 +50,14 @@
 (defn watch-scope-show [id] (str watch-scopes "/" id))
 (defn watch-scope-edit [id] (str (watch-scope-show id) "/edit"))
 
-(defn watch-scope-watch-scope-terms [id-watch-scope]
-  (str (watch-scope-show id-watch-scope) "/watch_scope_terms"))
-(defn watch-scope-watch-scope-term-create [id-watch-scope]
-  (str (watch-scope-watch-scope-terms id-watch-scope) "/create"))
-(defn watch-scope-watch-scope-term-show [id-watch-scope id-watch-scope-term]
-  (str (watch-scope-watch-scope-terms id-watch-scope) "/" id-watch-scope-term))
-(defn watch-scope-watch-scope-term-edit [id-watch-scope id-watch-scope-term]
-  (str (watch-scope-watch-scope-term-show id-watch-scope id-watch-scope-term) "/edit"))
+#_(defn watch-scope-watch-scope-terms [id-watch-scope]
+    (str (watch-scope-show id-watch-scope) "/watch_scope_terms"))
+#_(defn watch-scope-watch-scope-term-create [id-watch-scope]
+    (str (watch-scope-watch-scope-terms id-watch-scope) "/create"))
+#_(defn watch-scope-watch-scope-term-show [id-watch-scope id-watch-scope-term]
+    (str (watch-scope-watch-scope-terms id-watch-scope) "/" id-watch-scope-term))
+#_(defn watch-scope-watch-scope-term-edit [id-watch-scope id-watch-scope-term]
+    (str (watch-scope-watch-scope-term-show id-watch-scope id-watch-scope-term) "/edit"))
 
 (defn watch-scope-device-logs [id-watch-scope]
   (str (watch-scope-show id-watch-scope) "/device_logs"))
@@ -65,4 +65,4 @@
 (defn show-login-page-when-not-loggedin [path]
   (and (includes? path front)
        (not (includes? path login))
-       #_(not )))
+       #_(not)))
