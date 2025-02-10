@@ -17,9 +17,10 @@
 (defn delete [id]
   (jdbc/delete! db-spec key-table ["id = ?" id]))
 
-(defn update [id params]
+(defn update [id params & [{:keys [transaction]}]]
+  (println :update-watch-scope id (filter-params params))
   (jdbc/with-db-transaction [t-con db-spec]
-    (jdbc/update! db-spec key-table params ["id = ?" id])
+    (jdbc/update! (or transaction db-spec) key-table (filter-params params) ["id = ?" id])
     {key-table (get-by-id id {:transaction t-con})}))
 
 (defn update-for-owner-user [{:keys [id id-user params]}]

@@ -3,11 +3,13 @@
             ["react-router-dom" :as router]
             [clojure.walk :refer [keywordize-keys]]
             [front.route :as route]
-            [front.view.common.wrapper.fetching :as wrapper.fetching]
+            [front.model.device :as model.device]
             [front.model.watch-scope :as model.watch-scope]
+            [front.view.common.wrapper.fetching :as wrapper.fetching]
             [front.view.common.wrapper.show404 :as wrapper.show404]
             [front.view.util.label :as util.label]
             [front.view.util.breadcrumb :as breadcrumb]
+            [front.view.util.watch-scope :as util.watch-scope]
             [front.view.util :as util]))
 
 (defn- page []
@@ -17,10 +19,24 @@
         [item set-item] (react/useState)
         state-info-system (util/build-state-info :__system #(react/useState))
         state-info-name (util/build-state-info :name #(react/useState))
+        state-info-terms (util/build-state-info :terms #(react/useState []))
+        [device-list-and-total set-device-list-and-total] (react/useState)
+        info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
+        load-devices
+        (fn [id-user-team next]
+          (model.device/fetch-list-and-total-for-user-team
+           {:limit 1000
+            :user_team_id id-user-team
+            :page 0
+            :on-receive
+            (fn [result errors]
+              (set-device-list-and-total result)
+              (next errors))}))
         on-receive-item
         (fn [item]
           (set-item item)
-          (util/set-default-and-draft state-info-name (:name item)))
+          (util/set-default-and-draft state-info-name (:name item))
+          (util/set-default-and-draft state-info-terms (util.watch-scope/terms-params->draft (:terms item))))
         on-receive-response (fn [data errors]
                               (when errors ((:set-errors state-info-system) errors))
                               (if-let [errors-str (:errors data)]
@@ -37,15 +53,22 @@
           (model.watch-scope/update
            {:id id-item
             :name (:draft state-info-name)
-            :on-receive on-receive-response}))
-        info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))]
+            :terms (util.watch-scope/terms-draft->params (:draft state-info-terms))
+            :on-receive on-receive-response}))]
     (react/useEffect
      (fn []
        (wrapper.fetching/start info-wrapper-fetching)
-       (model.watch-scope/fetch-by-id {:id id-item
-                                       :on-receive (fn [user errors]
-                                                     (on-receive-item user)
-                                                     (wrapper.fetching/finished info-wrapper-fetching errors))})
+       (model.watch-scope/fetch-by-id
+        {:id id-item
+         :on-receive
+         (fn [item errors]
+           (on-receive-item item)
+           (if-not (empty? errors)
+             (wrapper.fetching/finished info-wrapper-fetching errors)
+             (load-devices
+              (:user_team_id item)
+              (fn [errors]
+                (wrapper.fetching/finished info-wrapper-fetching errors)))))})
        (fn []))
      #js [])
     [:<>
@@ -61,7 +84,8 @@
           [:form.form-control
            [util/render-errors-as-alerts (:errors state-info-system)]
            [util/render-input util.label/name state-info-name]
-           [:button.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply} util.label/update]]])})]))
+           (util.watch-scope/render-fields-for-terms state-info-terms device-list-and-total)
+           [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} util.label/update]]])})]))
 
 (defn core []
   (wrapper.show404/wrapper

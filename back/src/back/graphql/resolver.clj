@@ -296,15 +296,21 @@
                       (model.user-team/get-by-id-for-owner-user id-user-team (:id user) {:transaction transaction}))]
       (when user-team
         (let [watch-scope (model.watch-scope/create params {:transaction transaction})]
-          (model.watch-scope-term/create-list-for-watch-scope (:terms params) (:id watch-scope) {:transaction transaction})
+          (model.watch-scope-term/create-list-for-watch-scope (:id watch-scope) (:terms params) {:transaction transaction})
           {model.watch-scope/key-table watch-scope})))))
 
 (defn watch-scope-update [context args _]
   (println "args watch-scope-update" args)
-  (let [user (get-user-loggedin context)
-        id (:id args)
-        params (:watch_scope args)]
-    (when (model.user/admin? user) (model.watch-scope/update id params))))
+  (jdbc/with-db-transaction [transaction db-spec]
+    (let [user (get-user-loggedin context)
+          id-watch-scope (:id args)
+          params-watch-scope (:watch_scope args)
+          params-terms (:terms params-watch-scope)]
+      (when (model.user/admin? user)
+        (when-let [watch-scope (model.watch-scope/update id-watch-scope params-watch-scope {:transaction transaction})]
+          (model.watch-scope-term/delete-list-for-watch-scope id-watch-scope {:transaction transaction})
+          (model.watch-scope-term/create-list-for-watch-scope id-watch-scope params-terms {:transaction transaction})
+          (assoc watch-scope :terms (model.watch-scope-term/get-list-for-watch-scope id-watch-scope)))))))
 
 (defn watch-scope-delete [context args _]
   (println "args watch-scope-delete" args)

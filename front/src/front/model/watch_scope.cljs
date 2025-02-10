@@ -63,11 +63,13 @@
                   :str-input-params str-params
                   :on-receive on-receive})))
 
-(defn update [{:keys [id name on-receive]}]
-  (let [str-params (format "id: %s, %s: {name: %s}"
+(defn update [{:keys [id name terms on-receive]}]
+  (let [str-params (format "id: %s, %s: {name: %s, %s: %s}"
                            (util/build-input-str-for-int id)
                            name-table
-                           (util/build-input-str-for-str name))]
+                           (util/build-input-str-for-str name)
+                           name-watch-scope-terms-on-field
+                           (util.term/term-list->param-str terms))]
     (util/update {:name-table name-table
                   :str-keys-receive (build-str-table-and-keys)
                   :str-input-params str-params

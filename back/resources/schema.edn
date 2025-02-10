@@ -44,8 +44,7 @@
     :terms {:type (list InputWatchScopeTermOnWatchScope)}}}
   :InputWatchScopeUpdate
   {:fields
-   {:user_team_id {:type Int}
-    :name {:type String}
+   {:name {:type String}
     :terms {:type (list InputWatchScopeTermOnWatchScope)}}}
   :InputWatchScopeTermCreate
   {:fields

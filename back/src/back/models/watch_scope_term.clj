@@ -55,7 +55,11 @@
           item (get-by-id id {:transaction t-con})]
       {key-table item})))
 
-(defn create-list-for-watch-scope [terms id-watch-scope & [{:keys [transaction]}]]
+(defn delete-list-for-watch-scope [id-watch-scope & [{:keys [transaction]}]]
+  (println :delete-list-for-watch-scoep id-watch-scope)
+  (jdbc/delete! (or transaction db-spec) key-table ["watch_scope_id = ?" id-watch-scope]))
+
+(defn create-list-for-watch-scope [id-watch-scope terms & [{:keys [transaction]}]]
   (let [params (for [term terms] (-> term filter-params (assoc :watch_scope_id id-watch-scope)))]
     (jdbc/insert-multi! (or transaction db-spec) key-table params)))
 
