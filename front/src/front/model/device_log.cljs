@@ -29,14 +29,11 @@
         (if (string? key) key (last key)))))
 
 (defn get-val-from-record [record val-key & [{:keys [data]}]]
-  (let [data (or data (js->clj (.parse js/JSON (:data record))))
-        first-key (if (string? val-key) val-key (first val-key))
+  (let [first-key (if (string? val-key) val-key (first val-key))
         target-field (when-not (empty? first-key)
                        (case first-key
-                         "data" data
-                         "created_at" (:created_at record)
-                         "id" (:id record)
-                         :else nil))
+                         "data" (or data (js->clj (.parse js/JSON (:data record))))
+                         (get record (keyword first-key))))
         json-key (when-not (string? val-key) (rest val-key))]
     (get-by-json-key target-field json-key)))
 

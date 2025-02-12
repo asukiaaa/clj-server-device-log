@@ -7,6 +7,7 @@
             [clj-time.core :as t]
             [clj-time.format :as f]
             [back.config :refer [db-spec]]
+            [back.models.util.device-log :as util.device-log]
             [back.models.util :as model.util]))
 
 (def defaults
@@ -130,9 +131,9 @@
 (defn where-max-group-by? [item]
   (or (get item "group_by") (get item "max")))
 
-(defn build-query-where [{:keys [where base-table-key str-where-and]}]
+(defn build-query-where [{:keys [where base-table-key build-str-where-and]}]
   (->>
-   [str-where-and
+   [(when build-str-where-and (build-str-where-and base-table-key))
     (when-not (or (nil? where) (empty? where))
       (let [where-max-group-by (filter where-max-group-by? where)
             where-normal (filter #(not (where-max-group-by? %)) where)]
@@ -151,7 +152,7 @@
       (when-not (empty? and-list)
         (str "where " (join " AND " and-list)))))))
 
-(defn build-query-select-max-group-by [where-max-group-by {:keys [db-table-key base-table-key]}]
+(defn build-query-select-max-group-by [where-max-group-by {:keys [name-table base-table-key]}]
   #_(println "build-query-select-max-group-by" where-max-group-by)
   (when-not (empty? where-max-group-by)
     (let [;; table-keys (for [item where-max-group-by] (str ))
@@ -165,33 +166,34 @@
                               query (join " " ["(SELECT"
                                                "max(" (build-target-key (walk/keywordize-keys (get item "max"))) ") AS" converted-max-key ","
                                                group-by-key "AS" converted-group-by-key
-                                               "FROM" db-table-key
+                                               "FROM" name-table
                                                "GROUP BY" group-by-key
                                                ") as" table-key])]
                           query)))]
       (println "query for select-max-group-by" query)
       query)))
 
-(defn get-list-with-total [params & [{:keys [str-where-and transaction]}]]
+(defn get-list-with-total [params & [{:keys [build-str-join build-str-where-and transaction]}]]
   (let [limit (or (:limit params) (:limit defaults))
         page (or (:page params) 0)
         order (when-let [str-order (:order params)]
                 (json/read-str str-order))
         where (when-let [w (:where params)] (json/read-str w))
-        db-table-key "device_log"
+        name-table util.device-log/name-table
         base-table-key "dl"
         where-max-group-by (filter where-max-group-by? where)
         str-query-select-max-group-by
         (build-query-select-max-group-by where-max-group-by
-                                         {:db-table-key db-table-key
+                                         {:name-table name-table
                                           :base-table-key base-table-key})
-        str-query (join " " ["SELECT SQL_CALC_FOUND_ROWS dl.*, device.name device_name FROM" db-table-key "AS" base-table-key
+        str-query (join " " ["SELECT SQL_CALC_FOUND_ROWS dl.*, device.name device_name FROM" name-table "AS" base-table-key
                              "LEFT JOIN device ON device.id = dl.device_id"
                              "LEFT JOIN device_type ON device_type.id = device.device_type_id"
+                             (when build-str-join (build-str-join base-table-key))
                              (when-not (empty? str-query-select-max-group-by) (str ", " str-query-select-max-group-by))
                              (build-query-where {:where where
                                                  :base-table-key base-table-key
-                                                 :str-where-and str-where-and})
+                                                 :build-str-where-and build-str-where-and})
                              (build-query-order order base-table-key)
                              "LIMIT" limit
                              "OFFSET" (* limit page)])]
@@ -199,7 +201,7 @@
     (model.util/get-list-with-total [str-query] {:transaction transaction})))
 
 (defn get-by-id [id]
-  (first (jdbc/query db-spec ["select * from device_log where id = ?" id])))
+  (first (jdbc/query db-spec [(format "select * from %s where id = ?" util.device-log/name-table) id])))
 
 (defn create [params]
-  (jdbc/insert! db-spec :device_log params))
+  (jdbc/insert! db-spec util.device-log/key-table params))

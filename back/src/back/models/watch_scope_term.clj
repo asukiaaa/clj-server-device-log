@@ -2,7 +2,9 @@
   (:refer-clojure :exclude [update])
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.core :refer [format]]
+            [clojure.string :refer [join]]
             [back.config :refer [db-spec]]
+            [back.models.util.device-log :as util.device-log]
             [back.models.util :as model.util]))
 
 (def name-table "watch_scope_term")
@@ -14,12 +16,28 @@
   (select-keys params [:id :device_id :watch_scope_id :datetime_from :datetime_until]))
 
 (defn build-query-device-ids-for-watch-scope [id-watch-scope]
-  (format "(SELECT device_id from %s WHERE watch_scope_id = %s)"
-          name-table
-          id-watch-scope))
-
-(defn filter-params [params]
-  (select-keys params [:device_id :watch_scope_id :from :until]))
+  (->> [(format "SELECT %s.id FROM %s INNER JOIN %s ON %s.device_id = %s.device_id"
+                util.device-log/name-table
+                util.device-log/name-table
+                name-table
+                util.device-log/name-table
+                name-table)
+        "WHERE"
+        (format "%s.watch_scope_id = %d" name-table id-watch-scope)
+        "AND"
+        (format "(((%s.datetime_from IS NULL) OR (%s.datetime_from < %s.created_at)) AND ((%s.datetime_until IS NULL) OR (%s.datetime_until > %s.created_at)))"
+                name-table
+                name-table
+                util.device-log/name-table
+                name-table
+                name-table
+                util.device-log/name-table)
+        (format "GROUP BY %s.id" util.device-log/name-table)]
+       (join " ")
+       (format "(%s)"))
+  #_(format "(SELECT device_id from %s WHERE watch_scope_id = %s)"
+            name-table
+            id-watch-scope))
 
 (defn get-by-id [id & [{:keys [transaction]}]]
   (model.util/get-by-id id name-table

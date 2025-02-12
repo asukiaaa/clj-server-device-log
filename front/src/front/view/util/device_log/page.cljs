@@ -114,7 +114,7 @@
        [:div
         (when-not show-config
           [:f> pagination/core {:total-page total-page}])
-        [:div.m-1 (str "requested " (str (:default info-limit)) " from " total)]
+        [:div.m-1 (str "requested " (:default info-limit) " from " total)]
         (when (get-default-as-bool info-show-graph)
           [:f> util.graph/core logs-key-fetched logs config-renderer])
         (when (get-default-as-bool info-show-table)

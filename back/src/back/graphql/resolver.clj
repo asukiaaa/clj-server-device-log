@@ -23,7 +23,7 @@
 (defn device-logs
   [_ args _]
   (println "args for device-logs" args)
-  (model-device-log/get-list-with-total args {:str-where-and "device_id IS NULL"}))
+  (model-device-log/get-list-with-total args {:build-str-where-and #(format "%s.device_id IS NULL" %)}))
 
 (defn device-logs-for-device
   [context args _]
@@ -34,7 +34,7 @@
         (when-let [device (model.device/get-by-id-for-user id-device (:id user) {:transaction transaction})]
           (-> (model-device-log/get-list-with-total
                args
-               {:str-where-and (format "device_id = %d" id-device)
+               {:build-str-where-and #(format "%s.device_id = %d" % id-device)
                 :transaction transaction})
               (assoc :device device)))))))
 
@@ -46,18 +46,25 @@
         id-user (:id user)]
     (jdbc/with-db-transaction [transaction db-spec]
       (when-let [device-type (model.device-type/get-by-id-for-user id-device-type id-user {:transaction transaction})]
-        (-> (model-device-log/get-list-with-total args {:str-where-and (format "device_type.id = %d" id-device-type)
+        (-> (model-device-log/get-list-with-total args {:build-str-where-and #(format "%s.device_type.id = %d" % id-device-type)
                                                         :transaction transaction})
             (assoc model.device-type/key-table device-type))))))
 
 (defn device-logs-for-watch-scope
   [context args _]
   (println "args for device-logs-for-watch-scope" args)
-  (when-let [user (get-user-loggedin context)]
-    (when (model.user/admin? user)
-      (when-let [id-watch-scope (:watch_scope_id args)]
-        (let [query-device-ids (model.watch-scope-term/build-query-device-ids-for-watch-scope id-watch-scope)]
-          (model-device-log/get-list-with-total args {:str-where-and (format "device_id IN %s" query-device-ids)}))))))
+  (jdbc/with-db-transaction [transaction db-spec]
+    (let [user (get-user-loggedin context)
+          id-watch-scope (:watch_scope_id args)
+          watch-scope (model.watch-scope/get-by-id id-watch-scope {:transaction transaction})]
+      (when (or (model.user/admin? user) (= (:owner_user_id watch-scope) (:id user)))
+        (model-device-log/get-list-with-total
+         args
+         {:build-str-where-and
+          (fn [name-table-device-log]
+            (format "%s.id IN %s"
+                    name-table-device-log
+                    (model.watch-scope-term/build-query-device-ids-for-watch-scope id-watch-scope)))})))))
 
 (defn login [context args _]
   (println "requested user login")

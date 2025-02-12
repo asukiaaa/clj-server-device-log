@@ -68,6 +68,8 @@
            {:message-confirm (model.watch-scope/build-confirmation-message-for-deleting item)
             :action-delete #(model.watch-scope/delete {:id (:id item)
                                                        :on-receive (fn [] (navigate route/watch-scopes))})}]
+          " "
+          [:> router/Link {:to (route/watch-scope-device-logs id)} util.label/logs]
           [:table.table.table-sm
            [:thead
             [:tr

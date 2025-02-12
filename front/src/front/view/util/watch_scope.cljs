@@ -1,5 +1,6 @@
 (ns front.view.util.watch-scope
-  (:require [front.view.util.label :as util.label]
+  (:require [clojure.string :refer [split]]
+            [front.view.util.label :as util.label]
             [front.view.util :as util]
             [front.model.device :as model.device]))
 
@@ -19,8 +20,21 @@
                              (:datetime_until_date term)
                              (:datetime_until_time term))})))
 
+(defn- parse-str-datetime [str-datetime]
+  (when str-datetime
+    (split str-datetime #" ")))
+
+(defn- term-params->draft [term]
+  (let [[from-date from-time] (parse-str-datetime (:datetime_from term))
+        [until-date until-time] (parse-str-datetime (:datetime_until term))]
+    (assoc term
+           :datetime_from_date from-date
+           :datetime_from_time from-time
+           :datetime_until_date until-date
+           :datetime_until_time until-time)))
+
 (defn terms-params->draft [terms]
-  (into {} (for [[index term] (map-indexed vector terms)] [index term])))
+  (into {} (for [[index term] (map-indexed vector terms)] [index (term-params->draft term)])))
 
 (defn- render-fields-for-term [state-info-terms index options-for-device-ids on-click-delete]
   (let [term (get (:draft state-info-terms) index)]
