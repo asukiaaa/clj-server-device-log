@@ -75,8 +75,7 @@
           [:> router/Link {:to (route/device-device-files (:id device))} (util.label/device-item device)]
           " "
           (util.timezone/build-datetime-str-in-timezone
-           (:created_at item-on-modal)
-           {:datetime-format util.timezone/date-fns-format-datetime-until-minutes-with-timezone})])]
+           (:recorded_at item-on-modal))])]
       [:> bs/Modal.Body {:class :p-0}
        [:img {:src (:path item-on-modal)
               :key (:path item-on-modal)

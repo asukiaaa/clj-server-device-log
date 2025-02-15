@@ -27,12 +27,13 @@
         time))))
 
 (def date-fns-format-with-timezone "yyyy-MM-dd HH:mm:ss.SSS XX")
-(def date-fns-format-datetime-until-minutes-with-timezone "yyyy-MM-dd HH:mm XX")
+(def date-fns-format-with-timezone-until-second "yyyy-MM-dd HH:mm:ss XX")
+(def date-fns-format-with-timezone-until-minutes "yyyy-MM-dd HH:mm XX")
 
 (defn build-datetime-str-in-timezone [str-datetime & [{:keys [datetime-format str-timezone]}]]
   (if (empty? str-datetime)
     util.label/invalid-date
-    (let [datetime-format (or datetime-format date-fns-format-with-timezone)
+    (let [datetime-format (or datetime-format date-fns-format-with-timezone-until-second)
           date (parse str-datetime date-fns-format-with-timezone (TZDate.))
           date (when-not (isValid date)
                  (parse (str str-datetime " +0000") date-fns-format-with-timezone (TZDate.)))

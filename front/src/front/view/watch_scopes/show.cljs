@@ -24,12 +24,12 @@
             (util.label/datetime-from-item
              (util.timezone/build-datetime-str-in-timezone
               datetime-from
-              {:datetime-format util.timezone/date-fns-format-datetime-until-minutes-with-timezone})))
+              {:datetime-format util.timezone/date-fns-format-with-timezone-until-minutes})))
           (when datetime-until
             (util.label/datetime-until-item
              (util.timezone/build-datetime-str-in-timezone
               datetime-until
-              {:datetime-format util.timezone/date-fns-format-datetime-until-minutes-with-timezone})))]))]))
+              {:datetime-format util.timezone/date-fns-format-with-timezone-until-minutes})))]))]))
 
 (defn render-terms [terms]
   (for [term terms]

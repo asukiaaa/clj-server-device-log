@@ -8,7 +8,7 @@
   (let [width 200
         height 150
         path-url (:path device-file)
-        created-at (:created_at device-file)
+        recorded-at (:recorded_at device-file)
         id-device (:device_id device-file)
         device (:device device-file)]
     [:div.card.m-2 {:style {:float :left :width width}}
@@ -20,4 +20,4 @@
       (when-not without-device
         [:div
          [:> router/Link {:to (route/device-device-files id-device)} (util.label/device-item device)]])
-      [:div (util.timezone/build-datetime-str-in-timezone created-at {:datetime-format util.timezone/date-fns-format-datetime-until-minutes-with-timezone})]]]))
+      [:div (util.timezone/build-datetime-str-in-timezone recorded-at {:datetime-format util.timezone/date-fns-format-with-timezone-until-minutes})]]]))

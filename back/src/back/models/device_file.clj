@@ -43,7 +43,8 @@
   (let [{:keys [transaction]} optional-params
         {:keys [list total]}
         (model.util/get-list-with-total-with-building-query
-         name-table params optional-params)]
+         name-table params (assoc optional-params
+                                  :str-order "recorded_at DESC"))]
     {:list (-> list
                (assign-device-to-list {:transaction transaction})
                assign-path-url-to-list)

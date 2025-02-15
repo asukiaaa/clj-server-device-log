@@ -6,7 +6,7 @@
             [front.model.util :as util]))
 
 (def name-table "device_file")
-(def keys-for-table [:path :device_id :created_at])
+(def keys-for-table [:path :device_id :recorded_at :created_at])
 (defn build-str-keys-for-table [& [{:keys [without-device]}]]
   (join " "
         [(join " " (map name keys-for-table))
