@@ -146,6 +146,7 @@
    {:device_id {:type (non-null Int)}
     :path {:type String}
     :device {:type Device}
+    :recorded_at {:type String}
     :created_at {:type String}}}
   :ResponseDeviceFileForDeviceListTotal
   {:fields

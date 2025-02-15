@@ -63,8 +63,9 @@
           item (get-by-id #_"(SELECT LAST_INSERT_ID())" id (name key-table) {:transaction t-con})]
       item)))
 
-(defn get-list-with-total-with-building-query [name-table params & [{:keys [str-where str-keys-select transaction]}]]
+(defn get-list-with-total-with-building-query [name-table params & [{:keys [str-where str-keys-select transaction str-before-where]}]]
   (-> (build-query-get-index name-table {:str-keys-select str-keys-select})
+      (#(if-not (empty? str-before-where) (str % " " str-before-where) %))
       (#(if-not (empty? str-where) (str % " where " str-where) %))
       (append-limit-offset-by-limit-page-params params)
       (get-list-with-total {:transaction transaction})))

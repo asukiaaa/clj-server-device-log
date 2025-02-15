@@ -8,6 +8,9 @@
 (def timeformat-datetime-with-millis (time.format/formatter "yyyyMMdd-HHmmss-SSS"))
 (def path-url-filestorage "/filestorage")
 
+(defn parse-str-datetime [str-datetime]
+  (time.format/parse timeformat-datetime-with-millis str-datetime))
+
 (defn- build-path-dir-for-devices-after-filestorage []
   "device/")
 
@@ -46,23 +49,21 @@
 (def pattern-created-at-in-path-url
   (re-pattern (str path-url-filestorage "/device/[0-9]+/([0-9-]+)/.*?")))
 
-#_(def pattern-timestamp-on-path
-    (re-pattern (str path-url-filestorage)))
+(def pattern-filename-in-path-url
+  (re-pattern (str path-url-filestorage "/device/[0-9]+/[0-9-]+/(.*+)")))
 
 (defn convert-timestamp-on-path-to-timestamp-ordinal [timestamp-on-path]
   (when-let [result (re-matches #"(\d{4})(\d{2})(\d{2})-(\d{2})(\d{2})(\d{2})-(\d{3})"  timestamp-on-path)]
     (let [[_ year month day hour min sec millis] result]
       (str year "-" month "-" day " " hour ":" min ":" sec "." millis))))
 
-(defn get-created-at-from-path-url [path-url]
+(defn get-str-created-at-from-path-url [path-url]
   (let [result (re-seq pattern-created-at-in-path-url path-url)]
     (-> result first second)))
 
-(defn- build-path-url-of-item [item]
-  (let [id-device (:device_id item)
-        str-datetime (:datetime_dir item)
-        name (:name item)]
-    (str (build-path-dir-for-device-after-filestorage id-device) "/" str-datetime "/" name)))
+(defn get-filename-from-path-url [path-url]
+  (let [result (re-seq pattern-filename-in-path-url path-url)]
+    (-> result first second)))
 
 (defn- get-path-files [dir]
   (->> dir io/file file-seq
@@ -72,8 +73,20 @@
 (defn get-path-files-for-device [id-device]
   (get-path-files (build-dir-for-device id-device)))
 
-(defn get-path-files-for-devices [id-device]
+(defn get-path-files-for-devices []
   (get-path-files (build-dir-for-devices)))
+
+(defn get-ids-device []
+  (->> (build-dir-for-devices) io/file .list seq
+       (map (fn [item] (Integer. item)))))
+
+(defn- split-by-params [list-files params]
+  (let [{:keys [limit page]} params]
+    (->> list-files
+         (split-at (* limit page))
+         second
+         (split-at limit)
+         first)))
 
 (defn create-file-for-device [file-input filename id-device]
   (let [str-datetime (time.format/unparse timeformat-datetime-with-millis (time/now))
@@ -88,12 +101,17 @@
     (io/copy file-input (io/file path-file)) ; TODO avoid overwriting
     params))
 
+(defn build-path-local-for-device-file [item]
+  (str path-filestorage "/" (build-path-file-for-device-after-filestorage item)))
+
 (defn build-info-map-from-path-file [path-file]
   (let [path-url (convert-path-file-to-path-url path-file)
         id-device (get-id-device-from-path-url path-url)
+        filename (get-filename-from-path-url path-url)
         created-at (-> path-url
-                       get-created-at-from-path-url
+                       get-str-created-at-from-path-url
                        convert-timestamp-on-path-to-timestamp-ordinal)]
     {:path path-url
      :device_id id-device
+     :name filename
      :created_at created-at}))

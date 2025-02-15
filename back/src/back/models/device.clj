@@ -41,6 +41,10 @@
       build-item-for-device-type
       build-item-for-user-team))
 
+(defn build-sql-ids []
+  (format "(SELECT id FROM %s)"
+          name-table))
+
 (defn build-sql-ids-for-user-teams [sql-id-user-team]
   (format "(SELECT id FROM %s WHERE user_team_id IN %s)"
           name-table
