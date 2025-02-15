@@ -214,8 +214,7 @@
     (model.device-type/for-user-delete {:id (:id args)
                                         :id-user (:id user)})))
 
-(defn device-type-api-keys-for-device-type
-  [context args _]
+(defn device-type-api-keys-for-device-type [context args _]
   (println "args for device-type-api-keys-for-device-type" args)
   (let [user (get-user-loggedin context)
         id-user (:id user)]
@@ -225,8 +224,7 @@
              args id-user id-device-type)
             (assoc model.device-type/key-table device-type))))))
 
-(defn device-type-api-key-for-device-type
-  [context args _]
+(defn device-type-api-key-for-device-type [context args _]
   (println "args for device-type-api-key-for-device-type" args)
   (let [user (get-user-loggedin context)]
     (when-let [id-device-type (:device_type_id args)]
@@ -254,15 +252,13 @@
     (model.device-type-api-key/delete-for-user {:id (:id args)
                                                 :id-user (:id user)})))
 
-(defn device-files-for-device
-  [context args _]
+(defn device-files-for-device [context args _]
   (println "args for device-files-for-device" args)
   (let [user (get-user-loggedin context)
         id-device (:device_id args)]
     (model.device-file/get-list-with-total-for-user-device args (:id user) id-device)))
 
-(defn device-files-latest-each-device
-  [context args _]
+(defn device-files-latest-each-device [context args _]
   (println "args for device-files-latest-each-device" args)
   (jdbc/with-db-transaction [transaction db-spec]
     (let [user (get-user-loggedin context)
@@ -271,15 +267,13 @@
           list-and-total (model.device-file/get-list-with-total-latest-each-device args sql-ids-devices {:transaction transaction})]
       list-and-total)))
 
-(defn watch-scopes
-  [context args _]
+(defn watch-scopes [context args _]
   (println "args for watch-scopes" args)
   (when-let [user (get-user-loggedin context)]
     (when (model.user/admin? user)
       (model.watch-scope/get-list-with-total args))))
 
-(defn watch-scope
-  [context args _]
+(defn watch-scope [context args _]
   (println "args for watch-scope" args)
   (when-let [user (get-user-loggedin context)]
     (when (model.user/admin? user)
