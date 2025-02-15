@@ -254,9 +254,14 @@
 
 (defn device-files-for-device [context args _]
   (println "args for device-files-for-device" args)
-  (let [user (get-user-loggedin context)
-        id-device (:device_id args)]
-    (model.device-file/get-list-with-total-for-user-device args (:id user) id-device)))
+  (jdbc/with-db-transaction [transaction db-spec]
+    (let [user (get-user-loggedin context)
+          id-device (:device_id args)
+          device (model.device/get-by-id-for-user id-device (:id user) {:transaction transaction})
+          files-list-total
+          (when device
+            (model.device-file/get-list-with-total-for-device args id-device {:transaction transaction}))]
+      (assoc files-list-total model.device/key-table device))))
 
 (defn device-files-latest-each-device [context args _]
   (println "args for device-files-latest-each-device" args)
