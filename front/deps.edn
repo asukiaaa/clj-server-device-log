@@ -1,10 +1,9 @@
 {:deps {org.clojure/clojure {:mvn/version "1.11.1"}
         org.clojure/clojurescript {:mvn/version "1.11.132"}
         org.slf4j/slf4j-simple {:mvn/version "2.0.13"}
-        com.google.javascript/closure-compiler-unshaded {:mvn/version "v20230802"}
         com.andrewmcveigh/cljs-time {:mvn/version "0.5.2"}
         lambdaisland/uri {:mvn/version "1.19.155"}
-        thheller/shadow-cljs {:mvn/version "2.27.5"}
+        thheller/shadow-cljs {:mvn/version "2.28.20"}
         reagent/reagent {:mvn/version "1.2.0" :exclusions [cljsjs/react cljsjs/react-dom]}
         re-graph/re-graph {:mvn/version "0.1.17"}}
  :paths ["src" "resources" "target" "node_modules"]
