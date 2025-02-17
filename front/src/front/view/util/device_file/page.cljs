@@ -13,9 +13,10 @@
 (defn core [fetch-list-and-total & [{:keys [on-receive]}]]
   (let [location (router/useLocation)
         [list-and-total set-list-and-total] (react/useState)
-        [item-on-modal set-item-in-modal] (react/useState)
+        index-last (dec (count (:list list-and-total)))
         info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
         received-list (:list list-and-total)
+        [index-show-modal set-index-show-modal] (react/useState)
         total (:total list-and-total)
         query-params (util/read-query-params)
         number-page (or (:page query-params) 0)
@@ -38,53 +39,43 @@
               (when on-receive (on-receive result errors))
               (wrapper.fetching/finished info-wrapper-fetching errors))}))
         on-click-image
-        (fn [item]
-          (set-item-in-modal item))
+        (fn [index]
+          (println :click-image index)
+          (set-index-show-modal index))
         on-click-next
         (fn []
-          (let [list (:list list-and-total)
-                path-current (:path item-on-modal)
-                index-next-item (->> (for [[index item] (map-indexed vector list)]
-                                       (when (= (:path item) path-current)
-                                         (inc index)))
-                                     (remove nil?)
-                                     first)
-                next-item (get list index-next-item)]
-            (set-item-in-modal next-item)))
+          (let [list (:list list-and-total)]
+            (set-index-show-modal (if (= index-show-modal (dec (count list)))
+                                    nil (inc index-show-modal)))))
         on-click-prev
         (fn []
-          (let [list (:list list-and-total)
-                path-current (:path item-on-modal)
-                index-prev-item (->> (for [[index item] (map-indexed vector list)]
-                                       (when (= (:path item) path-current)
-                                         (dec index)))
-                                     (remove nil?)
-                                     first)
-                prev-item (get list index-prev-item)]
-            (set-item-in-modal prev-item)))]
+          (let [list (:list list-and-total)]
+            (set-index-show-modal (if (> index-show-modal 0)
+                                    (dec index-show-modal) nil))))]
     (react/useEffect
      (fn []
        (load-list)
        (fn []))
      #js [location])
     [:<>
-     [:> bs/Modal {:show (seq item-on-modal) :size :xl :onHide #(set-item-in-modal nil)}
-      [:> bs/Modal.Header {:closeButton true}
-       (let [device (-> item-on-modal :device)]
-         [:div
-          [:> router/Link {:to (route/device-device-files (:id device))} (util.label/device-item device)]
-          " "
-          (util.timezone/build-datetime-str-in-timezone
-           (:recorded_at item-on-modal))])]
-      [:> bs/Modal.Body {:class :p-0}
-       [:img {:src (:path item-on-modal)
-              :key (:path item-on-modal)
-              :style {:object-fit :contain
-                      :width "100%"}}]]
-      [:> bs/Modal.Footer
-       #_[:> bs/Button {:on-click #(set-item-in-modal nil)} util.label/close]
-       [:> bs/Button {:on-click on-click-prev} util.label/prev]
-       [:> bs/Button {:on-click on-click-next} util.label/next]]]
+     (let [item-on-modal (get (:list list-and-total) index-show-modal)]
+       [:> bs/Modal {:show (seq item-on-modal) :size :xl :onHide #(set-index-show-modal nil)}
+        [:> bs/Modal.Header {:closeButton true}
+         (let [device (-> item-on-modal :device)]
+           [:div
+            [:> router/Link {:to (route/device-device-files (:id device))} (util.label/device-item device)]
+            " "
+            (util.timezone/build-datetime-str-in-timezone
+             (:recorded_at item-on-modal))])]
+        [:> bs/Modal.Body {:class :p-0}
+         [:img {:src (:path item-on-modal)
+                :key (:path item-on-modal)
+                :style {:object-fit :contain
+                        :width "100%"}}]]
+        [:> bs/Modal.Footer
+         #_[:> bs/Button {:on-click #(set-item-in-modal nil)} util.label/close]
+         [:> bs/Button {:on-click on-click-prev :disabled (= index-show-modal 0)} util.label/prev]
+         [:> bs/Button {:on-click on-click-next :disabled (= index-show-modal index-last)} util.label/next]]])
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer
@@ -92,7 +83,7 @@
         element-pagination
         [:div.ms-2 "total " total]
         [:div {:style {:width "100%" :overflow :auto}}
-         (for [item received-list]
+         (for [[index item] (map-indexed vector received-list)]
            [:<> {:key (:path item)}
-            [:f> file.card/core item {:on-click-image on-click-image}]])]
+            [:f> file.card/core item {:on-click-image (fn [_] (on-click-image index))}]])]
         element-pagination]})]))
