@@ -86,7 +86,7 @@
                               (map :id))
         ids-device-on-local (util.filestorage/get-ids-device)]
     #_(println :ids-for-device ids-device-on-db ids-device-on-local)
-    (for [id-device ids-device-on-local]
+    (doseq [id-device ids-device-on-local]
       (when (some #(= % id-device) ids-device-on-db)
         (let [path-files (util.filestorage/get-path-files-for-device id-device)
               device-files (get-list-for-device id-device)

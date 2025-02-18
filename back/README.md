@@ -13,8 +13,11 @@ clj -M:run db migrate
 clj -X:dev
 ```
 
-### Tips
+## Load local files for device
 
+```sh
+clj -M:run db load-local-device-files
+```
 
 ### Build an uberjar
 

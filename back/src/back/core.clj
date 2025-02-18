@@ -5,6 +5,7 @@
             [ns-tracker.core :refer [ns-tracker]]
             [ragtime.repl :as ragr]
             [back.models.user :as user]
+            [back.models.device-file :as model.device-file]
             [back.config :as config]
             [back.route :refer [main] :rename {main routes-main}]))
 
@@ -51,6 +52,8 @@
       (db-migrate)
       (start-server config/port))
     "server" (start-server config/port)
+    "load-local-device-files" (model.device-file/update-for-files-on-local)
     "db" (condp = (second args)
            "migrate" (db-migrate)
-           "rollback" (db-rollback))))
+           "rollback" (db-rollback))
+    (println (str "no matching key" (first args)))))
