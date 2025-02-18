@@ -33,11 +33,21 @@
     (->> list-files
          (map #(assign-info-to-item-from-map % {:map-id-device map-id-device})))))
 
+(defn- assign-path-url-to-item [item]
+  (if (:path item)
+    item
+    (assoc item :path (util.filestorage/build-path-url-for-device item))))
+
+(defn- assign-path-url-thumbnail-to-item [item]
+  (if (or (:path_thumbnail item) (not (util.filestorage/present-thumbnail-for-device? item)))
+    item
+    (assoc item :path_thumbnail (util.filestorage/build-path-url-thumbnail-for-device item))))
+
 (defn- assign-path-url-to-list [list-files]
   (for [item list-files]
-    (if (:path item)
-      item
-      (assoc item :path (util.filestorage/build-path-url-for-device item)))))
+    (-> item
+        assign-path-url-to-item
+        assign-path-url-thumbnail-to-item)))
 
 (defn- get-list-with-total-base [params & [optional-params]]
   (let [{:keys [transaction]} optional-params
@@ -55,7 +65,8 @@
                                     :str-where (format "device_id = %s" id-device)}))
 
 (defn get-path-file-for-user [path-url id-user]
-  (let [id-device (util.filestorage/get-id-device-from-path-url path-url)
+  (let [id-device (or (util.filestorage/get-id-device-from-path-url path-url)
+                      (util.filestorage/get-id-device-from-path-url-thumbnail path-url))
         device (model.device/get-by-id-for-user id-device id-user)]
     (when device
       (util.filestorage/convert-path-url-to-path-file path-url))))
@@ -114,4 +125,8 @@
           (println :id-device id-device :params-multi-insert params-multi-insert)
           #_(println id-device path-files device-files map-device-files)
           (when-not (empty? params-multi-insert)
-            (jdbc/insert-multi! db-spec key-table params-multi-insert)))))))
+            (jdbc/insert-multi! db-spec key-table params-multi-insert))
+          (doseq [path-file path-files]
+            (when (util.filestorage/is-path-image? path-file)
+              (when (util.filestorage/create-thumbnail path-file)
+                (println "created thumbnail of" path-file)))))))))

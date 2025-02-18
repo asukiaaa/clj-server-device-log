@@ -7,7 +7,7 @@
 (defn core [device-file & [{:keys [without-device on-click-image]}]]
   (let [width 200
         height 150
-        path-url (:path device-file)
+        path-url (or (:path_thumbnail device-file) (:path device-file))
         recorded-at (:recorded_at device-file)
         id-device (:device_id device-file)
         device (:device device-file)]
