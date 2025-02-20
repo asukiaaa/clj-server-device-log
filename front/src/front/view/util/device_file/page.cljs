@@ -10,6 +10,10 @@
             [front.view.util.label :as util.label]
             [front.util.timezone :as util.timezone]))
 
+(defn prefetch-for-item [item]
+  (when item
+    [:link {:rel :prefetch :href (:path item) :as :image}]))
+
 (defn core [fetch-list-and-total & [{:keys [on-receive]}]]
   (let [location (router/useLocation)
         [list-and-total set-list-and-total] (react/useState)
@@ -62,12 +66,19 @@
        [:> bs/Modal {:show (seq item-on-modal) :size :xl :onHide #(set-index-show-modal nil)}
         [:> bs/Modal.Header {:closeButton true}
          (let [device (-> item-on-modal :device)]
-           [:div
+           [:<>
             [:> router/Link {:to (route/device-device-files (:id device))} (util.label/device-item device)]
             " "
             (util.timezone/build-datetime-str-in-timezone
              (:recorded_at item-on-modal))])]
         [:> bs/Modal.Body {:class :p-0}
+         (when-not (nil? index-show-modal)
+           [:<>
+            (prefetch-for-item (get (:list list-and-total) (dec index-show-modal)))
+            (prefetch-for-item (get (:list list-and-total) (inc index-show-modal)))])
+         [:div.d-flex.justify-content-center
+          [:> bs/Button {:on-click on-click-prev :class :m-1 :disabled (= index-show-modal 0)} util.label/prev]
+          [:> bs/Button {:on-click on-click-next :class :m-1 :disabled (= index-show-modal index-last)} util.label/next]]
          [:img {:src (:path item-on-modal)
                 :key (:path item-on-modal)
                 :style {:object-fit :contain
