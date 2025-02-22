@@ -35,7 +35,7 @@
 
 (defn fetch-list-and-total [{:keys [on-receive limit page]}]
   (util/fetch-list-and-total {:name-table (str name-table "s")
-                              :str-keys-of-item str-keys-for-table
+                              :str-keys-of-item (build-str-keys-for-table-with-watch-term-and-device)
                               :on-receive on-receive
                               :limit limit
                               :page page}))

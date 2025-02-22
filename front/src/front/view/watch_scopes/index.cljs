@@ -8,15 +8,14 @@
             [front.view.common.wrapper.show404 :as wrapper.show404]
             [front.view.util.label :as util.label]
             [front.view.util.breadcrumb :as breadcrumb]
+            [front.view.util.watch-scope :as util.watch-scope]
             [front.view.util :as util]))
 
 (defn render-watch-scope [watch-scope on-delete]
   [:tr
-   [:td (:id watch-scope)]
-   #_[:td (:user_id watch-scope)]
    [:td (:name watch-scope)]
-   [:td (:created_at watch-scope)]
-   [:td (:updated_at watch-scope)]
+   #_[:td (:user_team_id watch-scope)]
+   [:td (util.watch-scope/render-terms (:terms watch-scope))]
    [:td
     [:> router/Link {:to (route/watch-scope-show (:id watch-scope))} util.label/show]
     " "
@@ -62,11 +61,9 @@
         [:table.table.table-sm
          [:thead
           [:tr
-           [:th "id"]
-           #_[:th "user_id"]
            [:th "name"]
-           [:th "created_at"]
-           [:th "updated_at"]
+           [:th util.label/user-team]
+           #_[:th "terms"]
            [:th "actions"]]]
          [:tbody
           (for [item received-list]

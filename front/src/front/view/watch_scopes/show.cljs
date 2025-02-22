@@ -5,36 +5,10 @@
             [front.model.watch-scope :as model.watch-scope]
             [front.view.common.wrapper.show404 :as wrapper.show404]
             [front.view.common.wrapper.fetching :as wrapper.fetching]
-            [front.util.timezone :as util.timezone]
+            [front.view.util.watch-scope :as util.watch-scope]
             [front.view.util.label :as util.label]
             [front.view.util.breadcrumb :as breadcrumb]
             [front.view.util :as util]))
-
-(defn render-term [term]
-  (let [device (:device term)]
-    [:div
-     [:> router/Link {:to (route/device-show (:id device))} (util.label/device-item device)]
-     " "
-     (let [datetime-from (:datetime_from term)
-           datetime-until (:datetime_until term)]
-       (if (and (nil? datetime-from) (nil? datetime-until))
-         util.label/no-term
-         [:<>
-          (when datetime-from
-            (util.label/datetime-from-item
-             (util.timezone/build-datetime-str-in-timezone
-              datetime-from
-              {:datetime-format util.timezone/date-fns-format-with-timezone-until-minutes})))
-          (when datetime-until
-            (util.label/datetime-until-item
-             (util.timezone/build-datetime-str-in-timezone
-              datetime-until
-              {:datetime-format util.timezone/date-fns-format-with-timezone-until-minutes})))]))]))
-
-(defn render-terms [terms]
-  (for [term terms]
-    [:<> {:key (:id term)}
-     (render-term term)]))
 
 (defn- page []
   (let [params (js->clj (router/useParams))
@@ -82,7 +56,7 @@
                [:td
                 (cond
                   (= key :terms)
-                  (render-terms (key item))
+                  (util.watch-scope/render-terms (key item))
                   :else
                   (get item key))]])]]])})]))
 

@@ -8,10 +8,11 @@
             [back.models.device-type :as model.device-type]
             [back.config :refer [db-spec]]
             [back.util.encryption :as encryption]
+            [back.models.util.device :as util.device]
             [back.models.util :as model.util]))
 
-(def name-table "device")
-(def key-table (keyword name-table))
+(def name-table util.device/name-table)
+(def key-table util.device/key-table)
 (def str-sql-select-for-device-type-columns "device_type.name device_type_name, device_type.user_id device_type_user_id")
 (def str-sql-select-for-user-team-columns "user_team.name user_team_name, user_team.owner_user_id user_team_owner_user_id")
 (def str-join-tables

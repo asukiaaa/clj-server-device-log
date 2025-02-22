@@ -43,11 +43,11 @@
           item (get-by-id id {:transaction t-con})]
       item)))
 
-(defn- get-list-with-total-base [params & [{:keys [str-where]}]]
-  (model.util/get-list-with-total-with-building-query name-table params {:str-where str-where}))
+(defn get-list-with-total [params & [{:keys [str-where transaction]}]]
+  (model.util/get-list-with-total-with-building-query name-table params {:str-where str-where :transaction transaction}))
 
-(defn get-list-with-total-for-user-team [params user-team-id]
-  (get-list-with-total-base params {:str-where (format "user_team_id = %d" user-team-id)}))
+(defn get-list-with-total-for-user-team [params id-user-team & [{:keys [transaction]}]]
+  (get-list-with-total params {:str-where (format "user_team_id = %d" id-user-team) :transaction transaction}))
 
-(defn get-list-with-total [params]
-  (get-list-with-total-base params))
+(defn get-list-with-total-for-user-teams [params sql-ids-user-team & [{:keys [transaction]}]]
+  (get-list-with-total params {:str-where (format "user_team_id IN %s" sql-ids-user-team)} {:transaction transaction}))

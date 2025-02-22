@@ -1,8 +1,37 @@
 (ns front.view.util.watch-scope
-  (:require [clojure.string :refer [split]]
+  (:require ["react-router-dom" :as router]
+            [front.route :as route]
+            [clojure.string :refer [split]]
             [front.view.util.label :as util.label]
             [front.view.util :as util]
+            [front.util.timezone :as util.timezone]
             [front.model.device :as model.device]))
+
+(defn render-term [term]
+  (let [device (:device term)]
+    [:div
+     [:> router/Link {:to (route/device-show (:id device))} (util.label/device-item device)]
+     " "
+     (let [datetime-from (:datetime_from term)
+           datetime-until (:datetime_until term)]
+       (if (and (nil? datetime-from) (nil? datetime-until))
+         util.label/no-term
+         [:<>
+          (when datetime-from
+            (util.label/datetime-from-item
+             (util.timezone/build-datetime-str-in-timezone
+              datetime-from
+              {:datetime-format util.timezone/date-fns-format-with-timezone-until-minutes})))
+          (when datetime-until
+            (util.label/datetime-until-item
+             (util.timezone/build-datetime-str-in-timezone
+              datetime-until
+              {:datetime-format util.timezone/date-fns-format-with-timezone-until-minutes})))]))]))
+
+(defn render-terms [terms]
+  (for [term terms]
+    [:<> {:key (:id term)}
+     (render-term term)]))
 
 (defn- build-datetime-from-str-date-and-time [str-date str-time]
   (when-not (empty str-date)

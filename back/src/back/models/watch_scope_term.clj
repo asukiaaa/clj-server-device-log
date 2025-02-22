@@ -5,17 +5,16 @@
             [clojure.string :refer [join]]
             [back.config :refer [db-spec]]
             [back.models.util.device-log :as util.device-log]
-            [back.models.util :as model.util]))
+            [back.models.util :as model.util]
+            [back.models.util.device :as util.device]))
 
 (def name-table "watch_scope_term")
-#_(def name-table-with-device (str name-table " LEFT JOIN device ON device.id = device_id"))
 (def key-table (keyword name-table))
-#_(def str-keys-select-with-device-name (str name-table ".*, device.name as device_name"))
 
 (defn filter-params [params]
   (select-keys params [:id :device_id :watch_scope_id :datetime_from :datetime_until]))
 
-(defn build-query-device-ids-for-watch-scope [id-watch-scope]
+(defn build-query-ids-device-log-for-watch-scope [id-watch-scope]
   (->> [(format "SELECT %s.id FROM %s INNER JOIN %s ON %s.device_id = %s.device_id"
                 util.device-log/name-table
                 util.device-log/name-table
@@ -34,15 +33,11 @@
                 util.device-log/name-table)
         (format "GROUP BY %s.id" util.device-log/name-table)]
        (join " ")
-       (format "(%s)"))
-  #_(format "(SELECT device_id from %s WHERE watch_scope_id = %s)"
-            name-table
-            id-watch-scope))
+       (format "(%s)")))
 
 (defn get-by-id [id & [{:keys [transaction]}]]
   (model.util/get-by-id id name-table
                         {:transaction transaction
-                         ;:str-keys-select str-keys-select-with-device-name
                          :str-key-id (str name-table ".id")}))
 
 (defn delete [id]
@@ -81,22 +76,36 @@
   (let [params (for [term terms] (-> term filter-params (assoc :watch_scope_id id-watch-scope)))]
     (jdbc/insert-multi! (or transaction db-spec) key-table params)))
 
+(defn get-list-with-device [{:keys [str-where transaction]}]
+  (println :get-list-with-device str-where)
+  (let [query
+        (->> [(format "SELECT %s.*, %s FROM %s" name-table (util.device/build-str-select-params-for-joined) name-table)
+              (format "INNER JOIN %s ON %s.id = %s.device_id" util.device/name-table util.device/name-table name-table)
+              (when str-where (format "WHERE %s" str-where))]
+             (join " "))
+        items (jdbc/query (or transaction db-spec) query)]
+    (map util.device/build-device-item-from-selected-params-joined items)))
+
 (defn get-list-for-watch-scope [id-watch-scope & [{:keys [transaction]}]]
-  (jdbc/query (or transaction db-spec)
-              (format "SELECT * FROM %s WHERE watch_scope_id = %d"
-                      name-table
-                      id-watch-scope)))
+  (get-list-with-device
+   {:str-where (format "watch_scope_id = %d" id-watch-scope)
+    :transaction transaction}))
 
 (defn- get-list-with-total-base [params & [{:keys [str-where transaction]}]]
   (model.util/get-list-with-total-with-building-query
    name-table params
    {:str-where str-where
-    ;:str-keys-select str-keys-select-with-device-name
     :transaction transaction}))
-
-#_(defn get-list-with-total-for-user-team [params user-team-id & [{:keys [transaction]}]]
-    (get-list-with-total-base params {:str-where (format "user_team_id = %d" user-team-id)
-                                      :transaction transaction}))
 
 (defn get-list-with-total [params & [{:keys [transaction]}]]
   (get-list-with-total-base params {:transaction transaction}))
+
+(defn assign-to-list-watch-scope [list-watch-scope & [{:keys [transaction]}]]
+  (let [str-list-ids-watch-scope
+        (->> (for [item list-watch-scope] (str (:id item)))
+             (join ",")
+             (format "(%s)"))
+        terms (get-list-with-device {:str-where (format "%s.watch_scope_id IN %s" name-table str-list-ids-watch-scope)
+                                     :transaction transaction})]
+    (for [watch-scope list-watch-scope]
+      (assoc watch-scope :terms (filter #(= (:id watch-scope) (:watch_scope_id %)) terms)))))
