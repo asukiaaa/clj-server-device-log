@@ -4,6 +4,7 @@
             [clojure.string :refer [join]]
             [front.model.util.device :as util.device]
             [front.model.util.watch-scope-term :as util.term]
+            [front.model.util.user-team :as util.user-team]
             [front.model.util :as util]))
 
 (def name-table "watch_scope")
@@ -11,9 +12,11 @@
 (def name-watch-scope-terms-on-field "terms")
 (def keys-for-table [:id :user_team_id :name :created_at :updated_at])
 (def str-keys-for-table (join " " (map name keys-for-table)))
-(defn build-str-keys-for-table-with-watch-term-and-device []
-  (format "%s %s {%s %s {%s}}"
+
+(defn build-str-keys-for-table-with-watch-joined-tables []
+  (format "%s %s %s {%s %s {%s}}"
           str-keys-for-table
+          (util.user-team/build-str-table-and-keys)
           name-watch-scope-terms-on-field
           util.term/str-keys-for-table
           util.device/name-table
@@ -22,10 +25,6 @@
   (format "%s {%s}"
           name-table
           str-keys-for-table))
-(defn build-str-table-and-keys-with-terms []
-  (format "%s {%s}"
-          name-table
-          (build-str-keys-for-table-with-watch-term-and-device)))
 
 (defn build-select-options-from-list-and-total [list-and-total]
   (for [item (:list list-and-total)]
@@ -35,14 +34,14 @@
 
 (defn fetch-list-and-total [{:keys [on-receive limit page]}]
   (util/fetch-list-and-total {:name-table (str name-table "s")
-                              :str-keys-of-item (build-str-keys-for-table-with-watch-term-and-device)
+                              :str-keys-of-item (build-str-keys-for-table-with-watch-joined-tables)
                               :on-receive on-receive
                               :limit limit
                               :page page}))
 
 (defn fetch-by-id [{:keys [id on-receive]}]
   (util/fetch-by-id {:name-table name-table
-                     :str-keys-of-item (build-str-keys-for-table-with-watch-term-and-device)
+                     :str-keys-of-item (build-str-keys-for-table-with-watch-joined-tables)
                      :id id
                      :on-receive on-receive}))
 

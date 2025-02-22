@@ -9,15 +9,20 @@
             [back.config :refer [db-spec]]
             [back.util.encryption :as encryption]
             [back.models.util.device :as util.device]
+            [back.models.util.user-team :as util.user-team]
             [back.models.util :as model.util]))
 
 (def name-table util.device/name-table)
 (def key-table util.device/key-table)
 (def str-sql-select-for-device-type-columns "device_type.name device_type_name, device_type.user_id device_type_user_id")
-(def str-sql-select-for-user-team-columns "user_team.name user_team_name, user_team.owner_user_id user_team_owner_user_id")
-(def str-join-tables
+(defn build-str-join-tables []
   (join " " ["INNER JOIN device_type ON device_type_id = device_type.id"
-             "LEFT JOIN user_team ON user_team_id = user_team.id"]))
+             (format "LEFT JOIN %s ON user_team_id = user_team.id" util.user-team/name-table)]))
+(defn build-str-keys-select-with-device-type-and-user-team []
+  (format "%s.*, %s, %s"
+          name-table
+          str-sql-select-for-device-type-columns
+          (util.user-team/build-str-select-params-for-joined)))
 
 (defn build-item-for-device-type [item]
   (if (empty? item)
@@ -28,19 +33,10 @@
           item (assoc item :device_type device_type)]
       item)))
 
-(defn build-item-for-user-team [item]
-  (if (or (empty? item) (nil? (:user_team_id item)))
-    item
-    (let [user-team {:id (:user_team_id item)
-                     :name (:user_team_name item)
-                     :owner_user_id (:user_team_owner_user_id item)}
-          item (assoc item :user_team user-team)]
-      item)))
-
 (defn build-item [item]
   (-> item
       build-item-for-device-type
-      build-item-for-user-team))
+      util.user-team/build-item-from-selected-params-joined))
 
 (defn build-sql-ids []
   (format "(SELECT id FROM %s)"
@@ -94,8 +90,8 @@
 (defn get-by-id-for-user [id user-id & [{:keys [transaction]}]]
   (let [query (format "SELECT device.*, %s, %s FROM device %s WHERE device.id = ? AND device_type.user_id = ?"
                       str-sql-select-for-device-type-columns
-                      str-sql-select-for-user-team-columns
-                      str-join-tables)
+                      (util.user-team/build-str-select-params-for-joined)
+                      (build-str-join-tables))
         item (first (jdbc/query (or transaction db-spec) [query id user-id]))
         item (build-item item)]
     item))
@@ -153,18 +149,16 @@
 
 (defn get-list-with-total-for-user [params user-id]
   (-> (model.util/build-query-get-index
-       name-table {:str-keys-select (str "device.*, " str-sql-select-for-device-type-columns
-                                         ", " str-sql-select-for-user-team-columns)})
-      (str " " str-join-tables)
+       name-table {:str-keys-select (build-str-keys-select-with-device-type-and-user-team)})
+      (str " " (build-str-join-tables))
       (str (format " WHERE device_type.user_id = %d" user-id))
       (model.util/append-limit-offset-by-limit-page-params params)
       (model.util/get-list-with-total {:build-item build-item})))
 
 (defn get-list-with-total-for-user-team [params id-user-team & [{:keys [transaction]}]]
   (-> (model.util/build-query-get-index
-       name-table {:str-keys-select (str "device.*, " str-sql-select-for-device-type-columns
-                                         ", " str-sql-select-for-user-team-columns)})
-      (str " " str-join-tables)
+       name-table {:str-keys-select (build-str-keys-select-with-device-type-and-user-team)})
+      (str " " (build-str-join-tables))
       (str (format " WHERE device.user_team_id = %d" id-user-team))
       (model.util/append-limit-offset-by-limit-page-params params)
       (model.util/get-list-with-total {:build-item build-item :transaction transaction})))

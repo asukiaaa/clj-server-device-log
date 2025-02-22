@@ -3,16 +3,32 @@
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.core :refer [format]]
             [back.config :refer [db-spec]]
-            [back.models.util :as model.util]))
+            [back.models.util :as model.util]
+            [back.models.util.user-team :as util.user-team]))
 
 (def name-table "watch_scope")
 (def key-table (keyword name-table))
+(defn build-str-keys-select-with-join []
+  (format "%s.*, %s" name-table (util.user-team/build-str-select-params-for-joined)))
+(defn build-str-join []
+  (format "LEFT JOIN %s ON %s.id = %s.user_team_id"
+          util.user-team/name-table
+          util.user-team/name-table
+          name-table))
+
+(defn build-item [item]
+  (util.user-team/build-item-from-selected-params-joined item))
 
 (defn filter-params [params]
   (select-keys params [:name :user_team_id]))
 
 (defn get-by-id [id & [{:keys [transaction]}]]
-  (model.util/get-by-id id name-table {:transaction transaction}))
+  (model.util/get-by-id
+   id name-table
+   {:str-keys-select (build-str-keys-select-with-join)
+    :str-before-where (build-str-join)
+    :build-item build-item
+    :transaction transaction}))
 
 (defn delete [id]
   (jdbc/delete! db-spec key-table ["id = ?" id]))
@@ -44,7 +60,13 @@
       item)))
 
 (defn get-list-with-total [params & [{:keys [str-where transaction]}]]
-  (model.util/get-list-with-total-with-building-query name-table params {:str-where str-where :transaction transaction}))
+  (model.util/get-list-with-total-with-building-query
+   name-table params
+   {:str-before-where (build-str-join)
+    :str-keys-select (build-str-keys-select-with-join)
+    :build-item build-item
+    :str-where str-where
+    :transaction transaction}))
 
 (defn get-list-with-total-for-user-team [params id-user-team & [{:keys [transaction]}]]
   (get-list-with-total params {:str-where (format "user_team_id = %d" id-user-team) :transaction transaction}))

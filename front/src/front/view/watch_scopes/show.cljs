@@ -50,13 +50,17 @@
              [:th "key"]
              [:th "value"]]]
            [:tbody
-            (for [key [:id :user_team_id :name :terms :created_at :updated_at]]
+            (for [key [:id :user_team :name :terms :created_at :updated_at]]
               [:tr {:key key}
                [:td key]
                [:td
                 (cond
                   (= key :terms)
                   (util.watch-scope/render-terms (key item))
+                  (= key :user_team)
+                  (if-let [team (:user_team item)]
+                    [:> router/Link {:to (route/user-team-show (:id team))} (util.label/user-team-item team)]
+                    util.label/no-data)
                   :else
                   (get item key))]])]]])})]))
 

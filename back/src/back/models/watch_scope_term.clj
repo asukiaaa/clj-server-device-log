@@ -84,7 +84,7 @@
               (when str-where (format "WHERE %s" str-where))]
              (join " "))
         items (jdbc/query (or transaction db-spec) query)]
-    (map util.device/build-device-item-from-selected-params-joined items)))
+    (map util.device/build-item-from-selected-params-joined items)))
 
 (defn get-list-for-watch-scope [id-watch-scope & [{:keys [transaction]}]]
   (get-list-with-device

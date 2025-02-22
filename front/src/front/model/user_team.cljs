@@ -2,11 +2,11 @@
   (:refer-clojure :exclude [update])
   (:require goog.string
             clojure.string
+            [front.model.util.user-team :as util.user-team]
             [front.model.util :as util]))
 
-(def name-table "user_team")
-(def keys-for-table [:id :owner_user_id :name :memo :created_at :updated_at])
-(def str-keys-for-table (clojure.string/join " " (map name keys-for-table)))
+(def name-table util.user-team/name-table)
+(def str-keys-for-table util.user-team/str-keys-for-table)
 
 (defn build-select-options-from-list-and-total [list-and-total]
   (for [item (:list list-and-total)]

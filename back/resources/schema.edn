@@ -106,11 +106,11 @@
   :Device
   {:fields
    {:id {:type (non-null Int)}
-    :device_type_id {:type (non-null Int)}
-    :user_team_id {:type Int}
     :name {:type String}
     :device_type {:type DeviceType}
+    :device_type_id {:type (non-null Int)}
     :user_team {:type UserTeam}
+    :user_team_id {:type Int}
     :created_at {:type String}
     :updated_at {:type String}}}
   :ResponseDeviceListTotal
@@ -158,6 +158,7 @@
   {:fields
    {:id {:type (non-null Int)}
     :user_team_id {:type (non-null Int)}
+    :user_team {:type UserTeam}
     :terms {:type (list WatchScopeTerm)}
     :name {:type String}
     :created_at {:type String}

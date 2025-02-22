@@ -69,6 +69,7 @@
 (defn user [user] (show-key user [:name :email :id]))
 (def users "Users")
 (def user-team "User team")
+(defn user-team-item [item] (show-key item [:name]))
 (def user-teams "User teams")
 (def watch-scope "Watch scope")
 (def watch-scopes "Watch scopes")

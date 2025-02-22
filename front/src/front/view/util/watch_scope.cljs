@@ -1,7 +1,7 @@
 (ns front.view.util.watch-scope
   (:require ["react-router-dom" :as router]
             [front.route :as route]
-            [clojure.string :refer [split]]
+            [clojure.string :refer [split join]]
             [front.view.util.label :as util.label]
             [front.view.util :as util]
             [front.util.timezone :as util.timezone]
@@ -16,17 +16,18 @@
            datetime-until (:datetime_until term)]
        (if (and (nil? datetime-from) (nil? datetime-until))
          util.label/no-term
-         [:<>
-          (when datetime-from
-            (util.label/datetime-from-item
-             (util.timezone/build-datetime-str-in-timezone
-              datetime-from
-              {:datetime-format util.timezone/date-fns-format-with-timezone-until-minutes})))
-          (when datetime-until
-            (util.label/datetime-until-item
-             (util.timezone/build-datetime-str-in-timezone
-              datetime-until
-              {:datetime-format util.timezone/date-fns-format-with-timezone-until-minutes})))]))]))
+         (->> [(when datetime-from
+                 (util.label/datetime-from-item
+                  (util.timezone/build-datetime-str-in-timezone
+                   datetime-from
+                   {:datetime-format util.timezone/date-fns-format-with-timezone-until-minutes})))
+               (when datetime-until
+                 (util.label/datetime-until-item
+                  (util.timezone/build-datetime-str-in-timezone
+                   datetime-until
+                   {:datetime-format util.timezone/date-fns-format-with-timezone-until-minutes})))]
+              (remove nil?)
+              (join " "))))]))
 
 (defn render-terms [terms]
   (for [term terms]

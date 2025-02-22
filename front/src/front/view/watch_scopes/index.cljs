@@ -14,7 +14,8 @@
 (defn render-watch-scope [watch-scope on-delete]
   [:tr
    [:td (:name watch-scope)]
-   #_[:td (:user_team_id watch-scope)]
+   [:td (let [team (:user_team watch-scope)]
+          [:> router/Link {:to (route/user-team-show (:id team))} (util.label/user-team-item team)])]
    [:td (util.watch-scope/render-terms (:terms watch-scope))]
    [:td
     [:> router/Link {:to (route/watch-scope-show (:id watch-scope))} util.label/show]
@@ -63,7 +64,7 @@
           [:tr
            [:th "name"]
            [:th util.label/user-team]
-           #_[:th "terms"]
+           [:th "terms"]
            [:th "actions"]]]
          [:tbody
           (for [item received-list]

@@ -3,10 +3,11 @@
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.core :refer [format]]
             [back.config :refer [db-spec]]
+            [back.models.util.user-team :as util.user-team]
             [back.models.util :as model.util]))
 
-(def name-table "user_team")
-(def key-table (keyword name-table))
+(def name-table util.user-team/name-table)
+(def key-table util.user-team/key-table)
 
 (defn filter-params [params]
   (select-keys params [:name :owner_user_id :memo]))

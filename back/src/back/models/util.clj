@@ -49,11 +49,16 @@
       (format "%s LIMIT %d OFFSET %d" str-query (int limit) (int offset)))
     str-query))
 
-(defn get-by-id [id name-table & [{:keys [transaction str-keys-select str-key-id]}]]
+(defn get-by-id [id name-table & [{:keys [transaction str-keys-select str-key-id str-before-where build-item]}]]
   (let [str-keys-select (or str-keys-select "*")
-        str-key-id (or str-key-id "id")
-        query (format "SELECT %s FROM %s WHERE %s = ?" str-keys-select name-table str-key-id)]
-    (first (jdbc/query (or transaction db-spec) [query id]))))
+        str-key-id (or str-key-id (format "%s.id" name-table))
+        query (->> [(format "SELECT %s FROM %s" str-keys-select name-table)
+                    str-before-where
+                    (format "WHERE %s = ?"  str-key-id)]
+                   (remove nil?)
+                   (join " "))
+        item (first (jdbc/query (or transaction db-spec) [query id]))]
+    (if build-item (build-item item) item)))
 
 (defn create [key-table params]
   (jdbc/with-db-transaction [t-con db-spec]
@@ -63,10 +68,10 @@
           item (get-by-id #_"(SELECT LAST_INSERT_ID())" id (name key-table) {:transaction t-con})]
       item)))
 
-(defn get-list-with-total-with-building-query [name-table params & [{:keys [str-where str-keys-select transaction str-before-where str-order]}]]
+(defn get-list-with-total-with-building-query [name-table params & [{:keys [str-where str-keys-select transaction str-before-where str-order build-item]}]]
   (-> (build-query-get-index name-table {:str-keys-select str-keys-select})
       (#(if-not (empty? str-before-where) (str % " " str-before-where) %))
       (#(if-not (empty? str-where) (str % " WHERE " str-where) %))
       (#(if-not (empty? str-order) (str % " ORDER BY " str-order) %))
       (append-limit-offset-by-limit-page-params params)
-      (get-list-with-total {:transaction transaction})))
+      (get-list-with-total {:transaction transaction :build-item build-item})))
