@@ -23,7 +23,7 @@
         state-info-user-team-id (util/build-state-info :user_team_id #(react/useState))
         info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
         limit-of-list 1000 ; TODO apply search
-        arr-state-info [state-info-system state-info-device-type-id state-info-user-team-id]
+        arr-state-info [state-info-name state-info-system state-info-device-type-id state-info-user-team-id]
         on-receive (fn [data errors]
                      (set-waiting-response false)
                      (if-not (empty? errors)
