@@ -46,7 +46,9 @@
         id-user (:id user)]
     (jdbc/with-db-transaction [transaction db-spec]
       (when-let [device-type (model.device-type/get-by-id-for-user id-device-type id-user {:transaction transaction})]
-        (-> (model-device-log/get-list-with-total args {:build-str-where-and #(format "%s.device_type.id = %d" % id-device-type)
+        (-> (model-device-log/get-list-with-total args {:build-str-where-and
+                                                        (fn [_]
+                                                          (format "device_type.id = %d" id-device-type))
                                                         :transaction transaction})
             (assoc model.device-type/key-table device-type))))))
 
