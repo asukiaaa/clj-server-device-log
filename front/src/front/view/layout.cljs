@@ -6,6 +6,7 @@
             [front.model.user :as model.user]
             [front.route :as route]
             [front.view.util.label :as util.label]
+            [front.view.util.links :as util.links]
             [front.view.util :as util]))
 
 (defn loader [js-params]
@@ -51,7 +52,8 @@
            [:<>
             [:> bs/Nav.Link {:to route/dashboard :as router/Link} util.label/dashboard]
             [:> bs/NavDropdown {:title (:name user) :id "nav-dropdown" :align :end}
-             [:> bs/NavDropdown.Item {:to route/profile :as router/Link} util.label/profile]
+             (for [[label path] (util.links/build-list-menu-links-for-user user)]
+               [:> bs/NavDropdown.Item {:to path :as router/Link :key path} label])
              [:> bs/NavDropdown.Divider]
              [:> bs/NavDropdown.Item {:on-click logout :href route/logout} util.label/logout]]])]]]]
      [:> router/Outlet]]))
