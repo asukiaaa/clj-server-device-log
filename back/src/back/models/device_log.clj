@@ -15,7 +15,7 @@
    :order [{:key "created_at" :dir "DESC"}]})
 
 (defn filter-key [key]
-  (when (.contains ["created_at" "id" "data"] key)
+  (when (.contains ["created_at" "device_id" "id" "data"] key)
     key))
 
 (defn filter-order-dir [dir]
