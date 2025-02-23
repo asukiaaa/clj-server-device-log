@@ -109,11 +109,12 @@
   (get-list-with-total-base params {:transaction transaction}))
 
 (defn assign-to-list-watch-scope [list-watch-scope & [{:keys [transaction]}]]
-  (let [str-list-ids-watch-scope
-        (->> (for [item list-watch-scope] (str (:id item)))
-             (join ",")
-             (format "(%s)"))
-        terms (get-list-with-device {:str-where (format "%s.watch_scope_id IN %s" name-table str-list-ids-watch-scope)
-                                     :transaction transaction})]
-    (for [watch-scope list-watch-scope]
-      (assoc watch-scope :terms (filter #(= (:id watch-scope) (:watch_scope_id %)) terms)))))
+  (when-not (empty? list-watch-scope)
+    (let [str-list-ids-watch-scope
+          (->> (for [item list-watch-scope] (str (:id item)))
+               (join ",")
+               (format "(%s)"))
+          terms (get-list-with-device {:str-where (format "%s.watch_scope_id IN %s" name-table str-list-ids-watch-scope)
+                                       :transaction transaction})]
+      (for [watch-scope list-watch-scope]
+        (assoc watch-scope :terms (filter #(= (:id watch-scope) (:watch_scope_id %)) terms))))))
