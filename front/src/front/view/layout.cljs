@@ -43,7 +43,7 @@
     [:div
      [:> bs/Navbar {:bg :light :data-bs-theme :light}
       [:> bs/Container {:fluid true}
-       [:> bs/Navbar.Brand {:to "/" :as router/Link} "device logs"]
+       [:> bs/Navbar.Brand {:to "/" :as router/Link} "Device log"]
        [:> bs/Navbar.Toggle]
        [:> bs/Navbar.Collapse {:class :justify-content-end}
         [:> bs/Nav

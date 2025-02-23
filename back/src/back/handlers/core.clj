@@ -15,11 +15,12 @@
           [:head
            [:meta {:name "viewport" :content "width=device-width,initial-scale=1"}]
            [:link {:rel "stylesheet" :href "/css/bootstrap.min.css"}]
+           [:title "device log"]
            #_[:script {:src "./out/main.js" :type "text/javascript"}]
            #_[:base {:href "/"}]
            #_[:script {:src "/front/out/main.js" :type "module"}]]
           [:body
-           [:div {:id "app"} "maybe loading js"]
+           [:div {:id "app"} "loading.."]
            [:script {:src "/out-cljs/main.js" :type "text/javascript"}]
            #_[:script {:src "/front/out/index.js" :type "module"}]
            #_[:base {:href "/front/target/public/"}]
