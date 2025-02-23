@@ -123,7 +123,7 @@
            (assign-to-draft value state-info keys-assoc-in)))}]
      (render-errors-for-input item-errors)]))
 
-(defn render-select [label state-info value-labels & [{:keys [type str-class-wrapper disabled on-blur keys-assoc-in]}]]
+(defn render-select [label state-info value-labels & [{:keys [type str-class-wrapper disabled on-blur keys-assoc-in override-on-change without-empty-option]}]]
   (let [{:keys [item-default item-draft item-errors item-key]} (build-item-values state-info keys-assoc-in)]
     [:div {:class str-class-wrapper}
      [:div
@@ -139,8 +139,11 @@
        :on-change
        (fn [e]
          (let [value (-> e .-target .-value)]
-           (assign-to-draft value state-info keys-assoc-in)))}
-      [:option ""]
+           (if override-on-change
+             (override-on-change value state-info keys-assoc-in)
+             (assign-to-draft value state-info keys-assoc-in))))}
+      (when-not without-empty-option
+        [:option ""])
       (let [value-selected (or item-draft item-default)]
         (for [[value label] value-labels]
           [:option {:value value :key value} label (= value value-selected)]))]

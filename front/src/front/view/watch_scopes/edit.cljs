@@ -74,7 +74,8 @@
     [:<>
      [:f> breadcrumb/core
       [{:label util.label/watch-scopes :path route/watch-scopes}
-       {:label (util.label/watch-scope-item item)}]]
+       {:label (util.label/watch-scope-item item) :path (route/watch-scope-show id-item)}
+       {:label util.label/edit}]]
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer

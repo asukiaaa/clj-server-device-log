@@ -63,6 +63,7 @@
 (def term "Term")
 (def terms "Terms")
 (def time "Time")
+(def timezone "Timezone")
 (def until "Until")
 (def update "Update")
 (def updated-at "Updated at")

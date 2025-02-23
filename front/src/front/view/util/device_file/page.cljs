@@ -25,7 +25,7 @@
       (when-not without-device
         [:div
          [:> router/Link {:to (route/device-device-files id-device)} (util.label/device-item device)]])
-      [:div (util.timezone/build-datetime-str-in-timezone recorded-at {:datetime-format util.timezone/date-fns-format-with-timezone-until-minutes})]]]))
+      [:div (util.timezone/build-datetime-str-in-timezone recorded-at {:datetime-format util.timezone/date-fns-format-with-timezone-until-minute})]]]))
 
 (defn render-hiddend-image [item]
   (when item
