@@ -9,6 +9,10 @@
             [front.model.util.user-team :as util.user-team]))
 
 (def name-table util.device/name-table)
+(defn build-query-keys-with-peripherals []
+  (join " " [util.device/query-keys
+             (util.device-type/build-query-table-and-keys)
+             (util.user-team/build-query-table-and-keys)]))
 (defn build-query-table-and-keys-with-peripherals []
   (util.device/build-query-table-and-keys
    {:query-keys-additional
@@ -23,7 +27,7 @@
 
 (defn fetch-list-and-total [{:keys [on-receive limit page]}]
   (util/fetch-list-and-total {:name-table (str name-table "s")
-                              :str-keys-of-item (build-query-table-and-keys-with-peripherals)
+                              :str-keys-of-item (build-query-keys-with-peripherals)
                               :on-receive on-receive
                               :limit limit
                               :page page}))
@@ -31,7 +35,7 @@
 (defn fetch-list-and-total-for-user-team [{:keys [on-receive user_team_id limit page]}]
   (util/fetch-list-and-total {:name-table (str name-table "s_for_user_team")
                               :str-params (format "user_team_id: %s" (util/build-input-str-for-int user_team_id))
-                              :str-keys-of-item (build-query-table-and-keys-with-peripherals)
+                              :str-keys-of-item (build-query-keys-with-peripherals)
                               :on-receive on-receive
                               :limit limit
                               :page page}))
