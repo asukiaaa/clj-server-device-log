@@ -2,7 +2,7 @@
   (:require [goog.string :refer [format]]
             [clojure.string :refer [join]]))
 
-(def name-table "device_tye")
+(def name-table "device_type")
 (def key-table (keyword name-table))
 (def keys-for-table [:id :user_id :name :created_at :updated_at])
 (def query-keys (join " " (map name keys-for-table)))
