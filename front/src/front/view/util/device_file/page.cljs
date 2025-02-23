@@ -105,7 +105,6 @@
               (wrapper.fetching/finished info-wrapper-fetching errors))}))
         on-click-image
         (fn [index]
-          (println :click-image index)
           (set-index-show-modal index))
         on-click-next
         (fn []

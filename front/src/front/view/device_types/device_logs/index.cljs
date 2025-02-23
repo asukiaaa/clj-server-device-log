@@ -14,7 +14,6 @@
         [device-type set-device-type] (react/useState)
         on-receive
         (fn [data]
-          (println :on-receive data)
           (set-device-type (:device_type data)))
         fetch-list-and-total
         (fn [params]

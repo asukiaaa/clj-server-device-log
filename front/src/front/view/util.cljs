@@ -88,7 +88,6 @@
    :item-key (if keys-assoc-in (str keys-assoc-in) key)})
 
 (defn assign-to-draft [value {:keys [set-draft draft]} keys-assoc-in]
-  (println value keys-assoc-in set-draft)
   (set-draft (if keys-assoc-in
                (assoc-in draft keys-assoc-in value)
                value)))
