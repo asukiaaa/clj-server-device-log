@@ -38,6 +38,7 @@
             #_[front.view.watch-scopes.watch-scope-terms.create :as watch-scope.watch-scope-term.create]
             #_[front.view.watch-scopes.watch-scope-terms.show :as watch-scope.watch-scope-term.show]
             #_[front.view.watch-scopes.watch-scope-terms.edit :as watch-scope.watch-scope-term.edit]
+            [front.view.watch-scopes.device-files.index :as watch-scope.device-file.index]
             [front.view.watch-scopes.device-logs.index :as watch-scope.device-log.index]
             [front.view.profile.index :as profile.index]
             [front.view.profile.password-edit :as profile.password-edit]
@@ -111,6 +112,7 @@
                  {:path ":watch_scope_term_id" :children
                   [{:index true :element (r/as-element [:f> watch-scope.watch-scope-term.show/core])}
                    {:path "edit" :element (r/as-element [:f> watch-scope.watch-scope-term.edit/core])}]}]}
+             {:path "device_files" :element (r/as-element [:f> watch-scope.device-file.index/core])}
              {:path "device_logs" :element (r/as-element [:f> watch-scope.device-log.index/core])}]}]}
          {:path "*" :element (r/as-element [:f> page404/core]) :status 404}]}]}])))
 

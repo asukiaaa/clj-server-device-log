@@ -7,11 +7,11 @@
             [front.model.util :as util]))
 
 (def name-table util.watch-scope-term/name-table)
-(def str-keys-for-table util.watch-scope-term/str-keys-for-table)
+(def query-keys util.watch-scope-term/query-keys)
 
 (defn fetch-list-and-total-for-watch-scope [{:keys [id-watch-scope on-receive limit page]}]
   (util/fetch-list-and-total {:name-table (str name-table "s_for_watch_scope")
-                              :str-keys-of-item str-keys-for-table
+                              :str-keys-of-item query-keys
                               :str-additional-field (model.watch-scope/build-str-table-and-keys)
                               :on-receive on-receive
                               :str-params (format "watch_scope_id: %s" (util/build-input-str-for-int id-watch-scope))
@@ -20,13 +20,13 @@
 
 #_(defn fetch-by-id [{:keys [id on-receive]}]
     (util/fetch-by-id {:name-table name-table
-                       :str-keys-of-item str-keys-for-table
+                       :str-keys-of-item query-keys
                        :id id
                        :on-receive on-receive}))
 
 (defn fetch-by-id-for-watch-scope [{:keys [id id-watch-scope on-receive]}]
   (util/fetch-by-id {:name-table (str name-table "_for_watch_scope")
-                     :str-keys-of-item str-keys-for-table
+                     :str-keys-of-item query-keys
                      :id id
                      :str-additional-params (format "watch_scope_id: %s" (util/build-input-str-for-int id-watch-scope))
                      :on-receive on-receive}))
@@ -45,7 +45,7 @@
     (util/create {:name-table name-table
                   :str-keys-receive (format "%s { %s }"
                                             name-table
-                                            str-keys-for-table)
+                                            query-keys)
                   :str-input-params str-params
                   :on-receive on-receive})))
 
@@ -57,7 +57,7 @@
     (util/update {:name-table name-table
                   :str-keys-receive (format "%s { %s }"
                                             name-table
-                                            str-keys-for-table)
+                                            query-keys)
                   :str-input-params str-params
                   :on-receive on-receive})))
 

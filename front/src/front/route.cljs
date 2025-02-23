@@ -61,6 +61,8 @@
 
 (defn watch-scope-device-logs [id-watch-scope]
   (str (watch-scope-show id-watch-scope) "/device_logs"))
+(defn watch-scope-device-files [id-watch-scope]
+  (str (watch-scope-show id-watch-scope) "/device_files"))
 
 (defn show-login-page-when-not-loggedin [path]
   (and (includes? path front)

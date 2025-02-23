@@ -4,36 +4,44 @@
             [clojure.core :refer [format]]
             [clojure.string :refer [join]]
             [back.config :refer [db-spec]]
-            [back.models.util.device-log :as util.device-log]
             [back.models.util :as model.util]
-            [back.models.util.device :as util.device]))
+            [back.models.util.device :as util.device]
+            [back.models.util.device-log :as util.device-log]
+            [back.models.util.device-file :as util.device-file]
+            [back.models.util.watch-scope-term :as util.watch-scope-term]))
 
-(def name-table "watch_scope_term")
-(def key-table (keyword name-table))
+(def name-table util.watch-scope-term/name-table)
+(def key-table util.watch-scope-term/key-table)
 
 (defn filter-params [params]
   (select-keys params [:id :device_id :watch_scope_id :datetime_from :datetime_until]))
 
-(defn build-query-ids-device-log-for-watch-scope [id-watch-scope]
+(defn- build-sql-ids-some-table-for-watch-scope [id-watch-scope name-table-other str-key-datetime-to-compare]
   (->> [(format "SELECT %s.id FROM %s INNER JOIN %s ON %s.device_id = %s.device_id"
-                util.device-log/name-table
-                util.device-log/name-table
+                name-table-other
+                name-table-other
                 name-table
-                util.device-log/name-table
+                name-table-other
                 name-table)
         "WHERE"
         (format "%s.watch_scope_id = %d" name-table id-watch-scope)
         "AND"
-        (format "(((%s.datetime_from IS NULL) OR (%s.datetime_from < %s.created_at)) AND ((%s.datetime_until IS NULL) OR (%s.datetime_until > %s.created_at)))"
-                name-table
-                name-table
-                util.device-log/name-table
-                name-table
-                name-table
-                util.device-log/name-table)
-        (format "GROUP BY %s.id" util.device-log/name-table)]
+        (util.watch-scope-term/build-sql-datetime-is-target str-key-datetime-to-compare)
+        (format "GROUP BY %s.id" name-table-other)]
        (join " ")
        (format "(%s)")))
+
+(defn build-sql-ids-device-log-for-watch-scope [id-watch-scope]
+  (build-sql-ids-some-table-for-watch-scope
+   id-watch-scope
+   util.device-log/name-table
+   (format "%s.created_at" util.device-log/name-table)))
+
+(defn build-sql-ids-device-file-for-watch-scope [id-watch-scope]
+  (build-sql-ids-some-table-for-watch-scope
+   id-watch-scope
+   util.device-file/name-table
+   (format "%s.recorded_at" util.device-file/name-table)))
 
 (defn get-by-id [id & [{:keys [transaction]}]]
   (model.util/get-by-id id name-table

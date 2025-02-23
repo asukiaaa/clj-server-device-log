@@ -6,7 +6,7 @@
             [front.model.util :as util]))
 
 (def name-table util.user-team/name-table)
-(def str-keys-for-table util.user-team/str-keys-for-table)
+(def query-keys util.user-team/query-keys)
 
 (defn build-select-options-from-list-and-total [list-and-total]
   (for [item (:list list-and-total)]
@@ -16,14 +16,14 @@
 
 (defn fetch-list-and-total [{:keys [on-receive limit page]}]
   (util/fetch-list-and-total {:name-table (str name-table "s")
-                              :str-keys-of-item str-keys-for-table
+                              :str-keys-of-item query-keys
                               :on-receive on-receive
                               :limit limit
                               :page page}))
 
 (defn fetch-by-id [{:keys [id on-receive]}]
   (util/fetch-by-id {:name-table name-table
-                     :str-keys-of-item str-keys-for-table
+                     :str-keys-of-item query-keys
                      :id id
                      :on-receive on-receive}))
 
@@ -41,7 +41,7 @@
     (util/create {:name-table name-table
                   :str-keys-receive (goog.string.format "%s { %s }"
                                                         name-table
-                                                        str-keys-for-table)
+                                                        query-keys)
                   :str-input-params str-params
                   :on-receive on-receive})))
 
@@ -55,7 +55,7 @@
     (util/update {:name-table name-table
                   :str-keys-receive (goog.string.format "%s { %s }"
                                                         name-table
-                                                        str-keys-for-table)
+                                                        query-keys)
                   :str-input-params str-params
                   :on-receive on-receive})))
 

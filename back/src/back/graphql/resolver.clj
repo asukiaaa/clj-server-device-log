@@ -66,7 +66,7 @@
           (fn [name-table-device-log]
             (format "%s.id IN %s"
                     name-table-device-log
-                    (model.watch-scope-term/build-query-ids-device-log-for-watch-scope id-watch-scope)))})))))
+                    (model.watch-scope-term/build-sql-ids-device-log-for-watch-scope id-watch-scope)))})))))
 
 (defn login [context args _]
   (println "requested user login")
@@ -274,6 +274,21 @@
           list-and-total (model.device-file/get-list-with-total-latest-each-device args sql-ids-devices {:transaction transaction})]
       list-and-total)))
 
+(defn device-files-for-watch-scope [context args _]
+  (println "args for device-files-for-watch-scope" args)
+  (jdbc/with-db-transaction [transaction db-spec]
+    (let [user (get-user-loggedin context)
+          id-watch-scope (:watch_scope_id args)
+          watch-scope
+          (if (model.user/admin? user)
+            (model.watch-scope/get-by-id id-watch-scope {:transaction transaction})
+            (model.watch-scope/get-by-id-for-user-visible id-watch-scope (:id user) {:transaction transaction}))
+          sql-ids-device-file (model.watch-scope-term/build-sql-ids-device-file-for-watch-scope id-watch-scope)
+          files-list-total
+          (when watch-scope
+            (model.device-file/get-list-with-total-for-ids args sql-ids-device-file {:transaction transaction}))]
+      (assoc files-list-total model.watch-scope/key-table watch-scope))))
+
 (defn watch-scopes [context args _]
   (println "args for watch-scopes" args)
   (when-let [user (get-user-loggedin context)]
@@ -441,6 +456,7 @@
    :Query/watch_scope_term_for_watch_scope watch-scope-term-for-watch-scope
    :Query/device_files_for_device device-files-for-device
    :Query/device_files_latest_each_device device-files-latest-each-device
+   :Query/device_files_for_watch_scope device-files-for-watch-scope
    :Query/users users
    :Query/user user
    :Query/user_teams user-teams

@@ -44,6 +44,8 @@
                                                        :on-receive (fn [] (navigate route/watch-scopes))})}]
           " "
           [:> router/Link {:to (route/watch-scope-device-logs id)} util.label/logs]
+          " "
+          [:> router/Link {:to (route/watch-scope-device-files id)} util.label/files]
           [:table.table.table-sm
            [:thead
             [:tr

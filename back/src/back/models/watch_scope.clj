@@ -4,10 +4,11 @@
             [clojure.core :refer [format]]
             [back.config :refer [db-spec]]
             [back.models.util :as model.util]
-            [back.models.util.user-team :as util.user-team]))
+            [back.models.util.user-team :as util.user-team]
+            [back.models.util.watch-scope :as util.watch-scope]))
 
-(def name-table "watch_scope")
-(def key-table (keyword name-table))
+(def name-table util.watch-scope/name-table)
+(def key-table util.watch-scope/key-table)
 (defn build-str-keys-select-with-join []
   (format "%s.*, %s" name-table (util.user-team/build-str-select-params-for-joined)))
 (defn build-str-join []
@@ -27,6 +28,15 @@
    id name-table
    {:str-keys-select (build-str-keys-select-with-join)
     :str-before-where (build-str-join)
+    :build-item build-item
+    :transaction transaction}))
+
+(defn get-by-id-for-user-visible [id id-user & [{:keys [transaction]}]]
+  (model.util/get-by-id
+   id name-table
+   {:str-keys-select (build-str-keys-select-with-join)
+    :str-before-where (build-str-join)
+    :str-where (format "%s.owner_user_id = %d" util.user-team/name-table id-user)
     :build-item build-item
     :transaction transaction}))
 

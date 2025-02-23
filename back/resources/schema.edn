@@ -149,11 +149,20 @@
     :device {:type Device}
     :recorded_at {:type String}
     :created_at {:type String}}}
+  :ResponseDeviceFileListTotal
+  {:fields
+   {:list {:type (list DeviceFile)}
+    :total {:type Int}}}
   :ResponseDeviceFileForDeviceListTotal
   {:fields
    {:list {:type (list DeviceFile)}
     :total {:type Int}
     :device {:type Device}}}
+  :ResponseDeviceFileForWatchScopeListTotal
+  {:fields
+   {:list {:type (list DeviceFile)}
+    :total {:type Int}
+    :watch_scope {:type WatchScope}}}
   :WatchScope
   {:fields
    {:id {:type (non-null Int)}
@@ -311,7 +320,7 @@
      :args {:id {:type (non-null Int)}
             :device_type_id {:type (non-null Int)}}}
     :device_files_latest_each_device
-    {:type ResponseDeviceFileForDeviceListTotal
+    {:type ResponseDeviceFileListTotal
      :args {:limit {:type Int}
             :page {:type Int}
             :where {:type String}
@@ -319,6 +328,13 @@
     :device_files_for_device
     {:type ResponseDeviceFileForDeviceListTotal
      :args {:device_id {:type (non-null Int)}
+            :limit {:type Int}
+            :page {:type Int}
+            :where {:type String}
+            :order {:type String}}}
+    :device_files_for_watch_scope
+    {:type ResponseDeviceFileForWatchScopeListTotal
+     :args {:watch_scope_id {:type (non-null Int)}
             :limit {:type Int}
             :page {:type Int}
             :where {:type String}

@@ -6,10 +6,13 @@
             [back.config :refer [db-spec]]
             [back.models.device :as model.device]
             [back.models.util :as model.util]
+            [back.models.util.device-file :as util.device-file]
+            [back.models.util.watch-scope :as util.watch-scope]
+            [back.models.util.watch-scope-term :as util.watch-scope-term]
             [back.util.filestorage :as util.filestorage]))
 
-(def name-table "device_file")
-(def key-table (keyword name-table))
+(def name-table util.device-file/name-table)
+(def key-table util.device-file/key-table)
 
 (defn filter-params [params]
   (select-keys params [:name :datetime_dir :device_id]))
@@ -91,6 +94,13 @@
                          name-table-left-join
                          name-table
                          name-table-left-join)]))}))
+
+(defn get-list-with-total-for-ids [params sql-ids & [{:keys [transaction]}]]
+  (get-list-with-total-base
+   params
+   {:transaction transaction
+    :str-where
+    (format "%s.id IN %s" name-table sql-ids)}))
 
 (defn update-for-files-on-local []
   (let [ids-device-on-db (->> (jdbc/query db-spec (model.device/build-sql-ids))

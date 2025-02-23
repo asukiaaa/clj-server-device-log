@@ -2,17 +2,18 @@
   (:refer-clojure :exclude [update])
   (:require [goog.string :refer [format]]
             [clojure.string :refer [join]]
-            [front.model.device-type :as model.device-type]
+            [front.model.util :as util]
             [front.model.util.authorization-bearer :as bearer]
             [front.model.util.device :as util.device]
-            [front.model.util :as util]))
+            [front.model.util.device-type :as util.device-type]
+            [front.model.util.user-team :as util.user-team]))
 
 (def name-table util.device/name-table)
-(defn build-str-keys-for-device-with-peripherals []
-  (join " "
-        [util.device/str-keys-for-device
-         (model.device-type/build-str-table-and-keys)
-         "user_team{id name owner_user_id}"]))
+(defn build-query-table-and-keys-with-peripherals []
+  (util.device/build-query-table-and-keys
+   {:query-keys-additional
+    (join " " [(util.device-type/build-query-table-and-keys)
+               (util.user-team/build-query-table-and-keys)])}))
 
 (defn build-select-options-from-list-and-total [list-and-total]
   (for [item (:list list-and-total)]
@@ -20,15 +21,9 @@
           value (str (:name item) " " (-> item :device_type :name))]
       [id value])))
 
-(defn build-str-table-and-keys []
-  (format "%s {%s}"
-          name-table
-          (build-str-keys-for-device-with-peripherals)
-          #_str-keys-for-device))
-
 (defn fetch-list-and-total [{:keys [on-receive limit page]}]
   (util/fetch-list-and-total {:name-table (str name-table "s")
-                              :str-keys-of-item (build-str-keys-for-device-with-peripherals)
+                              :str-keys-of-item (build-query-table-and-keys-with-peripherals)
                               :on-receive on-receive
                               :limit limit
                               :page page}))
@@ -36,14 +31,14 @@
 (defn fetch-list-and-total-for-user-team [{:keys [on-receive user_team_id limit page]}]
   (util/fetch-list-and-total {:name-table (str name-table "s_for_user_team")
                               :str-params (format "user_team_id: %s" (util/build-input-str-for-int user_team_id))
-                              :str-keys-of-item (build-str-keys-for-device-with-peripherals)
+                              :str-keys-of-item (build-query-table-and-keys-with-peripherals)
                               :on-receive on-receive
                               :limit limit
                               :page page}))
 
 (defn fetch-by-id [{:keys [id on-receive]}]
   (util/fetch-by-id {:name-table name-table
-                     :str-keys-of-item (build-str-keys-for-device-with-peripherals)
+                     :str-keys-of-item (build-query-table-and-keys-with-peripherals)
                      :id id
                      :on-receive on-receive}))
 
@@ -65,7 +60,7 @@
                            (util/build-input-str-for-int user_team_id)
                            (util/build-input-str-for-str name))]
     (util/create {:name-table name-table
-                  :str-keys-receive (build-str-table-and-keys)
+                  :str-keys-receive (util.device/build-query-table-and-keys)
                   :str-input-params str-params
                   :on-receive on-receive})))
 
@@ -77,7 +72,7 @@
                            (util/build-input-str-for-int user_team_id)
                            (util/build-input-str-for-str name))]
     (util/update {:name-table name-table
-                  :str-keys-receive (build-str-table-and-keys)
+                  :str-keys-receive (util.device/build-query-table-and-keys)
                   :str-input-params str-params
                   :on-receive on-receive})))
 
