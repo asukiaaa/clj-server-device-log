@@ -44,8 +44,7 @@
 
 (defn- str-date-and-time->str-datetime-in-utc [str-date str-time str-timezone]
   (when-not (empty? str-date)
-    (if (empty? str-time)
-      str-date
+    (let [str-time (or str-time "00:00")]
       (-> (str str-date " " str-time)
           (util.timezone/datetime-str-without-timzone->datetime-in-timezone {:str-timezone str-timezone})
           (util.timezone/datetime->str-in-timezone
