@@ -16,7 +16,9 @@
         recorded-at (:recorded_at device-file)
         id-device (:device_id device-file)
         device (:device device-file)]
-    [:div.card.m-2 {:style {:float :left :width width}}
+    [:div.card.m-2 {:style {:display :inline-block
+                            :vertical-align :top
+                            :width width}}
      [:a {:href "#" :on-click (fn [e] (.preventDefault e) (when on-click-image (on-click-image device-file)))}
       [:img.card-img-top {:src path-url
                           :style {:object-fit :contain
@@ -24,8 +26,13 @@
      [:div.card-body.p-1
       (when-not without-device
         [:div
-         [:> router/Link {:to (route/device-device-files id-device)} (util.label/device-item device)]])
-      [:div (util.timezone/build-datetime-str-in-timezone recorded-at {:datetime-format util.timezone/date-fns-format-with-timezone-until-minute})]]]))
+         [:> router/Link {:to (route/device-device-files id-device)}
+          (-> device util.label/device-item)]])
+      [:div (util.timezone/build-datetime-str-in-timezone recorded-at {:datetime-format util.timezone/date-fns-format-with-timezone-until-minute})]
+      (for [watch-scope (:watch_scopes device-file)]
+        [:div {:key (:id watch-scope)}
+         [:> router/Link {:to (route/watch-scope-device-files (:id watch-scope))}
+          (-> watch-scope util.label/watch-scope-item)]])]]))
 
 (defn render-hiddend-image [item]
   (when item
@@ -55,23 +62,28 @@
      [:> bs/Modal.Header {:closeButton true}
       (let [device (-> item-on-modal :device)]
         [:<>
-         [:> router/Link {:to (route/device-device-files (:id device))} (util.label/device-item device)]
-         " "
-         (util.timezone/build-datetime-str-in-timezone
-          (:recorded_at item-on-modal))])]
+         [:> router/Link {:to (route/device-device-files (:id device))}
+          (util.label/device-item device)]
+         [:span.ps-1
+          (util.timezone/build-datetime-str-in-timezone
+           (:recorded_at item-on-modal))]])]
      [:> bs/Modal.Body {:class :p-0}
       [:<>
        (for [[key item] map-items-loaded]
          [:<> {:key key}
           (render-hiddend-image item)])]
       [:div.d-flex.justify-content-center
-       [:> bs/Button {:on-click on-click-prev :class :m-1 :disabled (= index-show-modal 0)} util.label/prev]
-       [:> bs/Button {:on-click on-click-next :class :m-1 :disabled (= index-show-modal index-last)} util.label/next]]
+       [:> bs/Button {:on-click on-click-prev :class "my-2 mx-1" :disabled (= index-show-modal 0)} util.label/prev]
+       [:> bs/Button {:on-click on-click-next :class "my-2 mx-1" :disabled (= index-show-modal index-last)} util.label/next]]
       [:img {:src (:path item-on-modal)
              :key (:path item-on-modal)
              :style {:object-fit :contain
                      :width "100%"}}]]
      [:> bs/Modal.Footer
+      (for [watch-scope (:watch_scopes item-on-modal)]
+        [:div {:key (:id watch-scope)}
+         [:> router/Link {:to (route/watch-scope-device-files (:id watch-scope))}
+          (util.label/watch-scope-item watch-scope)]])
       #_[:> bs/Button {:on-click #(set-item-in-modal nil)} util.label/close]
       [:> bs/Button {:on-click on-click-prev :disabled (= index-show-modal 0)} util.label/prev]
       [:> bs/Button {:on-click on-click-next :disabled (= index-show-modal index-last)} util.label/next]]]))
@@ -133,7 +145,7 @@
        [:<>
         element-pagination
         [:div.ms-2 "total " total]
-        [:div {:style {:width "100%" :overflow :auto}}
+        [:div {:style {:width "100%"}}
          (for [[index item] (map-indexed vector received-list)]
            [:<> {:key (:path item)}
             (render-card item {:on-click-image (fn [_] (on-click-image index))})])]

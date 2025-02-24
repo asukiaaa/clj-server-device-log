@@ -36,6 +36,42 @@
     (->> list-files
          (map #(assign-info-to-item-from-map % {:map-id-device map-id-device})))))
 
+(defn- assign-watch-scoopes-to-list [list-file & [{:keys [transaction]}]]
+  (when-not (empty? list-file)
+    (let [key-id-device-file (keyword (format "%s_id" util.device-file/name-table))
+          sql-ids-device-file (->> (map :id list-file) (join ",") (format "(%s)"))
+          query (join " " [(format "SELECT %s.id %s , %s.* from %s"
+                                   util.device-file/name-table
+                                   (name key-id-device-file)
+                                   util.watch-scope/name-table
+                                   util.watch-scope/name-table)
+                           (format "INNER JOIN %s ON %s.id = %s.watch_scope_id"
+                                   util.watch-scope-term/name-table
+                                   util.watch-scope/name-table
+                                   util.watch-scope-term/name-table)
+                           (format "INNER JOIN %s ON %s.device_id = %s.device_id AND %s"
+                                   util.device-file/name-table
+                                   util.device-file/name-table
+                                   util.watch-scope-term/name-table
+                                   (util.watch-scope-term/build-sql-datetime-is-target
+                                    (format "%s.recorded_at" util.device-file/name-table)))
+                           (format "WHERE %s.id IN %s"
+                                   util.device-file/name-table
+                                   sql-ids-device-file)])
+          list-watch-scope (jdbc/query (or transaction db-spec) query)
+          map-id-device-file-id-watch-scope
+          (reduce (fn [result item]
+                    (let [id-device-file (key-id-device-file item)
+                          id-watch-scope (:id item)
+                          map-for-id-device-file (get result id-device-file)]
+                      (assoc result id-device-file (assoc map-for-id-device-file id-watch-scope item))))
+                  {} list-watch-scope)
+          list-device-file
+          (for [item list-file]
+            (let [list-watch-scope (vals (get map-id-device-file-id-watch-scope (:id item)))]
+              (assoc item (-> util.watch-scope/name-table (str "s") keyword) list-watch-scope)))]
+      list-device-file)))
+
 (defn- assign-path-url-to-item [item]
   (if (:path item)
     item
@@ -60,6 +96,7 @@
                                   :str-order "recorded_at DESC"))]
     {:list (-> list
                (assign-device-to-list {:transaction transaction})
+               (assign-watch-scoopes-to-list {:transaction transaction})
                assign-path-url-to-list)
      :total total}))
 

@@ -147,6 +147,7 @@
     :path {:type String}
     :path_thumbnail {:type String}
     :device {:type Device}
+    :watch_scopes {:type (list WatchScope)}
     :recorded_at {:type String}
     :created_at {:type String}}}
   :ResponseDeviceFileListTotal

@@ -10,7 +10,11 @@
 (def keys-for-table [:path :path_thumbnail :device_id :recorded_at :created_at])
 (def query-keys (join " " (map name keys-for-table)))
 (defn build-query-keys-with-device []
-  (str query-keys " " (util.device/build-query-table-and-keys)))
+  (format "%s %s %s{%s}"
+          query-keys
+          (util.device/build-query-table-and-keys)
+          (str util.watch-scope/name-table "s")
+          util.watch-scope/query-keys))
 
 (defn fetch-list-and-total-for-watch-scope [{:keys [id-watch-scope on-receive limit page]}]
   (util/fetch-list-and-total {:name-table (str name-table "s_for_watch_scope")
