@@ -24,6 +24,8 @@
 (def api-key "API key")
 (defn api-key-item [item] (show-key item [:name :id]))
 (def close "Close")
+(def config-default "Config default")
+(def config-format "Config format")
 (def copy "Copy")
 (def copied "Copied")
 (def create "Create")

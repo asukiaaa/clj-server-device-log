@@ -11,11 +11,15 @@
 
 (defn- page []
   (let [navigate (router/useNavigate)
-        state-info-name (util/build-state-info :name #(react/useState))
+        state-info-name (util/build-state-info :name react/useState)
+        state-info-system (util/build-state-info :__system #(react/useState))
+        state-info-config-default (util/build-state-info :config_default react/useState)
+        state-info-config-format (util/build-state-info :config_format react/useState)
+        list-state-info [state-info-system state-info-name state-info-config-default state-info-config-format]
         on-receive (fn [data]
                      (if-let [errors-str (:errors data)]
                        (let [errors (keywordize-keys (js->clj (.parse js/JSON errors-str)))]
-                         (doseq [state [state-info-name]]
+                         (doseq [state list-state-info]
                            (let [key (:key state)
                                  errors-for-key (get errors key)]
                              ((:set-errors state) errors-for-key))))
@@ -25,13 +29,17 @@
         (fn [e]
           (.preventDefault e)
           (model.device-type/create
-           {:name (:draft state-info-name)
-            :on-receive on-receive}))]
+           (reduce (fn [params state-info]
+                     (assoc params (:key state-info) (:draft state-info)))
+                   {:on-receive on-receive}
+                   list-state-info)))]
     [:div
      [:f> breadcrumb/core [{:label util.label/device-types :path route/device-types}
                            {:label util.label/create}]]
      [:form.form-control
-      [util/render-input "name" state-info-name]
+      [util/render-input util.label/name state-info-name]
+      [util/render-textarea util.label/config-format state-info-config-format]
+      [util/render-textarea util.label/config-default state-info-config-default]
       [:button.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply} util.label/create]]]))
 
 (defn core []

@@ -27,7 +27,9 @@
     :user_team_id {:type Int}}}
   :InputDeviceTypeCreateUpdate
   {:fields
-   {:name {:type String}}}
+   {:name {:type String}
+    :config_default {:type String}
+    :config_format {:type String}}}
   :InputDeviceTypeApiKeyCreate
   {:fields
    {:name {:type String}
@@ -122,6 +124,8 @@
    {:id {:type (non-null Int)}
     :user_id {:type (non-null Int)}
     :name {:type String}
+    :config_default {:type String}
+    :config_format {:type String}
     :created_at {:type String}
     :updated_at {:type String}}}
   :ResponseDeviceTypeListTotal

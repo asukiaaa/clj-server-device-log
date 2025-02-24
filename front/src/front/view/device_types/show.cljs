@@ -7,7 +7,8 @@
             [front.view.util :as util]
             [front.view.util.breadcrumb :as breadcrumb]
             [front.view.util.label :as util.label]
-            [front.model.device-type :as model.device-type]))
+            [front.model.device-type :as model.device-type]
+            [front.model.util.device-type :as model.util.device-type]))
 
 (defn- page []
   (let [params (js->clj (router/useParams))
@@ -51,7 +52,7 @@
              [:th "key"]
              [:th "value"]]]
            [:tbody
-            (for [key [:id :user_id :name :created_at :updated_at]]
+            (for [key model.util.device-type/keys-for-table]
               [:tr {:key key}
                [:td key]
                [:td (get item key)]])]]])})]))

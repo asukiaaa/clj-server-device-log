@@ -33,20 +33,24 @@
                       :id id
                       :on-receive on-receive}))
 
-(defn create [{:keys [name on-receive]}]
-  (let [str-params (goog.string.format "%s: {name: %s}"
+(defn create [{:keys [name config_default config_format on-receive]}]
+  (let [str-params (goog.string.format "%s: {name: %s, config_default: %s, config_format: %s}"
                                        name-table
-                                       (util/build-input-str-for-str name))]
+                                       (util/build-input-str-for-str name)
+                                       (util/build-input-str-for-str config_default)
+                                       (util/build-input-str-for-str config_format))]
     (util/create {:name-table name-table
                   :str-keys-receive (util.device-type/build-query-table-and-keys)
                   :str-input-params str-params
                   :on-receive on-receive})))
 
-(defn update [{:keys [id name on-receive]}]
-  (let [str-params (goog.string.format "id: %s, %s: {name: %s}"
+(defn update [{:keys [id name config_default config_format on-receive]}]
+  (let [str-params (goog.string.format "id: %s, %s: {name: %s, config_default: %s, config_format: %s}"
                                        (util/build-input-str-for-int id)
                                        name-table
-                                       (util/build-input-str-for-str name))]
+                                       (util/build-input-str-for-str name)
+                                       (util/build-input-str-for-str config_default)
+                                       (util/build-input-str-for-str config_format))]
     (util/update {:name-table name-table
                   :str-keys-receive (util.device-type/build-query-table-and-keys)
                   :str-input-params str-params
