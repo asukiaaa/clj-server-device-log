@@ -125,6 +125,13 @@
         {:status 200
          :body (json/write-str result)}))))
 
+(defn api-get-device-config [req]
+  (let [str-bearer (handler.util/get-bearer req)
+        device (model.device/get-by-authorization-bearer str-bearer)]
+    (when device
+      {:status 200
+       :body (-> device :id model.device/get-config json/write-str)})))
+
 (defn api-post-device-file [req]
   (let [str-bearer (handler.util/get-bearer req)
         device (or (model.device/get-by-key-str str-bearer) ; TODO remove after updating key on devices

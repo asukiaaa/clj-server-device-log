@@ -85,6 +85,9 @@
     ["/api/device"
      :post [(body-params) handlers/api-post-device]
      :route-name :api-post-device]
+    ["/api/device_config"
+     :get [(body-params) handlers/api-get-device-config]
+     :route-name :api-get-device-cnfig]
     ["/api/device_file"
      :post [(middlewares/multipart-params) handlers/api-post-device-file]
      :route-name :api-post-device-file]

@@ -1,5 +1,14 @@
 # curl
 
+## device config
+
+```sh
+AUTHORIZATION_BEARER="authorization-bearer-of-device"
+HOST=http://localhost:3000
+curl -X GET ${HOST}/api/device_config \
+  -H "Authorization: Bearer ${AUTHORIZATION_BEARER}"
+```
+
 ## device file
 
 Example command to upload file for device

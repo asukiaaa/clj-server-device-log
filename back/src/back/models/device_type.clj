@@ -3,10 +3,11 @@
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.core :refer [format]]
             [back.config :refer [db-spec]]
-            [back.models.util :as model.util]))
+            [back.models.util :as model.util]
+            [back.models.util.device-type :as util.device-type]))
 
-(def name-table "device_type")
-(def key-table (keyword name-table))
+(def name-table util.device-type/name-table)
+(def key-table util.device-type/key-table)
 
 (defn filter-params [params]
   (select-keys params [:name :user_id :config_format :config_default]))

@@ -2,6 +2,7 @@
   (:refer-clojure :exclude [update])
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.core :refer [format]]
+            [clojure.data.json :as json]
             [clojure.string :refer [join]]
             [clj-time.core :as cljt]
             [clj-time.format :as cljt-format]
@@ -9,6 +10,7 @@
             [back.config :refer [db-spec]]
             [back.util.encryption :as encryption]
             [back.models.util.device :as util.device]
+            [back.models.util.device-type :as util.device-type]
             [back.models.util.user-team :as util.user-team]
             [back.models.util :as model.util]))
 
@@ -165,3 +167,14 @@
 
 (defn get-list-with-total-for-admin [params]
   (model.util/get-list-with-total-with-building-query name-table params))
+
+(defn get-config [id-device & [{:keys [transaction]}]]
+  (let [query (join " " [(format "SELECT %s.config_default FROM %s" util.device-type/name-table name-table)
+                         (format "INNER JOIN %s ON %s.device_type_id = %s.id"
+                                 util.device-type/name-table
+                                 name-table
+                                 util.device-type/name-table)
+                         (format "WHERE %s.id = %d" name-table id-device)])
+        item (first (jdbc/query (or transaction db-spec) query))
+        config-default (when-let [str-config (:config_default item)] (json/read-str str-config))]
+    config-default))
