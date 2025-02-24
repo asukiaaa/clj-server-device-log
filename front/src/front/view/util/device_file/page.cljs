@@ -53,11 +53,14 @@
             (let [item-loaded (get map-items-loaded index)]
               (when (and (seq item)
                          (not (= (:path item) (:path item-loaded))))
-                (set-map-items-loaded (assoc map-items-loaded index item))))))]
+                (set-map-items-loaded (assoc map-items-loaded index item))))))
+        preload-neighbors
+        (fn []
+          (when-not (nil? index-show-modal)
+            (add-item-to-loaded-if-not (dec index-show-modal))
+            (add-item-to-loaded-if-not (inc index-show-modal))))]
     (when-not (nil? index-show-modal)
-      (add-item-to-loaded-if-not index-show-modal)
-      (add-item-to-loaded-if-not (dec index-show-modal))
-      (add-item-to-loaded-if-not (inc index-show-modal)))
+      (add-item-to-loaded-if-not index-show-modal))
     [:> bs/Modal {:show (seq item-on-modal) :size :xl :onHide #(set-index-show-modal nil)}
      [:> bs/Modal.Header {:closeButton true}
       (let [device (-> item-on-modal :device)]
@@ -77,6 +80,7 @@
        [:> bs/Button {:on-click on-click-next :class "my-2 mx-1" :disabled (= index-show-modal index-last)} util.label/next]]
       [:img {:src (:path item-on-modal)
              :key (:path item-on-modal)
+             :on-load preload-neighbors
              :style {:object-fit :contain
                      :width "100%"}}]]
      [:> bs/Modal.Footer
