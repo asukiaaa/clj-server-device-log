@@ -34,17 +34,19 @@
     (into {} (for [key (.keys url-search-params)]
                [(keyword key) (.get url-search-params key)]))))
 
-(defn build-state-info [key build-state]
-  (let [state-default (build-state)
-        state-draft (build-state)
-        state-errors (build-state)]
-    {:key key
-     :default (first state-default)
-     :set-default (second state-default)
-     :draft (first state-draft)
-     :set-draft (second state-draft)
-     :errors (first state-errors)
-     :set-errors (second state-errors)}))
+(defn build-state-info [key build-state & [{:keys [default draft]}]]
+  (let [value-default default
+        value-draft (or draft default)]
+    (let [state-default (if value-default (build-state value-default) (build-state))
+          state-draft (if value-draft (build-state value-draft) (build-state))
+          state-errors (build-state)]
+      {:key key
+       :default (first state-default)
+       :set-default (second state-default)
+       :draft (first state-draft)
+       :set-draft (second state-draft)
+       :errors (first state-errors)
+       :set-errors (second state-errors)})))
 
 (defn set-default-and-draft [info val]
   ((:set-default info) val)

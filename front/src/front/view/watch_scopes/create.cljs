@@ -18,7 +18,7 @@
         state-info-system (util/build-state-info :__system #(react/useState))
         state-info-name (util/build-state-info :name #(react/useState))
         state-info-id-user-team (util/build-state-info :user_team_id #(react/useState))
-        state-info-terms (util/build-state-info :terms #(react/useState {}))
+        state-info-terms (util/build-state-info :terms react/useState {:default (util.watch-scope/build-initial-terms-params)})
         [device-list-and-total set-device-list-and-total] (react/useState)
         [user-team-list-and-total set-user-team-list-and-total] (react/useState)
         info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))

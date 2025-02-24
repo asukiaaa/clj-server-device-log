@@ -79,6 +79,9 @@
            key-datetime-until-date until-date
            key-datetime-until-time until-time)))
 
+(defn build-initial-terms-params []
+  {key-str-timezone (util.timezone/get)})
+
 (defn terms-params->draft [terms & [{:keys [str-timezone]}]]
   (let [str-timezone (or str-timezone (util.timezone/get))]
     (into {key-str-timezone str-timezone}
