@@ -42,7 +42,7 @@
 
 (defn fetch-by-id [{:keys [id on-receive]}]
   (util/fetch-by-id {:name-table name-table
-                     :str-keys-of-item (build-query-table-and-keys-with-peripherals)
+                     :str-keys-of-item (build-query-keys-with-peripherals)
                      :id id
                      :on-receive on-receive}))
 
