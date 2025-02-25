@@ -2,6 +2,7 @@
   (:require [clojure.data.json :as json]
             [clojure.java.io :as io]
             [clojure.java.jdbc :as jdbc]
+            [clojure.walk :refer [keywordize-keys]]
             [hiccup.page :refer [html5]]
             [back.config :refer [db-spec]]
             [back.handlers.util :as handler.util]
@@ -9,7 +10,8 @@
             [back.models.device-type-api-key :as model.device-type-api-key]
             [back.models.device :as model.device]
             [back.models.device-file :as model.device-file]
-            [back.config :as config]))
+            [back.config :as config]
+            [back.models.util :as model.util]))
 
 (defn top [req]
   {:status 200
@@ -119,14 +121,16 @@
     (let [str-bearer (handler.util/get-bearer req)
           device-type-api-key (model.device-type-api-key/get-by-authorization-bearer str-bearer {:transaction transaction})]
       (when (model.device-type-api-key/has-permission-to-create-device? device-type-api-key)
-        (let [params (:json-params req)
+        (let [params (-> req :json-params json/read-str keywordize-keys)
               id-device-type (:device_type_id device-type-api-key)
               params-device (-> (:device params)
                                 (assoc :device_type_id id-device-type))
-              result (model.device/create params-device {:transaction transaction})
-              result (assoc result :authorization_bearer (model.device/build-authorization-bearer (-> result :device :key_str)))]
+              result-create (model.device/create params-device {:transaction transaction})
+              result-return (if-let [device (model.device/key-table result-create)]
+                              {model.util/key-authorization-bearer (model.device/build-authorization-bearer-for-item device)}
+                              result-create)]
           {:status 200
-           :body (json/write-str result)})))))
+           :body (json/write-str result-return)})))))
 
 (defn api-get-device-config [req]
   (let [str-bearer (handler.util/get-bearer req)

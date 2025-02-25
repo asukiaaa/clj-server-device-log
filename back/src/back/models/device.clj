@@ -55,14 +55,12 @@
 (defn get-by-id [id & [{:keys [transaction]}]]
   (model.util/get-by-id id name-table {:transaction transaction}))
 
-(defn build-authorization-bearer [item]
-  (let [data-for-bearer {key-table {:key_str (:key_str item)}
-                         :created_at (cljt-format/unparse model.util/time-format-yyyymmdd-hhmmss (cljt/now))}]
-    (encryption/encode data-for-bearer)))
+(defn build-authorization-bearer-for-item [item]
+  (model.util/build-authorization-bearer (:key_str item) key-table :key_str))
 
 (defn get-authorizaton-bearer-by-id [id-device & [{:keys [transaction]}]]
   (let [item (get-by-id id-device {:transaction transaction})]
-    (build-authorization-bearer item)))
+    (build-authorization-bearer-for-item item)))
 
 (defn get-list-by-ids [ids & [{:keys [transaction]}]]
   (when-not (empty? ids)
@@ -119,20 +117,32 @@
 (defn build-key-str []
   (model.util/build-random-str-alphabets-and-number 60))
 
-(defn assign-unique-key-str-to-params [params transaction]
+(defn- assign-unique-key-str-to-params [params transaction]
   (let [hash (build-key-str)
         user (get-by-key-str hash {:transaction transaction})]
     (if (empty? user)
       (assoc params :key_str hash)
       (assign-unique-key-str-to-params params transaction))))
 
+(defn is-unique-name-for-device-type [params & [{:keys [transaction]}]]
+  (let [name (model.util/build-input-str-for-str (:name params))
+        id-device-type (:device_type_id params)
+        query (join " " [(format "SELECT * FROM %s" name-table)
+                         (format "WHERE name = %s AND device_type_id = %d"
+                                 name id-device-type)])
+        device (-> (jdbc/query (or transaction db-spec) query)
+                   first)]
+    (not device)))
+
 (defn create [params & [{:keys [transaction]}]]
   (jdbc/with-db-transaction [t-con (or transaction db-spec)]
-    (jdbc/insert! t-con key-table (-> params filter-params (assign-unique-key-str-to-params t-con)))
-    (let [id (-> (jdbc/query t-con "SELECT LAST_INSERT_ID()")
-                 first vals first)
-          item (get-by-id id {:transaction t-con})]
-      {:device item})))
+    (if (is-unique-name-for-device-type params {:transaction transaction})
+      (do (jdbc/insert! t-con key-table (-> params filter-params (assign-unique-key-str-to-params t-con)))
+          (let [id (-> (jdbc/query t-con "SELECT LAST_INSERT_ID()")
+                       first vals first)
+                item (get-by-id id {:transaction t-con})]
+            {key-table item}))
+      {:errors {:name ["required to unique for device type"]}})))
 
 (defn create-for-user [params user-id]
   (jdbc/with-db-transaction [t-con db-spec]

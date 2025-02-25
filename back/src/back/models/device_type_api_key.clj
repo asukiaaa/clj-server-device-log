@@ -1,8 +1,6 @@
 (ns back.models.device-type-api-key
   (:refer-clojure :exclude [update])
-  (:require [clj-time.core :as cljt]
-            [clj-time.format :as cljt-format]
-            [clojure.java.jdbc :as jdbc]
+  (:require [clojure.java.jdbc :as jdbc]
             [clojure.core :refer [format]]
             [clojure.data.json :as json]
             [clojure.string :refer [join]]
@@ -25,14 +23,12 @@
 (defn get-by-id [id & [{:keys [transaction]}]]
   (model.util/get-by-id id name-table {:transaction transaction}))
 
-(defn build-authorization-bearer [item]
-  (let [data-for-bearer {key-table {:key_str (:key_str item)}
-                         :created_at (cljt-format/unparse model.util/time-format-yyyymmdd-hhmmss (cljt/now))}]
-    (encryption/encode data-for-bearer)))
+(defn build-authorization-bearer-for-item [item]
+  (model.util/build-authorization-bearer (:key_str item) key-table :key_str))
 
 (defn get-authorizaton-bearer-by-id [id-device & [{:keys [transaction]}]]
   (let [item (get-by-id id-device {:transaction transaction})]
-    (build-authorization-bearer item)))
+    (build-authorization-bearer-for-item item)))
 
 (defn get-by-key-str [key-str & [{:keys [transaction]}]]
   (when-not (empty? key-str)

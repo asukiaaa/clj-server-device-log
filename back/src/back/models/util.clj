@@ -1,14 +1,17 @@
 (ns back.models.util
-  (:require [clojure.java.jdbc :as jdbc]
+  (:require [clj-time.core :as cljt]
+            [clj-time.format :as cljt-format]
+            [clojure.java.jdbc :as jdbc]
             [clojure.data.json :as json]
             [clojure.core :refer [format]]
-            [clj-time.format :as cljt-format]
             [clojure.string :refer [escape join]]
-            [back.config :refer [db-spec]]))
+            [back.config :refer [db-spec]]
+            [back.util.encryption :as encryption]))
 
 (def time-format-yyyymmdd-hhmmss (cljt-format/formatter "YYYY-MM-dd HH:mm:ss"))
 (def ^:private str-alphabets-and-number "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 (def ^:private str-parentesis-and-special-chars ":[]\\/.,\"!#$%&'()-^")
+(def key-authorization-bearer :authorization_bearer)
 
 (defn build-random-str-complex [len]
   (apply str (repeatedly len #(rand-nth (str str-alphabets-and-number str-parentesis-and-special-chars)))))
@@ -33,6 +36,10 @@
   (when-not (nil? text)
     (escape text {\" "\\\""
                   \\ "\\\\"})))
+
+(defn build-input-str-for-str [val]
+  (let [val (escape-for-sql val)]
+    (if (nil? val) "null" (format "\"%s\"" val))))
 
 (defn build-query-get-index [name-table & [{:keys [with-calc-found-rows str-keys-select]}]]
   (let [with-calc-found-rows (if (nil? with-calc-found-rows) true with-calc-found-rows)
@@ -75,3 +82,9 @@
       (#(if-not (empty? str-order) (str % " ORDER BY " str-order) %))
       (append-limit-offset-by-limit-page-params params)
       (get-list-with-total {:transaction transaction :build-item build-item})))
+
+(defn build-authorization-bearer [key-str key-table key-key-str]
+  (when key-str
+    (encryption/encode
+     {key-table {key-key-str key-str}
+      :created_at (cljt-format/unparse time-format-yyyymmdd-hhmmss (cljt/now))})))
