@@ -1,7 +1,9 @@
 (ns back.handlers.core
   (:require [clojure.data.json :as json]
             [clojure.java.io :as io]
+            [clojure.java.jdbc :as jdbc]
             [hiccup.page :refer [html5]]
+            [back.config :refer [db-spec]]
             [back.handlers.util :as handler.util]
             [back.models.device-log :as model.device-log]
             [back.models.device-type-api-key :as model.device-type-api-key]
@@ -113,17 +115,18 @@
          :body "ok"}))))
 
 (defn api-post-device [req]
-  (let [str-bearer (handler.util/get-bearer req)
-        device-type-api-key (model.device-type-api-key/get-by-authorization-bearer str-bearer)]
-    (when (model.device-type-api-key/has-permission-to-create-device device-type-api-key)
-      (let [params (:json-params req)
-            id-device-type (:device_type_id device-type-api-key)
-            params-device (-> (:device params)
-                              (assoc :device_type_id id-device-type))
-            result (model.device/create params-device)
-            result (assoc result :authorization_bearer (model.device/build-authorization-bearer (-> result :device :key_str)))]
-        {:status 200
-         :body (json/write-str result)}))))
+  (jdbc/with-db-transaction [transaction db-spec]
+    (let [str-bearer (handler.util/get-bearer req)
+          device-type-api-key (model.device-type-api-key/get-by-authorization-bearer str-bearer {:transaction transaction})]
+      (when (model.device-type-api-key/has-permission-to-create-device? device-type-api-key)
+        (let [params (:json-params req)
+              id-device-type (:device_type_id device-type-api-key)
+              params-device (-> (:device params)
+                                (assoc :device_type_id id-device-type))
+              result (model.device/create params-device {:transaction transaction})
+              result (assoc result :authorization_bearer (model.device/build-authorization-bearer (-> result :device :key_str)))]
+          {:status 200
+           :body (json/write-str result)})))))
 
 (defn api-get-device-config [req]
   (let [str-bearer (handler.util/get-bearer req)

@@ -103,6 +103,6 @@
 (defn get-list-with-total-for-user-and-device-type [params id-user id-device-type]
   (get-list-with-total-base params {:str-where (format "%s.user_id = %d AND device_type_id = %d" model.device-type/name-table id-user id-device-type)}))
 
-(defn has-permission-to-create-device [device-type-api-key]
+(defn has-permission-to-create-device? [device-type-api-key]
   (let [permission (json/read-json (:permission device-type-api-key))]
     (:create_device permission)))

@@ -126,8 +126,8 @@
       (assoc params :key_str hash)
       (assign-unique-key-str-to-params params transaction))))
 
-(defn create [params]
-  (jdbc/with-db-transaction [t-con db-spec]
+(defn create [params & [{:keys [transaction]}]]
+  (jdbc/with-db-transaction [t-con (or transaction db-spec)]
     (jdbc/insert! t-con key-table (-> params filter-params (assign-unique-key-str-to-params t-con)))
     (let [id (-> (jdbc/query t-con "SELECT LAST_INSERT_ID()")
                  first vals first)
