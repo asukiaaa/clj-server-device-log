@@ -1,0 +1,8 @@
+{:up
+ ["ALTER TABLE device
+   MODIFY name CHAR(255) NOT NULL,
+   ADD CONSTRAINT unique_device_name_for_device_type UNIQUE ( name, device_type_id )"]
+ :down
+ ["ALTER TABLE device
+   MODIFY name CHAR(255),
+   DROP CONSTRAINT unique_device_name_for_device_type"]}
