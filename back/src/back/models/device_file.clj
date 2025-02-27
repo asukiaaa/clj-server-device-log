@@ -1,7 +1,9 @@
 (ns back.models.device-file
   (:refer-clojure :exclude [update])
-  (:require [clojure.java.jdbc :as jdbc]
+  (:require [clojure.data.json :as json]
+            [clojure.java.jdbc :as jdbc]
             [clojure.string :refer [join]]
+            [clojure.walk :refer [keywordize-keys]]
             [clj-time.format :as cljt-format]
             [back.config :refer [db-spec]]
             [back.models.device :as model.device]
@@ -15,14 +17,15 @@
 (def key-table util.device-file/key-table)
 
 (defn filter-params [params]
-  (select-keys params [:name :datetime_dir :device_id]))
+  (select-keys params [:name :datetime_dir :device_id :recorded_at]))
 
 (defn create-record [params & [{:keys [transaction]}]]
   (jdbc/insert! (or transaction db-spec) key-table (filter-params params)))
 
-(defn create-file [file-input filename id-device & [{:keys [transaction]}]]
-  (let [params (util.filestorage/create-file-for-device file-input filename id-device)]
-    (create-record params {:transaction transaction})
+(defn create-file [file-input filename id-device & [{:keys [transaction file-config-json-str]}]]
+  (let [file-config  (-> file-config-json-str json/read-str keywordize-keys)
+        params (util.filestorage/create-file-for-device file-input filename id-device)]
+    (create-record (merge file-config params) {:transaction transaction})
     (util.filestorage/build-path-url-for-device params)))
 
 (defn- assign-info-to-item-from-map [item {:keys [map-id-device]}]

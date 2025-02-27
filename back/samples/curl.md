@@ -22,6 +22,18 @@ curl -X POST ${HOST}/api/device_file \
   -F "file=@$PATH_FILE"
 ```
 
+Use multipart to specify recorded_at
+
+```sh
+AUTHORIZATION_BEARER="authorization-bearer-of-device"
+PATH_FILE="your-local/image.png"
+HOST=http://localhost:3000
+curl -X POST ${HOST}/api/device_file \
+  -H "Authorization: Bearer ${AUTHORIZATION_BEARER}" \
+  -F "file=@$PATH_FILE" \
+  -F "file_config={\"recorded_at\": \"2025-01-05 09:00:00\"}"
+```
+
 ## device
 
 Example commands to create device

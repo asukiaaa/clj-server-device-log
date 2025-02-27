@@ -4,13 +4,12 @@
             [clojure.java.jdbc :as jdbc]
             [clojure.walk :refer [keywordize-keys]]
             [hiccup.page :refer [html5]]
-            [back.config :refer [db-spec]]
+            [back.config :as config :refer [db-spec]]
             [back.handlers.util :as handler.util]
             [back.models.device-log :as model.device-log]
             [back.models.device-type-api-key :as model.device-type-api-key]
             [back.models.device :as model.device]
             [back.models.device-file :as model.device-file]
-            [back.config :as config]
             [back.models.util :as model.util]))
 
 (defn top [req]
@@ -144,14 +143,19 @@
         device (or (model.device/get-by-key-str str-bearer) ; TODO remove after updating key on devices
                    (model.device/get-by-authorization-bearer str-bearer))]
     (when device
-      (let [id-device (:id device)
-            info-file (-> req :multipart-params (get "file"))
-            input-file (:tempfile info-file)
-            filename (:filename info-file)
-            path-file (model.device-file/create-file input-file filename id-device)
-            result {:file {:path path-file}}]
-        {:status 200
-         :body (json/write-str result)}))))
+      (try
+        (let [id-device (:id device)
+              info-file (-> req :multipart-params (get "file"))
+              info-file-config (-> req :multipart-params (get "file_config"))
+              input-file (:tempfile info-file)
+              filename (:filename info-file)
+              path-file (model.device-file/create-file input-file filename id-device {:file-config-json-str info-file-config})
+              result {:file {:path path-file}}]
+          {:status 200
+           :body (json/write-str result)})
+        (catch Exception e
+          {:status 500
+           :body (str e)})))))
 
 (defn get-file-from-filestorage [request]
   (let [path-url (-> request :path-info)
