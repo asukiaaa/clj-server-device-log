@@ -139,8 +139,8 @@
         required-scale-bigger (max required-scale-by-width required-scale-by-height)]
     #_(println :origin-size image-input-width image-input-height)
     (when (< required-scale-bigger 1)
-      (let [scaled-width (int (* image-input-width required-scale-bigger))
-            scaled-height (int (* image-input-height required-scale-bigger))
+      (let [scaled-width (-> (* image-input-width required-scale-bigger) Math/ceil int)
+            scaled-height (-> (* image-input-height required-scale-bigger) Math/ceil int)
             scaled-instance (.getScaledInstance image-input scaled-width scaled-height Image/SCALE_AREA_AVERAGING)
             scaled-image (BufferedImage. scaled-width scaled-height (.getType image-input))
             _ (-> scaled-image
