@@ -23,7 +23,7 @@
   (jdbc/insert! (or transaction db-spec) key-table (filter-params params)))
 
 (defn create-file [file-input filename id-device & [{:keys [transaction file-config-json-str]}]]
-  (let [file-config  (-> file-config-json-str json/read-str keywordize-keys)
+  (let [file-config  (when file-config-json-str (-> file-config-json-str json/read-str keywordize-keys))
         params (util.filestorage/create-file-for-device file-input filename id-device)]
     (create-record (merge file-config params) {:transaction transaction})
     (util.filestorage/build-path-url-for-device params)))
