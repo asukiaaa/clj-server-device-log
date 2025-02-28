@@ -2,7 +2,8 @@
   (:require [goog.string :refer [format]]
             clojure.string
             [front.model.util :as util :refer [build-input-str-for-str]]
-            [front.model.util.device :as util.device]))
+            [front.model.util.device :as util.device]
+            [front.model.util.device-type :as util.device-type]))
 
 (def name-table "device_log")
 (def keys-for-device-logs [:id :device_id :device_name :created_at :data])
@@ -60,7 +61,7 @@
 (defn fetch-list-and-total-for-device-type [{:keys [id-device-type str-where str-order limit page on-receive]}]
   (fetch-list-and-total {:str-where str-where
                          :str-order str-order
-                         :str-additional-field (util.device/build-query-table-and-keys)
+                         :str-additional-field (util.device-type/build-query-table-and-keys)
                          :limit limit
                          :pate page
                          :on-receive on-receive}
