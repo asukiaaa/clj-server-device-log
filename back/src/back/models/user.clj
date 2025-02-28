@@ -8,9 +8,11 @@
             [clj-time.core :as t]
             [clj-time.format :as f]
             [back.config :refer [db-spec]]
-            [back.models.util :as model.util]))
+            [back.models.util :as model.util]
+            [back.models.util.user :as util.user]))
 
-(def name-table "user")
+(def name-table util.user/name-table)
+(def key-table util.user/key-table)
 
 (defn delete [id]
   ; TODO prohibit deleting when who has device-type

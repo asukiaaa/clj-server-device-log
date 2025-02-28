@@ -8,7 +8,7 @@
            (format  "%s.%s joined_%s_%s" name-table str-key-param name-table str-key-param)))
        (join ",")))
 
-(defn build-item-from-selected-params-joined [name-table keys-param params]
+(defn build-item-from-selected-params-joined [name-table keys-param params & [{:keys [name-table-destination]}]]
   (let [item (->> (for [key-param keys-param]
                     (when-let [value (get params (keyword (format "joined_%s_%s" name-table (name key-param))))]
                       [key-param value]))
@@ -16,4 +16,4 @@
                   (into {}))]
     (if (empty? item)
       params
-      (assoc params (keyword name-table) item))))
+      (assoc params (keyword (or name-table-destination name-table)) item))))

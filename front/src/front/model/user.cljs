@@ -4,10 +4,10 @@
             clojure.string
             [clojure.walk :refer [keywordize-keys]]
             [front.model.util :as util :refer [build-input-str-for-str]]
+            [front.model.util.user :as util.user]
             [re-graph.core :as re-graph]))
 
-(def keys-for-user [:id :email :name :permission :created_at :updated_at])
-(def str-keys-for-user (clojure.string/join " " (map name keys-for-user)))
+(def str-keys-for-user util.user/query-keys-with-permission)
 
 (defn build-select-options-from-list-and-total [list-and-total]
   (for [item (:list list-and-total)]

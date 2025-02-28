@@ -8,14 +8,13 @@
 (def name "Name")
 
 (defn- show-key [item keys]
-  (if (string? keys)
-    (show-key item [keys])
-    (if (empty? item)
-      no-data
-      (->> (for [key keys] (str (key item)))
-           (remove empty?)
-           first
-           (#(or % no-data))))))
+  (if (empty? item)
+    no-data
+    (->> (for [key (if (keyword? keys) [keys] keys)]
+           (str (if (keyword? key) (key item) (get-in item key))))
+         (remove empty?)
+         first
+         (#(or % no-data)))))
 
 (def action "Action")
 (def add-term "Add term")
@@ -55,6 +54,7 @@
 (def next "Next")
 (def no-file-to-show "No file to show")
 (def no-term "No term")
+(def member "Member")
 (def password "Password")
 (def password-again "Password again")
 (def password-edit "Edit password")
@@ -69,11 +69,12 @@
 (def until "Until")
 (def update "Update")
 (def updated-at "Updated at")
-(defn user [user] (show-key user [:name :email :id]))
+(defn user-item [user] (show-key user [:name :email :id]))
 (def users "Users")
 (def user-team "User team")
 (defn user-team-item [item] (show-key item [:name]))
 (def user-teams "User teams")
+(defn user-team-member-item [item] (show-key item [[:member :name]]))
 (def watch-scope "Watch scope")
 (def watch-scopes "Watch scopes")
 (defn watch-scope-item [item] (show-key item [:name :id]))

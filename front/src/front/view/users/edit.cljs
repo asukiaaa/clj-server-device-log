@@ -57,7 +57,7 @@
      #js [])
     [:<>
      [:f> breadcrumb/core [{:label util.label/users :path route/users}
-                           {:label (util.label/user user) :path (route/user-show id-user)}
+                           {:label (util.label/user-item user) :path (route/user-show id-user)}
                            {:label util.label/edit}]]
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching

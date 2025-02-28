@@ -1,0 +1,13 @@
+{:up
+ ["CREATE TABLE user_team_member(
+   id SERIAL NOT NULL PRIMARY KEY UNIQUE,
+   user_team_id BIGINT UNSIGNED NOT NULL,
+   CONSTRAINT fk_user_team_member__user_team_id FOREIGN KEY(user_team_id) REFERENCES user_team(id) ON DELETE CASCADE,
+   member_id BIGINT UNSIGNED NOT NULL,
+   CONSTRAINT fk_user_team_member__member_id FOREIGN KEY(member_id) REFERENCES user(id) ON DELETE CASCADE,
+   UNIQUE KEY(user_team_id, member_id),
+   permission JSON,
+   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP);"]
+ :down
+ ["DROP TABLE user_team_member;"]}

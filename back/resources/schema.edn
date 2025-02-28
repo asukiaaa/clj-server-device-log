@@ -20,6 +20,14 @@
    {:owner_user_id {:type Int}
     :name {:type String}
     :memo {:type String}}}
+  :InputUserTeamMemberCreate
+  {:fields
+   {:user_team_id {:type (non-null Int)}
+    :user_email {:type String}
+    :permission {:type String}}}
+  :InputUserTeamMemberUpdate
+  {:fields
+   {:permission {:type String}}}
   :InputDeviceCreateUpdate
   {:fields
    {:name {:type String}
@@ -93,6 +101,13 @@
     :permission {:type String}
     :created_at {:type String}
     :updated_at {:type String}}}
+  :UserWithoutPermission
+  {:fields
+   {:id {:type (non-null Int)}
+    :email {:type (non-null String)}
+    :name {:type String}
+    :created_at {:type String}
+    :updated_at {:type String}}}
   :UserTeam
   {:fields
    {:id {:type (non-null Int)}
@@ -101,10 +116,25 @@
     :memo {:type String}
     :created_at {:type String}
     :updated_at {:type String}}}
+  :UserTeamMember
+  {:fields
+   {:id {:type (non-null Int)}
+    :user_team_id {:type (non-null Int)}
+    :member_id {:type (non-null Int)}
+    :user_team {:type UserTeam}
+    :member {:type UserWithoutPermission}
+    :permission {:type String}
+    :created_at {:type String}
+    :updated_at {:type String}}}
   :ResponseUserTeamListTotal
   {:fields
    {:list {:type (list UserTeam)}
     :total {:type Int}}}
+  :ResponseUserTeamMemberForUserTeamListTotal
+  {:fields
+   {:list {:type (list UserTeamMember)}
+    :total {:type Int}
+    :user_team {:type UserTeam}}}
   :Device
   {:fields
    {:id {:type (non-null Int)}
@@ -253,6 +283,10 @@
   {:fields
    {:errors {:type String}
     :user_team {:type UserTeam}}}
+  :ResponseUserTeamMemberCreateUpdate
+  {:fields
+   {:errors {:type String}
+    :user_team_member {:type UserTeamMember}}}
   :Query
   {:fields
    {:authorization_bearer_for_device
@@ -386,6 +420,17 @@
     :user_team
     {:type UserTeam
      :args {:id {:type (non-null Int)}}}
+    :user_team_members_for_user_team
+    {:type ResponseUserTeamMemberForUserTeamListTotal
+     :args {:user_team_id {:type (non-null Int)}
+            :limit {:type Int}
+            :page {:type Int}
+            :where {:type String}
+            :order {:type String}}}
+    :user_team_member_for_user_team
+    {:type UserTeamMember
+     :args {:id {:type (non-null Int)}
+            :user_team_id {:type (non-null Int)}}}
     :user_loggedin {:type :User}}}
   :Mutation
   {:fields
@@ -407,8 +452,18 @@
     :user_team_update
     {:type ResponseUserTeamCreateUpdate
      :args {:id {:type (non-null Int)}
-            :user_team {:type InputUserTeamCreate}}}
+            :user_team {:type InputUserTeamUpdate}}}
     :user_team_delete
+    {:type ResponseDelete
+     :args {:id {:type (non-null Int)}}}
+    :user_team_member_create
+    {:type ResponseUserTeamMemberCreateUpdate
+     :args {:user_team_member {:type InputUserTeamMemberCreate}}}
+    :user_team_member_update
+    {:type ResponseUserTeamMemberCreateUpdate
+     :args {:id {:type (non-null Int)}
+            :user_team_member {:type InputUserTeamMemberUpdate}}}
+    :user_team_member_delete
     {:type ResponseDelete
      :args {:id {:type (non-null Int)}}}
     :device_create

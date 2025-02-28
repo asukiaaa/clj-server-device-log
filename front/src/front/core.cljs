@@ -15,6 +15,10 @@
             [front.view.user-teams.create :as user-team.create]
             [front.view.user-teams.show :as user-team.show]
             [front.view.user-teams.edit :as user-team.edit]
+            [front.view.user-teams.members.index :as user-team.member.index]
+            [front.view.user-teams.members.create :as user-team.member.create]
+            [front.view.user-teams.members.show :as user-team.member.show]
+            [front.view.user-teams.members.edit :as user-team.member.edit]
             [front.view.devices.index :as device.index]
             [front.view.devices.create :as device.create]
             [front.view.devices.show :as device.show]
@@ -77,7 +81,13 @@
            {:path "create" :element (r/as-element [:f> user-team.create/core])}
            {:path ":user_team_id" :children
             [{:index true :element (r/as-element [:f> user-team.show/core])}
-             {:path "edit" :element (r/as-element [:f> user-team.edit/core])}]}]}
+             {:path "edit" :element (r/as-element [:f> user-team.edit/core])}
+             {:path "members" :children
+              [{:index true :element (r/as-element [:f> user-team.member.index/core])}
+               {:path "create" :element (r/as-element [:f> user-team.member.create/core])}
+               {:path ":user_team_member_id" :children
+                [{:index true :element (r/as-element [:f> user-team.member.show/core])}
+                 {:path "edit" :element (r/as-element [:f> user-team.member.edit/core])}]}]}]}]}
          {:path "devices" :children
           [{:index true :element (r/as-element [:f> device.index/core])}
            {:path "create" :element (r/as-element [:f> device.create/core])}

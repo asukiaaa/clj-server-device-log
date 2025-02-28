@@ -11,6 +11,11 @@
   (->> js/window.location.href
        (new js/URL)))
 
+(defn assign-arr-state-info-to-params [arr-info-state params]
+  (reduce (fn [params info-state]
+            (assoc params (:key info-state) (:draft info-state)))
+          params arr-info-state))
+
 (defn push-query-params [query-params]
   ;; (println "push-url")
   (let [url-object (build-current-url-object)

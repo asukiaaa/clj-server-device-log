@@ -8,6 +8,7 @@
             [front.view.util :as util]
             [front.view.util.breadcrumb :as breadcrumb]
             [front.view.util.label :as util.label]
+            [front.view.user-teams.util :as v.team.util]
             [front.model.user-team :as model.user-team]))
 
 (defn render-user-team [user-team on-delete]
@@ -28,7 +29,11 @@
     " "
     [:f> util/btn-confirm-delete
      {:message-confirm (model.user-team/build-confirmation-message-for-deleting user-team)
-      :action-delete #(model.user-team/delete {:id (:id user-team) :on-receive on-delete})}]]])
+      :action-delete #(model.user-team/delete {:id (:id user-team) :on-receive on-delete})}]
+    (for [[label link] (v.team.util/build-related-links (:id user-team))]
+      [:<> {:key label}
+       " "
+       [:> router/Link {:to link} label]])]])
 
 (defn-  page []
   (let [location (router/useLocation)

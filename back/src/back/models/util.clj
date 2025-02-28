@@ -20,6 +20,7 @@
   (apply str (repeatedly len #(rand-nth str-alphabets-and-number))))
 
 (defn get-list-with-total [query-get-records & [{:keys [build-item transaction]}]]
+  #_(println query-get-records)
   (jdbc/with-db-transaction [transaction (or transaction db-spec)]
     (let [items (jdbc/query transaction query-get-records)
           total (-> (jdbc/query transaction "SELECT FOUND_ROWS()") first vals first)
@@ -67,8 +68,8 @@
         item (first (jdbc/query (or transaction db-spec) [query id]))]
     (if build-item (build-item item) item)))
 
-(defn create [key-table params]
-  (jdbc/with-db-transaction [t-con db-spec]
+(defn create [key-table params & [{:keys [transaction]}]]
+  (jdbc/with-db-transaction [t-con (or transaction db-spec)]
     (jdbc/insert! t-con key-table params)
     (let [id (-> (jdbc/query t-con "SELECT LAST_INSERT_ID()")
                  first vals first)

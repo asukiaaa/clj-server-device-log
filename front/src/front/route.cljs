@@ -21,6 +21,12 @@
 (def user-team-create (str user-teams "/create"))
 (defn user-team-show [id] (str user-teams "/" id))
 (defn user-team-edit [id] (str (user-team-show id) "/edit"))
+(defn user-team-members [id-user-team] (str (user-team-show id-user-team) "/members"))
+(defn user-team-member-create [id-user-team] (str (user-team-members id-user-team) "/create"))
+(defn user-team-member-show [id-user-team id-user-team-member]
+  (str (user-team-members id-user-team) "/" id-user-team-member))
+(defn user-team-member-edit [id-user-team id-user-team-member]
+  (str (user-team-member-show id-user-team id-user-team-member) "/edit"))
 
 (def devices (str front "/devices"))
 (def device-create (str devices "/create"))

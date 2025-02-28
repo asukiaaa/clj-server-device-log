@@ -1,9 +1,11 @@
 (ns back.graphql.resolver
-  (:require [clojure.java.jdbc :as jdbc]
+  (:require [clojure.data.json :as json]
+            [clojure.java.jdbc :as jdbc]
             [back.config :refer [db-spec]]
             [back.models.device-log :as model-device-log]
             [back.models.user :as model.user]
             [back.models.user-team :as model.user-team]
+            [back.models.user-team-member :as model.user-team-member]
             [back.models.device :as model.device]
             [back.models.device-type :as model.device-type]
             [back.models.device-type-api-key :as model.device-type-api-key]
@@ -159,14 +161,14 @@
 (defn user-team-create [context args _]
   (println "args user-team-create" args)
   (let [user (get-user-loggedin context)
-        params (:user_team args)]
+        params (model.user-team/key-table args)]
     (when (model.user/admin? user) (model.user-team/create params))))
 
 (defn user-team-update [context args _]
   (println "args user-team-update" args)
   (let [user (get-user-loggedin context)
         id (:id args)
-        params (:user_team args)]
+        params (model.user-team/key-table args)]
     (when (model.user/admin? user) (model.user-team/update id params))))
 
 (defn user-team-delete [context args _]
@@ -174,6 +176,72 @@
   (let [user (get-user-loggedin context)
         id (:id args)]
     (when (model.user/admin? user) (model.user-team/delete id))))
+
+(defn user-team-members-for-user-team
+  [context args _]
+  (println "args for user-team-members-for-user-team" args)
+  (jdbc/with-db-transaction [transaction db-spec]
+    (when-let [user (get-user-loggedin context)]
+      (let [id-user-team (:user_team_id args)
+            user-team (if (model.user/admin? user)
+                        (model.user-team/get-by-id id-user-team {:transaction transaction})
+                        (model.user-team/get-by-id-for-user id-user-team (:id user) {:transaction transaction}))]
+        (when user-team
+          (-> (model.user-team-member/get-list-with-total-for-user-team args id-user-team {:transaction transaction})
+              (assoc model.user-team/key-table user-team)))))))
+
+(defn user-team-member-for-user-team
+  [context args _]
+  (println "args for user-team-member-for-user-team" args)
+  (when-let [user (get-user-loggedin context)]
+    (let [id-user-team (:user_team_id args)]
+      (jdbc/with-db-transaction [transaction db-spec]
+        (when (or (model.user/admin? user)
+                  (model.user-team/user-has-permission-to-read
+                   {:id-user-team id-user-team
+                    :id-user (:id user)
+                    :transaction transaction}))
+          (model.user-team-member/get-by-id (:id args)))))))
+
+(defn user-team-member-create [context args _]
+  (println "args user-team-member-create" args)
+  (when-let [user (get-user-loggedin context)]
+    (let [params (model.user-team-member/key-table args)
+          id-user-team (:user_team_id params)]
+      (jdbc/with-db-transaction [transaction db-spec]
+        (when (or (model.user/admin? user)
+                  (model.user-team/user-has-permission-to-write
+                   {:id-user-team id-user-team
+                    :id-user (:id user)
+                    :transaction transaction}))
+          (if-let [member (model.user/get-by-email (:user_email params))]
+            (model.user-team-member/create (assoc params :member_id (:id member)) {:transaction transaction})
+            (:errors (json/write-str {:user_email ["Not found"]}))))))))
+
+(defn user-team-member-update [context args _]
+  (println "args user-team-member-update" args)
+  (when-let [user (get-user-loggedin context)]
+    (let [id (:id args)
+          params (model.user-team-member/key-table args)]
+      (jdbc/with-db-transaction [transaction db-spec]
+        (when (or (model.user/admin? user)
+                  (model.user-team/user-has-permission-to-write
+                   {:id-user-team (model.user-team-member/build-query-id-user-team id)
+                    :id-user (:id user)
+                    :transaction transaction}))
+          (model.user-team-member/update id params {:transaction transaction}))))))
+
+(defn user-team-member-delete [context args _]
+  (println "args user-team-member-delete" args)
+  (when-let [user (get-user-loggedin context)]
+    (let [id (:id args)]
+      (jdbc/with-db-transaction [transaction db-spec]
+        (when (or (model.user/admin? user)
+                  (model.user-team/user-has-permission-to-write
+                   {:id-user-team (model.user-team-member/build-query-id-user-team id)
+                    :id-user (:id user)
+                    :transaction transaction}))
+          (model.user-team-member/delete id {:transaction transaction}))))))
 
 (defn devices [context args _]
   (let [user (get-user-loggedin context)]
@@ -184,7 +252,7 @@
   (jdbc/with-db-transaction [transaction db-spec]
     (let [user (get-user-loggedin context)
           id-user-team (:user_team_id args)
-          user-team (model.user-team/get-by-id-for-owner-user id-user-team (:id user) {:transaction transaction})
+          user-team (model.user-team/get-by-id-for-user id-user-team (:id user) {:transaction transaction})
           list-and-total (when user-team (model.device/get-list-with-total-for-user-team args id-user-team {:transaction transaction}))]
       list-and-total)))
 
@@ -321,7 +389,7 @@
           id-user-team (:user_team_id params)
           user-team (if (model.user/admin? user)
                       (model.user-team/get-by-id id-user-team {:transaction transaction})
-                      (model.user-team/get-by-id-for-owner-user id-user-team (:id user) {:transaction transaction}))]
+                      (model.user-team/get-by-id-for-user id-user-team (:id user) {:transaction transaction}))]
       (when user-team
         (let [watch-scope (model.watch-scope/create params {:transaction transaction})]
           (model.watch-scope-term/create-list-for-watch-scope (:id watch-scope) (:terms params) {:transaction transaction})
@@ -461,6 +529,8 @@
    :Query/user user
    :Query/user_teams user-teams
    :Query/user_team user-team
+   :Query/user_team_members_for_user_team user-team-members-for-user-team
+   :Query/user_team_member_for_user_team user-team-member-for-user-team
    :Query/user_for_resetting_password user-for-resetting-password
    :Query/device device
    :Query/devices devices
@@ -474,6 +544,9 @@
    :Mutation/user_team_create user-team-create
    :Mutation/user_team_update user-team-update
    :Mutation/user_team_delete user-team-delete
+   :Mutation/user_team_member_create user-team-member-create
+   :Mutation/user_team_member_update user-team-member-update
+   :Mutation/user_team_member_delete user-team-member-delete
    :Mutation/device_create device-create
    :Mutation/device_update device-update
    :Mutation/device_delete device-delete

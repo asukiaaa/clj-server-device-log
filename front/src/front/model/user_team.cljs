@@ -6,6 +6,7 @@
             [front.model.util :as util]))
 
 (def name-table util.user-team/name-table)
+(def key-table util.user-team/key-table)
 (def query-keys util.user-team/query-keys)
 
 (defn build-select-options-from-list-and-total [list-and-total]
