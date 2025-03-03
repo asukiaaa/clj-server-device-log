@@ -9,9 +9,6 @@
 (def name-table util.device-type/name-table)
 (def key-table util.device-type/key-table)
 
-(defn filter-params [params]
-  (select-keys params [:name :user_id :config_format :config_default]))
-
 (defn get-by-id [id & [{:keys [transaction]}]]
   (model.util/get-by-id id name-table {:transaction transaction}))
 
@@ -37,7 +34,7 @@
 
 (defn create [params]
   (jdbc/with-db-transaction [t-con db-spec]
-    (jdbc/insert! t-con key-table (filter-params params))
+    (jdbc/insert! t-con key-table (util.device-type/filter-params params))
     (let [id (-> (jdbc/query t-con "SELECT LAST_INSERT_ID()")
                  first vals first)
           item (get-by-id id {:transaction t-con})]

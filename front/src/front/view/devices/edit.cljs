@@ -10,7 +10,8 @@
             [front.view.util.breadcrumb :as breadcrumb]
             [front.view.util.label :as util.label]
             [front.view.common.wrapper.fetching :as wrapper.fetching]
-            [front.view.util :as util]))
+            [front.view.util :as util]
+            [front.model.util.user-team-device-config :as util.user-team-device-config]))
 
 (defn- page []
   (let [params (js->clj (router/useParams))
@@ -22,12 +23,14 @@
         state-info-name (util/build-state-info :name #(react/useState))
         state-info-device-type-id (util/build-state-info :device_type_id #(react/useState))
         state-info-user-team-id (util/build-state-info :user_team_id #(react/useState))
-        arr-state-info [state-info-name state-info-device-type-id state-info-user-team-id]
+        state-info-user-team-device-config-config (util/build-state-info :user_team_device_config_config react/useState)
+        arr-state-info [state-info-name state-info-device-type-id state-info-user-team-id state-info-user-team-device-config-config]
         on-receive-item
         (fn [item]
           (set-item item)
           (doseq [state arr-state-info]
-            (util/set-default-and-draft state ((:key state) item))))
+            (util/set-default-and-draft state ((:key state) item)))
+          (util/set-default-and-draft state-info-user-team-device-config-config (-> item util.user-team-device-config/key-table :config)))
         info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
         on-receive-response (fn [data errors]
                               (wrapper.fetching/set-errors info-wrapper-fetching errors)
@@ -96,7 +99,7 @@
       {:info info-wrapper-fetching
        :renderer
        (if (empty? item)
-         [:div "no data"]
+         [:div util.label/no-data]
          [:div
           [:form.form-control
            [util/render-input util.label/name state-info-name]
@@ -104,7 +107,9 @@
             (model.device-type/build-select-options-from-list-and-total device-type-list-and-total)]
            [util/render-select util.label/user-team state-info-user-team-id
             (model.user-team/build-select-options-from-list-and-total user-team-list-and-total)]
-           [:button.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply} util.label/edit]]])})]))
+           [util/render-textarea util.label/config-on-user-team state-info-user-team-device-config-config
+            {:disabled (empty? (str (:draft state-info-user-team-id)))}]
+           [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} util.label/edit]]])})]))
 
 (defn core []
   (wrapper.show404/wrapper

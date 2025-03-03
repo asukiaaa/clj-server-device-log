@@ -10,5 +10,4 @@
   (util.core/build-str-select-params-for-joined name-table keys-param))
 
 (defn build-item-from-selected-params-joined [params]
-  #_(assoc params key-table {:id 1 :owner_user_id 2})
   (util.core/build-item-from-selected-params-joined name-table keys-param params))

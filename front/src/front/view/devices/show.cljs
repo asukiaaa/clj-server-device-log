@@ -4,6 +4,7 @@
             [front.route :as route]
             [front.view.common.wrapper.show404 :as wrapper.show404]
             [front.view.common.wrapper.fetching :as wrapper.fetching]
+            [front.view.devices.util :as v.device.util]
             [front.view.util :as util]
             [front.view.util.breadcrumb :as breadcrumb]
             [front.view.util.label :as util.label]
@@ -48,18 +49,18 @@
              [:f> util/btn-confirm-delete
               {:message-confirm (model.device/build-confirmation-message-for-deleting item)
                :action-delete #(model.device/delete {:id (:id item)
-                                                     :on-receive (fn [] (navigate route/devices))})}]
-             " "])
-          [:> router/Link {:to (route/device-device-files (:id item))} util.label/files]
-          " "
-          [:> router/Link {:to (route/device-device-logs (:id item))} util.label/logs]
+                                                     :on-receive (fn [] (navigate route/devices))})}]])
+          (for [[label link] (v.device.util/build-related-links (:id item))]
+            [:<> {:key label}
+             " "
+             [:> router/Link {:to link} label]])
           [:table.table.table-sm
            [:thead
             [:tr
              [:th "key"]
              [:th "value"]]]
            [:tbody
-            (for [key [:id :name :authorization_bearer :device_type :user_team :created_at :updated_at]]
+            (for [key [:id :name :authorization_bearer :device_type :user_team :user_team_device_config :created_at :updated_at]]
               [:tr {:key key}
                [:td key]
                [:td
@@ -67,6 +68,8 @@
                   (or (= key :device_type) (= key :user_team))
                   (let [val (key item)]
                     (str (:id val) " " (:name val)))
+                  (= key :user_team_device_config)
+                  (-> item key :config)
                   (= key :authorization_bearer)
                   [:f> util/button-to-fetch-authorization-bearer fetch-bearer {:on-fetched on-fetched-bearer}]
                   :else

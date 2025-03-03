@@ -1,0 +1,13 @@
+{:up
+ ["CREATE TABLE user_team_device_config(
+   id SERIAL NOT NULL PRIMARY KEY UNIQUE,
+   user_team_id BIGINT UNSIGNED NOT NULL,
+   CONSTRAINT fk_user_team_device_config__user_team_id FOREIGN KEY(user_team_id) REFERENCES user_team(id) ON DELETE CASCADE,
+   device_id BIGINT UNSIGNED NOT NULL,
+   CONSTRAINT fk_user_team_device_config__device_id FOREIGN KEY(device_id) REFERENCES device(id) ON DELETE CASCADE,
+   UNIQUE KEY(user_team_id, device_id),
+   config JSON,
+   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP);"]
+ :down
+ ["DROP TABLE user_team_device_config;"]}

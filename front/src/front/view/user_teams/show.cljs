@@ -4,6 +4,7 @@
             [front.route :as route]
             [front.view.common.wrapper.show404 :as wrapper.show404]
             [front.view.common.wrapper.fetching :as wrapper.fetching]
+            [front.view.user-teams.util :as v.team.util]
             [front.view.util :as util]
             [front.view.util.breadcrumb :as breadcrumb]
             [front.view.util.label :as util.label]
@@ -41,6 +42,10 @@
            {:message-confirm (model.user-team/build-confirmation-message-for-deleting item)
             :action-delete #(model.user-team/delete {:id (:id item)
                                                      :on-receive (fn [] (navigate route/user-teams))})}]
+          (for [[label link] (v.team.util/build-related-links id)]
+            [:<> {:key label}
+             " "
+             [:> router/Link {:to link} label]])
           [:table.table.table-sm
            [:thead
             [:tr

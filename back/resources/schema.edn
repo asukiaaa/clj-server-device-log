@@ -28,6 +28,10 @@
   :InputUserTeamMemberUpdate
   {:fields
    {:permission {:type String}}}
+  :InputUserTeamConfigForDeviceCreateUpdate
+  {:fields
+   {:user_team_id {:type (non-null Int)}
+    :config {:type String}}}
   :InputDeviceCreateUpdate
   {:fields
    {:name {:type String}
@@ -126,6 +130,14 @@
     :permission {:type String}
     :created_at {:type String}
     :updated_at {:type String}}}
+  :UserTeamDeviceConfig
+  {:fields
+   {:id {:type (non-null Int)}
+    :user_team_id {:type (non-null Int)}
+    :device_id {:type (non-null Int)}
+    :config {:type String}
+    :created_at {:type String}
+    :updated_at {:type String}}}
   :ResponseUserTeamListTotal
   {:fields
    {:list {:type (list UserTeam)}
@@ -143,6 +155,8 @@
     :device_type_id {:type (non-null Int)}
     :user_team {:type UserTeam}
     :user_team_id {:type Int}
+    :user_team_device_config {:type UserTeamDeviceConfig}
+    :watch_scope_terms {:type (list WatchScopeTerm)}
     :created_at {:type String}
     :updated_at {:type String}}}
   :ResponseDeviceListTotal
@@ -468,11 +482,13 @@
      :args {:id {:type (non-null Int)}}}
     :device_create
     {:type ResponseDeviceCreateUpdate
-     :args {:device {:type InputDeviceCreateUpdate}}}
+     :args {:device {:type InputDeviceCreateUpdate}
+            :user_team_device_config {:type InputUserTeamConfigForDeviceCreateUpdate}}}
     :device_update
     {:type ResponseDeviceCreateUpdate
      :args {:id {:type (non-null Int)}
-            :device {:type InputDeviceCreateUpdate}}}
+            :device {:type InputDeviceCreateUpdate}
+            :user_team_device_config {:type InputUserTeamConfigForDeviceCreateUpdate}}}
     :device_delete
     {:type ResponseDelete
      :args {:id {:type (non-null Int)}}}

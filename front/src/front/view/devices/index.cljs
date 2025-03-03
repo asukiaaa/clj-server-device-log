@@ -6,6 +6,7 @@
             [front.view.common.component.pagination :as pagination]
             [front.view.common.wrapper.fetching :as wrapper.fetching]
             [front.view.common.wrapper.show404 :as wrapper.show404]
+            [front.view.devices.util :as v.device.util]
             [front.view.util :as util]
             [front.view.util.breadcrumb :as breadcrumb]
             [front.view.util.label :as util.label]
@@ -32,11 +33,11 @@
        " "
        [:f> util/btn-confirm-delete
         {:message-confirm (model.device/build-confirmation-message-for-deleting device)
-         :action-delete #(model.device/delete {:id (:id device) :on-receive on-delete})}]
-       " "])
-    [:> router/Link {:to (route/device-device-files (:id device))} util.label/files]
-    " "
-    [:> router/Link {:to (route/device-device-logs (:id device))} util.label/logs]]])
+         :action-delete #(model.device/delete {:id (:id device) :on-receive on-delete})}]])
+    (for [[label link] (v.device.util/build-related-links (:id device))]
+      [:<> {:key label}
+       " "
+       [:> router/Link {:to link} label]])]])
 
 (defn-  page []
   (let [location (router/useLocation)

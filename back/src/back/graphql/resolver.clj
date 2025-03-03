@@ -5,6 +5,7 @@
             [back.models.device-log :as model-device-log]
             [back.models.user :as model.user]
             [back.models.user-team :as model.user-team]
+            [back.models.user-team-device-config :as model.user-team-device-config]
             [back.models.user-team-member :as model.user-team-member]
             [back.models.device :as model.device]
             [back.models.device-type :as model.device-type]
@@ -252,9 +253,11 @@
   (jdbc/with-db-transaction [transaction db-spec]
     (let [user (get-user-loggedin context)
           id-user-team (:user_team_id args)
-          user-team (model.user-team/get-by-id-for-user id-user-team (:id user) {:transaction transaction})
+          user-team (if (model.user/admin? user)
+                      (model.user-team/get-by-id id-user-team {:transaction transaction})
+                      (model.user-team/get-by-id-for-user id-user-team (:id user) {:transaction transaction}))
           list-and-total (when user-team (model.device/get-list-with-total-for-user-team args id-user-team {:transaction transaction}))]
-      list-and-total)))
+      (assoc list-and-total model.user-team/key-table user-team))))
 
 (defn device-types [context args _]
   (let [user (get-user-loggedin context)]
@@ -470,24 +473,64 @@
     (when-not (empty? user)
       (model.user/reset-password-with-checking-current-password (:id user) args))))
 
-(defn device-create [context args _]
-  (println "args device-create" args)
-  (let [user (get-user-loggedin context)
-        params_device_type (:device args)]
-    (when (model.user/admin? user)
-      (model.device/create-for-user params_device_type (:id user)))))
-
 (defn device [context args _]
   (println "args device" args)
   (let [user (get-user-loggedin context)]
     (model.device/get-by-id-for-user (:id args) (:id user))))
 
+(defn create-user-team-device-config-with-checking-permission [{:keys [is-admin params id-user id-device transaction]}]
+  (jdbc/with-db-transaction [transaction (or transaction db-spec)]
+    (let [id-user-team (:user_team_id params)]
+      (when (or is-admin
+                (model.user-team/user-has-permission-to-write
+                 {:id-user id-user
+                  :id-user-team id-user-team
+                  :transaction transaction}))
+        (model.user-team-device-config/delete-and-create-for-device
+         params id-device {:transaction transaction})))))
+
+(defn device-create [context args _]
+  (println "args device-create" args)
+  (let [user (get-user-loggedin context)
+        id-user (:id user)
+        is-admin (model.user/admin? user)
+        params-device (model.device/key-table args)
+        params-config (model.user-team-device-config/key-table args)]
+    (jdbc/with-db-transaction [transaction db-spec]
+      (let [device
+            (when is-admin
+              (model.device/create-for-user params-device id-user {:transaction transaction}))
+            user-team-device-config
+            (create-user-team-device-config-with-checking-permission
+             {:is-admin is-admin
+              :params params-config
+              :id-user id-user
+              :id-device (:id device)
+              :transaction transaction})]
+        {model.device/key-table device
+         model.user-team-device-config/key-table user-team-device-config}))))
+
 (defn device-update [context args _]
   (println "args device-update" args)
   (let [user (get-user-loggedin context)
-        params (-> args :device)]
-    (when (model.user/admin? user)
-      (model.device/for-user-update {:id (:id args) :id-user (:id user) :params params}))))
+        id-user (:id user)
+        is-admin (model.user/admin? user)
+        id-device (:id args)
+        params-device (model.device/key-table args)
+        params-config (model.user-team-device-config/key-table args)]
+    (jdbc/with-db-transaction [transaction db-spec]
+      (let [device
+            (when is-admin
+              (model.device/update-for-user {:id id-device :id-user id-user :params params-device :transaction transaction}))
+            user-team-device-config
+            (create-user-team-device-config-with-checking-permission
+             {:is-admin is-admin
+              :params params-config
+              :id-user id-user
+              :id-device (:id device)
+              :transaction transaction})]
+        {model.device/key-table device
+         model.user-team-device-config/key-table user-team-device-config}))))
 
 (defn device-delete [context args _]
   (println "args device-delete" args)
