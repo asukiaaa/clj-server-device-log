@@ -95,7 +95,7 @@
           (model.user-team/build-select-options-from-list-and-total user-team-list-and-total)]
          [util/render-textarea util.label/config-on-user-team state-info-user-team-device-config-config
           {:disabled (empty? (str (:draft state-info-user-team-id)))}]
-         [:button.btn.btn-primary.btn-sm.mt-1
+         [:button.btn.btn-primary.mt-1
           {:on-click on-click-apply
            :disabled waiting-response}
           util.label/create]]]})]))

@@ -15,6 +15,7 @@
             [front.view.user-teams.create :as user-team.create]
             [front.view.user-teams.show :as user-team.show]
             [front.view.user-teams.edit :as user-team.edit]
+            [front.view.user-teams.device-types.index :as user-team.device-type.index]
             [front.view.user-teams.members.index :as user-team.member.index]
             [front.view.user-teams.members.create :as user-team.member.create]
             [front.view.user-teams.members.show :as user-team.member.show]
@@ -34,14 +35,14 @@
             [front.view.device-types.device-type-api-keys.create :as device-type.device-type-api-key.create]
             [front.view.device-types.device-type-api-keys.show :as device-type.device-type-api-key.show]
             [front.view.device-types.device-type-api-keys.edit :as device-type.device-type-api-key.edit]
+            [front.view.device-types.user-team-configs.index :as device-type.user-team-config.index]
+            [front.view.device-types.user-team-configs.select-team :as device-type.user-team-config.select-team]
+            [front.view.device-types.user-team-configs.show :as device-type.user-team-config.show]
+            [front.view.device-types.user-team-configs.edit :as device-type.user-team-config.edit]
             [front.view.watch-scopes.index :as watch-scope.index]
             [front.view.watch-scopes.create :as watch-scope.create]
             [front.view.watch-scopes.show :as watch-scope.show]
             [front.view.watch-scopes.edit :as watch-scope.edit]
-            #_[front.view.watch-scopes.watch-scope-terms.index :as watch-scope.watch-scope-term.index]
-            #_[front.view.watch-scopes.watch-scope-terms.create :as watch-scope.watch-scope-term.create]
-            #_[front.view.watch-scopes.watch-scope-terms.show :as watch-scope.watch-scope-term.show]
-            #_[front.view.watch-scopes.watch-scope-terms.edit :as watch-scope.watch-scope-term.edit]
             [front.view.watch-scopes.device-files.index :as watch-scope.device-file.index]
             [front.view.watch-scopes.device-logs.index :as watch-scope.device-log.index]
             [front.view.profile.index :as profile.index]
@@ -82,6 +83,8 @@
            {:path ":user_team_id" :children
             [{:index true :element (r/as-element [:f> user-team.show/core])}
              {:path "edit" :element (r/as-element [:f> user-team.edit/core])}
+             {:path "device_types" :children
+              [{:index true :element (r/as-element [:f> user-team.device-type.index/core])}]}
              {:path "members" :children
               [{:index true :element (r/as-element [:f> user-team.member.index/core])}
                {:path "create" :element (r/as-element [:f> user-team.member.create/core])}
@@ -109,7 +112,13 @@
                {:path "create" :element (r/as-element [:f> device-type.device-type-api-key.create/core])}
                {:path ":device_type_api_key_id" :children
                 [{:index true :element (r/as-element [:f> device-type.device-type-api-key.show/core])}
-                 {:path "edit" :element (r/as-element [:f> device-type.device-type-api-key.edit/core])}]}]}]}]}
+                 {:path "edit" :element (r/as-element [:f> device-type.device-type-api-key.edit/core])}]}]}
+             {:path "user_team_configs" :children
+              [{:index true :element (r/as-element [:f> device-type.user-team-config.index/core])}
+               {:path "select_team" :element (r/as-element [:f> device-type.user-team-config.select-team/core])}
+               {:path ":user_team_id" :children
+                [{:index true :element (r/as-element [:f> device-type.user-team-config.show/core])}
+                 {:path "edit" :element (r/as-element [:f> device-type.user-team-config.edit/core])}]}]}]}]}
          {:path "watch_scopes" :children
           [{:index true :element (r/as-element [:f> watch-scope.index/core])}
            {:path "create" :element (r/as-element [:f> watch-scope.create/core])}

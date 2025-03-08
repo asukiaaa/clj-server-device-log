@@ -4,6 +4,7 @@
             [clojure.core :refer [format]]
             [back.config :refer [db-spec]]
             [back.models.util :as model.util]
+            [back.models.util.device :as util.device]
             [back.models.util.device-type :as util.device-type]))
 
 (def name-table util.device-type/name-table)
@@ -40,11 +41,22 @@
           item (get-by-id id {:transaction t-con})]
       {key-table item})))
 
-(defn- get-list-with-total-base [params & [{:keys [str-where]}]]
-  (model.util/get-list-with-total-with-building-query name-table params {:str-where str-where}))
+(defn- get-list-with-total-base [params & [{:keys [str-where transaction]}]]
+  (model.util/get-list-with-total-with-building-query name-table params {:str-where str-where
+                                                                         :transaction transaction}))
 
 (defn get-list-with-total-for-user [params user-id]
   (get-list-with-total-base params {:str-where (format "user_id = %d" user-id)}))
+
+(defn get-list-with-total-for-user-team [params id-user-team & [{:keys [transaction]}]]
+  (get-list-with-total-base
+   params
+   {:str-where (let [query-select-types-for-user-team
+                     (format "(SELECT device_type_id FROM %s WHERE user_team_id = %d GROUP BY device_type_id)"
+                             util.device/name-table
+                             id-user-team)]
+                 (format "id IN %s" query-select-types-for-user-team))
+    :transaction transaction}))
 
 (defn get-list-with-total-for-admin [params]
   (get-list-with-total-base params))

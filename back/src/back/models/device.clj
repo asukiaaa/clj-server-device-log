@@ -55,6 +55,11 @@
           name-table
           sql-id-user-team))
 
+(defn build-sql-ids-user-team-for-device-type [id-device-type]
+  (format "(SELECT user_team_id from %s WHERE device_type_id = %d)"
+          name-table
+          id-device-type))
+
 (defn filter-params [params]
   (select-keys params [:name :device_type_id :user_team_id]))
 

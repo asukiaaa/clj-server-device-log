@@ -14,6 +14,5 @@
 (defn delete-and-create-for-device [params id-device & [{:keys [transaction]}]]
   (jdbc/with-db-transaction [transaction (or transaction db-spec)]
     (jdbc/delete! (or transaction db-spec) key-table ["device_id = ?" id-device])
-
     (when (seq params)
       (model.util/create key-table (assoc params :device_id id-device) {:transaction transaction}))))

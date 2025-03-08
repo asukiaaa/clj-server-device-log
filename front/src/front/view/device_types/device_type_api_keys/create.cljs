@@ -21,7 +21,7 @@
         state-info-system (util/build-state-info :__system #(react/useState))
         on-receive
         (fn [data errors]
-          (if-not (empty? errors)
+          (if (empty? errors)
             ((:set-errors state-info-system) errors)
             (if-let [errors-str (:errors data)]
               (let [errors (keywordize-keys (js->clj (.parse js/JSON errors-str)))]
@@ -52,13 +52,14 @@
      [:f> breadcrumb/core
       [{:label util.label/device-types :path route/device-types}
        {:label (util.label/device-type-item device-type) :path (route/device-type-show id-device-type)}
-       {:label util.label/api-keys}]]
+       {:label util.label/api-keys :path (route/device-type-device-type-api-keys id-device-type)}
+       {:label util.label/create}]]
      [:form.form-control
       [util/render-errors-as-alerts (:errors state-info-system)]
       [util/render-input util.label/name state-info-name]
       [util/render-textarea util.label/permission state-info-permission]
       [util.explanation/permission]
-      [:button.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply} util.label/create]]]))
+      [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} util.label/create]]]))
 
 (defn core []
   (wrapper.show404/wrapper

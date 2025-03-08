@@ -9,27 +9,30 @@
             [front.view.util :as util]
             [front.view.util.breadcrumb :as breadcrumb]
             [front.view.util.label :as util.label]
+            [front.view.device-types.util :as v.device-type.util]
             [front.model.device-type :as model.device-type]))
 
 (defn render-device-type [device-type on-delete]
-  [:tr
-   [:td (:id device-type)]
-   #_[:td (:user_id device-type)]
-   [:td (:name device-type)]
-   #_[:td (:created_at device-type)]
-   [:td (:updated_at device-type)]
-   [:td
-    [:> router/Link {:to (route/device-type-show (:id device-type))} util.label/show]
-    " "
-    [:> router/Link {:to (route/device-type-edit (:id device-type))} util.label/edit]
-    " "
-    [:f> util/btn-confirm-delete
-     {:message-confirm (model.device-type/build-confirmation-message-for-deleting device-type)
-      :action-delete #(model.device-type/delete {:id (:id device-type) :on-receive on-delete})}]
-    " "
-    [:> router/Link {:to (route/device-type-device-type-api-keys (:id device-type))} util.label/api-keys]
-    " "
-    [:> router/Link {:to (route/device-type-device-logs (:id device-type))} util.label/logs]]])
+  (let [id-device-type (:id device-type)]
+    [:tr
+     [:td id-device-type]
+     #_[:td (:user_id device-type)]
+     [:td (:name device-type)]
+     #_[:td (:created_at device-type)]
+     [:td (:updated_at device-type)]
+     [:td
+      [:> router/Link {:to (route/device-type-show id-device-type)} util.label/show]
+      " "
+      [:> router/Link {:to (route/device-type-edit id-device-type)} util.label/edit]
+      " "
+      [:f> util/btn-confirm-delete
+       {:message-confirm (model.device-type/build-confirmation-message-for-deleting device-type)
+        :action-delete #(model.device-type/delete {:id id-device-type :on-receive on-delete})}]
+      " "
+      (for [[label link] (v.device-type.util/build-related-links id-device-type)]
+        [:<> {:key label}
+         " "
+         [:> router/Link {:to link} label]])]]))
 
 (defn-  page []
   (let [location (router/useLocation)

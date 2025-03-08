@@ -20,6 +20,9 @@
    {:owner_user_id {:type Int}
     :name {:type String}
     :memo {:type String}}}
+  :InputUserTeamDeviceTypeConfigUpdate
+  {:fields
+   {:config {:type String}}}
   :InputUserTeamMemberCreate
   {:fields
    {:user_team_id {:type (non-null Int)}
@@ -28,7 +31,11 @@
   :InputUserTeamMemberUpdate
   {:fields
    {:permission {:type String}}}
-  :InputUserTeamConfigForDeviceCreateUpdate
+  :InputUserTeamDeviceConfigForDeviceCreateUpdate
+  {:fields
+   {:user_team_id {:type (non-null Int)}
+    :config {:type String}}}
+  :InputUserTeamDeviceTypeConfigForDeviceTypeCreateUpdate
   {:fields
    {:user_team_id {:type (non-null Int)}
     :config {:type String}}}
@@ -138,10 +145,30 @@
     :config {:type String}
     :created_at {:type String}
     :updated_at {:type String}}}
+  :UserTeamDeviceTypeConfig
+  {:fields
+   {:id {:type Int} ; allow request for empty record
+    :user_team {:type UserTeam}
+    :user_team_id {:type (non-null Int)}
+    :device_type {:type DeviceType}
+    :device_type_id {:type (non-null Int)}
+    :config {:type String}
+    :created_at {:type String}
+    :updated_at {:type String}}}
   :ResponseUserTeamListTotal
   {:fields
    {:list {:type (list UserTeam)}
     :total {:type Int}}}
+  :ResponseUserTeamForDeviceTypeListTotal
+  {:fields
+   {:device_type {:type DeviceType}
+    :list {:type (list UserTeam)}
+    :total {:type Int}}}
+  :ResponseUserTeamDeviceTypeConfigForDeviceTypeListTotal
+  {:fields
+   {:list {:type (list UserTeamDeviceTypeConfig)}
+    :total {:type Int}
+    :device_type {:type DeviceType}}}
   :ResponseUserTeamMemberForUserTeamListTotal
   {:fields
    {:list {:type (list UserTeamMember)}
@@ -175,6 +202,11 @@
   :ResponseDeviceTypeListTotal
   {:fields
    {:list {:type (list DeviceType)}
+    :total {:type Int}}}
+  :ResponseDeviceTypeForUserTeamListTotal
+  {:fields
+   {:user_team {:type UserTeam}
+    :list {:type (list DeviceType)}
     :total {:type Int}}}
   :DeviceTypeApiKey
   {:fields
@@ -297,6 +329,10 @@
   {:fields
    {:errors {:type String}
     :user_team {:type UserTeam}}}
+  :ResponseUserTeamDeviceTypeConfigCreateUpdate
+  {:fields
+   {:errors {:type String}
+    :user_team_device_type_config {:type UserTeamDeviceTypeConfig}}}
   :ResponseUserTeamMemberCreateUpdate
   {:fields
    {:errors {:type String}
@@ -358,6 +394,13 @@
             :page {:type Int}
             :where {:type String}
             :order {:type String}}}
+    :device_types_for_user_team
+    {:type ResponseDeviceTypeForUserTeamListTotal
+     :args {:user_team_id {:type (non-null Int)}
+            :limit {:type Int}
+            :page {:type Int}
+            :where {:type String}
+            :order {:type String}}}
     :device_type
     {:type DeviceType
      :args {:id {:type (non-null Int)}}}
@@ -371,6 +414,21 @@
     :device_type_api_key_for_device_type
     {:type DeviceTypeApiKey
      :args {:id {:type (non-null Int)}
+            :device_type_id {:type (non-null Int)}}}
+    :user_team_device_type_configs_for_device_type
+    {:type ResponseUserTeamDeviceTypeConfigForDeviceTypeListTotal
+     :args {:device_type_id {:type (non-null Int)}
+            :limit {:type Int}
+            :page {:type Int}
+            :where {:type String}
+            :order {:type String}}}
+    :user_team_device_type_config
+    {:type UserTeamDeviceTypeConfig
+     :args {:user_team_id {:type (non-null Int)}
+            :device_type_id {:type (non-null Int)}}}
+    :user_team_device_type_config_to_edit
+    {:type UserTeamDeviceTypeConfig
+     :args {:user_team_id {:type (non-null Int)}
             :device_type_id {:type (non-null Int)}}}
     :device_files_latest_each_device
     {:type ResponseDeviceFileListTotal
@@ -425,15 +483,22 @@
     :user
     {:type User
      :args {:id {:type (non-null Int)}}}
+    :user_team
+    {:type UserTeam
+     :args {:id {:type (non-null Int)}}}
     :user_teams
     {:type ResponseUserTeamListTotal
      :args {:limit {:type Int}
             :page {:type Int}
             :where {:type String}
             :order {:type String}}}
-    :user_team
-    {:type UserTeam
-     :args {:id {:type (non-null Int)}}}
+    :user_teams_for_device_type
+    {:type ResponseUserTeamForDeviceTypeListTotal
+     :args {:device_type_id {:type (non-null Int)}
+            :limit {:type Int}
+            :page {:type Int}
+            :where {:type String}
+            :order {:type String}}}
     :user_team_members_for_user_team
     {:type ResponseUserTeamMemberForUserTeamListTotal
      :args {:user_team_id {:type (non-null Int)}
@@ -470,6 +535,15 @@
     :user_team_delete
     {:type ResponseDelete
      :args {:id {:type (non-null Int)}}}
+    :user_team_device_type_config_update
+    {:type ResponseUserTeamDeviceTypeConfigCreateUpdate
+     :args {:user_team_id {:type (non-null Int)}
+            :device_type_id {:type (non-null Int)}
+            :user_team_device_type_config {:type InputUserTeamDeviceTypeConfigUpdate}}}
+    :user_team_device_type_config_delete
+    {:type ResponseDelete
+     :args {:user_team_id {:type (non-null Int)}
+            :device_type_id {:type (non-null Int)}}}
     :user_team_member_create
     {:type ResponseUserTeamMemberCreateUpdate
      :args {:user_team_member {:type InputUserTeamMemberCreate}}}
@@ -483,12 +557,12 @@
     :device_create
     {:type ResponseDeviceCreateUpdate
      :args {:device {:type InputDeviceCreateUpdate}
-            :user_team_device_config {:type InputUserTeamConfigForDeviceCreateUpdate}}}
+            :user_team_device_config {:type InputUserTeamDeviceConfigForDeviceCreateUpdate}}}
     :device_update
     {:type ResponseDeviceCreateUpdate
      :args {:id {:type (non-null Int)}
             :device {:type InputDeviceCreateUpdate}
-            :user_team_device_config {:type InputUserTeamConfigForDeviceCreateUpdate}}}
+            :user_team_device_config {:type InputUserTeamDeviceConfigForDeviceCreateUpdate}}}
     :device_delete
     {:type ResponseDelete
      :args {:id {:type (non-null Int)}}}

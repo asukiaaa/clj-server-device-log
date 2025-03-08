@@ -4,6 +4,7 @@
             [front.route :as route]
             [front.view.common.wrapper.show404 :as wrapper.show404]
             [front.view.common.wrapper.fetching :as wrapper.fetching]
+            [front.view.device-types.util :as v.device-type.util]
             [front.view.util :as util]
             [front.view.util.breadcrumb :as breadcrumb]
             [front.view.util.label :as util.label]
@@ -42,9 +43,10 @@
             :action-delete #(model.device-type/delete {:id (:id item)
                                                        :on-receive (fn [] (navigate route/device-types))})}]
           " "
-          [:> router/Link {:to (route/device-type-device-type-api-keys (:id item))} util.label/api-keys]
-          " "
-          [:> router/Link {:to (route/device-type-device-logs (:id item))} util.label/logs]
+          (for [[label link] (v.device-type.util/build-related-links (:id item))]
+            [:<> {:key label}
+             " "
+             [:> router/Link {:to link} label]])
 
           [:table.table.table-sm
            [:thead

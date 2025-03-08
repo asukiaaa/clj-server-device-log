@@ -1,9 +1,10 @@
 (ns front.model.user-team
   (:refer-clojure :exclude [update])
-  (:require goog.string
+  (:require [goog.string :refer [format]]
             clojure.string
             [front.model.util.user-team :as util.user-team]
-            [front.model.util :as util]))
+            [front.model.util :as util]
+            [front.model.util.device-type :as util.device-type]))
 
 (def name-table util.user-team/name-table)
 (def key-table util.user-team/key-table)
@@ -16,11 +17,17 @@
       [id (str id " " name)])))
 
 (defn fetch-list-and-total [{:keys [on-receive limit page]}]
-  (util/fetch-list-and-total {:name-table (str name-table "s")
-                              :str-keys-of-item query-keys
-                              :on-receive on-receive
-                              :limit limit
-                              :page page}))
+  (-> {:limit limit :page page :on-receive on-receive}
+      util.user-team/build-info-query-fetch-list-and-total
+      util/fetch-info-query))
+
+(defn fetch-list-and-total-for-device-type [{:keys [device_type_id on-receive limit page]}]
+  (-> {:limit limit :page page :on-receive on-receive
+       :name-table (str name-table "s_for_device_type")
+       :query-additional-field (util.device-type/build-query-table-and-keys)
+       :query-params (format "device_type_id: %d" device_type_id)}
+      util.user-team/build-info-query-fetch-list-and-total
+      util/fetch-info-query))
 
 (defn fetch-by-id [{:keys [id on-receive]}]
   (util/fetch-by-id {:name-table name-table
@@ -34,29 +41,25 @@
                       :on-receive on-receive}))
 
 (defn create [{:keys [name memo id-owner-user on-receive]}]
-  (let [str-params (goog.string.format "%s: {name: %s, memo: %s, owner_user_id: %s}"
-                                       name-table
-                                       (util/build-input-str-for-str name)
-                                       (util/build-input-str-for-str memo)
-                                       (util/build-input-str-for-int id-owner-user))]
+  (let [str-params (format "%s: {name: %s, memo: %s, owner_user_id: %s}"
+                           name-table
+                           (util/build-input-str-for-str name)
+                           (util/build-input-str-for-str memo)
+                           (util/build-input-str-for-int id-owner-user))]
     (util/create {:name-table name-table
-                  :str-keys-receive (goog.string.format "%s { %s }"
-                                                        name-table
-                                                        query-keys)
+                  :str-keys-receive (util.device-type/build-query-table-and-keys)
                   :str-input-params str-params
                   :on-receive on-receive})))
 
 (defn update [{:keys [id name memo id-owner-user on-receive]}]
-  (let [str-params (goog.string.format "id: %s, %s: {name: %s, memo: %s, owner_user_id: %s}"
-                                       (util/build-input-str-for-int id)
-                                       name-table
-                                       (util/build-input-str-for-str name)
-                                       (util/build-input-str-for-str memo)
-                                       (util/build-input-str-for-int id-owner-user))]
+  (let [str-params (format "id: %s, %s: {name: %s, memo: %s, owner_user_id: %s}"
+                           (util/build-input-str-for-int id)
+                           name-table
+                           (util/build-input-str-for-str name)
+                           (util/build-input-str-for-str memo)
+                           (util/build-input-str-for-int id-owner-user))]
     (util/update {:name-table name-table
-                  :str-keys-receive (goog.string.format "%s { %s }"
-                                                        name-table
-                                                        query-keys)
+                  :str-keys-receive (util.device-type/build-query-table-and-keys)
                   :str-input-params str-params
                   :on-receive on-receive})))
 

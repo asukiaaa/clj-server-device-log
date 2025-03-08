@@ -82,14 +82,17 @@
 (defn create [params]
   {key-table (model.util/create key-table (filter-params params))})
 
-(defn- get-list-with-total-base [params & [{:keys [str-where transaction]}]]
+(defn get-list-with-total [params & [{:keys [str-where transaction]}]]
   (model.util/get-list-with-total-with-building-query name-table params {:str-where str-where :transaction transaction}))
 
-(defn get-list-with-total-for-owner-user [params user-id]
-  (get-list-with-total-base params {:str-where (format "owner_user_id = %d" user-id)}))
+(defn get-list-with-total-for-owner-user [params user-id & [{:keys [transaction]}]]
+  (get-list-with-total params {:str-where (format "owner_user_id = %d" user-id) :transaction transaction}))
 
-(defn get-list-with-total [params & [{:keys [transaction]}]]
-  (get-list-with-total-base params {:transaction transaction}))
+(defn get-list-with-total-for-ids [params sql-ids & [{:keys [transaction]}]]
+  (get-list-with-total
+   params
+   {:str-where (format "id IN %s" sql-ids)
+    :transaction transaction}))
 
 (defn- user-has-permission-base [query-id-user-team query-where & [{:keys [transaction]}]]
   (first (jdbc/query (or transaction db-spec)

@@ -6,6 +6,7 @@
             [back.models.user :as model.user]
             [back.models.user-team :as model.user-team]
             [back.models.user-team-device-config :as model.user-team-device-config]
+            [back.models.user-team-device-type-config :as model.user-team-device-type-config]
             [back.models.user-team-member :as model.user-team-member]
             [back.models.device :as model.device]
             [back.models.device-type :as model.device-type]
@@ -152,6 +153,18 @@
     (when (model.user/admin? user)
       (model.user-team/get-list-with-total args))))
 
+(defn user-teams-for-device-type
+  [context args _]
+  (println "args for user-teams-for-device-type" args)
+  (when-let [user (get-user-loggedin context)]
+    (jdbc/with-db-transaction [transaction db-spec]
+      (when (model.user/admin? user)
+        (let [id-device-type (:device_type_id args)
+              sql-ids-user-team (model.device/build-sql-ids-user-team-for-device-type id-device-type)]
+          (-> (model.user-team/get-list-with-total-for-ids args sql-ids-user-team {:transaction transaction})
+              (assoc model.device-type/key-table
+                     (model.device-type/get-by-id id-device-type {:transaction transaction}))))))))
+
 (defn user-team
   [context args _]
   (println "args for user-team" args)
@@ -177,6 +190,85 @@
   (let [user (get-user-loggedin context)
         id (:id args)]
     (when (model.user/admin? user) (model.user-team/delete id))))
+
+(defn user-team-device-type-configs-for-device-type
+  [context args _]
+  (println "args for user-team-device-type-configs-for-device-type" args)
+  (when-let [user (get-user-loggedin context)]
+    (jdbc/with-db-transaction [transaction db-spec]
+      (let [id-device-type (:device_type_id args)
+            device-type (if (model.user/admin? user)
+                          (model.device-type/get-by-id id-device-type {:transaction transaction})
+                          (model.device-type/get-by-id-for-user id-device-type (:id user) {:transaction transaction}))]
+        (when device-type
+          (-> (model.user-team-device-type-config/get-list-with-total-for-device-type args id-device-type {:transaction transaction})
+              (assoc model.device-type/key-table device-type)))))))
+
+(defn user-team-device-type-config
+  [context args _]
+  (println "args for user-team-device-type-config" args)
+  (when-let [user (get-user-loggedin context)]
+    (jdbc/with-db-transaction [transaction db-spec]
+      (let [id-user-team (:user_team_id args)
+            id-device-type (:device_type_id args)]
+        (when (or (model.user/admin? user)
+                  (model.user-team/user-has-permission-to-read
+                   {:id-user-team id-user-team
+                    :id-user (:id user)
+                    :transaction transaction}))
+          (model.user-team-device-type-config/get-by-user-team-and-device-type
+           id-user-team id-device-type {:transaction transaction}))))))
+
+(defn user-team-device-type-config-to-edit
+  [context args _]
+  (println "args for user-team-device-type-config-to-edit" args)
+  (when-let [user (get-user-loggedin context)]
+    (jdbc/with-db-transaction [transaction db-spec]
+      (let [id-user-team (:user_team_id args)
+            id-device-type (:device_type_id args)]
+        (when (or (model.user/admin? user)
+                  (model.user-team/user-has-permission-to-write
+                   {:id-user-team id-user-team
+                    :id-user (:id user)
+                    :transaction transaction}))
+          (if-let [config (model.user-team-device-type-config/get-by-user-team-and-device-type
+                           id-user-team id-device-type {:transaction transaction})]
+            config
+            {:device_type_id id-device-type
+             model.device-type/key-table
+             (model.device-type/get-by-id id-device-type (:transaction transaction))
+             :user_team_id id-user-team
+             model.user-team/key-table
+             (model.user-team/get-by-id id-user-team {:transaction transaction})}))))))
+
+(defn user-team-device-type-config-update [context args _]
+  (println "args user-team-device-type-config-update" args)
+  (when-let [user (get-user-loggedin context)]
+    (jdbc/with-db-transaction [transaction db-spec]
+      (let [params (model.user-team-device-type-config/key-table args)
+            id-user-team (:user_team_id args)
+            id-device-type (:device_type_id args)]
+        (when (or (model.user/admin? user)
+                  (model.user-team/user-has-permission-to-write
+                   {:id-user-team id-user-team
+                    :id-user (:id user)
+                    :transaction transaction}))
+          (model.user-team-device-type-config/update id-user-team id-device-type params {:transaction transaction})
+          {model.user-team-device-type-config/key-table
+           (model.user-team-device-type-config/get-by-user-team-and-device-type id-user-team id-device-type {:transaction transaction})})))))
+
+(defn user-team-device-type-config-delete [context args _]
+  (println "args user-team-device-type-config-delete" args)
+  (when-let [user (get-user-loggedin context)]
+    (jdbc/with-db-transaction [transaction db-spec]
+      (let [id-user-team (:user_team_id args)
+            id-device-type (:device_type_id args)]
+        (when (or (model.user/admin? user)
+                  (model.user-team/user-has-permission-to-write
+                   {:id-user-team id-user-team
+                    :id-user (:id user)
+                    :transaction transaction}))
+          (model.user-team-device-type-config/delete id-user-team id-device-type {:transaction transaction}))))))
 
 (defn user-team-members-for-user-team
   [context args _]
@@ -262,6 +354,18 @@
 (defn device-types [context args _]
   (let [user (get-user-loggedin context)]
     (model.device-type/get-list-with-total-for-user args (:id user))))
+
+(defn device-types-for-user-team [context args _]
+  (let [user (get-user-loggedin context)
+        id-user (:id user)
+        id-user-team (:user_team_id args)]
+    (jdbc/with-db-transaction [transaction db-spec]
+      (when-let [user-team (when
+                            (or (model.user/admin? user)
+                                (model.user-team/user-has-permission-to-read {:id-user id-user :id-user-team id-user-team :transaction transaction}))
+                             (model.user-team/get-by-id id-user-team))]
+        (-> (model.device-type/get-list-with-total-for-user-team args id-user-team)
+            (assoc model.user-team/key-table user-team))))))
 
 (defn device-type [context args _]
   (let [user (get-user-loggedin context)]
@@ -568,18 +672,23 @@
    :Query/device_files_for_device device-files-for-device
    :Query/device_files_latest_each_device device-files-latest-each-device
    :Query/device_files_for_watch_scope device-files-for-watch-scope
-   :Query/users users
    :Query/user user
-   :Query/user_teams user-teams
+   :Query/users users
    :Query/user_team user-team
+   :Query/user_teams user-teams
+   :Query/user_teams_for_device_type user-teams-for-device-type
+   :Query/user_team_device_type_config user-team-device-type-config
+   :Query/user_team_device_type_config_to_edit user-team-device-type-config-to-edit
+   :Query/user_team_device_type_configs_for_device_type user-team-device-type-configs-for-device-type
    :Query/user_team_members_for_user_team user-team-members-for-user-team
    :Query/user_team_member_for_user_team user-team-member-for-user-team
    :Query/user_for_resetting_password user-for-resetting-password
    :Query/device device
    :Query/devices devices
    :Query/devices_for_user_team devices-for-user-team
-   :Query/device_types device-types
    :Query/device_type device-type
+   :Query/device_types device-types
+   :Query/device_types_for_user_team device-types-for-user-team
    :Query/user_loggedin user-loggedin
    :Mutation/user_create user-create
    :Mutation/user_update user-update
@@ -587,6 +696,8 @@
    :Mutation/user_team_create user-team-create
    :Mutation/user_team_update user-team-update
    :Mutation/user_team_delete user-team-delete
+   :Mutation/user_team_device_type_config_update user-team-device-type-config-update
+   :Mutation/user_team_device_type_config_delete user-team-device-type-config-delete
    :Mutation/user_team_member_create user-team-member-create
    :Mutation/user_team_member_update user-team-member-update
    :Mutation/user_team_member_delete user-team-member-delete

@@ -21,6 +21,7 @@
 (def user-team-create (str user-teams "/create"))
 (defn user-team-show [id] (str user-teams "/" id))
 (defn user-team-edit [id] (str (user-team-show id) "/edit"))
+(defn user-team-device-types [id-user-team] (str (user-team-show id-user-team) "/device_types"))
 (defn user-team-members [id-user-team] (str (user-team-show id-user-team) "/members"))
 (defn user-team-member-create [id-user-team] (str (user-team-members id-user-team) "/create"))
 (defn user-team-member-show [id-user-team id-user-team-member]
@@ -39,6 +40,13 @@
 (def device-type-create (str device-types "/create"))
 (defn device-type-show [id] (str device-types "/" id))
 (defn device-type-edit [id] (str (device-type-show id) "/edit"))
+(defn device-type-user-team-configs [id-device-type] (str (device-type-show id-device-type) "/user_team_configs"))
+(defn device-type-user-team-config-select-team [id-device-type]
+  (str (device-type-user-team-configs id-device-type) "/select_team"))
+(defn device-type-user-team-config-show [id-device-type id-user-team]
+  (str (device-type-user-team-configs id-device-type) "/" id-user-team))
+(defn device-type-user-team-config-edit [id-device-type id-user-team]
+  (str (device-type-user-team-config-show id-device-type id-user-team) "/edit"))
 
 (defn device-type-device-logs [id-device-type]
   (str (device-type-show id-device-type) "/device_logs"))

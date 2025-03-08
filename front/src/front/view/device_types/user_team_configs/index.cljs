@@ -1,9 +1,9 @@
-(ns front.view.device-types.device-type-api-keys.index
+(ns front.view.device-types.user-team-configs.index
   (:require ["react" :as react]
             ["react-router-dom" :as router]
             [front.route :as route]
             [front.model.device-type :as model.device-type]
-            [front.model.device-type-api-key :as model.device-type-api-key]
+            [front.model.user-team-device-type-config :as model.user-team-device-type-config]
             [front.view.common.component.pagination :as pagination]
             [front.view.common.wrapper.fetching :as wrapper.fetching]
             [front.view.common.wrapper.show404 :as wrapper.show404]
@@ -11,20 +11,20 @@
             [front.view.util.label :as util.label]
             [front.view.util :as util]))
 
-(defn render-device-type-api-key [device-type-api-key on-delete]
-  [:tr
-   [:td (:id device-type-api-key)]
-   [:td (:name device-type-api-key)]
-   [:td (:permission device-type-api-key)]
-   [:td (:updated_at device-type-api-key)]
-   [:td
-    [:> router/Link {:to (route/device-type-device-type-api-key-show (:device_type_id device-type-api-key) (:id device-type-api-key))} util.label/show]
-    " "
-    [:> router/Link {:to (route/device-type-device-type-api-key-edit (:device_type_id device-type-api-key) (:id device-type-api-key))} util.label/edit]
-    " "
-    [:f> util/btn-confirm-delete
-     {:message-confirm (model.device-type-api-key/build-confirmation-message-for-deleting device-type-api-key)
-      :action-delete #(model.device-type-api-key/delete {:id (:id device-type-api-key) :on-receive on-delete})}]]])
+(defn render-user-team-device-type-config [item on-delete]
+  (let [id-device-type (:device_type_id item)
+        id-user-team (:user_team_id item)]
+    [:tr
+     [:td [:> router/Link {:to (route/user-team-show id-user-team)} (util.label/user-team-item (:user_team item))]]
+     [:td
+      [:> router/Link {:to (route/device-type-user-team-config-show id-device-type id-user-team)} util.label/show]
+      " "
+      [:> router/Link {:to (route/device-type-user-team-config-edit id-device-type id-user-team)} util.label/edit]
+      " "
+      [:f> util/btn-confirm-delete
+       {:message-confirm (model.user-team-device-type-config/build-confirmation-message-for-deleting item)
+        :action-delete #(model.user-team-device-type-config/delete
+                         {:device_type_id id-device-type :user_team_id id-user-team :on-receive on-delete})}]]]))
 
 (defn-  page []
   (let [params (js->clj (router/useParams))
@@ -42,10 +42,10 @@
         load-list
         (fn []
           (wrapper.fetching/start info-wrapper-fetching)
-          (model.device-type-api-key/fetch-list-and-total-for-device-type
+          (model.user-team-device-type-config/fetch-list-and-total-for-device-type
            {:limit number-limit
             :page number-page
-            :id-device-type id-device-type
+            :device_type_id id-device-type
             :on-receive (fn [result errors]
                           (set-list-and-total result)
                           (set-device-type (model.device-type/key-table result))
@@ -59,25 +59,22 @@
      [:f> breadcrumb/core
       [{:label util.label/device-types :path route/device-types}
        {:label (util.label/device-type-item device-type) :path (route/device-type-show id-device-type)}
-       {:label util.label/api-keys}]]
-     [:> router/Link {:to (route/device-type-device-type-api-key-create id-device-type)} util.label/create]
+       {:label util.label/user-team-configs}]]
+     [:> router/Link {:to (route/device-type-user-team-config-select-team id-device-type)} util.label/select-team]
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer
        [:<>
-        [:div "total " total]
+        [:div util.label/total " " total]
         [:table.table.table-sm
          [:thead
           [:tr
-           [:th util.label/id]
-           [:th util.label/name]
-           [:th util.label/permission]
-           [:th util.label/updated-at]
+           [:th util.label/user-team]
            [:th util.label/action]]]
          [:tbody
           (for [item received-list]
             [:<> {:key (:id item)}
-             [:f> render-device-type-api-key item load-list]])]]
+             [:f> render-user-team-device-type-config item load-list]])]]
         [:f> pagination/core {:total-page number-total-page
                               :current-page number-page}]]})]))
 
