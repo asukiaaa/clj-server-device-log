@@ -4,16 +4,19 @@
 
 (def name-table "device_type")
 (def key-table (keyword name-table))
-(def keys-for-table [:id :user_id :name :config_format :config_default :created_at :updated_at])
+(def keys-for-table [:id :manager_user_team_id :name :config_format :config_default :created_at :updated_at])
 (def query-keys (join " " (map name keys-for-table)))
+(def ^:private this-query-keys query-keys)
+(def key-manager-user-team :manager_user_team)
+(def name-manager-user-team (name key-manager-user-team))
 
 (defn build-query-table-and-keys [& [params-optional]]
   (util.core/build-query-table-and-keys
    name-table query-keys params-optional))
 
-(defn build-info-query-fetch-by-id [id on-receive]
+(defn build-info-query-fetch-by-id [id on-receive & [{:keys [query-keys]}]]
   (util.core/build-info-query-fetch-by-id
    {:name-table name-table
-    :query-keys-of-item query-keys
+    :query-keys-of-item (or query-keys this-query-keys)
     :id id
     :on-receive on-receive}))

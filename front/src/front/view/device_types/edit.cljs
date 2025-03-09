@@ -16,16 +16,19 @@
         navigate (router/useNavigate)
         [item set-item] (react/useState)
         state-info-system (util/build-state-info :__system #(react/useState))
+        state-info-id-manager-user-team (util/build-state-info :manager_user_team_id #(react/useState))
         state-info-name (util/build-state-info :name #(react/useState))
         state-info-config-default (util/build-state-info :config_default react/useState)
         state-info-config-format (util/build-state-info :config_format react/useState)
-        list-state-info [state-info-system state-info-name state-info-config-default state-info-config-format]
+        list-state-info [state-info-id-manager-user-team state-info-system state-info-name state-info-config-default state-info-config-format]
         on-receive-item
         (fn [item]
           (set-item item)
           (doseq [state-info list-state-info]
             (util/set-default-and-draft state-info ((:key state-info) item))))
-        on-receive-response (fn [data]
+        on-receive-response (fn [data errors]
+                              (when-not (empty? errors)
+                                ((:set-errors state-info-system) errors))
                               (if-let [errors-str (:errors data)]
                                 (let [errors (keywordize-keys (js->clj (.parse js/JSON errors-str)))]
                                   (doseq [state list-state-info]
@@ -47,10 +50,11 @@
     (react/useEffect
      (fn []
        (wrapper.fetching/start info-wrapper-fetching)
-       (model.device-type/fetch-by-id {:id id-item
-                                       :on-receive (fn [user errors]
-                                                     (on-receive-item user)
-                                                     (wrapper.fetching/finished info-wrapper-fetching errors))})
+       (model.device-type/fetch-by-id
+        {:id id-item
+         :on-receive (fn [user errors]
+                       (on-receive-item user)
+                       (wrapper.fetching/finished info-wrapper-fetching errors))})
        (fn []))
      #js [])
     [:<>
@@ -64,11 +68,13 @@
        (if (empty? item)
          [:div util.label/no-data]
          [:div
+          [util/render-errors-as-alerts (:errors state-info-system)]
           [:form.form-control
+           [util/render-input util.label/manager-user-team state-info-id-manager-user-team]
            [util/render-input util.label/name state-info-name]
            [util/render-textarea util.label/config-format state-info-config-format]
            [util/render-textarea util.label/config-default state-info-config-default]
-           [:button.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply} util.label/edit]]])})]))
+           [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} util.label/edit]]])})]))
 
 (defn core []
   (wrapper.show404/wrapper

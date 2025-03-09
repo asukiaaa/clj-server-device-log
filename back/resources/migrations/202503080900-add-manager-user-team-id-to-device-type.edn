@@ -1,0 +1,12 @@
+{:up
+ ["ALTER TABLE device_type
+   ADD COLUMN manager_user_team_id BIGINT UNSIGNED AFTER id,
+   ADD CONSTRAINT fk_device_type__manager_user_team_id
+   FOREIGN KEY(manager_user_team_id) REFERENCES user_team(id)"
+  "UPDATE device_type set manager_user_team_id =
+   (SELECT user_team.id FROM user_team
+   WHERE user_team.owner_user_id = device_type.user_id LIMIT 1)"
+  "ALTER TABLE device_type
+   MODIFY COLUMN manager_user_team_id BIGINT UNSIGNED NOT NULL"]
+ :down
+ ["ALTER TABLE device_type DROP CONSTRAINT fk_device_type__manager_user_team_id, DROP COLUMN manager_user_team_id"]}

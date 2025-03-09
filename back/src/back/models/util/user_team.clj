@@ -9,5 +9,5 @@
 (defn build-str-select-params-for-joined []
   (util.core/build-str-select-params-for-joined name-table keys-param))
 
-(defn build-item-from-selected-params-joined [params]
-  (util.core/build-item-from-selected-params-joined name-table keys-param params))
+(defn build-item-from-selected-params-joined [params & [{:keys [name-table-destination]}]]
+  (util.core/build-item-from-selected-params-joined name-table keys-param params {:name-table-destination name-table-destination}))

@@ -47,7 +47,6 @@
             [:<> {:key label}
              " "
              [:> router/Link {:to link} label]])
-
           [:table.table.table-sm
            [:thead
             [:tr
@@ -56,8 +55,17 @@
            [:tbody
             (for [key model.util.device-type/keys-for-table]
               [:tr {:key key}
-               [:td key]
-               [:td (get item key)]])]]])})]))
+               (cond
+                 (= key :manager_user_team_id)
+                 (let [user-team (model.util.device-type/key-manager-user-team item)]
+                   [:<>
+                    [:td util.label/manager-user-team]
+                    [:td [:> router/Link {:to (route/user-team-show (:id user-team))}
+                          (util.label/user-team-item user-team)]]])
+                 :else
+                 [:<>
+                  [:td key]
+                  [:td (get item key)]])])]]])})]))
 
 (defn core []
   (wrapper.show404/wrapper

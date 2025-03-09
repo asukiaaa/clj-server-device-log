@@ -11,7 +11,8 @@
             [back.models.util.device-file :as util.device-file]
             [back.models.util.watch-scope :as util.watch-scope]
             [back.models.util.watch-scope-term :as util.watch-scope-term]
-            [back.util.filestorage :as util.filestorage]))
+            [back.util.filestorage :as util.filestorage]
+            [back.models.util.user-team-permission :as util.user-team-permission]))
 
 (def name-table util.device-file/name-table)
 (def key-table util.device-file/key-table)
@@ -34,7 +35,9 @@
 
 (defn- assign-device-to-list [list-files & [{:keys [transaction]}]]
   (let [ids-device (->> list-files (map :device_id) distinct)
-        devices (model.device/get-list-by-ids ids-device {:transaction transaction})
+        sql-ids-device (format "(%s)" (join "," ids-device))
+        devices (when-not (empty? ids-device)
+                  (model.device/get-list-by-ids sql-ids-device {:transaction transaction}))
         map-id-device (into {} (for [device devices] [(:id device) device]))]
     (->> list-files
          (map #(assign-info-to-item-from-map % {:map-id-device map-id-device})))))
@@ -107,10 +110,10 @@
   (get-list-with-total-base params {:transaction transaction
                                     :str-where (format "device_id = %s" id-device)}))
 
-(defn get-path-file-for-user [path-url id-user]
+(defn get-path-file-for-user [path-url id-user & [{:keys [transaction]}]]
   (let [id-device (or (util.filestorage/get-id-device-from-path-url path-url)
                       (util.filestorage/get-id-device-from-path-url-thumbnail path-url))
-        device (model.device/get-by-id-for-user id-device id-user)]
+        device (model.device/get-by-id-for-user id-device id-user {:transaction transaction})]
     (when device
       (util.filestorage/convert-path-url-to-path-file path-url))))
 

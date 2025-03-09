@@ -57,23 +57,36 @@
       (format "%s LIMIT %d OFFSET %d" str-query (int limit) (int offset)))
     str-query))
 
-(defn get-by-id [id name-table & [{:keys [transaction str-keys-select str-key-id str-before-where build-item]}]]
+(defn get-one [name-table & [{:keys [transaction str-keys-select str-where str-before-where build-item]}]]
   (let [str-keys-select (or str-keys-select "*")
-        str-key-id (or str-key-id (format "%s.id" name-table))
         query (->> [(format "SELECT %s FROM %s" str-keys-select name-table)
                     str-before-where
-                    (format "WHERE %s = ?"  str-key-id)]
+                    (when str-where (format "WHERE %s" str-where))]
                    (remove nil?)
                    (join " "))
-        item (first (jdbc/query (or transaction db-spec) [query id]))]
+        ; _ (println query)
+        item (first (jdbc/query (or transaction db-spec) query))]
     (if build-item (build-item item) item)))
+
+(defn get-by-id [id name-table & [{:keys [transaction str-keys-select str-key-id str-where str-before-where build-item]}]]
+  (let [str-key-id (or str-key-id (format "%s.id" name-table))
+        str-where (->> [(format "%s = %d"  str-key-id id)
+                        str-where]
+                       (remove nil?)
+                       (join " AND "))]
+    (get-one name-table
+             {:str-keys-select str-keys-select
+              :str-where str-where
+              :str-before-where str-before-where
+              :build-item build-item
+              :transaction transaction})))
 
 (defn create [key-table params & [{:keys [transaction]}]]
   (jdbc/with-db-transaction [t-con (or transaction db-spec)]
     (jdbc/insert! t-con key-table params)
     (let [id (-> (jdbc/query t-con "SELECT LAST_INSERT_ID()")
                  first vals first)
-          item (get-by-id #_"(SELECT LAST_INSERT_ID())" id (name key-table) {:transaction t-con})]
+          item (get-by-id id (name key-table) {:transaction t-con})]
       item)))
 
 (defn get-list-with-total-with-building-query [name-table params & [{:keys [str-where str-keys-select transaction str-before-where str-order build-item]}]]

@@ -47,6 +47,7 @@
   :InputDeviceTypeCreateUpdate
   {:fields
    {:name {:type String}
+    :manager_user_team_id {:type Int}
     :config_default {:type String}
     :config_format {:type String}}}
   :InputDeviceTypeApiKeyCreate
@@ -193,7 +194,8 @@
   :DeviceType
   {:fields
    {:id {:type (non-null Int)}
-    :user_id {:type (non-null Int)}
+    :manager_user_team {:type UserTeam}
+    :manager_user_team_id {:type (non-null Int)}
     :name {:type String}
     :config_default {:type String}
     :config_format {:type String}

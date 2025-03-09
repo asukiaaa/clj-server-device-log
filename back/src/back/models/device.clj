@@ -4,14 +4,15 @@
             [clojure.core :refer [format]]
             [clojure.data.json :as json]
             [clojure.string :refer [join]]
-            [back.models.device-type :as model.device-type]
             [back.config :refer [db-spec]]
             [back.util.encryption :as encryption]
             [back.models.util.device :as util.device]
             [back.models.util.device-type :as util.device-type]
             [back.models.util.user-team :as util.user-team]
             [back.models.util.user-team-device-config :as util.user-team-device-config]
-            [back.models.util :as model.util]))
+            [back.models.util :as model.util]
+            [back.models.util.user-team-permission :as util.user-team-permission]
+            [back.models.device-type :as model.device-type]))
 
 (def name-table util.device/name-table)
 (def key-table util.device/key-table)
@@ -63,8 +64,13 @@
 (defn filter-params [params]
   (select-keys params [:name :device_type_id :user_team_id]))
 
-(defn get-by-id [id & [{:keys [transaction]}]]
-  (model.util/get-by-id id name-table {:transaction transaction}))
+(defn get-by-id [id & [{:keys [str-where transaction]}]]
+  (model.util/get-by-id
+   id name-table
+   {:str-keys-select (build-str-keys-select-with-peripherals)
+    :str-before-where (build-str-join-tables)
+    :str-where str-where
+    :transaction transaction}))
 
 (defn build-authorization-bearer-for-item [item]
   (model.util/build-authorization-bearer (:key_str item) key-table :key_str))
@@ -73,12 +79,11 @@
   (let [item (get-by-id id-device {:transaction transaction})]
     (build-authorization-bearer-for-item item)))
 
-(defn get-list-by-ids [ids & [{:keys [transaction]}]]
-  (when-not (empty? ids)
-    (let [query (format "SELECT * from %s WHERE id IN %s"
-                        name-table
-                        (format "(%s)" (join "," ids)))]
-      (jdbc/query (or transaction db-spec) query))))
+(defn get-list-by-ids [sql-ids & [{:keys [transaction]}]]
+  (let [query (format "SELECT * from %s WHERE id IN %s"
+                      name-table
+                      sql-ids)]
+    (jdbc/query (or transaction db-spec) query)))
 
 (defn get-by-key-str [key-str & [{:keys [transaction]}]]
   (when-not (empty? key-str)
@@ -92,32 +97,45 @@
     (get-by-key-str key-str {:transaction transaction})))
 
 (defn delete [id]
-  ; TODO prohibit deleting when who has device
   (jdbc/delete! db-spec key-table ["id = ?" id]))
 
 (defn update [id params]
   (jdbc/update! db-spec key-table params ["id = ?" id]))
 
-(defn get-by-id-for-user [id user-id & [{:keys [transaction]}]]
-  (let [query (format "SELECT %s FROM device %s WHERE device.id = ? AND device_type.user_id = ?"
-                      (build-str-keys-select-with-peripherals)
-                      (build-str-join-tables))
-        item (first (jdbc/query (or transaction db-spec) [query id user-id]))
-        item (build-item item)]
-    item))
+(defn get-by-id-for-user [id id-user & [{:keys [transaction]}]]
+  (let [sql-ids-user-team (util.user-team-permission/build-query-ids-for-user-show id-user)
+        str-where (format "(%s.user_team_id IN %s OR %s.manager_user_team_id IN %s)"
+                          name-table
+                          sql-ids-user-team
+                          util.device-type/name-table
+                          sql-ids-user-team)]
+    (get-by-id
+     id
+     {:str-where str-where
+      :transaction transaction})))
+
+(defn get-by-id-for-user-to-edit [id id-user & [{:keys [transaction]}]]
+  (let [sql-ids-user-team (util.user-team-permission/build-query-ids-for-user-write id-user)
+        str-where (format "%s.manager_user_team_id IN %s"
+                          util.user-team/name-table
+                          sql-ids-user-team)]
+    (get-by-id
+     id
+     {:str-where str-where
+      :transaction transaction})))
 
 (defn update-for-user [{:keys [id id-user params transaction]}]
   (jdbc/with-db-transaction [t-con (or transaction db-spec)]
-    (let [item (get-by-id-for-user id id-user {:transaction t-con})]
+    (let [item (get-by-id-for-user-to-edit id id-user {:transaction t-con})]
       (if (empty? item)
         {:errors ["item not found"]}
         (do
           (jdbc/update! db-spec key-table params ["id = ?" id])
           (get-by-id id {:transaction t-con}))))))
 
-(defn for-user-delete [{:keys [id id-user]}]
+(defn delete-for-user [id id-user]
   (jdbc/with-db-transaction [t-con db-spec]
-    (let [item (get-by-id-for-user id id-user {:transaction t-con})]
+    (let [item (get-by-id-for-user-to-edit id id-user {:transaction t-con})]
       (if (empty? item)
         {:errors ["device does not avairable"]}
         (do
@@ -157,7 +175,9 @@
 (defn create-for-user [params user-id & [{:keys [transaction]}]]
   (jdbc/with-db-transaction [transaction (or transaction db-spec)]
     (let [device-type-id (:device_type_id params)
-          device-type (model.device-type/get-by-id-for-user device-type-id user-id {:transaction transaction})]
+          ; TODO resolve the spagetti
+          device-type (model.device-type/get-by-id-for-user-to-edit
+                       device-type-id user-id {:via-manager true :transaction transaction})]
       (if (empty? device-type)
         {:errors ["device type does not avairable"]}
         (do
@@ -168,21 +188,40 @@
                        first vals first)]
             (get-by-id id {:transaction transaction})))))))
 
-(defn get-list-with-total-for-user [params user-id]
-  (-> (model.util/build-query-get-index
-       name-table {:str-keys-select (build-str-keys-select-with-peripherals)})
-      (str " " (build-str-join-tables))
-      (str (format " WHERE device_type.user_id = %d" user-id))
-      (model.util/append-limit-offset-by-limit-page-params params)
-      (model.util/get-list-with-total {:build-item build-item})))
+(defn- build-query-filter-by-user-teams [sql-ids-user-team {:keys [via-device via-manager]}]
+  (->> [(when via-device
+          (format "%s.user_team_id IN %s"
+                  name-table
+                  sql-ids-user-team))
+        (when via-manager
+          (str (format "%s.manager_user_team_id IN %s"
+                       util.device-type/name-table
+                       sql-ids-user-team)))]
+       (remove nil?)
+       (join " OR ")
+       (format "(%s)")))
 
-(defn get-list-with-total-for-user-team [params id-user-team & [{:keys [transaction]}]]
-  (-> (model.util/build-query-get-index
-       name-table {:str-keys-select (build-str-keys-select-with-peripherals)})
-      (str " " (build-str-join-tables))
-      (str (format " WHERE device.user_team_id = %d" id-user-team))
-      (model.util/append-limit-offset-by-limit-page-params params)
-      (model.util/get-list-with-total {:build-item build-item :transaction transaction})))
+(defn get-list-with-total-for-user-teams [params sql-ids-user-team & [{:keys [via-device via-manager transaction]}]]
+  (model.util/get-list-with-total-with-building-query
+   name-table params
+   {:str-keys-select (build-str-keys-select-with-peripherals)
+    :str-before-where (build-str-join-tables)
+    :str-where (build-query-filter-by-user-teams sql-ids-user-team {:via-device via-device :via-manager via-manager})
+    :build-item build-item
+    :transaction transaction}))
+
+(defn get-list-with-total-for-user-team [params id-user-team & [{:keys [via-device via-manager transaction]}]]
+  (get-list-with-total-for-user-teams params (format "(%d)" id-user-team) {:via-device via-device
+                                                                           :via-manager via-manager
+                                                                           :transaction transaction}))
+
+#_(defn get-list-with-total-for-user-teams-via-device [params sql-ids-user-team & [{:keys [transaction]}]]
+    (-> (model.util/build-query-get-index
+         name-table {:str-keys-select (build-str-keys-select-with-peripherals)})
+        (str " " (build-str-join-tables))
+        (str (format " WHERE device.user_team_id IN %s" sql-ids-user-team))
+        (model.util/append-limit-offset-by-limit-page-params params)
+        (model.util/get-list-with-total {:build-item build-item :transaction transaction})))
 
 (defn get-list-with-total-for-admin [params]
   (model.util/get-list-with-total-with-building-query name-table params))

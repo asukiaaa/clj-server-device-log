@@ -5,6 +5,7 @@
             [clojure.string :refer [join]]
             [back.config :refer [db-spec]]
             [back.models.util.user-team :as util.user-team]
+            [back.models.util.user-team-permission :as util.user-team-permission]
             [back.models.util :as model.util]
             [back.models.util.user-team-member :as util.user-team-member]))
 
@@ -39,35 +40,6 @@
 (defn delete-for-owner-user [{:keys [id id-user]}]
   (jdbc/delete! db-spec key-table ["id = ? AND owner_user_id = ?" id id-user]))
 
-(defn build-query-owner-or-member [id-user]
-  (format "(%s.owner_user_id = %d OR %s.member_id = %d)"
-          name-table id-user
-          util.user-team-member/name-table id-user))
-
-(defn build-query-owner-or-member-writable [id-user]
-  (format "(%s.owner_user_id = %d OR (%s.member_id = %d AND JSON_VALUE(permission,\"$.admin\")))"
-          name-table id-user
-          util.user-team-member/name-table id-user))
-
-(defn build-query-ids-all []
-  (format "SELECT id FROM %s" name-table))
-
-(defn- build-query-ids-for-user-base [id-user str-where]
-  (->> [(build-query-ids-all)
-        (format "LEFT JOIN %s ON %s.user_team_id = %s.id"
-                util.user-team-member/name-table
-                util.user-team-member/name-table
-                name-table)
-        (format "WHERE %s" str-where)]
-       (join " ")
-       (format "(%s)")))
-
-(defn build-query-ids-for-user-show [id-user]
-  (build-query-ids-for-user-base id-user (build-query-owner-or-member id-user)))
-
-(defn build-query-ids-for-user-write [id-user]
-  (build-query-ids-for-user-base id-user (build-query-owner-or-member id-user)))
-
 (defn get-by-id-for-user [id id-user & [{:keys [transaction]}]]
   (first (jdbc/query (or transaction db-spec)
                      (join " " [(format "SELECT %s.* FROM %s" name-table name-table)
@@ -77,16 +49,13 @@
                                         name-table)
                                 (format "WHERE %s.id = %d AND %s"
                                         name-table id
-                                        (build-query-owner-or-member id-user))]))))
+                                        (util.user-team-permission/build-query-owner-or-member id-user))]))))
 
 (defn create [params]
   {key-table (model.util/create key-table (filter-params params))})
 
 (defn get-list-with-total [params & [{:keys [str-where transaction]}]]
   (model.util/get-list-with-total-with-building-query name-table params {:str-where str-where :transaction transaction}))
-
-(defn get-list-with-total-for-owner-user [params user-id & [{:keys [transaction]}]]
-  (get-list-with-total params {:str-where (format "owner_user_id = %d" user-id) :transaction transaction}))
 
 (defn get-list-with-total-for-ids [params sql-ids & [{:keys [transaction]}]]
   (get-list-with-total
@@ -106,7 +75,7 @@
                                         query-where)]))))
 
 (defn user-has-permission-to-write [{:keys [id-user-team id-user transaction]}]
-  (user-has-permission-base id-user-team (build-query-owner-or-member-writable id-user) {:transaction transaction}))
+  (user-has-permission-base id-user-team (util.user-team-permission/build-query-owner-or-member-writable id-user) {:transaction transaction}))
 
 (defn user-has-permission-to-read [{:keys [id-user-team id-user transaction]}]
-  (user-has-permission-base id-user-team (build-query-owner-or-member id-user) {:transaction transaction}))
+  (user-has-permission-base id-user-team (util.user-team-permission/build-query-owner-or-member id-user) {:transaction transaction}))

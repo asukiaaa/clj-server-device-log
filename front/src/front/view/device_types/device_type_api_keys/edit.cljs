@@ -28,7 +28,7 @@
           (util/set-default-and-draft state-info-name (:name item))
           (util/set-default-and-draft state-info-permission (:permission item)))
         on-receive-response (fn [data errors]
-                              (when errors
+                              (when-not (empty? errors)
                                 ((:set-errors state-info-system) errors))
                               (if-let [errors-str (:errors data)]
                                 (let [errors (keywordize-keys (js->clj (.parse js/JSON errors-str)))]

@@ -58,6 +58,7 @@
 (def next "Next")
 (def no-file-to-show "No file to show")
 (def no-term "No term")
+(def manager-user-team "Manager user team")
 (def member "Member")
 (def password "Password")
 (def password-again "Password again")

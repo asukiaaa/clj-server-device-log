@@ -9,6 +9,11 @@
 (def name-table util.device-type/name-table)
 (def key-table util.device-type/key-table)
 (def query-keys util.device-type/query-keys)
+(def key-manager-user-team util.device-type/key-manager-user-team)
+(defn build-query-keys-with-peripheral []
+  (format "%s %s"
+          query-keys
+          (util.user-team/build-query-table-and-keys {:name-table util.device-type/name-manager-user-team})))
 
 (defn build-select-options-from-list-and-total [list-and-total]
   (for [item (:list list-and-total)]
@@ -18,7 +23,7 @@
 
 (defn fetch-list-and-total [{:keys [on-receive limit page]}]
   (util/fetch-list-and-total {:name-table (str name-table "s")
-                              :str-keys-of-item query-keys
+                              :str-keys-of-item (build-query-keys-with-peripheral)
                               :on-receive on-receive
                               :limit limit
                               :page page}))
@@ -36,7 +41,7 @@
     :page page}))
 
 (defn fetch-by-id [{:keys [id on-receive]}]
-  (-> (util.device-type/build-info-query-fetch-by-id id on-receive)
+  (-> (util.device-type/build-info-query-fetch-by-id id on-receive {:query-keys (build-query-keys-with-peripheral)})
       (util/fetch-info-query)))
 
 (defn delete [{:keys [id on-receive]}]
@@ -44,10 +49,11 @@
                       :id id
                       :on-receive on-receive}))
 
-(defn create [{:keys [name config_default config_format on-receive]}]
-  (let [str-params (format "%s: {name: %s, config_default: %s, config_format: %s}"
+(defn create [{:keys [name config_default manager_user_team_id config_format on-receive]}]
+  (let [str-params (format "%s: {name: %s,  manager_user_team_id: %s, config_default: %s, config_format: %s}"
                            name-table
                            (util/build-input-str-for-str name)
+                           (util/build-input-str-for-int manager_user_team_id)
                            (util/build-input-str-for-str config_default)
                            (util/build-input-str-for-str config_format))]
     (util/create {:name-table name-table
@@ -55,11 +61,12 @@
                   :str-input-params str-params
                   :on-receive on-receive})))
 
-(defn update [{:keys [id name config_default config_format on-receive]}]
-  (let [str-params (format "id: %s, %s: {name: %s, config_default: %s, config_format: %s}"
+(defn update [{:keys [id name manager_user_team_id config_default config_format on-receive]}]
+  (let [str-params (format "id: %s, %s: {name: %s, manager_user_team_id: %s, config_default: %s, config_format: %s}"
                            (util/build-input-str-for-int id)
                            name-table
                            (util/build-input-str-for-str name)
+                           (util/build-input-str-for-int manager_user_team_id)
                            (util/build-input-str-for-str config_default)
                            (util/build-input-str-for-str config_format))]
     (util/update {:name-table name-table

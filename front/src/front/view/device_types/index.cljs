@@ -13,13 +13,11 @@
             [front.model.device-type :as model.device-type]))
 
 (defn render-device-type [device-type on-delete]
-  (let [id-device-type (:id device-type)]
+  (let [id-device-type (:id device-type)
+        user-team (model.device-type/key-manager-user-team device-type)]
     [:tr
-     [:td id-device-type]
-     #_[:td (:user_id device-type)]
      [:td (:name device-type)]
-     #_[:td (:created_at device-type)]
-     [:td (:updated_at device-type)]
+     [:td [:> router/Link {:to (route/user-team-show (:id user-team))} (util.label/user-team-item user-team)]]
      [:td
       [:> router/Link {:to (route/device-type-show id-device-type)} util.label/show]
       " "
@@ -70,12 +68,9 @@
         [:table.table.table-sm
          [:thead
           [:tr
-           [:th "id"]
-           #_[:th "user_id"]
-           [:th "name"]
-           #_[:th "created_at"]
-           [:th "updated_at"]
-           [:th "actions"]]]
+           [:th util.label/name]
+           [:th util.label/manager-user-team]
+           [:th util.label/action]]]
          [:tbody
           (for [item received-list]
             [:<> {:key (:id item)}

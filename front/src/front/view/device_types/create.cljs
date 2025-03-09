@@ -13,9 +13,10 @@
   (let [navigate (router/useNavigate)
         state-info-name (util/build-state-info :name react/useState)
         state-info-system (util/build-state-info :__system #(react/useState))
+        state-info-id-manager-user-team (util/build-state-info :manager_user_team_id #(react/useState))
         state-info-config-default (util/build-state-info :config_default react/useState)
         state-info-config-format (util/build-state-info :config_format react/useState)
-        list-state-info [state-info-system state-info-name state-info-config-default state-info-config-format]
+        list-state-info [state-info-system state-info-id-manager-user-team state-info-name state-info-config-default state-info-config-format]
         on-receive (fn [data]
                      (if-let [errors-str (:errors data)]
                        (let [errors (keywordize-keys (js->clj (.parse js/JSON errors-str)))]
@@ -37,10 +38,12 @@
      [:f> breadcrumb/core [{:label util.label/device-types :path route/device-types}
                            {:label util.label/create}]]
      [:form.form-control
+      [util/render-errors-as-alerts (:errors state-info-system)]
+      [util/render-input util.label/manager-user-team state-info-id-manager-user-team]
       [util/render-input util.label/name state-info-name]
       [util/render-textarea util.label/config-format state-info-config-format]
       [util/render-textarea util.label/config-default state-info-config-default]
-      [:button.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply} util.label/create]]]))
+      [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} util.label/create]]]))
 
 (defn core []
   (wrapper.show404/wrapper

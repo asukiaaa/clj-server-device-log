@@ -14,7 +14,10 @@
             [back.models.watch-scope :as model.watch-scope]
             [back.models.watch-scope-term :as model.watch-scope-term]
             [back.models.device-file :as model.device-file]
-            [com.walmartlabs.lacinia.resolve :refer [resolve-as]]))
+            [com.walmartlabs.lacinia.resolve :refer [resolve-as]]
+            [back.models.util.device :as util.device]
+            [back.models.util.device-permission :as util.device-permission]
+            [back.models.util.user-team-permission :as util.user-team-permission]))
 
 (defn get-user-loggedin [context]
   (:user-loggedin context))
@@ -45,16 +48,25 @@
 (defn device-logs-for-device-type
   [context args _]
   (println "args for device-logs-for-device-type" args)
-  (let [id-device-type (:device_type_id args)
-        user (get-user-loggedin context)
-        id-user (:id user)]
-    (jdbc/with-db-transaction [transaction db-spec]
-      (when-let [device-type (model.device-type/get-by-id-for-user id-device-type id-user {:transaction transaction})]
-        (-> (model-device-log/get-list-with-total args {:build-str-where-and
-                                                        (fn [_]
-                                                          (format "device_type.id = %d" id-device-type))
-                                                        :transaction transaction})
-            (assoc model.device-type/key-table device-type))))))
+  (when-let [user (get-user-loggedin context)]
+    (let [id-device-type (:device_type_id args)
+          id-user (:id user)]
+      (jdbc/with-db-transaction [transaction db-spec]
+        (when-let [device-type (model.device-type/get-by-id-for-user
+                                id-device-type id-user {:via-device true
+                                                        :via-manager true
+                                                        :transaction transaction})]
+          (-> (model-device-log/get-list-with-total
+               args {:build-str-where-and
+                     (fn [_]
+                       (format "%s.id IN %s"
+                               util.device/name-table
+                               (-> id-user
+                                   util.user-team-permission/build-query-ids-for-user-show
+                                   (util.device-permission/build-query-ids-ids-for-user-teams {:via-device true
+                                                                                               :via-manager true}))))
+                     :transaction transaction})
+              (assoc model.device-type/key-table device-type)))))))
 
 (defn device-logs-for-watch-scope
   [context args _]
@@ -199,7 +211,9 @@
       (let [id-device-type (:device_type_id args)
             device-type (if (model.user/admin? user)
                           (model.device-type/get-by-id id-device-type {:transaction transaction})
-                          (model.device-type/get-by-id-for-user id-device-type (:id user) {:transaction transaction}))]
+                          (model.device-type/get-by-id-for-user id-device-type (:id user) {:via-manager true
+                                                                                           :via-device true
+                                                                                           :transaction transaction}))]
         (when device-type
           (-> (model.user-team-device-type-config/get-list-with-total-for-device-type args id-device-type {:transaction transaction})
               (assoc model.device-type/key-table device-type)))))))
@@ -337,8 +351,11 @@
           (model.user-team-member/delete id {:transaction transaction}))))))
 
 (defn devices [context args _]
-  (let [user (get-user-loggedin context)]
-    (model.device/get-list-with-total-for-user args (:id user))))
+  (when-let [user (get-user-loggedin context)]
+    (if (model.user/admin? user)
+      (model.device/get-list-with-total-for-admin args)
+      (let [sql-ids-user-team (util.user-team-permission/build-query-ids-for-user-show (:id user))]
+        (model.device/get-list-with-total-for-user-teams args sql-ids-user-team {:via-device true :via-manager true})))))
 
 (defn devices-for-user-team [context args _]
   (println "args devices-for-user-team" args)
@@ -348,14 +365,23 @@
           user-team (if (model.user/admin? user)
                       (model.user-team/get-by-id id-user-team {:transaction transaction})
                       (model.user-team/get-by-id-for-user id-user-team (:id user) {:transaction transaction}))
-          list-and-total (when user-team (model.device/get-list-with-total-for-user-team args id-user-team {:transaction transaction}))]
+          list-and-total (when user-team (model.device/get-list-with-total-for-user-team
+                                          args id-user-team {:via-device true
+                                                             :transaction transaction}))]
       (assoc list-and-total model.user-team/key-table user-team))))
 
 (defn device-types [context args _]
-  (let [user (get-user-loggedin context)]
-    (model.device-type/get-list-with-total-for-user args (:id user))))
+  (when-let [user (get-user-loggedin context)]
+    (jdbc/with-db-transaction [transaction db-spec]
+      (if (model.user/admin? user)
+        (model.device-type/get-list-with-total args {:transaction transaction})
+        (model.device-type/get-list-with-total-for-user args (:id user)
+                                                        {:via-device true
+                                                         :via-manager true
+                                                         :transaction transaction})))))
 
 (defn device-types-for-user-team [context args _]
+  (println "args device-types-for-user-team" args)
   (let [user (get-user-loggedin context)
         id-user (:id user)
         id-user-team (:user_team_id args)]
@@ -363,43 +389,52 @@
       (when-let [user-team (when
                             (or (model.user/admin? user)
                                 (model.user-team/user-has-permission-to-read {:id-user id-user :id-user-team id-user-team :transaction transaction}))
-                             (model.user-team/get-by-id id-user-team))]
-        (-> (model.device-type/get-list-with-total-for-user-team args id-user-team)
+                             (model.user-team/get-by-id id-user-team {:transaction transaction}))]
+        (-> (model.device-type/get-list-with-total-for-user-team args id-user-team {:via-device true
+                                                                                    :transaction transaction})
             (assoc model.user-team/key-table user-team))))))
 
 (defn device-type [context args _]
-  (let [user (get-user-loggedin context)]
-    (model.device-type/get-by-id-for-user (:id args) (:id user))))
+  (when-let [user (get-user-loggedin context)]
+    (if (model.user/admin? user)
+      (model.device-type/get-by-id (:id args) (:id user))
+      (model.device-type/get-by-id-for-user (:id args) (:id user) {:via-device true :via-manager true}))))
 
 (defn device-type-create [context args _]
   (println "args device-type-create" args)
   (let [user (get-user-loggedin context)
-        params_device_type (-> (:device_type args)
-                               (assoc :user_id (:id user)))]
-    (model.device-type/create params_device_type)))
+        params-device-type (:device_type args)]
+    (when (model.user/admin? user)
+      (model.device-type/create params-device-type))))
 
 (defn device-type-update [context args _]
   (println "args device-type-create" args)
-  (let [user (get-user-loggedin context)]
-    (model.device-type/for-user-update {:id (:id args)
-                                        :id-user (:id user)
-                                        :params (:device_type args)})))
+  (when-let [user (get-user-loggedin context)]
+    (let [id-device-type (:id args)
+          id-user (:id user)
+          params-device-type (:device_type args)]
+      (model.device-type/update-for-user {:id id-device-type
+                                          :id-user id-user
+                                          :params params-device-type}))))
 
 (defn device-type-delete [context args _]
   (println "args device-type-delete" args)
-  (let [user (get-user-loggedin context)]
-    (model.device-type/for-user-delete {:id (:id args)
+  (when-let [user (get-user-loggedin context)]
+    (model.device-type/delete-for-user {:id (:id args)
                                         :id-user (:id user)})))
 
 (defn device-type-api-keys-for-device-type [context args _]
   (println "args for device-type-api-keys-for-device-type" args)
-  (let [user (get-user-loggedin context)
-        id-user (:id user)]
-    (when-let [id-device-type (:device_type_id args)]
-      (when-let [device-type (model.device-type/get-by-id-for-user id-device-type id-user)]
-        (-> (model.device-type-api-key/get-list-with-total-for-user-and-device-type
-             args id-user id-device-type)
-            (assoc model.device-type/key-table device-type))))))
+  (when-let [user (get-user-loggedin context)]
+    (let [id-user (:id user)
+          id-device-type (:device_type_id args)]
+      (jdbc/with-db-transaction [transaction db-spec]
+        (when-let [device-type (model.device-type/get-by-id-for-user-to-edit
+                                id-device-type id-user {:via-manager true
+                                                        :transaction transaction})]
+          (-> (model.device-type-api-key/get-list-with-total-for-device-type
+               args id-device-type {:transaction transaction})
+              (assoc model.device-type/key-table device-type)))))))
 
 (defn device-type-api-key-for-device-type [context args _]
   (println "args for device-type-api-key-for-device-type" args)
@@ -640,7 +675,7 @@
   (println "args device-delete" args)
   (let [user (get-user-loggedin context)]
     (when (model.user/admin? user)
-      (model.device/for-user-delete {:id (:id args) :id-user (:id user)}))))
+      (model.device/delete-for-user (:id args) (:id user)))))
 
 (defn authorization-bearer-for-device [context args _]
   (println "authorization-bearer-for-device")

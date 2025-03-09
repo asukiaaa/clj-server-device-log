@@ -21,7 +21,7 @@
         state-info-system (util/build-state-info :__system #(react/useState))
         on-receive
         (fn [data errors]
-          (if (empty? errors)
+          (if-not (empty? errors)
             ((:set-errors state-info-system) errors)
             (if-let [errors-str (:errors data)]
               (let [errors (keywordize-keys (js->clj (.parse js/JSON errors-str)))]
