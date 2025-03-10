@@ -123,20 +123,29 @@
                       name-table
                       id-device)))
 
-(defn get-list-with-total-latest-each-device [params sql-ids-device & [{:keys [transaction]}]]
+(defn get-list-with-total-latest-each-device-for-admin [params & [{:keys [sql-ids-device transaction]}]]
   (get-list-with-total-base
    params
    {:transaction transaction
     :str-before-where
     (let [name-table-left-join "df2"]
       (join " " ["INNER JOIN"
-                 (format "(SELECT max(recorded_at) max_recorded_at, device_id FROM %s WHERE device_id IN %s GROUP BY device_id)" name-table sql-ids-device)
+                 (->> [(format "SELECT max(recorded_at) max_recorded_at, device_id FROM %s"
+                               name-table)
+                       (when sql-ids-device (format "WHERE device_id IN %s" sql-ids-device))
+                       "GROUP BY device_id"]
+                      (remove nil?)
+                      (join " ")
+                      (format "(%s)"))
                  name-table-left-join
                  (format "ON %s.recorded_at = %s.max_recorded_at AND %s.device_id = %s.device_id"
                          name-table
                          name-table-left-join
                          name-table
                          name-table-left-join)]))}))
+
+(defn get-list-with-total-latest-each-device [params sql-ids-device & [{:keys [transaction]}]]
+  (get-list-with-total-latest-each-device-for-admin params {:sql-ids-device sql-ids-device :transaction transaction}))
 
 (defn get-list-with-total-for-ids [params sql-ids & [{:keys [transaction]}]]
   (get-list-with-total-base
