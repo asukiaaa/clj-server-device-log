@@ -6,7 +6,6 @@
 (def key-table (keyword name-table))
 (def keys-for-table [:id :manager_user_team_id :name :config_format :config_default :created_at :updated_at])
 (def query-keys (join " " (map name keys-for-table)))
-(def ^:private this-query-keys query-keys)
 (def key-manager-user-team :manager_user_team)
 (def name-manager-user-team (name key-manager-user-team))
 
@@ -17,6 +16,6 @@
 (defn build-info-query-fetch-by-id [id on-receive & [{:keys [query-keys]}]]
   (util.core/build-info-query-fetch-by-id
    {:name-table name-table
-    :query-keys-of-item (or query-keys this-query-keys)
+    :query-keys-of-item (or query-keys @#'name-table)
     :id id
     :on-receive on-receive}))
