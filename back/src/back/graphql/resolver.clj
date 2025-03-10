@@ -659,7 +659,8 @@
         params-config (model.user-team-device-config/key-table args)]
     (jdbc/with-db-transaction [transaction db-spec]
       (let [device
-            (when is-admin
+            (if is-admin
+              (model.device/update-for-admin id-device params-device {:transaction transaction})
               (model.device/update-for-user {:id id-device :id-user id-user :params params-device :transaction transaction}))
             user-team-device-config
             (create-user-team-device-config-with-checking-permission

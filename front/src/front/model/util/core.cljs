@@ -9,7 +9,7 @@
           (if query-keys-additional (str " " query-keys-additional) "")))
 
 (defn- escape-int [val]
-  (when-not (nil? val)
+  (when-not (or (nil? val) (= val ""))
     (if (int? val)
       val
       (js/parseInt val))))

@@ -100,8 +100,8 @@
 (defn delete [id]
   (jdbc/delete! db-spec key-table ["id = ?" id]))
 
-(defn update [id params]
-  (jdbc/update! db-spec key-table params ["id = ?" id]))
+(defn update-for-admin [id params & [{:keys [transaction]}]]
+  (jdbc/update! (or transaction db-spec) key-table params ["id = ?" id]))
 
 (defn get-by-id-for-user [id id-user & [{:keys [transaction]}]]
   (let [sql-ids-user-team (util.user-team-permission/build-query-ids-for-user-show id-user)
@@ -118,7 +118,7 @@
 (defn get-by-id-for-user-to-edit [id id-user & [{:keys [transaction]}]]
   (let [sql-ids-user-team (util.user-team-permission/build-query-ids-for-user-write id-user)
         str-where (format "%s.manager_user_team_id IN %s"
-                          util.user-team/name-table
+                          util.device-type/name-table
                           sql-ids-user-team)]
     (get-by-id
      id
@@ -126,17 +126,17 @@
       :transaction transaction})))
 
 (defn update-for-user [{:keys [id id-user params transaction]}]
-  (jdbc/with-db-transaction [t-con (or transaction db-spec)]
-    (let [item (get-by-id-for-user-to-edit id id-user {:transaction t-con})]
+  (jdbc/with-db-transaction [transaction (or transaction db-spec)]
+    (let [item (get-by-id-for-user-to-edit id id-user {:transaction transaction})]
       (if (empty? item)
         {:errors ["item not found"]}
         (do
           (jdbc/update! db-spec key-table params ["id = ?" id])
-          (get-by-id id {:transaction t-con}))))))
+          (get-by-id id {:transaction transaction}))))))
 
 (defn delete-for-user [id id-user]
-  (jdbc/with-db-transaction [t-con db-spec]
-    (let [item (get-by-id-for-user-to-edit id id-user {:transaction t-con})]
+  (jdbc/with-db-transaction [transaction db-spec]
+    (let [item (get-by-id-for-user-to-edit id id-user {:transaction transaction})]
       (if (empty? item)
         {:errors ["device does not avairable"]}
         (do
