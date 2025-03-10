@@ -70,6 +70,7 @@
    {:str-keys-select (build-str-keys-select-with-peripherals)
     :str-before-where (build-str-join-tables)
     :str-where str-where
+    :build-item build-item
     :transaction transaction}))
 
 (defn build-authorization-bearer-for-item [item]
@@ -201,30 +202,25 @@
        (join " OR ")
        (format "(%s)")))
 
-(defn get-list-with-total-for-user-teams [params sql-ids-user-team & [{:keys [via-device via-manager transaction]}]]
+(defn get-list-with-total-for-admin [params & [{:keys [str-where transaction]}]]
   (model.util/get-list-with-total-with-building-query
    name-table params
    {:str-keys-select (build-str-keys-select-with-peripherals)
     :str-before-where (build-str-join-tables)
-    :str-where (build-query-filter-by-user-teams sql-ids-user-team {:via-device via-device :via-manager via-manager})
+    :str-where str-where
     :build-item build-item
+    :transaction transaction}))
+
+(defn get-list-with-total-for-user-teams [params sql-ids-user-team & [{:keys [via-device via-manager transaction]}]]
+  (get-list-with-total-for-admin
+   params
+   {:str-where (build-query-filter-by-user-teams sql-ids-user-team {:via-device via-device :via-manager via-manager})
     :transaction transaction}))
 
 (defn get-list-with-total-for-user-team [params id-user-team & [{:keys [via-device via-manager transaction]}]]
   (get-list-with-total-for-user-teams params (format "(%d)" id-user-team) {:via-device via-device
                                                                            :via-manager via-manager
                                                                            :transaction transaction}))
-
-#_(defn get-list-with-total-for-user-teams-via-device [params sql-ids-user-team & [{:keys [transaction]}]]
-    (-> (model.util/build-query-get-index
-         name-table {:str-keys-select (build-str-keys-select-with-peripherals)})
-        (str " " (build-str-join-tables))
-        (str (format " WHERE device.user_team_id IN %s" sql-ids-user-team))
-        (model.util/append-limit-offset-by-limit-page-params params)
-        (model.util/get-list-with-total {:build-item build-item :transaction transaction})))
-
-(defn get-list-with-total-for-admin [params]
-  (model.util/get-list-with-total-with-building-query name-table params))
 
 (defn get-config [id-device & [{:keys [transaction]}]]
   (let [query (join " " [(format "SELECT %s.config_default FROM %s" util.device-type/name-table name-table)
