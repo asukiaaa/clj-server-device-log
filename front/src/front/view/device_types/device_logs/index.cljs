@@ -23,7 +23,7 @@
      [:f> breadcrumb/core
       [{:label util.label/device-types :path route/device-types}
        {:label (util.label/device-type-item device-type) :path (route/device-type-show id-device-type)}
-       {:label util.label/api-keys}]]
+       {:label util.label/logs}]]
      (device-log.page/core fetch-list-and-total {:on-receive on-receive})]))
 
 (defn core []
