@@ -60,6 +60,8 @@
 (def no-term "No term")
 (def manager-user-team "Manager user team")
 (def member "Member")
+(def memo "Memo")
+(def owner-user "Owner user")
 (def password "Password")
 (def password-again "Password again")
 (def password-edit "Edit password")

@@ -37,7 +37,7 @@
                          (model.user-team/create
                           {:name (:draft state-info-name)
                            :memo (:draft state-info-memo)
-                           :id-owner-user (:draft state-info-id-owner-user)
+                           :owner_user_id (:draft state-info-id-owner-user)
                            :on-receive on-receive}))
         load-list (fn []
                     (wrapper.fetching/start info-wrapper-fetching)
@@ -61,10 +61,10 @@
        [:div
         [:form.form-control
          [util/render-errors-as-alerts (:errors state-info-system)]
-         [util/render-input "name" state-info-name {:disabled waiting-response}]
-         [util/render-textarea "memo" state-info-memo {:disabled waiting-response}]
-         [util/render-select "owner user id" state-info-id-owner-user (model.user/build-select-options-from-list-and-total user-list-and-total) {:disabled waiting-response}]
-         [:button.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply :disabled waiting-response} "apply"]]]})]))
+         [util/render-input util.label/name state-info-name {:disabled waiting-response}]
+         [util/render-textarea util.label/memo state-info-memo {:disabled waiting-response}]
+         [util/render-select util.label/owner-user state-info-id-owner-user (model.user/build-select-options-from-list-and-total user-list-and-total) {:disabled waiting-response}]
+         [:button.btn.btn-primary.mt-1 {:on-click on-click-apply :disabled waiting-response} util.label/create]]]})]))
 
 (defn core []
   (wrapper.show404/wrapper

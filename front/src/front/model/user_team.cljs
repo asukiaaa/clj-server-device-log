@@ -40,26 +40,26 @@
                       :id id
                       :on-receive on-receive}))
 
-(defn create [{:keys [name memo id-owner-user on-receive]}]
+(defn create [{:keys [name memo owner_user_id on-receive]}]
   (let [str-params (format "%s: {name: %s, memo: %s, owner_user_id: %s}"
                            name-table
                            (util/build-input-str-for-str name)
                            (util/build-input-str-for-str memo)
-                           (util/build-input-str-for-int id-owner-user))]
+                           (util/build-input-str-for-int owner_user_id))]
     (util/create {:name-table name-table
-                  :str-keys-receive (util.device-type/build-query-table-and-keys)
+                  :str-keys-receive (util.user-team/build-query-table-and-keys)
                   :str-input-params str-params
                   :on-receive on-receive})))
 
-(defn update [{:keys [id name memo id-owner-user on-receive]}]
+(defn update [{:keys [id name memo owner_user_id on-receive]}]
   (let [str-params (format "id: %s, %s: {name: %s, memo: %s, owner_user_id: %s}"
                            (util/build-input-str-for-int id)
                            name-table
                            (util/build-input-str-for-str name)
                            (util/build-input-str-for-str memo)
-                           (util/build-input-str-for-int id-owner-user))]
+                           (util/build-input-str-for-int owner_user_id))]
     (util/update {:name-table name-table
-                  :str-keys-receive (util.device-type/build-query-table-and-keys)
+                  :str-keys-receive (util.user-team/build-query-table-and-keys)
                   :str-input-params str-params
                   :on-receive on-receive})))
 

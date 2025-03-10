@@ -44,7 +44,7 @@
                           {:id id-item
                            :name (:draft state-info-name)
                            :memo (:draft state-info-memo)
-                           :id-owner-user (:draft state-info-id-owner-user)
+                           :owner_user_id (:draft state-info-id-owner-user)
                            :on-receive on-receive-response}))
         info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))]
     (react/useEffect
@@ -65,14 +65,14 @@
       {:info info-wrapper-fetching
        :renderer
        (if (empty? item)
-         [:div "no data"]
+         [:div util.label/no-data]
          [:div
           [:form.form-control
            [util/render-errors-as-alerts (:errors state-info-system)]
-           [util/render-input "name" state-info-name {:disabled waiting-response}]
-           [util/render-input "memo" state-info-memo {:disabled waiting-response}]
-           [util/render-input "owner user" state-info-id-owner-user {:disabled waiting-response}]
-           [:button.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply :disabled waiting-response} "apply"]]])})]))
+           [util/render-input util.label/name state-info-name {:disabled waiting-response}]
+           [util/render-input util.label/memo state-info-memo {:disabled waiting-response}]
+           [util/render-input util.label/owner-user state-info-id-owner-user {:disabled waiting-response}]
+           [:button.btn.btn-primary.mt-1 {:on-click on-click-apply :disabled waiting-response} util.label/update]]])})]))
 
 (defn core []
   (wrapper.show404/wrapper
