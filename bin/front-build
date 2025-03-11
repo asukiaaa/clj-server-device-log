@@ -1,0 +1,7 @@
+#!/bin/sh
+
+DIR_HERE=$(dirname $(realpath $0))
+DIR_REPO=$DIR_HERE/../
+cd $DIR_REPO
+
+docker compose run front bash -c "rm -rf ./out-cljs && yarn && clj -M:build"

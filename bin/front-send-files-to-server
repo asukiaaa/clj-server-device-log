@@ -1,0 +1,18 @@
+#!/bin/sh
+
+DIR_IN_DIR_DEPLOY=front
+
+DIR_DEPLOY=$1
+SERVER_AND_DIR_TO_DEPLOY=$2
+
+if [ -z "$DIR_DEPLOY" ] || [ -z "$SERVER_AND_DIR_TO_DEPLOY" ]; then
+  echo "require path of dir deploy
+example:
+$0 ./deploy some-server:dir-deploy"
+  exit 1
+fi
+
+DIR_DEPLOY_FRONT=${DIR_DEPLOY}/${DIR_IN_DIR_DEPLOY}
+DESTINATION=${SERVER_AND_DIR_TO_DEPLOY}/${DIR_IN_DIR_DEPLOY}
+
+rsync --mkpath -avz --delete $DIR_DEPLOY_FRONT $DESTINATION

@@ -1,0 +1,22 @@
+#!/bin/sh
+
+DIR_DEPLOY=$1
+
+if [ -z "$DIR_DEPLOY" ]; then
+  echo "require path of dir deploy
+example $0 ./deploy"
+  exit 1
+fi
+
+DIR_DEPLOY=$(realpath $DIR_DEPLOY)
+
+DIR_HERE=$(dirname $(realpath $0))
+DIR_REPO=$DIR_HERE/../
+cd $DIR_REPO
+
+DIR_DEPLOY_BACK=$DIR_DEPLOY/back
+if [ -d $DIR_DEPLOY_BACK ]; then
+  rm -r $DIR_DEPLOY_BACK
+fi
+mkdir -p $DIR_DEPLOY_BACK
+cp back/back.jar $DIR_DEPLOY_BACK

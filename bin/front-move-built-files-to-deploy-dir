@@ -1,0 +1,25 @@
+#!/bin/sh
+
+DIR_DEPLOY=$1
+
+if [ -z "$DIR_DEPLOY" ]; then
+  echo "require path of dir deploy
+example $0 ./deploy"
+  exit 1
+fi
+
+DIR_DEPLOY=$(realpath $DIR_DEPLOY)
+
+DIR_HERE=$(dirname $(realpath $0))
+DIR_REPO=$DIR_HERE/../
+cd $DIR_REPO
+
+DIR_DEPLOY_FRONT=$DIR_DEPLOY/front
+
+if [ -d $DIR_DEPLOY_FRONT ]; then
+  rm -r $DIR_DEPLOY_FRONT
+fi
+mkdir -p $DIR_DEPLOY_FRONT/out-cljs
+cp -r front/out-cljs/public $DIR_DEPLOY_FRONT/out-cljs
+mkdir -p $DIR_DEPLOY_FRONT/resources
+cp -r front/resources/public $DIR_DEPLOY_FRONT/resources

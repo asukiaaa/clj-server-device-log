@@ -1,0 +1,21 @@
+#!/bin/sh
+
+DIR_DEPLOY=$1
+SERVER_AND_DIR_TO_DEPLOY=$2
+
+if [ -z "$DIR_DEPLOY" ] || [ -z "$SERVER_AND_DIR_TO_DEPLOY" ]; then
+  echo "require path of dir deploy
+example:
+$0 ./deploy some-server:dir-deploy"
+  exit 1
+fi
+
+DIR_DEPLOY=$(realpath $DIR_DEPLOY)
+
+DIR_HERE=$(dirname $(realpath $0))
+$DIR_HERE/back-build
+$DIR_HERE/front-build
+$DIR_HERE/back-move-built-files-to-deploy-dir $DIR_DEPLOY
+$DIR_HERE/front-move-built-files-to-deploy-dir $DIR_DEPLOY
+$DIR_HERE/back-send-files-to-server $DIR_DEPLOY $SERVER_AND_DIR_TO_DEPLOY
+$DIR_HERE/front-send-files-to-server $DIR_DEPLOY $SERVER_AND_DIR_TO_DEPLOY
