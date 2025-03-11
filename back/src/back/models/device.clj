@@ -101,7 +101,9 @@
   (jdbc/delete! db-spec key-table ["id = ?" id]))
 
 (defn update-for-admin [id params & [{:keys [transaction]}]]
-  (jdbc/update! (or transaction db-spec) key-table params ["id = ?" id]))
+  (jdbc/with-db-transaction [transaction (or transaction db-spec)]
+    (jdbc/update! (or transaction db-spec) key-table params ["id = ?" id])
+    (get-by-id id {:transaction transaction})))
 
 (defn get-by-id-for-user [id id-user & [{:keys [transaction]}]]
   (let [sql-ids-user-team (util.user-team-permission/build-query-ids-for-user-show id-user)
