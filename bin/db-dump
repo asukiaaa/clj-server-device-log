@@ -1,0 +1,22 @@
+#!/bin/bash
+
+DIR_EXEC=$(pwd)
+
+if [ "$1" = "" ]; then
+  echo "You can input dump file like
+Example:
+$0 db-\$(date '+%Y%m%d-%H%M%S').dump"
+  FILE_DUMP=db-$(date '+%Y%m%d-%H%M%S').dump
+else
+  FILE_DUMP=$1
+fi
+
+FILE_DUMP=$(realpath $FILE_DUMP)
+echo create
+echo $FILE_DUMP
+
+DIR_HERE=$(dirname $(realpath $0))
+DIR_REPO=$DIR_HERE/../
+cd $DIR_REPO
+
+docker compose exec -T mariadb bash -c "mariadb-dump --host=localhost --user=\$MYSQL_USER --password=\$MYSQL_PASSWORD \$MYSQL_DATABASE" > $FILE_DUMP

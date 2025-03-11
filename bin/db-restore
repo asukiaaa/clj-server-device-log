@@ -11,4 +11,11 @@ $0 some.dump"
   exit 1
 fi
 
-docker compose exec -T mariadb mysql --host=localhost --user=maria-user --password=maria-pass server_practice < $1
+FILE_RESTORE=$(realpath $FILE_RESTORE)
+
+DIR_HERE=$(dirname $(realpath $0))
+DIR_REPO=$DIR_HERE/../
+cd $DIR_REPO
+
+# docker compose exec -T mariadb mysql --host=localhost --user=maria-user --password=maria-pass server_practice < $1
+docker compose exec -T mariadb bash -c "mysql --host=localhost --user=\$MYSQL_USER --password=\$MYSQL_PASSWORD \$MYSQL_DATABASE" < $FILE_RESTORE
