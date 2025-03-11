@@ -11,7 +11,7 @@ $0 some.dump"
   exit 1
 fi
 
-FILE_RESTORE=$(realpath $FILE_RESTORE)
+FILE_RESTORE=$(realpath $1)
 
 DIR_HERE=$(dirname $(realpath $0))
 DIR_REPO=$DIR_HERE/../
