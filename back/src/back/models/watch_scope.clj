@@ -34,12 +34,12 @@
     :build-item build-item
     :transaction transaction}))
 
-(defn get-by-id-for-user-visible [id id-user & [{:keys [transaction]}]]
+(defn get-by-id-for-user-teams [id sql-ids-user-team & [{:keys [transaction]}]]
   (model.util/get-by-id
    id name-table
    {:str-keys-select (build-str-keys-select-with-join)
     :str-before-where (build-str-join)
-    :str-where (format "%s.owner_user_id = %d" util.user-team/name-table id-user)
+    :str-where (format "%s.id IN %s" util.user-team/name-table sql-ids-user-team)
     :build-item build-item
     :transaction transaction}))
 

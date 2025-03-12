@@ -164,8 +164,9 @@
   [context args _]
   (println "args for user-teams" args)
   (when-let [user (get-user-loggedin context)]
-    (when (model.user/admin? user)
-      (model.user-team/get-list-with-total args))))
+    (if (model.user/admin? user)
+      (model.user-team/get-list-with-total args)
+      (model.user-team/get-list-with-total-for-ids args (util.user-team-permission/build-query-ids-for-user-show (:id user))))))
 
 (defn user-teams-for-device-type
   [context args _]
@@ -183,8 +184,9 @@
   [context args _]
   (println "args for user-team" args)
   (when-let [user (get-user-loggedin context)]
-    (when (model.user/admin? user)
-      (model.user-team/get-by-id (:id args)))))
+    (if (model.user/admin? user)
+      (model.user-team/get-by-id (:id args))
+      (model.user-team/get-by-id-for-user (:id args) (:id user)))))
 
 (defn user-team-create [context args _]
   (println "args user-team-create" args)
@@ -481,7 +483,7 @@
   (println "args for device-files-latest-each-device" args)
   (when-let [user (get-user-loggedin context)]
     (jdbc/with-db-transaction [transaction db-spec]
-      (let [sql-ids-user-team (model.user-team/build-sql-ids-for-user (:id user))
+      (let [sql-ids-user-team (util.user-team-permission/build-query-ids-for-user-show (:id user))
             sql-ids-devices (model.device/build-sql-ids-for-user-teams sql-ids-user-team)
             list-and-total (if (model.user/admin? user)
                              (model.device-file/get-list-with-total-latest-each-device-for-admin args {:transaction transaction})
@@ -496,7 +498,9 @@
           watch-scope
           (if (model.user/admin? user)
             (model.watch-scope/get-by-id id-watch-scope {:transaction transaction})
-            (model.watch-scope/get-by-id-for-user-visible id-watch-scope (:id user) {:transaction transaction}))
+            (model.watch-scope/get-by-id-for-user-teams
+             id-watch-scope (util.user-team-permission/build-query-ids-for-user-show (:id user))
+             {:transaction transaction}))
           sql-ids-device-file (model.watch-scope-term/build-sql-ids-device-file-for-watch-scope id-watch-scope)
           files-list-total
           (when watch-scope
@@ -512,7 +516,7 @@
               (model.user/admin? user)
               (model.watch-scope/get-list-with-total args)
               :else
-              (let [sql-ids-user-team (model.user-team/build-sql-ids-for-user (:id user))]
+              (let [sql-ids-user-team (util.user-team-permission/build-query-ids-for-user-show (:id user))]
                 (model.watch-scope/get-list-with-total-for-user-teams args sql-ids-user-team)))
             list-watch-scope (-> (:list list-and-total)
                                  (model.watch-scope-term/assign-to-list-watch-scope {:transaction transaction}))]
@@ -521,11 +525,16 @@
 (defn watch-scope [context args _]
   (println "args for watch-scope" args)
   (when-let [user (get-user-loggedin context)]
-    (when (model.user/admin? user)
-      (jdbc/with-db-transaction [transaction db-spec]
-        (when-let [watch-scope (model.watch-scope/get-by-id (:id args) {:transaction transaction})]
-          (let [terms (model.watch-scope-term/get-list-for-watch-scope (:id watch-scope) {:transaction transaction})]
-            (assoc watch-scope :terms terms)))))))
+    (jdbc/with-db-transaction [transaction db-spec]
+      (when-let [watch-scope
+                 (if (model.user/admin? user)
+                   (model.watch-scope/get-by-id (:id args) {:transaction transaction})
+                   (model.watch-scope/get-by-id-for-user-teams
+                    (:id args)
+                    (util.user-team-permission/build-query-ids-for-user-show (:id user))
+                    {:transaction transaction}))]
+        (let [terms (model.watch-scope-term/get-list-for-watch-scope (:id watch-scope) {:transaction transaction})]
+          (assoc watch-scope :terms terms))))))
 
 (defn watch-scope-create [context args _]
   (println "args watch-scope-create" args)

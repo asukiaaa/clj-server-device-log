@@ -15,11 +15,6 @@
 (defn filter-params [params]
   (select-keys params [:name :owner_user_id :memo]))
 
-(defn build-sql-ids-for-user [id-user]
-  (format "(SELECT id FROM %s WHERE owner_user_id = %s)"
-          name-table
-          id-user))
-
 (defn get-by-id [id & [{:keys [transaction]}]]
   (model.util/get-by-id id name-table {:transaction transaction}))
 
