@@ -10,26 +10,16 @@
             [front.view.util :as util]))
 
 (defn loader [js-params]
-  (let [{:keys [request]} (-> js-params js->clj keywordize-keys)
-        url (.-url request)
-        uri (lamb.uri/uri url)
-        path (:path uri)
-        show-login-page-when-not-loggedin (route/show-login-page-when-not-loggedin path)]
-  ; https://gist.github.com/pesterhazy/c4bab748214d2d59883e05339ce22a0f#asynchronous-conditionals
-    (js/Promise.
-     (fn [resolve _reject]
-       (model.user/get-loggedin
-        {:on-receive
-         (fn [user]
+  (js/Promise.
+   (fn [resolve _reject]
+     (model.user/get-loggedin
+      {:on-receive
+       (fn [{:keys [user errors]}]
+         (if (or user errors)
            (if user
              (resolve user)
-             (resolve nil)
-             #_(if show-login-page-when-not-loggedin
-                 (let [query (:query uri)
-                       path-afetr-login (str path "?" query)
-                       encoded-path-after-login (js/escape path-afetr-login)]
-                   (resolve (router/redirect (str route/login "?path_after_login=" encoded-path-after-login))))
-                 (resolve nil))))})))))
+             (resolve nil))
+           (resolve nil)))}))))
 
 (defn core []
   (let [navigate (router/useNavigate)

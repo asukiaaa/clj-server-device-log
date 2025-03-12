@@ -156,6 +156,10 @@
     :config {:type String}
     :created_at {:type String}
     :updated_at {:type String}}}
+  :ResponseUserLoggedin
+  {:fields
+   {:user {:type User}
+    :errors {:type String}}}
   :ResponseUserTeamListTotal
   {:fields
    {:list {:type (list UserTeam)}
@@ -512,7 +516,7 @@
     {:type UserTeamMember
      :args {:id {:type (non-null Int)}
             :user_team_id {:type (non-null Int)}}}
-    :user_loggedin {:type :User}}}
+    :user_loggedin {:type ResponseUserLoggedin}}}
   :Mutation
   {:fields
    {:user_create

@@ -96,8 +96,10 @@
 (defn user-loggedin [context args _]
   (println "args for user-loggedin" args)
   (let [user-loggedin (get-user-loggedin context)]
-    (when-let [id (:id user-loggedin)]
-      (model.user/get-by-id id))))
+    (if-let [user (when-let [id (:id user-loggedin)]
+                    (model.user/get-by-id id))]
+      {model.user/key-table user}
+      {:errors (json/write-str ["not found"])})))
 
 (defn users [context args _]
   (println "args for users" args)
