@@ -9,31 +9,35 @@
             [front.view.util.label :as util.label]
             [front.util.timezone :as util.timezone]))
 
-(def window-width-use-full-screen-image 450)
+(def window-width-use-half-screen-width-image 450)
 
-(defn render-card [device-file & [{:keys [use-max-width without-device on-click-image]}]]
-  (let [width (when-not use-max-width 200)
+(defn render-card [device-file & [{:keys [use-half-width without-device on-click-image]}]]
+  (let [width 200
         path-url (or (:path_thumbnail device-file) (:path device-file))
         recorded-at (:recorded_at device-file)
         id-device (:device_id device-file)
         device (:device device-file)]
-    [:div.card.m-2 {:style {:display :inline-block
-                            :vertical-align :top
-                            :width width}}
-     [:a {:href "#" :on-click (fn [e] (.preventDefault e) (when on-click-image (on-click-image device-file)))}
-      [:img.card-img-top {:src path-url
-                          :style {:object-fit :contain
-                                  :aspect-ratio "4/3"}}]]
-     [:div.card-body.p-1
-      (when-not without-device
-        [:div
-         [:> router/Link {:to (route/device-device-files id-device)}
-          (-> device util.label/device-item)]])
-      [:div (util.timezone/build-datetime-str-in-timezone recorded-at {:datetime-format util.timezone/date-fns-format-with-timezone-until-minute})]
-      (for [watch-scope (:watch_scopes device-file)]
-        [:div {:key (:id watch-scope)}
-         [:> router/Link {:to (route/watch-scope-device-files (:id watch-scope))}
-          (-> watch-scope util.label/watch-scope-item)]])]]))
+    [:div (if use-half-width
+            {:class (when use-half-width "col-6 p-2")}
+            {:class "m-2"
+             :style {:display :inline-block
+                     :vertical-align :top
+                     :width width}})
+     [:div.card
+      [:a {:href "#" :on-click (fn [e] (.preventDefault e) (when on-click-image (on-click-image device-file)))}
+       [:img.card-img-top {:src path-url
+                           :style {:object-fit :contain
+                                   :aspect-ratio "4/3"}}]]
+      [:div.card-body.p-1
+       (when-not without-device
+         [:div
+          [:> router/Link {:to (route/device-device-files id-device)}
+           (-> device util.label/device-item)]])
+       [:div (util.timezone/build-datetime-str-in-timezone recorded-at {:datetime-format util.timezone/date-fns-format-with-timezone-until-minute})]
+       (for [watch-scope (:watch_scopes device-file)]
+         [:div {:key (:id watch-scope)}
+          [:> router/Link {:to (route/watch-scope-device-files (:id watch-scope))}
+           (-> watch-scope util.label/watch-scope-item)]])]]]))
 
 (defn render-hiddend-image [item]
   (when item
@@ -134,6 +138,7 @@
           (let [list (:list list-and-total)]
             (set-index-show-modal (if (> index-show-modal 0)
                                     (dec index-show-modal) nil))))
+        show-iamge-in-half-window-width (-> window-size :width (< window-width-use-half-screen-width-image))
         handle-window-size #(set-window-size (util/get-window-size))]
     (react/useEffect
      (fn []
@@ -156,10 +161,12 @@
        [:<>
         element-pagination
         [:div.ms-2 "total " total]
-        [:div {:style {:width "100%"}}
+        [:div (if show-iamge-in-half-window-width
+                {:class "row m-0"}
+                {:style {:width "100%"}})
          (for [[index item] (map-indexed vector received-list)]
            [:<> {:key (:path item)}
             [render-card item
-             {:use-max-width (-> window-size :width (< window-width-use-full-screen-image))
+             {:use-half-width show-iamge-in-half-window-width
               :on-click-image (fn [_] (on-click-image index))}]])]
         element-pagination]})]))
