@@ -28,7 +28,7 @@
                                      (on-receive (:logout data) (util/build-error-messages errors)))))
 
 (defn get-loggedin [{:keys [on-receive]}]
-  (let [query (goog.string.format "{ user_loggedin { errors %s } }" (util.user/build-query-table-and-keys))]
+  (let [query (goog.string.format "{ user_loggedin { errors %s } }" (util.user/build-query-table-and-keys-with-permission))]
     (re-graph/query query () (fn [{:keys [data errors]}]
                                (on-receive (:user_loggedin data) (util/build-error-messages errors))))))
 

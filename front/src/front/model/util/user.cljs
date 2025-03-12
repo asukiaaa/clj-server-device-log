@@ -10,7 +10,12 @@
 (def keys-for-table (remove #(= % :permission) keys-for-table-with-permission))
 (def query-keys (join " " (map name keys-for-table)))
 
-(defn build-query-table-and-keys []
+(defn build-query-table-and-keys [& [{:keys [query-additional-keys]}]]
   (format "%s {%s}"
           name-table
-          query-keys))
+          (->> [query-keys
+                query-additional-keys]
+               (remove nil?) (join " "))))
+
+(defn build-query-table-and-keys-with-permission []
+  (build-query-table-and-keys {:query-additional-keys "permission"}))
