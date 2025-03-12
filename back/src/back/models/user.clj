@@ -181,7 +181,7 @@
                         {:password_reset (json/write-str
                                           {:hash hash
                                            :until (f/unparse model.util/time-format-yyyymmdd-hhmmss
-                                                             (t/plus (t/now) (t/hours 1)))})}
+                                                             (t/plus (t/now) (t/days 1)))})}
                         ["id = ?" id])
           {:hash hash})))))
 
