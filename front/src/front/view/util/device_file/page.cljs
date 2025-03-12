@@ -9,9 +9,10 @@
             [front.view.util.label :as util.label]
             [front.util.timezone :as util.timezone]))
 
-(defn render-card [device-file & [{:keys [without-device on-click-image]}]]
-  (let [width 200
-        height 150
+(def window-width-use-full-screen-image 450)
+
+(defn render-card [device-file & [{:keys [use-max-width without-device on-click-image]}]]
+  (let [width (when-not use-max-width 200)
         path-url (or (:path_thumbnail device-file) (:path device-file))
         recorded-at (:recorded_at device-file)
         id-device (:device_id device-file)
@@ -22,7 +23,7 @@
      [:a {:href "#" :on-click (fn [e] (.preventDefault e) (when on-click-image (on-click-image device-file)))}
       [:img.card-img-top {:src path-url
                           :style {:object-fit :contain
-                                  :width width :height height}}]]
+                                  :aspect-ratio "4/3"}}]]
      [:div.card-body.p-1
       (when-not without-device
         [:div
@@ -95,6 +96,7 @@
 (defn core [fetch-list-and-total & [{:keys [on-receive]}]]
   (let [location (router/useLocation)
         [list-and-total set-list-and-total] (react/useState)
+        [window-size set-window-size] (react/useState (util/get-window-size))
         info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
         received-list (:list list-and-total)
         [index-show-modal set-index-show-modal] (react/useState)
@@ -131,7 +133,12 @@
         (fn []
           (let [list (:list list-and-total)]
             (set-index-show-modal (if (> index-show-modal 0)
-                                    (dec index-show-modal) nil))))]
+                                    (dec index-show-modal) nil))))
+        handle-window-size #(set-window-size (util/get-window-size))]
+    (react/useEffect
+     (fn []
+       (.addEventListener js/window "resize" handle-window-size)
+       (fn [] (.removeEventListener js/window "resize" handle-window-size))))
     (react/useEffect
      (fn []
        (load-list)
@@ -152,5 +159,7 @@
         [:div {:style {:width "100%"}}
          (for [[index item] (map-indexed vector received-list)]
            [:<> {:key (:path item)}
-            (render-card item {:on-click-image (fn [_] (on-click-image index))})])]
+            [render-card item
+             {:use-max-width (-> window-size :width (< window-width-use-full-screen-image))
+              :on-click-image (fn [_] (on-click-image index))}]])]
         element-pagination]})]))

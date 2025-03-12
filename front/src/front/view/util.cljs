@@ -11,6 +11,10 @@
   (->> js/window.location.href
        (new js/URL)))
 
+(defn get-window-size []
+  {:width (.-innerWidth js/window)
+   :height (.-innerHeight js/window)})
+
 (defn assign-arr-state-info-to-params [arr-info-state params]
   (reduce (fn [params info-state]
             (assoc params (:key info-state) (:draft info-state)))
