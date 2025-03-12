@@ -4,7 +4,7 @@ services:
     # working_dir: /usr/src/app/back
     build: ./back
     command: "clj -X:dev"
-    # command: bash -c "PORT=3000 java -jar back.jar"
+    # command: bash -c "java -jar back.jar server-with-migration"
     volumes:
       - ./back:/usr/src/app/back
       - ./filestorage:/usr/src/app/filestorage
