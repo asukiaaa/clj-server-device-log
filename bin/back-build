@@ -4,4 +4,5 @@ DIR_HERE=$(dirname $(realpath $0))
 DIR_REPO=$DIR_HERE/../
 cd $DIR_REPO
 
+docker compose down back
 docker compose run back clj -X:uberjar
