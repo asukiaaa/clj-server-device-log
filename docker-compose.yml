@@ -30,7 +30,7 @@ services:
     ports:
       - "9630:9630" # web socket for shadow js
   mariadb:
-    image: "mariadb:10.8"
+    image: "mariadb:11.4"
     volumes:
       - .volumes/mariadb:/var/lib/mysql
     environment:
