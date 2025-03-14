@@ -26,6 +26,12 @@ clojure -X:uberjar
 java -jar back.jar server-with-migration
 ```
 
+### Test
+
+```sh
+clj -M:runner:test
+```
+
 ## License
 
 Copyright © 2022 Asuki
