@@ -10,8 +10,7 @@
             [back.models.device-type-api-key :as model.device-type-api-key]
             [back.models.device :as model.device]
             [back.models.device-file :as model.device-file]
-            [back.models.util :as model.util]
-            [back.models.user-team :as model.user-team]))
+            [back.models.util :as model.util]))
 
 (defn top [req]
   {:status 200

@@ -1,10 +1,11 @@
 (ns front.view.util.breadcrumb
   (:require ["react-router-dom" :as router]
             [front.route :as route]
-            [front.view.util.label :as util.label]))
+            [front.view.util.label :as util.label]
+            [front.view.util :as util]))
 
 (defn core [links]
-  [:div.ms-2
+  [util/area-content
    (if (empty? links)
      [:span util.label/dashboard]
      [:<>

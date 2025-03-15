@@ -1,4 +1,5 @@
 (ns front.view.util.label
+  (:require [goog.string :refer [format]])
   (:refer-clojure :exclude [name next time update]))
 
 (def logout "Logout")
@@ -68,6 +69,8 @@
 (def permission "Permission")
 (def prev "Prev")
 (def profile "Profile")
+(defn result-in-total [number-result total]
+  (format "Result %d in %d" number-result total))
 (def select-team "Select team")
 (def show "Show")
 (def term "Term")

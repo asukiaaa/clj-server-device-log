@@ -9,7 +9,8 @@
             [clj-time.format :as f]
             [back.config :refer [db-spec]]
             [back.models.util :as model.util]
-            [back.models.util.user :as util.user]))
+            [back.models.util.user :as util.user]
+            [back.models.util.user-team :as util.user-team]))
 
 (def name-table util.user/name-table)
 (def key-table util.user/key-table)
@@ -19,7 +20,8 @@
   (jdbc/delete! db-spec :user ["id = ?" id]))
 
 (defn admin? [user]
-  (-> user :permission json/read-json :role (= "admin")))
+  (when-let [str-permission (:permission user)]
+    (-> str-permission json/read-json :role (= "admin"))))
 
 (defn build-hash [password salt]
   (-> (str password salt) bhash/sha3-512 codecs/bytes->hex))
@@ -27,8 +29,24 @@
 (defn get-by-email [email & [{:keys [transaction]}]]
   (first (jdbc/query (or transaction db-spec) ["SELECT * FROM user WHERE email = ?" (model.util/escape-for-sql email)])))
 
+(defn get-by-id-with-permission [id & [{:keys [transaction]}]]
+  (model.util/get-by-id
+   id name-table
+   {:str-keys-select (util.user/build-str-keys-select-for-table {:with-permission true})
+    :transaction transaction}))
+
 (defn get-by-id [id & [{:keys [transaction]}]]
-  (model.util/get-by-id id "user" {:transaction transaction}))
+  (-> (model.util/get-by-id
+       id name-table
+       {:str-keys-select (util.user/build-str-keys-select-for-table)
+        :transaction transaction})))
+
+(defn get-by-id-in-ids [id sql-ids & [{:keys [transaction]}]]
+  (-> (model.util/get-by-id
+       id name-table
+       {:str-keys-select (util.user/build-str-keys-select-for-table)
+        :str-where (format "%s.id IN %s" name-table sql-ids)
+        :transaction transaction})))
 
 (defn get-by-id-and-hash-password-reset [id hash-password-reset & [{:keys [transaction]}]]
   (let [user (get-by-id id {:transaction transaction})
@@ -141,8 +159,19 @@
                            :password "admin-pass"
                            :permission "{\"role\": \"admin\"}"})))
 
-(defn get-list-with-total [args]
-  (model.util/get-list-with-total-with-building-query name-table args))
+(defn get-list-with-total-for-admin [args & [{:keys [str-where transaction]}]]
+  (model.util/get-list-with-total-with-building-query
+   name-table args
+   {:str-where str-where
+    :str-keys-select (util.user/build-str-keys-select-for-table {:with-permission true})
+    :transaction transaction}))
+
+(defn get-list-with-total-by-ids [args sql-ids & [{:keys [transaction]}]]
+  (model.util/get-list-with-total-with-building-query
+   name-table args
+   {:str-where (format "%s.id IN %s" name-table sql-ids)
+    :str-keys-select (util.user/build-str-keys-select-for-table)
+    :transaction transaction}))
 
 (defn filter-for-session [user]
   (select-keys user [:id]))

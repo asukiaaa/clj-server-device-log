@@ -4,7 +4,6 @@
 (def name-table "device")
 (def key-table (keyword name-table))
 (def keys-param [:id :name :created_at :updated_at :device_type_id :user_team_id])
-(def str-keys-param (map name keys-param))
 
 (defn build-str-select-params-for-joined []
   (util.core/build-str-select-params-for-joined name-table keys-param))

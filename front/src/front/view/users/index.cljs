@@ -6,33 +6,29 @@
             [front.view.common.component.pagination :as pagination]
             [front.view.common.wrapper.fetching :as wrapper.fetching]
             [front.view.common.wrapper.show404 :as wrapper.show404]
+            [front.view.users.util :as v.user.util]
             [front.view.util :as util]
             [front.model.user :as model.user]
             [front.view.util.label :as util.label]
             [front.view.util.breadcrumb :as breadcrumb]))
 
-(defn render-user [user on-delete]
+(defn render-user [user on-delete user-loggedin]
   [:tr
-   [:td (:id user)]
-   [:td (:email user)]
    [:td (:name user)]
-   [:td (:created_at user)]
-   [:td (:updated_at user)]
+   [:td (:email user)]
    [:td
-    [:> router/Link {:to (route/user-show (:id user))} util.label/show]
-    " "
-    [:> router/Link {:to (route/user-edit (:id user))} util.label/edit]
-    " "
-    [:f> util/btn-confirm-delete
-     {:message-confirm (model.user/build-confirmation-message-for-deleting user)
-      :action-delete #(model.user/delete {:id (:id user) :on-receive on-delete})}]]])
+    (util/render-list
+     (v.user.util/build-related-links user on-delete user-loggedin)
+     (fn [link] [:<> link " "]))]])
 
 (defn-  page []
   (let [location (router/useLocation)
+        user-loggedin (util/get-user-loggedin)
         [user-list-and-total set-user-list-and-total] (react/useState)
         info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
         users (:list user-list-and-total)
         total (:total user-list-and-total)
+        number-result (count users)
         query-params (util/read-query-params)
         number-page (or (:page query-params) 0)
         number-limit (or (:limit query-params) 50)
@@ -54,30 +50,31 @@
      #js [location])
     [:<>
      [:f> breadcrumb/core [{:label util.label/users}]]
-     [:> router/Link {:to route/user-create} util.label/create]
+     (when (model.user/admin? user-loggedin)
+       [util/area-content
+        [:> router/Link {:to route/user-create} util.label/create]])
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer
        [:<>
-        [:div "total " total]
+        [util/area-content
+         (util.label/result-in-total number-result total)]
         [:table.table.table-sm
          [:thead
           [:tr
-           [:th "id"]
-           [:th "email"]
-           [:th "name"]
-           [:th "created_at"]
-           [:th "updated_at"]
-           [:th "actions"]]]
+           [:th util.label/name]
+           [:th util.label/email]
+           [:th util.label/action]]]
          [:tbody
           (for [user users]
             [:<> {:key (:id user)}
-             [:f> render-user user load-list]])]]
-        [:f> pagination/core {:build-url build-url-by-page
-                              :total-page number-total-page
-                              :current-page number-page}]]})]))
+             [:f> render-user user load-list user-loggedin]])]]
+        [util/area-content
+         [:f> pagination/core {:build-url build-url-by-page
+                               :total-page number-total-page
+                               :current-page number-page}]]]})]))
 
 (defn core []
   (wrapper.show404/wrapper
-   {:permission wrapper.show404/permission-admin
+   {:permission wrapper.show404/permission-login
     :page page}))

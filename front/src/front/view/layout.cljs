@@ -43,7 +43,8 @@
             [:> bs/Nav.Link {:to route/dashboard :as router/Link} util.label/dashboard]
             [:> bs/NavDropdown {:title (:name user) :id "nav-dropdown" :align :end}
              (for [[label path] (util.links/build-list-menu-links-for-user user)]
-               [:> bs/NavDropdown.Item {:to path :as router/Link :key path} label])
+               [:<> {:key label}
+                [:> bs/NavDropdown.Item {:to path :as router/Link :key path} label]])
              [:> bs/NavDropdown.Divider]
              [:> bs/NavDropdown.Item {:on-click logout :href route/logout} util.label/logout]]])]]]]
      [:> router/Outlet]]))

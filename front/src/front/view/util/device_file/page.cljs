@@ -18,8 +18,8 @@
         id-device (:device_id device-file)
         device (:device device-file)]
     [:div (if use-half-width
-            {:class (when use-half-width "col-6 p-2")}
-            {:class "m-2"
+            {:class (when use-half-width "col-6 p-1")}
+            {:class "m-1"
              :style {:display :inline-block
                      :vertical-align :top
                      :width width}})
@@ -105,6 +105,7 @@
         received-list (:list list-and-total)
         [index-show-modal set-index-show-modal] (react/useState)
         total (:total list-and-total)
+        number-result (count received-list)
         query-params (util/read-query-params)
         number-page (or (:page query-params) 0)
         number-limit (or (:limit query-params) 50)
@@ -112,8 +113,9 @@
         element-pagination
         (when (or (< number-limit total)
                   (> number-page (/ total number-limit)))
-          [:f> pagination/core {:total-page number-total-page
-                                :current-page number-page}])
+          [util/area-content
+           [:f> pagination/core {:total-page number-total-page
+                                 :current-page number-page}]])
         load-list
         (fn []
           (wrapper.fetching/start info-wrapper-fetching)
@@ -160,10 +162,12 @@
        :renderer
        [:<>
         element-pagination
-        [:div.ms-2 "total " total]
+        [util/area-content
+         (util.label/result-in-total number-result total)]
         [:div (if show-iamge-in-half-window-width
-                {:class "row m-0"}
-                {:style {:width "100%"}})
+                {:class "row mx-1"}
+                {:class "mx-1"
+                 :style {:width "100%"}})
          (for [[index item] (map-indexed vector received-list)]
            [:<> {:key (:path item)}
             [render-card item

@@ -17,6 +17,7 @@
             [com.walmartlabs.lacinia.resolve :refer [resolve-as]]
             [back.models.util.device :as util.device]
             [back.models.util.device-permission :as util.device-permission]
+            [back.models.util.user-permission :as util.user-permission]
             [back.models.util.user-team-permission :as util.user-team-permission]))
 
 (defn get-user-loggedin [context]
@@ -95,25 +96,30 @@
 
 (defn user-loggedin [context args _]
   (println "args for user-loggedin" args)
-  (let [user-loggedin (get-user-loggedin context)]
-    (if-let [user (when-let [id (:id user-loggedin)]
-                    (model.user/get-by-id id))]
-      {model.user/key-table user}
-      {:errors (json/write-str ["not found"])})))
+  (if-let [user-loggedin (get-user-loggedin context)]
+    {model.user/key-table user-loggedin}
+    {:errors (json/write-str ["not found"])}))
 
 (defn users [context args _]
   (println "args for users" args)
-  (handle-only-for-admin
-   context
-   (fn [] (model.user/get-list-with-total args))))
+  (when-let [user (get-user-loggedin context)]
+    (if (model.user/admin? user)
+      (model.user/get-list-with-total-for-admin args)
+      (let [sql-ids-user
+            (-> (util.user-team-permission/build-query-ids-for-user-show (:id user))
+                util.user-permission/build-query-ids-ids-for-user-teams)]
+        (model.user/get-list-with-total-by-ids args sql-ids-user)))))
 
 (defn user [context args _]
   (println "args for user" args)
-  (handle-only-for-admin
-   context
-   (fn []
-     (when-let [id-user (:id args)]
-       (model.user/get-by-id id-user)))))
+  (when-let [user (get-user-loggedin context)]
+    (when-let [id-user (:id args)]
+      (if (model.user/admin? user)
+        (model.user/get-by-id-with-permission id-user)
+        (let [sql-ids-user
+              (-> (util.user-team-permission/build-query-ids-for-user-show (:id user))
+                  util.user-permission/build-query-ids-ids-for-user-teams)]
+          (model.user/get-by-id-in-ids id-user sql-ids-user))))))
 
 (defn user-for-resetting-password [context args _]
   (println "args for user-for-resetting-password" args)

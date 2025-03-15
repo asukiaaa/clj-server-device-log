@@ -40,6 +40,11 @@
   (t/testing "FIXME, I fail."
     (t/is (= 0 1))))
 
+(def tests-to-create
+  ["TODO list for create test for graphql"
+   "users: admin can see all users"
+   "users: not admin can see users connected via user team"])
+
 #_(t/run-tests)
 
 #_(defn main [& args]

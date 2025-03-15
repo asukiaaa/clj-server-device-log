@@ -208,3 +208,10 @@
       [:button.btn.btn-secondary.btn-sm
        {:on-click on-click :disabled fetching}
        util.label/get-bearer])))
+
+(def area-content :div.mx-2)
+
+(defn render-list [list renderer]
+  (for [[key item] (map-indexed vector list)]
+    [:<> {:key key}
+     [renderer item]]))

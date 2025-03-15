@@ -1,13 +1,23 @@
 (ns back.models.util.user
-  (:require [back.models.util.core :as util.core]))
+  (:require [clojure.string :refer [join]]
+            [back.models.util.core :as util.core]))
 
 (def name-table "user")
 (def key-table (keyword name-table))
-(def keys-param [:id :name :email :permission :created_at :updated_at])
-(def str-keys-param (map name keys-param))
+(def keys-param [:id :name :email :created_at :updated_at])
+(def keys-param-with-permission (conj keys-param :permission))
+(defn- get-keys-param [with-permission]
+  (if with-permission keys-param-with-permission keys-param))
 
-(defn build-str-select-params-for-joined []
-  (util.core/build-str-select-params-for-joined name-table keys-param))
+(defn build-str-keys-select-for-table [& [{:keys [with-permission]}]]
+  (->> (for [key (get-keys-param with-permission)]
+         (format "%s.%s" name-table (name key)))
+       (join ",")))
 
-(defn build-item-from-selected-params-joined [params & [{:keys [name-table-destination]}]]
-  (util.core/build-item-from-selected-params-joined name-table keys-param params {:name-table-destination name-table-destination}))
+(defn build-str-select-params-for-joined [& [{:keys [with-permission]}]]
+  (util.core/build-str-select-params-for-joined name-table (get-keys-param with-permission)))
+
+(defn build-item-from-selected-params-joined [params & [{:keys [name-table-destination with-permission]}]]
+  (util.core/build-item-from-selected-params-joined
+   name-table (get-keys-param with-permission)
+   params {:name-table-destination name-table-destination}))

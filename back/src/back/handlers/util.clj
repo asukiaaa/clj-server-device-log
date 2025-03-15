@@ -17,7 +17,7 @@
 
 (defn decode-and-find-user-in-session [user-encoded-in-session]
   (when-let [user (decode-user-in-session user-encoded-in-session)]
-    (model.user/get-by-id (:id user))))
+    (model.user/get-by-id-with-permission (:id user))))
 
 (defn encode-user-for-session [user]
   (encryption/encode user))
