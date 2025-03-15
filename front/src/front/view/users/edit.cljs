@@ -70,7 +70,7 @@
            [util/render-input "name" state-info-name]
            [util/render-input "email" state-info-email]
            [util/render-textarea "permission" state-info-permission]
-           [:button.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply} "apply"]]])})]))
+           [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} util.label/update]]])})]))
 
 (defn core []
   (wrapper.show404/wrapper
