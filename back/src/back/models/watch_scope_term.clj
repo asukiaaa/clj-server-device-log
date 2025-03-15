@@ -8,6 +8,7 @@
             [back.models.util.device :as util.device]
             [back.models.util.device-log :as util.device-log]
             [back.models.util.device-file :as util.device-file]
+            [back.models.util.watch-scope :as util.watch-scope]
             [back.models.util.watch-scope-term :as util.watch-scope-term]))
 
 (def name-table util.watch-scope-term/name-table)
@@ -94,6 +95,16 @@
         items (jdbc/query (or transaction db-spec) query)]
     (map util.device/build-item-from-selected-params-joined items)))
 
+(defn get-list-with-watch-scope [{:keys [str-where transaction]}]
+  #_(println :get-list-with-watch-scope str-where)
+  (let [query
+        (->> [(format "SELECT %s.*, %s FROM %s" name-table (util.watch-scope/build-str-select-params-for-joined) name-table)
+              (format "INNER JOIN %s ON %s.id = %s.watch_scope_id" util.watch-scope/name-table util.watch-scope/name-table name-table)
+              (when str-where (format "WHERE %s" str-where))]
+             (join " "))
+        items (jdbc/query (or transaction db-spec) query)]
+    (map util.watch-scope/build-item-from-selected-params-joined items)))
+
 (defn get-list-for-watch-scope [id-watch-scope & [{:keys [transaction]}]]
   (get-list-with-device
    {:str-where (format "watch_scope_id = %d" id-watch-scope)
@@ -117,4 +128,21 @@
           terms (get-list-with-device {:str-where (format "%s.watch_scope_id IN %s" name-table str-list-ids-watch-scope)
                                        :transaction transaction})]
       (for [watch-scope list-watch-scope]
-        (assoc watch-scope :terms (filter #(= (:id watch-scope) (:watch_scope_id %)) terms))))))
+        (assoc watch-scope util.watch-scope/key-terms (filter #(= (:id watch-scope) (:watch_scope_id %)) terms))))))
+
+(defn assign-actives-to-list-device [list-device & [{:keys [transaction]}]]
+  (when-not (empty? list-device)
+    (let [str-list-ids-device
+          (->> (for [item list-device] (str (:id item)))
+               (join ",")
+               (format "(%s)"))
+          terms (get-list-with-watch-scope
+                 {:str-where (format "%s.device_id IN %s AND %s"
+                                     name-table str-list-ids-device (util.watch-scope-term/build-sql-is-active))
+                  :transaction transaction})]
+      (for [device list-device]
+        (assoc device util.device/key-active-watch-scope-terms (filter #(= (:id device) (:device_id %)) terms))))))
+
+(defn assign-actives-to-device [device & [{:keys [transaction]}]]
+  (when device
+    (first (assign-actives-to-list-device [device] {:transaction transaction}))))

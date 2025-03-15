@@ -18,6 +18,7 @@
          (#(or % no-data)))))
 
 (def action "Action")
+(def active-watch-scope "Active watch scope")
 (def add-term "Add term")
 (def assign-user-team-via-device-to-list-up
   "Assign user team via device to list up")

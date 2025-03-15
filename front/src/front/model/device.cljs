@@ -7,13 +7,18 @@
             [front.model.util.device :as util.device]
             [front.model.util.device-type :as util.device-type]
             [front.model.util.user-team :as util.user-team]
-            [front.model.util.user-team-device-config :as util.user-team-device-config]))
+            [front.model.util.user-team-device-config :as util.user-team-device-config]
+            [front.model.util.watch-scope :as util.watch-scope]
+            [front.model.util.watch-scope-term :as util.watch-scope-term]))
 
 (def name-table util.device/name-table)
 (defn build-query-keys-of-periperals []
   (join " " [(util.device-type/build-query-table-and-keys)
              (util.user-team/build-query-table-and-keys)
-             (util.user-team-device-config/build-query-table-and-keys)]))
+             (util.user-team-device-config/build-query-table-and-keys)
+             (util.watch-scope-term/build-query-table-and-keys
+              {:name-table (name util.device/key-active-watch-scope-terms)
+               :query-additional-keys (util.watch-scope/build-query-table-and-keys)})]))
 (defn build-query-keys-with-peripherals []
   (join " " [util.device/query-keys
              (build-query-keys-of-periperals)]))

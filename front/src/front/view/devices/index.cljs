@@ -8,7 +8,9 @@
             [front.view.util.label :as util.label]
             [front.view.util.table :as util.table]
             [front.model.user :as model.user]
-            [front.model.device :as model.device]))
+            [front.model.device :as model.device]
+            [front.model.util.device :as util.device]
+            [front.model.util.watch-scope :as util.watch-scope]))
 
 (defn render-device [device on-delete]
   [:tr
@@ -17,12 +19,13 @@
          (-> device :device_type :name)]]
    [:td [:> router/Link {:to (route/user-team-show (-> device :user_team :id))}
          (-> device :user_team :name)]]
+   [:td (v.device.util/render-active-watch-scope-terms device)]
    [:td
     (util/render-list-inline
      (v.device.util/build-related-links device))]])
 
 (defn- page []
-  (let [labels-header [util.label/name util.label/device-type util.label/user-team util.label/action]
+  (let [labels-header [util.label/name util.label/device-type util.label/user-team util.label/active-watch-scope util.label/action]
         user-loggedin (util/get-user-loggedin)]
     [:<>
      [:f> breadcrumb/core [{:label util.label/devices}]]

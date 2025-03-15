@@ -7,10 +7,12 @@
 (def key-table (keyword name-table))
 (def keys-for-table [:id :watch_scope_id :device_id :datetime_from :datetime_until :created_at :updated_at])
 (def query-keys (join " " (map name keys-for-table)))
-(defn build-str-table-and-keys []
+(defn build-query-table-and-keys [& [{:keys [name-table query-additional-keys]}]]
   (format "%s {%s}"
-          name-table
-          query-keys))
+          (or name-table @#'name-table)
+          (->> [query-keys
+                query-additional-keys]
+               (remove nil?) (join " "))))
 
 (defn term->param-str [term]
   (format "device_id: %s, datetime_from: %s, datetime_until: %s"

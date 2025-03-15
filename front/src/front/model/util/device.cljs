@@ -6,6 +6,7 @@
 (def name-table "device")
 (def keys-for-table [:id :device_type_id :user_team_id :name :created_at :updated_at])
 (def query-keys (join " " (map name keys-for-table)))
+(def key-active-watch-scope-terms :active_watch_scope_terms)
 
 (defn build-query-table-and-keys [& [{:keys [query-keys-additional] :as params-optional}]]
   (util.core/build-query-table-and-keys

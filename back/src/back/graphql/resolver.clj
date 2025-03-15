@@ -366,10 +366,17 @@
 
 (defn devices [context args _]
   (when-let [user (get-user-loggedin context)]
-    (if (model.user/admin? user)
-      (model.device/get-list-with-total-for-admin args)
-      (let [sql-ids-user-team (util.user-team-permission/build-query-ids-for-user-show (:id user))]
-        (model.device/get-list-with-total-for-user-teams args sql-ids-user-team {:via-device true :via-manager true})))))
+    (jdbc/with-db-transaction [transaction db-spec]
+      (let [list-and-total
+            (if (model.user/admin? user)
+              (model.device/get-list-with-total-for-admin args)
+              (let [sql-ids-user-team (util.user-team-permission/build-query-ids-for-user-show (:id user))]
+                (model.device/get-list-with-total-for-user-teams args sql-ids-user-team
+                                                                 {:via-device true :via-manager true
+                                                                  :transaction transaction})))
+            list-with-terms (model.watch-scope-term/assign-actives-to-list-device (:list list-and-total) {:transaction transaction})]
+        (assoc list-and-total
+               :list list-with-terms)))))
 
 (defn devices-for-user-team [context args _]
   (println "args devices-for-user-team" args)
@@ -652,7 +659,9 @@
 (defn device [context args _]
   (println "args device" args)
   (let [user (get-user-loggedin context)]
-    (model.device/get-by-id-for-user (:id args) (:id user))))
+    (jdbc/with-db-transaction [transaction db-spec]
+      (-> (model.device/get-by-id-for-user (:id args) (:id user) {:transaction transaction})
+          (model.watch-scope-term/assign-actives-to-device {:transaction transaction})))))
 
 (defn create-user-team-device-config-with-checking-permission [{:keys [is-admin params id-user id-device transaction]}]
   (jdbc/with-db-transaction [transaction (or transaction db-spec)]

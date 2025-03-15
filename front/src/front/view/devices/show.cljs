@@ -9,7 +9,12 @@
             [front.view.util.breadcrumb :as breadcrumb]
             [front.view.util.label :as util.label]
             [front.model.device :as model.device]
-            [front.model.user :as model.user]))
+            [front.model.user :as model.user]
+            [front.model.util.device-type :as util.device-type]
+            [front.model.util.user-team :as util.user-team]
+            [front.model.util.user-team-device-config :as util.user-team-device-config]
+            [front.model.util.device :as util.device]
+            [front.view.users.util :as v.user.util]))
 
 (defn- page []
   (let [params (js->clj (router/useParams))
@@ -51,26 +56,38 @@
              [:th "key"]
              [:th "value"]]]
            [:tbody
-            (for [key (->> [:id :name (when is-admin :authorization_bearer) :device_type :user_team :user_team_device_config :created_at :updated_at (when is-admin :action)]
+            [:tr [:td util.label/id] [:td (:id item)]]
+            [:tr [:td util.label/name] [:td (:name item)]]
+            [:tr
+             [:td util.label/active-watch-scope]
+             [:td (v.device.util/render-active-watch-scope-terms item {:item-wrapper :div})]]
+            (when is-admin
+              [:tr
+               [:td util.label/authorization-bearer]
+               [:td [:f> util/button-to-fetch-authorization-bearer fetch-bearer {:on-fetched on-fetched-bearer}]]])
+            [:tr
+             [:td util.label/device-type]
+             (let [device-type (util.device-type/key-table item)]
+               [:td [:> router/Link {:to (route/device-type-show (:id device-type))} (util.label/device-type-item device-type)]])]
+            [:tr
+             [:td util.label/user-team]
+             (let [user-team (util.user-team/key-table item)]
+               [:td [:> router/Link {:to (route/user-team-show (:id user-team))} (util.label/user-team-item user-team)]])]
+            [:tr [:td util.label/user-team-config] [:td (-> item util.user-team-device-config/key-table :config)]]
+            (when is-admin
+              [:tr
+               [:td util.label/action]
+               [:td [:f> util/btn-confirm-delete
+                     {:message-confirm (model.device/build-confirmation-message-for-deleting item)
+                      :action-delete #(model.device/delete {:id (:id item)
+                                                            :on-receive (fn [] (navigate route/devices))})}]]])
+            (for [key (->> [:created_at :updated_at]
                            (remove nil?))]
               [:tr {:key key}
-               [:td key]
-               [:td
-                (cond
-                  (or (= key :device_type) (= key :user_team))
-                  (let [val (key item)]
-                    (str (:id val) " " (:name val)))
-                  (= key :user_team_device_config)
-                  (-> item key :config)
-                  (= key :authorization_bearer)
-                  [:f> util/button-to-fetch-authorization-bearer fetch-bearer {:on-fetched on-fetched-bearer}]
-                  (= key :action)
-                  [:f> util/btn-confirm-delete
-                   {:message-confirm (model.device/build-confirmation-message-for-deleting item)
-                    :action-delete #(model.device/delete {:id (:id item)
-                                                          :on-receive (fn [] (navigate route/devices))})}]
-                  :else
-                  (str (get item key)))]])]]])})]))
+               [:td (cond (= key :created_at) util.label/created-at
+                          (= key :updated_at) util.label/updated-at)]
+               [:td (let [val (key item)]
+                      val)]])]]])})]))
 
 (defn core []
   (wrapper.show404/wrapper

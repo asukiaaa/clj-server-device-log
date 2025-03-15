@@ -188,7 +188,7 @@
     :user_team {:type UserTeam}
     :user_team_id {:type Int}
     :user_team_device_config {:type UserTeamDeviceConfig}
-    :watch_scope_terms {:type (list WatchScopeTerm)}
+    :active_watch_scope_terms {:type (list WatchScopeTerm)}
     :created_at {:type String}
     :updated_at {:type String}}}
   :ResponseDeviceListTotal
@@ -266,8 +266,9 @@
   :WatchScopeTerm
   {:fields
    {:id {:type (non-null Int)}
-    :device_id {:type (non-null Int)}
     :device {:type Device}
+    :device_id {:type (non-null Int)}
+    :watch_scope {:type WatchScope}
     :watch_scope_id {:type (non-null Int)}
     :datetime_from {:type String}
     :datetime_until {:type String}

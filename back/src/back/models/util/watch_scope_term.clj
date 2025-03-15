@@ -12,3 +12,7 @@
           name-table
           name-table
           str-key-datetime-to-compare))
+
+(defn build-sql-is-active []
+  (format "((%s.datetime_until IS NULL) OR (%s.datetime_until > NOW()))"
+          name-table name-table))
