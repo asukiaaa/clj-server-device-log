@@ -11,10 +11,10 @@
 (defn page []
   (let [user-loggedin (util/get-user-loggedin)]
     [:<>
-     [:f> breadcrumb/core []]
      [:> bs/Container {:fluid true}
       [:> bs/Row
        [:> bs/Col {:sm 2 :class :px-0}
+        [:f> breadcrumb/core []]
         [:div.list-group
          (for [[name url] (util.links/build-list-menu-links-for-user user-loggedin)]
            [:<> {:key name}

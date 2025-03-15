@@ -1,5 +1,7 @@
 (ns front.view.common.wrapper.fetching
-  (:require [front.view.page404 :as page404]))
+  (:require [front.view.page404 :as page404]
+            [front.view.util :as util]
+            [front.view.util.label :as util.label]))
 
 (defn build-info [fn-useState]
   (let [state-fetching (fn-useState)
@@ -23,7 +25,7 @@
   (let [{:keys [fetching errors]} info]
     (cond
       show-404 page404/core
-      fetching [:div "fetching"]
+      fetching [util/area-content util.label/fetching]
       :else
       [:<>
        (when errors

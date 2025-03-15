@@ -51,6 +51,7 @@
 (def device-groups "Device groups")
 (def edit "Edit")
 (def email "Email")
+(def fetching "Fetching")
 (def files "Files")
 (def from "From")
 (def get-bearer "Get bearer")
