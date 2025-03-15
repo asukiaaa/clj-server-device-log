@@ -39,6 +39,7 @@
 (defn datetime-until-item [str-datetiem-from]
   (str "until " str-datetiem-from))
 (def delete "Delete")
+(def delete-term "Delete term")
 (def device "Device")
 (def devices "Devices")
 (defn device-item [device] (show-key device [:name :id]))

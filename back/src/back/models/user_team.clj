@@ -59,15 +59,15 @@
     :transaction transaction}))
 
 (defn- user-has-permission-base [query-id-user-team query-where & [{:keys [transaction]}]]
-  (first (jdbc/query (or transaction db-spec)
-                     (join " " [(format "SELECT %s.id FROM %s" name-table name-table)
-                                (format "LEFT JOIN %s ON %s.user_team_id = %s.id"
-                                        util.user-team-member/name-table
-                                        util.user-team-member/name-table
-                                        name-table)
-                                (format "WHERE %s.id = %s AND %s"
-                                        name-table (if (number? query-id-user-team) (str query-id-user-team) query-id-user-team)
-                                        query-where)]))))
+  (let [query (join " " [(format "SELECT %s.id FROM %s" name-table name-table)
+                         (format "LEFT JOIN %s ON %s.user_team_id = %s.id"
+                                 util.user-team-member/name-table
+                                 util.user-team-member/name-table
+                                 name-table)
+                         (format "WHERE %s.id = %s AND %s"
+                                 name-table (if (number? query-id-user-team) (str query-id-user-team) query-id-user-team)
+                                 query-where)])]
+    (first (jdbc/query (or transaction db-spec) query))))
 
 (defn user-has-permission-to-write [{:keys [id-user-team id-user transaction]}]
   (user-has-permission-base id-user-team (util.user-team-permission/build-query-owner-or-member-writable id-user) {:transaction transaction}))

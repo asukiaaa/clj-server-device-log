@@ -8,14 +8,20 @@
             [front.view.util.watch-scope :as util.watch-scope]
             [front.view.util.label :as util.label]
             [front.view.util.breadcrumb :as breadcrumb]
-            [front.view.util :as util]))
+            [front.view.util :as util]
+            [front.view.watch-scopes.util :as v.watch-scope.util]))
 
 (defn- page []
   (let [params (js->clj (router/useParams))
-        navigate (router/useNavigate)
         id (get params "watch_scope_id")
         [item set-item] (react/useState)
-        info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))]
+        info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
+        navigate (router/useNavigate)
+        on-delete
+        (fn [{:keys [errors]}]
+          (if (nil? errors)
+            (navigate route/watch-scopes)
+            (js/alert (str errors))))]
     (react/useEffect
      (fn []
        (wrapper.fetching/start info-wrapper-fetching)
@@ -30,29 +36,21 @@
      [:f> breadcrumb/core
       [{:label util.label/watch-scopes :path route/watch-scopes}
        {:label (util.label/watch-scope-item item)}]]
+     (util/render-list-in-area-content-line
+      (v.watch-scope.util/build-related-links item))
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer
        (if (empty? item)
          [:div "no data"]
          [:div
-          [:> router/Link {:to (route/watch-scope-edit id)} util.label/edit]
-          " "
-          [:f> util/btn-confirm-delete
-           {:message-confirm (model.watch-scope/build-confirmation-message-for-deleting item)
-            :action-delete #(model.watch-scope/delete {:id (:id item)
-                                                       :on-receive (fn [] (navigate route/watch-scopes))})}]
-          " "
-          [:> router/Link {:to (route/watch-scope-device-logs id)} util.label/logs]
-          " "
-          [:> router/Link {:to (route/watch-scope-device-files id)} util.label/files]
           [:table.table.table-sm
            [:thead
             [:tr
              [:th "key"]
              [:th "value"]]]
            [:tbody
-            (for [key [:id :user_team :name :terms :created_at :updated_at]]
+            (for [key [:name :user_team :terms :created_at :updated_at]]
               [:tr {:key key}
                [:td key]
                [:td
@@ -64,7 +62,13 @@
                     [:> router/Link {:to (route/user-team-show (:id team))} (util.label/user-team-item team)]
                     util.label/no-data)
                   :else
-                  (get item key))]])]]])})]))
+                  (get item key))]])
+            [:tr
+             [:td util.label/action]
+             [:td
+              [:f> util/btn-confirm-delete
+               {:message-confirm (model.watch-scope/build-confirmation-message-for-deleting item)
+                :action-delete #(model.watch-scope/delete {:id id :on-receive on-delete})}]]]]]])})]))
 
 (defn core []
   (wrapper.show404/wrapper

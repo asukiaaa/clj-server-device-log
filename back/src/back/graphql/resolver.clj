@@ -18,7 +18,9 @@
             [back.models.util.device :as util.device]
             [back.models.util.device-permission :as util.device-permission]
             [back.models.util.user-permission :as util.user-permission]
-            [back.models.util.user-team-permission :as util.user-team-permission]))
+            [back.models.util.user-team-permission :as util.user-team-permission]
+            [back.models.util.watch-scope :as util.watch-scope]
+            [back.util.label :as util.label]))
 
 (defn get-user-loggedin [context]
   (:user-loggedin context))
@@ -76,7 +78,9 @@
     (let [user (get-user-loggedin context)
           id-watch-scope (:watch_scope_id args)
           watch-scope (model.watch-scope/get-by-id id-watch-scope {:transaction transaction})]
-      (when (or (model.user/admin? user) (= (:owner_user_id watch-scope) (:id user)))
+      (when (or (model.user/admin? user)
+                (model.user-team/user-has-permission-to-read {:id-user-team (:user_team_id watch-scope)
+                                                              :id-user (:id user)}))
         (model-device-log/get-list-with-total
          args
          {:build-str-where-and
@@ -548,13 +552,17 @@
     (let [user (get-user-loggedin context)
           params (:watch_scope args)
           id-user-team (:user_team_id params)
-          user-team (if (model.user/admin? user)
-                      (model.user-team/get-by-id id-user-team {:transaction transaction})
-                      (model.user-team/get-by-id-for-user id-user-team (:id user) {:transaction transaction}))]
-      (when user-team
+          user-team (when (or (model.user/admin? user)
+                              (model.user-team/user-has-permission-to-write
+                               {:id-user (:id user)
+                                :id-user-team id-user-team
+                                :transaction transaction}))
+                      (model.user-team/get-by-id id-user-team {:transaction transaction}))]
+      (if user-team
         (let [watch-scope (model.watch-scope/create params {:transaction transaction})]
           (model.watch-scope-term/create-list-for-watch-scope (:id watch-scope) (:terms params) {:transaction transaction})
-          {model.watch-scope/key-table watch-scope})))))
+          {model.watch-scope/key-table watch-scope})
+        {:errors (json/write-str [(util.label/no-permission)])}))))
 
 (defn watch-scope-update [context args _]
   (println "args watch-scope-update" args)
@@ -563,17 +571,27 @@
           id-watch-scope (:id args)
           params-watch-scope (:watch_scope args)
           params-terms (:terms params-watch-scope)]
-      (when (model.user/admin? user)
+      (if (or (model.user/admin? user)
+              (model.user-team/user-has-permission-to-write
+               {:id-user (:id user)
+                :id-user-team (util.watch-scope/build-query-get-id-user-team id-watch-scope)
+                :transaction transaction}))
         (when-let [watch-scope (model.watch-scope/update id-watch-scope params-watch-scope {:transaction transaction})]
           (model.watch-scope-term/delete-list-for-watch-scope id-watch-scope {:transaction transaction})
           (model.watch-scope-term/create-list-for-watch-scope id-watch-scope params-terms {:transaction transaction})
-          (assoc watch-scope :terms (model.watch-scope-term/get-list-for-watch-scope id-watch-scope)))))))
+          (assoc watch-scope :terms (model.watch-scope-term/get-list-for-watch-scope id-watch-scope)))
+        {:errors (json/write-str [(util.label/no-permission)])}))))
 
 (defn watch-scope-delete [context args _]
   (println "args watch-scope-delete" args)
   (let [user (get-user-loggedin context)
         id (:id args)]
-    (when (model.user/admin? user) (model.watch-scope/delete id))))
+    (if (or (model.user/admin? user)
+            (model.user-team/user-has-permission-to-write
+             {:id-user (:id user)
+              :id-user-team (util.watch-scope/build-query-get-id-user-team id)}))
+      (model.watch-scope/delete id)
+      {:errors (json/write-str [(util.label/no-permission)])})))
 
 (defn watch-scope-terms-for-watch-scope
   [context args _]

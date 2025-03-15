@@ -5,7 +5,8 @@
             [front.view.util.device-log.list :as util.list]
             [front.view.common.wrapper.fetching :as wrapper.fetching]
             [front.view.common.component.pagination :as pagination]
-            [front.view.util :as util :refer [build-state-info render-checkbox render-input render-textarea]]))
+            [front.view.util :as util :refer [build-state-info render-checkbox render-input render-textarea]]
+            [front.view.util.label :as util.label]))
 
 (def map-page-default
   {:str-renderer "[{\"key\":\"id\"},{\"key\":\"data\"},{\"key\":\"created_at\"}]"
@@ -41,6 +42,7 @@
         [logs set-logs] (react/useState)
         [logs-key-fetched set-logs-key-fetched] (react/useState)
         [total set-total] (react/useState)
+        number-result (count logs)
         info-limit (build-state-info :limit #(react/useState))
         info-str-renderer (build-state-info :str-renderer #(react/useState))
         info-str-where (build-state-info :str-where #(react/useState))
@@ -69,7 +71,7 @@
                                 :page page-current
                                 :on-receive
                                 (fn [data errors]
-                                  #_(on-receive "hoi")
+                                  #_(println data errors)
                                   (when-not (nil? on-receive) (on-receive data))
                                   (set-logs (:list data))
                                   (set-total (:total data))
@@ -114,7 +116,9 @@
        [:div
         (when-not show-config
           [:f> pagination/core {:total-page total-page}])
-        [:div.m-1 (str "requested " (:default info-limit) " from " total)]
+        [util/area-content
+         (when-not (nil? total)
+           (util.label/result-in-total number-result total))]
         (when (get-default-as-bool info-show-graph)
           [:f> util.graph/core logs-key-fetched logs config-renderer])
         (when (get-default-as-bool info-show-table)

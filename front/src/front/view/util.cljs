@@ -215,3 +215,16 @@
   (for [[key item] (map-indexed vector list)]
     [:<> {:key key}
      [renderer item]]))
+
+(defn render-list-inline [list]
+  (for [[key item] (map-indexed vector list)]
+    [:<> {:key key}
+     [:<> {:key item} item " "]]))
+
+(defn render-list-in-area-content-line [list]
+  [area-content (render-list-inline list)])
+
+(defn build-link-or-text [label path path-current]
+  (if (= path path-current)
+    [:span label]
+    [:> router/Link {:to path} label]))

@@ -10,7 +10,8 @@
             [front.view.util.label :as util.label]
             [front.view.util.breadcrumb :as breadcrumb]
             [front.view.util.watch-scope :as util.watch-scope]
-            [front.view.util :as util]))
+            [front.view.util :as util]
+            [front.view.watch-scopes.util :as v.watch-scope.util]))
 
 (defn- page []
   (let [params (js->clj (router/useParams))
@@ -76,6 +77,8 @@
       [{:label util.label/watch-scopes :path route/watch-scopes}
        {:label (util.label/watch-scope-item item) :path (route/watch-scope-show id-item)}
        {:label util.label/edit}]]
+     (util/render-list-in-area-content-line
+      (v.watch-scope.util/build-related-links item))
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer

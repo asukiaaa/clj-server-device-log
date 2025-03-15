@@ -143,7 +143,7 @@
                              :on-click (fn [e]
                                          (.preventDefault e)
                                          (on-click-delete))}
-       util.label/delete]]]))
+       util.label/delete-term]]]))
 
 (defn add-empty-map-to-last [terms]
   (let [key-last (-> terms keys last)

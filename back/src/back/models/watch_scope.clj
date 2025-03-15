@@ -2,13 +2,10 @@
   (:refer-clojure :exclude [update])
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.core :refer [format]]
-            [clojure.string :refer [join]]
             [back.config :refer [db-spec]]
             [back.models.util :as model.util]
             [back.models.util.user-team :as util.user-team]
-            [back.models.util.watch-scope :as util.watch-scope]
-            [back.models.util.watch-scope-term :as util.watch-scope-term]
-            [back.models.util.device-file :as util.device-file]))
+            [back.models.util.watch-scope :as util.watch-scope]))
 
 (def name-table util.watch-scope/name-table)
 (def key-table util.watch-scope/key-table)

@@ -7,26 +7,18 @@
             [front.view.util.breadcrumb :as breadcrumb]
             [front.view.util.watch-scope :as util.watch-scope]
             [front.view.util.table :as util.table]
-            [front.view.util :as util]))
+            [front.view.util :as util]
+            [front.view.watch-scopes.util :as v.watch-scope.util]))
 
-(defn render-watch-scope [watch-scope load-list]
+(defn render-watch-scope [watch-scope]
   [:tr
    [:td (:name watch-scope)]
    [:td (let [team (:user_team watch-scope)]
           [:> router/Link {:to (route/user-team-show (:id team))} (util.label/user-team-item team)])]
    [:td (util.watch-scope/render-terms (:terms watch-scope))]
    [:td
-    [:> router/Link {:to (route/watch-scope-show (:id watch-scope))} util.label/show]
-    " "
-    [:> router/Link {:to (route/watch-scope-edit (:id watch-scope))} util.label/edit]
-    " "
-    [:f> util/btn-confirm-delete
-     {:message-confirm (model.watch-scope/build-confirmation-message-for-deleting watch-scope)
-      :action-delete #(model.watch-scope/delete {:id (:id watch-scope) :on-receive load-list})}]
-    " "
-    [:> router/Link {:to (route/watch-scope-device-files (:id watch-scope))} util.label/files]
-    " "
-    [:> router/Link {:to (route/watch-scope-device-logs (:id watch-scope))} util.label/logs]]])
+    (util/render-list-inline
+     (v.watch-scope.util/build-related-links watch-scope))]])
 
 (defn- page []
   (let [labels-header [util.label/name util.label/user-team util.label/term util.label/action]]
