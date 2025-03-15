@@ -19,7 +19,6 @@
        (if (empty? user)
          [:div util.label/no-data]
          [:div
-          [:> router/Link {:to route/profile-password-edit} util.label/password-edit]
           " "
           #_[:f> util/btn-confirm-delete
              {:message-confirm (model.user/build-confirmation-message-for-deleting user)
@@ -31,10 +30,14 @@
              [:th "key"]
              [:th "value"]]]
            [:tbody
-            (for [key [:id :email :name :permission :created_at :updated_at]]
+            (for [key [:id :email :name :permission :password :created_at :updated_at]]
               [:tr {:key key}
                [:td key]
-               [:td (get user key)]])]]])})]))
+               [:td (cond
+                      (= key :password)
+                      [:> router/Link {:to route/profile-password-edit} util.label/password-edit]
+                      :else
+                      (get user key))]])]]])})]))
 
 (defn core []
   (wrapper.show404/wrapper

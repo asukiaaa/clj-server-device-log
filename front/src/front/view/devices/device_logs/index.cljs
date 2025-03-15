@@ -4,9 +4,11 @@
             [front.route :as route]
             [front.model.device-log :as model.device-log]
             [front.view.common.wrapper.show404 :as wrapper.show404]
+            [front.view.devices.util :as v.device.util]
             [front.view.util.device-log.page :as device-log.page]
             [front.view.util.breadcrumb :as breadcrumb]
-            [front.view.util.label :as util.label]))
+            [front.view.util.label :as util.label]
+            [front.view.util :as util]))
 
 (defn-  page []
   (let [params (js->clj (router/useParams))
@@ -18,6 +20,8 @@
       [{:label util.label/devices :path route/devices}
        {:label (util.label/device-item device) :path (route/device-show id-device)}
        {:label util.label/logs}]]
+     (util/render-list-in-area-content-line
+      (v.device.util/build-related-links device))
      (device-log.page/core
       #(model.device-log/fetch-list-and-total-for-device
         (assoc % :id-device id-device))

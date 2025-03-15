@@ -13,9 +13,10 @@
 
 (defn- page []
   (let [params (js->clj (router/useParams))
-        user (util/get-user-loggedin)
-        navigate (router/useNavigate)
         id (get params "device_id")
+        navigate (router/useNavigate)
+        user (util/get-user-loggedin)
+        is-admin (model.user/admin? user)
         [item set-item] (react/useState)
         info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
         fetch-bearer #(model.device/fetch-authorization-bearer-by-id
@@ -36,31 +37,22 @@
     [:<>
      [:f> breadcrumb/core [{:label util.label/devices :path route/devices}
                            {:label (util.label/device-item item)}]]
+     (util/render-list-in-area-content-line
+      (v.device.util/build-related-links item))
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer
        (if (empty? item)
          [:div "no data"]
          [:div
-          (when (model.user/admin? user)
-            [:<>
-             [:> router/Link {:to (route/device-edit id)} util.label/edit]
-             " "
-             [:f> util/btn-confirm-delete
-              {:message-confirm (model.device/build-confirmation-message-for-deleting item)
-               :action-delete #(model.device/delete {:id (:id item)
-                                                     :on-receive (fn [] (navigate route/devices))})}]])
-          (for [[label link] (v.device.util/build-related-links (:id item))]
-            [:<> {:key label}
-             " "
-             [:> router/Link {:to link} label]])
           [:table.table.table-sm
            [:thead
             [:tr
              [:th "key"]
              [:th "value"]]]
            [:tbody
-            (for [key [:id :name :authorization_bearer :device_type :user_team :user_team_device_config :created_at :updated_at]]
+            (for [key (->> [:id :name (when is-admin :authorization_bearer) :device_type :user_team :user_team_device_config :created_at :updated_at (when is-admin :action)]
+                           (remove nil?))]
               [:tr {:key key}
                [:td key]
                [:td
@@ -72,6 +64,11 @@
                   (-> item key :config)
                   (= key :authorization_bearer)
                   [:f> util/button-to-fetch-authorization-bearer fetch-bearer {:on-fetched on-fetched-bearer}]
+                  (= key :action)
+                  [:f> util/btn-confirm-delete
+                   {:message-confirm (model.device/build-confirmation-message-for-deleting item)
+                    :action-delete #(model.device/delete {:id (:id item)
+                                                          :on-receive (fn [] (navigate route/devices))})}]
                   :else
                   (str (get item key)))]])]]])})]))
 

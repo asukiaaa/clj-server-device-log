@@ -82,7 +82,8 @@
                               (into (sorted-map))
                               (#(assoc % pagination/key-page 0))
                               util/push-query-params)
-                         (load-query-params))]
+                         (load-query-params))
+        show-pagination (and (not show-config) (not (= total (count logs))))]
     (react/useEffect
      (fn []
        (load-query-params)
@@ -114,8 +115,9 @@
       {:info info-wrapper-fetching
        :renderer
        [:div
-        (when-not show-config
-          [:f> pagination/core {:total-page total-page}])
+        (when show-pagination
+          [util/area-content
+           [:f> pagination/core {:total-page total-page}]])
         [util/area-content
          (when-not (nil? total)
            (util.label/result-in-total number-result total))]
@@ -123,6 +125,6 @@
           [:f> util.graph/core logs-key-fetched logs config-renderer])
         (when (get-default-as-bool info-show-table)
           [:f> util.list/core logs config-renderer])
-        (when-not show-config
-          [:div.mb-2
+        (when show-pagination
+          [util/area-content
            [:f> pagination/core {:total-page total-page}]])]})]))

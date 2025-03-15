@@ -7,6 +7,7 @@
             [front.model.device-type :as model.device-type]
             [front.model.user-team :as model.user-team]
             [front.view.common.wrapper.show404 :as wrapper.show404]
+            [front.view.devices.util :as v.device.util]
             [front.view.util.breadcrumb :as breadcrumb]
             [front.view.util.label :as util.label]
             [front.view.common.wrapper.fetching :as wrapper.fetching]
@@ -95,6 +96,8 @@
                            {:label (util.label/device-item item)
                             :path (when item (route/device-show id-item))}
                            {:label util.label/edit}]]
+     (util/render-list-in-area-content-line
+      (v.device.util/build-related-links item))
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer

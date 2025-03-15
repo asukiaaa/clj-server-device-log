@@ -55,9 +55,9 @@
             [util/render-input "new password" state-info-password-new {:type type-for-password}]
             [util/render-input "new password again" state-info-password-new-again {:type type-for-password}]])
          [:div [util/render-checkbox "show password" state-info-show-password]]
-         [:a.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply
+         [:a.btn.btn-primary.mt-1 {:on-click on-click-apply
                                           :class (when waiting-response "disabled")}
-          "apply"]]])]))
+          util.label/update]]])]))
 
 (defn core []
   (wrapper.show404/wrapper
