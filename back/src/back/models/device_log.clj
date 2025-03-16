@@ -197,7 +197,7 @@
                              (build-query-order order base-table-key)
                              "LIMIT" limit
                              "OFFSET" (* limit page)])]
-    (println "str-query " str-query transaction)
+    #_(println "str-query" str-query transaction)
     (model.util/get-list-with-total [str-query] {:transaction transaction})))
 
 (defn get-by-id [id]
