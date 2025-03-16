@@ -66,7 +66,7 @@
                                util.device/name-table
                                (-> id-user
                                    util.user-team-permission/build-query-ids-for-user-show
-                                   (util.device-permission/build-query-ids-ids-for-user-teams-via
+                                   (util.device-permission/build-query-ids-for-user-teams-via
                                     {:via-device true :via-manager true}))))
                      :transaction transaction})
               (assoc model.device-type/key-table device-type)))))))
@@ -111,7 +111,7 @@
       (model.user/get-list-with-total-for-admin args)
       (let [sql-ids-user
             (-> (util.user-team-permission/build-query-ids-for-user-show (:id user))
-                util.user-permission/build-query-ids-ids-for-user-teams)]
+                util.user-permission/build-query-ids-for-user-teams)]
         (model.user/get-list-with-total-by-ids args sql-ids-user)))))
 
 (defn user [context args _]
@@ -122,7 +122,7 @@
         (model.user/get-by-id-with-permission id-user)
         (let [sql-ids-user
               (-> (util.user-team-permission/build-query-ids-for-user-show (:id user))
-                  util.user-permission/build-query-ids-ids-for-user-teams)]
+                  util.user-permission/build-query-ids-for-user-teams)]
           (model.user/get-by-id-in-ids id-user sql-ids-user))))))
 
 (defn user-for-resetting-password [context args _]

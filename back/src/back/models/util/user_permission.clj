@@ -5,7 +5,7 @@
             [back.models.util.user-team :as util.user-team]
             [back.models.util.user-team-member :as util.user-team-member]))
 
-(defn build-query-ids-ids-for-user-teams [sql-ids-user-team]
+(defn build-query-ids-for-user-teams [sql-ids-user-team]
   (->> [(format "SELECT %s.id FROM %s"
                 util.user/name-table
                 util.user/name-table)

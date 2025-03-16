@@ -4,7 +4,7 @@
             [back.models.util.device :as util.device]
             [back.models.util.device-type :as util.device-type]))
 
-(defn build-query-ids-ids-for-user-teams-via [sql-ids-user-team & [{:keys [via-device via-manager]}]]
+(defn build-query-ids-for-user-teams-via [sql-ids-user-team & [{:keys [via-device via-manager]}]]
   (->> [(format "SELECT %s.id FROM %s"
                 util.device/name-table
                 util.device/name-table)
