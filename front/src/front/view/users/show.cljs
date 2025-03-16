@@ -82,7 +82,7 @@
                       [:div
                        [:div.btn.btn-outline-primary {:on-click #(util/copy-to-clipboard url)}
                         "copy url to reset password"]
-                       [:span url]]))]]
+                       [:div url]]))]]
                 :else
                 [:tr {:key key}
                  [:td key]

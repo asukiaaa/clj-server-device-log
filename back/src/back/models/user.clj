@@ -10,7 +10,8 @@
             [back.config :refer [db-spec]]
             [back.models.util :as model.util]
             [back.models.util.user :as util.user]
-            [back.models.util.user-team :as util.user-team]))
+            [back.models.util.user-team :as util.user-team]
+            [back.util.label :as util.label]))
 
 (def name-table util.user/name-table)
 (def key-table util.user/key-table)
@@ -27,7 +28,10 @@
   (-> (str password salt) bhash/sha3-512 codecs/bytes->hex))
 
 (defn get-by-email [email & [{:keys [transaction]}]]
-  (first (jdbc/query (or transaction db-spec) ["SELECT * FROM user WHERE email = ?" (model.util/escape-for-sql email)])))
+  (first (jdbc/query (or transaction db-spec)
+                     [(format "SELECT %s FROM user WHERE email = ?"
+                              (util.user/build-str-keys-select-for-table))
+                      (model.util/escape-for-sql email)])))
 
 (defn get-by-id-with-permission [id & [{:keys [transaction]}]]
   (model.util/get-by-id
@@ -48,8 +52,11 @@
         :str-where (format "%s.id IN %s" name-table sql-ids)
         :transaction transaction})))
 
+(defn- get-by-id-bare [id & [{:keys [transaction]}]]
+  (model.util/get-by-id id name-table {:transaction transaction}))
+
 (defn get-by-id-and-hash-password-reset [id hash-password-reset & [{:keys [transaction]}]]
-  (let [user (get-by-id id {:transaction transaction})
+  (let [user (get-by-id-bare id {:transaction transaction})
         info-password-reset (when-let [str-password-reset (:password_reset user)]
                               (-> str-password-reset model.util/parse-json :parsed keywordize-keys))
         time-until (when-let [str-until (:until info-password-reset)]
@@ -229,4 +236,4 @@
                         {:hash (build-hash password (:salt user))
                          :password_reset nil}
                         ["id = ?" id-user])
-          {:message "ok"})))))
+          {:message (util.label/changed-password)})))))

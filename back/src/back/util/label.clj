@@ -2,3 +2,5 @@
 
 (defn no-permission []
   "No permission")
+(defn changed-password []
+  "Changed password")

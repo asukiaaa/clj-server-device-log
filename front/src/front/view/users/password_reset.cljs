@@ -6,7 +6,8 @@
             [front.model.user :as model.user]
             [front.view.page404 :as page404]
             [front.view.common.wrapper.fetching :as wrapper.fetching]
-            [front.view.util :as util]))
+            [front.view.util :as util]
+            [front.view.util.label :as util.label]))
 
 (defn- page []
   (let [params (js->clj (router/useParams))
@@ -62,10 +63,10 @@
       [:<>
        (cond
          (not (nil? message))
-         [:div
+         [util/area-content
           [:div message]
           [:div
-           [:> router/Link {:to route/login} "login"]]]
+           [:> router/Link {:to route/login} util.label/login]]]
          (nil? (:default state-info-id-user))
          [:f> page404/core]
          :else
@@ -75,10 +76,11 @@
            (let [show-password (:draft state-info-show-password)
                  type-for-password (if (= show-password "true") :text :password)]
              [:<>
-              [util/render-input "password" state-info-password {:type type-for-password}]
-              [util/render-input "password again" state-info-password-again {:type type-for-password}]])
-           [:div [util/render-checkbox "show password" state-info-show-password]]
-           [:button.btn.btn-primary.btn-sm.mt-1 {:on-click on-click-apply :class (when waiting-response "disabled")} "reset password"]]])]})))
+              [util/render-input util.label/password-10-chars-or-more state-info-password {:type type-for-password}]
+              [util/render-input util.label/password-again state-info-password-again {:type type-for-password}]])
+           [:div [util/render-checkbox util.label/show-password state-info-show-password]]
+           [:button.btn.btn-primary.mt-1 {:on-click on-click-apply :class (when waiting-response "disabled")}
+            util.label/reset-password]]])]})))
 
 (defn core []
   (page))
