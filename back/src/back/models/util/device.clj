@@ -11,3 +11,17 @@
 
 (defn build-item-from-selected-params-joined [params]
   (util.core/build-item-from-selected-params-joined name-table keys-param params))
+
+(defn build-sql-ids []
+  (format "(SELECT id FROM %s)"
+          name-table))
+
+(defn build-sql-ids-for-user-teams [sql-id-user-team]
+  (format "(SELECT id FROM %s WHERE user_team_id IN %s)"
+          name-table
+          sql-id-user-team))
+
+(defn build-sql-ids-user-team-for-device-type [id-device-type]
+  (format "(SELECT user_team_id from %s WHERE device_type_id = %d)"
+          name-table
+          id-device-type))

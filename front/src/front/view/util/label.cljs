@@ -20,8 +20,8 @@
 (def action "Action")
 (def active-watch-scope "Active watch scope")
 (def add-term "Add term")
-(def assign-user-team-via-device-to-list-up
-  "Assign user team via device to list up")
+(def assign-device-to-user-team-to-list-up
+  "Assign device to user team to list up")
 (def authorization-bearer "Authorizatino bearer")
 (def api-keys "API keys")
 (def api-key "API key")

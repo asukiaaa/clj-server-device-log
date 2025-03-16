@@ -1,11 +1,15 @@
 (ns front.view.util
   (:require ["react" :as react]
             ["react-router-dom" :as router]
-            [front.view.util.label :as util.label]))
+            [front.view.util.label :as util.label]
+            [front.model.user :as model.user]))
 
 (def key-user-loggedin "user-loggedin")
 (defn get-user-loggedin []
   (router/useRouteLoaderData key-user-loggedin))
+
+(defn detect-is-admin-loggedin []
+  (-> (get-user-loggedin) model.user/admin?))
 
 (defn build-current-url-object []
   (->> js/window.location.href

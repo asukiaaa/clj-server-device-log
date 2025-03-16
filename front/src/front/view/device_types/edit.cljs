@@ -6,6 +6,7 @@
             [front.model.device-type :as model.device-type]
             [front.view.common.wrapper.show404 :as wrapper.show404]
             [front.view.common.wrapper.fetching :as wrapper.fetching]
+            [front.view.device-types.util :as v.device-type.util]
             [front.view.util.breadcrumb :as breadcrumb]
             [front.view.util.label :as util.label]
             [front.view.util :as util]))
@@ -62,6 +63,8 @@
       [{:label util.label/device-types :path route/device-types}
        {:label (util.label/device-type-item item) :path (route/device-type-show id-item)}
        {:label util.label/edit}]]
+     (util/render-list-in-area-content-line
+      (v.device-type.util/build-related-links item))
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer

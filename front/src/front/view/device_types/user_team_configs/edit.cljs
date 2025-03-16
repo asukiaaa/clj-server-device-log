@@ -73,7 +73,7 @@
       {:info info-wrapper-fetching
        :renderer
        (if (empty? item)
-         [:div "no data"]
+         [util/area-content "no data"]
          [:div
           [:form.form-control
            [util/render-errors-as-alerts (:errors state-info-system)]

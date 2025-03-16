@@ -26,15 +26,6 @@
     (jdbc/update! db-spec key-table params ["id = ?" id])
     {key-table (get-by-id id {:transaction t-con})}))
 
-; TODO limit user for updating owner_user_id
-(defn update-for-owner-user [{:keys [id id-user params]}]
-  (jdbc/with-db-transaction [t-con db-spec]
-    (jdbc/update! db-spec key-table params ["id = ? AND owner_user_id = ?" id id-user])
-    {key-table (get-by-id id {:transaction t-con})}))
-
-(defn delete-for-owner-user [{:keys [id id-user]}]
-  (jdbc/delete! db-spec key-table ["id = ? AND owner_user_id = ?" id id-user]))
-
 (defn get-by-id-for-user [id id-user & [{:keys [transaction]}]]
   (first (jdbc/query (or transaction db-spec)
                      (join " " [(format "SELECT %s.* FROM %s" name-table name-table)

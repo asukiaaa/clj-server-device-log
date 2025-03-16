@@ -13,10 +13,12 @@
 
 (defn- page []
   (let [params (js->clj (router/useParams))
-        navigate (router/useNavigate)
         id (get params "device_type_id")
         [item set-item] (react/useState)
-        info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))]
+        info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
+        navigate (router/useNavigate)
+        on-delete (fn [] (navigate route/device-types))
+        is-admin (util/detect-is-admin-loggedin)]
     (react/useEffect
      (fn []
        (wrapper.fetching/start info-wrapper-fetching)
@@ -30,23 +32,14 @@
     [:<>
      [:f> breadcrumb/core [{:label util.label/device-types :path route/device-types}
                            {:label (util.label/device-type-item item)}]]
+     (util/render-list-in-area-content-line
+      (v.device-type.util/build-related-links item))
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer
        (if (empty? item)
          [:div "no data"]
-         [:div
-          [:> router/Link {:to (route/device-type-edit id)} util.label/edit]
-          " "
-          [:f> util/btn-confirm-delete
-           {:message-confirm (model.device-type/build-confirmation-message-for-deleting item)
-            :action-delete #(model.device-type/delete {:id (:id item)
-                                                       :on-receive (fn [] (navigate route/device-types))})}]
-          " "
-          (for [[label link] (v.device-type.util/build-related-links (:id item))]
-            [:<> {:key label}
-             " "
-             [:> router/Link {:to link} label]])
+         [:<>
           [:table.table.table-sm
            [:thead
             [:tr
@@ -65,7 +58,14 @@
                  :else
                  [:<>
                   [:td key]
-                  [:td (get item key)]])])]]])})]))
+                  [:td (get item key)]])])
+            (when is-admin
+              [:tr
+               [:td util.label/action]
+               [:td
+                [:f> util/btn-confirm-delete
+                 {:message-confirm (model.device-type/build-confirmation-message-for-deleting item)
+                  :action-delete #(model.device-type/delete {:id id :on-receive on-delete})}]]])]]])})]))
 
 (defn core []
   (wrapper.show404/wrapper

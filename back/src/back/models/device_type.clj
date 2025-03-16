@@ -41,7 +41,7 @@
     (format "%s.id IN %s"
             name-table query-select-types-for-user-team)))
 
-(defn build-query-filter-by-user-teams [sql-ids-user-team & [{:keys [via-device via-manager]}]]
+(defn build-query-filter-by-user-teams-via [sql-ids-user-team & [{:keys [via-device via-manager]}]]
   (->> [(when via-device (build-query-filter-by-user-teams-via-device sql-ids-user-team))
         (when via-manager (build-query-filter-by-user-teams-via-manager sql-ids-user-team))]
        (remove nil?)
@@ -78,19 +78,21 @@
             id (build-query-filter-by-user-teams-via-manager
                 (util.user-team-permission/build-query-ids-for-user-write id-user)))]))
 
-(defn get-by-id-for-user-teams [id sql-ids-user-team & [{:keys [transaction via-device via-manager]}]]
+(defn get-by-id-for-user-teams-via [id sql-ids-user-team & [{:keys [transaction via-device via-manager]}]]
   (get-by-id
    id
-   {:str-where (build-query-filter-by-user-teams sql-ids-user-team {:via-device via-device :via-manager via-manager})
+   {:str-where (build-query-filter-by-user-teams-via
+                sql-ids-user-team
+                {:via-device via-device :via-manager via-manager})
     :transaction transaction}))
 
-(defn get-by-id-for-user [id id-user & [{:keys [transaction via-device via-manager]}]]
-  (get-by-id-for-user-teams
+(defn get-by-id-for-user-via [id id-user & [{:keys [transaction via-device via-manager]}]]
+  (get-by-id-for-user-teams-via
    id (util.user-team-permission/build-query-ids-for-user-show id-user)
    {:transaction transaction :via-device via-device :via-manager via-manager}))
 
 (defn get-by-id-for-user-to-edit [id id-user & [{:keys [transaction]}]]
-  (get-by-id-for-user-teams
+  (get-by-id-for-user-teams-via
    id (util.user-team-permission/build-query-ids-for-user-write id-user)
    {:transaction transaction :via-manager true}))
 
@@ -111,22 +113,24 @@
     :build-item build-item
     :transaction transaction}))
 
-(defn get-list-with-total-for-user-teams [params sql-ids-user-team & [{:keys [transaction via-device via-manager]}]]
+(defn get-list-with-total-for-user-teams-via [params sql-ids-user-team & [{:keys [transaction via-device via-manager]}]]
   (get-list-with-total
    params
-   {:str-where (build-query-filter-by-user-teams sql-ids-user-team {:via-device via-device :via-manager via-manager})
+   {:str-where (build-query-filter-by-user-teams-via
+                sql-ids-user-team
+                {:via-device via-device :via-manager via-manager})
     :transaction transaction}))
 
-(defn get-list-with-total-for-user-team [params id-user-team & [{:keys [transaction via-device via-manager]}]]
-  (get-list-with-total-for-user-teams
+(defn get-list-with-total-for-user-team-via [params id-user-team & [{:keys [transaction via-device via-manager]}]]
+  (get-list-with-total-for-user-teams-via
    params
    (format "(%d)" id-user-team)
    {:transaction transaction
     :via-device via-device
     :via-manager via-manager}))
 
-(defn get-list-with-total-for-user [params id-user & [{:keys [transaction via-device via-manager]}]]
-  (get-list-with-total-for-user-teams
+(defn get-list-with-total-for-user-via [params id-user & [{:keys [transaction via-device via-manager]}]]
+  (get-list-with-total-for-user-teams-via
    params
    (util.user-team-permission/build-query-ids-for-user-show id-user)
    {:transaction transaction

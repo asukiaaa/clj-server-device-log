@@ -8,14 +8,27 @@
             [back.config :refer [db-spec]]
             [back.models.device :as model.device]
             [back.models.util :as model.util]
+            [back.models.util.device :as util.device]
             [back.models.util.device-file :as util.device-file]
             [back.models.util.watch-scope :as util.watch-scope]
             [back.models.util.watch-scope-term :as util.watch-scope-term]
-            [back.util.filestorage :as util.filestorage]
-            [back.models.util.user-team-permission :as util.user-team-permission]))
+            [back.util.filestorage :as util.filestorage]))
 
 (def name-table util.device-file/name-table)
 (def key-table util.device-file/key-table)
+
+(defn build-query-join []
+  (format "INNER JOIN %s ON %s.id = %s.device_id"
+          util.device/name-table
+          util.device/name-table
+          name-table))
+(defn build-str-keys-select-with-peripherals []
+  (format "%s.*, %s"
+          name-table
+          (util.device/build-str-select-params-for-joined)))
+(defn build-item [item]
+  (-> item
+      util.device/build-item-from-selected-params-joined))
 
 (defn filter-params [params]
   (select-keys params [:name :datetime_dir :device_id :recorded_at]))
@@ -28,19 +41,6 @@
         params (util.filestorage/create-file-for-device file-input filename id-device)]
     (create-record (merge file-config params) {:transaction transaction})
     (util.filestorage/build-path-url-for-device params)))
-
-(defn- assign-info-to-item-from-map [item {:keys [map-id-device]}]
-  (let [device (get map-id-device (:device_id item))]
-    (assoc item :device device)))
-
-(defn- assign-device-to-list [list-files & [{:keys [transaction]}]]
-  (let [ids-device (->> list-files (map :device_id) distinct)
-        sql-ids-device (format "(%s)" (join "," ids-device))
-        devices (when-not (empty? ids-device)
-                  (model.device/get-list-by-ids sql-ids-device {:transaction transaction}))
-        map-id-device (into {} (for [device devices] [(:id device) device]))]
-    (->> list-files
-         (map #(assign-info-to-item-from-map % {:map-id-device map-id-device})))))
 
 (defn- assign-watch-scoopes-to-list [list-file & [{:keys [transaction]}]]
   (when-not (empty? list-file)
@@ -94,14 +94,17 @@
         assign-path-url-to-item
         assign-path-url-thumbnail-to-item)))
 
-(defn- get-list-with-total-base [params & [optional-params]]
+(defn- get-list-with-total-base [params & [{:keys [:str-before-where] :as optional-params}]]
   (let [{:keys [transaction]} optional-params
         {:keys [list total]}
         (model.util/get-list-with-total-with-building-query
-         name-table params (assoc optional-params
-                                  :str-order "recorded_at DESC"))]
+         name-table params
+         (assoc optional-params
+                :str-keys-select (build-str-keys-select-with-peripherals)
+                :str-before-where (->> [str-before-where (build-query-join)] (remove nil?) (join " "))
+                :build-item build-item
+                :str-order "recorded_at DESC"))]
     {:list (-> list
-               (assign-device-to-list {:transaction transaction})
                (assign-watch-scoopes-to-list {:transaction transaction})
                assign-path-url-to-list)
      :total total}))
@@ -155,7 +158,7 @@
     (format "%s.id IN %s" name-table sql-ids)}))
 
 (defn update-for-files-on-local []
-  (let [ids-device-on-db (->> (jdbc/query db-spec (model.device/build-sql-ids))
+  (let [ids-device-on-db (->> (jdbc/query db-spec (util.device/build-sql-ids))
                               (map :id))
         ids-device-on-local (util.filestorage/get-ids-device)]
     #_(println :ids-for-device ids-device-on-db ids-device-on-local)

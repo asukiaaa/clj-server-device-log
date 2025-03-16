@@ -43,16 +43,17 @@
       {:info info-wrapper-fetching
        :renderer
        (if (empty? item)
-         [:div util.label/no-data]
+         [util/area-content util.label/no-data]
          [:div
-          [:> router/Link {:to (route/device-type-user-team-config-edit id-device-type id-user-team)} util.label/edit]
-          " "
-          [:f> util/btn-confirm-delete
-           {:message-confirm (model.user-team-device-type-config/build-confirmation-message-for-deleting item)
-            :action-delete #(model.user-team-device-type-config/delete
-                             {:user_team_id id-user-team
-                              :device_type_id id-device-type
-                              :on-receive (fn [] (navigate (route/device-type-user-team-configs id-device-type)))})}]
+          [util/area-content
+           [:> router/Link {:to (route/device-type-user-team-config-edit id-device-type id-user-team)} util.label/edit]
+           " "
+           [:f> util/btn-confirm-delete
+            {:message-confirm (model.user-team-device-type-config/build-confirmation-message-for-deleting item)
+             :action-delete #(model.user-team-device-type-config/delete
+                              {:user_team_id id-user-team
+                               :device_type_id id-device-type
+                               :on-receive (fn [] (navigate (route/device-type-user-team-configs id-device-type)))})}]]
           [:table.table.table-sm
            [:thead
             [:tr

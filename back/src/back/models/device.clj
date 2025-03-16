@@ -47,20 +47,6 @@
       util.user-team-device-config/build-item-from-selected-params-joined
       #_((fn [item] (println item) item))))
 
-(defn build-sql-ids []
-  (format "(SELECT id FROM %s)"
-          name-table))
-
-(defn build-sql-ids-for-user-teams [sql-id-user-team]
-  (format "(SELECT id FROM %s WHERE user_team_id IN %s)"
-          name-table
-          sql-id-user-team))
-
-(defn build-sql-ids-user-team-for-device-type [id-device-type]
-  (format "(SELECT user_team_id from %s WHERE device_type_id = %d)"
-          name-table
-          id-device-type))
-
 (defn filter-params [params]
   (select-keys params [:name :device_type_id :user_team_id]))
 
@@ -191,7 +177,7 @@
                        first vals first)]
             (get-by-id id {:transaction transaction})))))))
 
-(defn- build-query-filter-by-user-teams [sql-ids-user-team {:keys [via-device via-manager]}]
+(defn- build-query-filter-by-user-teams-via [sql-ids-user-team {:keys [via-device via-manager]}]
   (->> [(when via-device
           (format "%s.user_team_id IN %s"
                   name-table
@@ -214,16 +200,17 @@
     :build-item build-item
     :transaction transaction}))
 
-(defn get-list-with-total-for-user-teams [params sql-ids-user-team & [{:keys [via-device via-manager transaction]}]]
+(defn get-list-with-total-for-user-teams-via [params sql-ids-user-team & [{:keys [via-device via-manager transaction]}]]
   (get-list-with-total-for-admin
    params
-   {:str-where (build-query-filter-by-user-teams sql-ids-user-team {:via-device via-device :via-manager via-manager})
+   {:str-where (build-query-filter-by-user-teams-via sql-ids-user-team {:via-device via-device :via-manager via-manager})
     :transaction transaction}))
 
-(defn get-list-with-total-for-user-team [params id-user-team & [{:keys [via-device via-manager transaction]}]]
-  (get-list-with-total-for-user-teams params (format "(%d)" id-user-team) {:via-device via-device
-                                                                           :via-manager via-manager
-                                                                           :transaction transaction}))
+(defn get-list-with-total-for-user-team-via [params id-user-team & [{:keys [via-device via-manager transaction]}]]
+  (get-list-with-total-for-user-teams-via params (format "(%d)" id-user-team)
+                                          {:via-device via-device
+                                           :via-manager via-manager
+                                           :transaction transaction}))
 
 (defn get-config [id-device & [{:keys [transaction]}]]
   (let [query (join " " [(format "SELECT %s.config_default FROM %s" util.device-type/name-table name-table)
