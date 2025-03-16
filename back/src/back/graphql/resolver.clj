@@ -184,12 +184,16 @@
   (when-let [user (get-user-loggedin context)]
     (jdbc/with-db-transaction [transaction db-spec]
       (let [id-device-type (:device_type_id args)
-            device-type (if (model.user/admin? user)
+            is-admin (model.user/admin? user)
+            device-type (if is-admin
                           (model.device-type/get-by-id id-device-type {:transaction transaction})
                           (model.device-type/get-by-id-for-user-via id-device-type (:id user)
                                                                     {:via-device true :via-manager true
                                                                      :transaction transaction}))
-            sql-ids-user-team (util.device/build-sql-ids-user-team-for-device-type id-device-type)
+            sql-ids-user-team (when-not is-admin
+                                (util.user-team-permission/build-query-ids-for-user-write (:id user)))
+            sql-ids-user-team (util.device/build-sql-ids-user-team-for-device-type
+                               id-device-type {:sql-ids-user-team sql-ids-user-team})
             list-and-total (when device-type
                              (model.user-team/get-list-with-total-for-ids args sql-ids-user-team {:transaction transaction}))]
         (assoc list-and-total model.device-type/key-table device-type)))))

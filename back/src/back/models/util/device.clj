@@ -1,5 +1,6 @@
 (ns back.models.util.device
-  (:require [back.models.util.core :as util.core]))
+  (:require [clojure.string :refer [join]]
+            [back.models.util.core :as util.core]))
 
 (def name-table "device")
 (def key-table (keyword name-table))
@@ -21,7 +22,10 @@
           name-table
           sql-id-user-team))
 
-(defn build-sql-ids-user-team-for-device-type [id-device-type]
-  (format "(SELECT user_team_id from %s WHERE device_type_id = %d)"
+(defn build-sql-ids-user-team-for-device-type [id-device-type & [{:keys [sql-ids-user-team]}]]
+  (format "(SELECT user_team_id from %s WHERE %s)"
           name-table
-          id-device-type))
+          (->> [(format "device_type_id = %d" id-device-type)
+                (when sql-ids-user-team (format "user_team_id IN %s" sql-ids-user-team))]
+               (remove nil?)
+               (join " AND "))))

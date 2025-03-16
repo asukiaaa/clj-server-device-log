@@ -29,4 +29,4 @@
   (build-query-ids-for-user-base (build-query-owner-or-member id-user)))
 
 (defn build-query-ids-for-user-write [id-user]
-  (build-query-ids-for-user-base (build-query-owner-or-member id-user)))
+  (build-query-ids-for-user-base (build-query-owner-or-member-writable id-user)))
