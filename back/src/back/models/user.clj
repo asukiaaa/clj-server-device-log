@@ -27,6 +27,12 @@
 (defn build-hash [password salt]
   (-> (str password salt) bhash/sha3-512 codecs/bytes->hex))
 
+
+(defn- get-by-email-bare [email & [{:keys [transaction]}]]
+  (first (jdbc/query (or transaction db-spec)
+                     [(format "SELECT * FROM user WHERE email = ?")
+                      (model.util/escape-for-sql email)])))
+
 (defn get-by-email [email & [{:keys [transaction]}]]
   (first (jdbc/query (or transaction db-spec)
                      [(format "SELECT %s FROM user WHERE email = ?"
@@ -151,10 +157,10 @@
 (defn is-correct-password [user password]
   (= (:hash user) (build-hash password (:salt user))))
 
-(defn get-by-email-password [email password]
-  (when-let [user (get-by-email email)]
+(defn get-by-email-password-with-permission [email password]
+  (when-let [user (get-by-email-bare email)]
     (when (is-correct-password user password)
-      user)))
+      (select-keys user util.user/keys-param-with-permission))))
 
 (defn get-total-count []
   (-> (jdbc/query db-spec "SELECT COUNT(*) FROM user;") first vals first))

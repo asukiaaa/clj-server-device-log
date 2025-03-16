@@ -61,7 +61,7 @@
               user-loggedin-now
               (when-not (empty? args-login)
                 (Thread/sleep 1000) ; wait to take tome for brute force attack
-                (model.user/get-by-email-password (:email args-login) (:password args-login)))
+                (model.user/get-by-email-password-with-permission (:email args-login) (:password args-login)))
               user-loggedin (or user-loggedin-now
                                 (handler.util/decode-and-find-user-in-session
                                  (-> context :request :session :user)))]
