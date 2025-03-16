@@ -1,0 +1,8 @@
+{:up
+ ["ALTER TABLE watch_scope
+   MODIFY name CHAR(255) NOT NULL,
+   ADD CONSTRAINT unique_watch_scope_name_for_user_team UNIQUE ( name, user_team_id )"]
+ :down
+ ["ALTER TABLE watch_scope
+   MODIFY name CHAR(255),
+   DROP CONSTRAINT unique_watch_scope_name_for_user_team"]}

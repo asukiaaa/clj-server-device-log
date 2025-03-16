@@ -3,6 +3,7 @@
   (:require [goog.string :refer [format]]
             clojure.string
             [front.model.util.user-team :as util.user-team]
+            [front.view.util.label :as util.label]
             [front.model.util :as util]
             [front.model.util.device-type :as util.device-type]))
 
@@ -12,9 +13,7 @@
 
 (defn build-select-options-from-list-and-total [list-and-total]
   (for [item (:list list-and-total)]
-    (let [id (:id item)
-          name (:name item)]
-      [id (str id " " name)])))
+    [(:id item) (util.label/user-team-item item)]))
 
 (defn fetch-list-and-total [{:keys [on-receive limit page]}]
   (-> {:limit limit :page page :on-receive on-receive}

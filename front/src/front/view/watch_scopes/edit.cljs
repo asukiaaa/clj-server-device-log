@@ -11,13 +11,15 @@
             [front.view.util.breadcrumb :as breadcrumb]
             [front.view.util.watch-scope :as util.watch-scope]
             [front.view.util :as util]
-            [front.view.watch-scopes.util :as v.watch-scope.util]))
+            [front.view.watch-scopes.util :as v.watch-scope.util]
+            [front.model.user-team :as model.user-team]))
 
 (defn- page []
   (let [params (js->clj (router/useParams))
         id-item (get params "watch_scope_id")
         navigate (router/useNavigate)
         [item set-item] (react/useState)
+        [user-team set-user-team] (react/useState)
         state-info-system (util/build-state-info :__system #(react/useState))
         state-info-name (util/build-state-info :name #(react/useState))
         state-info-terms (util/build-state-info :terms #(react/useState []))
@@ -36,6 +38,7 @@
         on-receive-item
         (fn [item]
           (set-item item)
+          (set-user-team (model.user-team/key-table item))
           (util/set-default-and-draft state-info-name (:name item))
           (util/set-default-and-draft state-info-terms (util.watch-scope/terms-params->draft (:terms item))))
         on-receive-response (fn [data errors]
@@ -88,6 +91,9 @@
           [:form.form-control
            [util/render-errors-as-alerts (:errors state-info-system)]
            [util/render-input util.label/name state-info-name]
+           [:div
+            [:div util.label/user-team]
+            [:div (util.label/user-team-item user-team)]]
            (util.watch-scope/render-fields-for-terms state-info-terms device-list-and-total)
            [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} util.label/update]]])})]))
 

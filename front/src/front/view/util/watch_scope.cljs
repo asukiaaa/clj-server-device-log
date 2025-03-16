@@ -145,13 +145,27 @@
                                          (on-click-delete))}
        util.label/delete-term]]]))
 
-(defn add-empty-map-to-last [terms]
-  (let [key-last (-> terms keys last)
-        key-new-last (if (nil? key-last) 0 (inc key-last))]
-    (assoc terms key-new-last {})))
+(defn- build-new-key-last [terms]
+  (let [key-last (->> terms keys (remove keyword?) sort last)]
+    (if (nil? key-last) 0 (inc key-last))))
+
+(defn- build-new-key-first [terms]
+  (let [key-last (->> terms keys (remove keyword?) sort first)]
+    (if (nil? key-last) 0 (dec key-last))))
+
+(defn- add-empty-map-to-last [terms]
+  (assoc terms (build-new-key-last terms) {}))
+
+(defn- add-empty-map-to-first [terms]
+  (assoc terms (build-new-key-first terms) {}))
 
 (defn render-fields-for-terms [state-info-terms devices-list-and-total]
-  (let [add-term
+  (let [add-term-top
+        (fn [e]
+          (.preventDefault e)
+          ((:set-draft state-info-terms) (add-empty-map-to-first (:draft state-info-terms)))
+          ((:set-default state-info-terms) (add-empty-map-to-first (:default state-info-terms))))
+        add-term-bottom
         (fn [e]
           (.preventDefault e)
           ((:set-draft state-info-terms) (add-empty-map-to-last (:draft state-info-terms)))
@@ -159,7 +173,8 @@
         delete-term
         (fn [index]
           ((:set-draft state-info-terms) (dissoc (:draft state-info-terms) index))
-          ((:set-default state-info-terms) (dissoc (:default state-info-terms) index)))]
+          ((:set-default state-info-terms) (dissoc (:default state-info-terms) index)))
+        indexes-sorted (->> (:draft state-info-terms) keys (remove keyword?) sort)]
     [:div
      [:div util.label/terms]
      [util/render-select util.label/timezone state-info-terms (util.timezone/build-options-for-select)
@@ -168,8 +183,12 @@
        :override-on-change
        (fn [value state-info _keys-assoc-in]
          (change-timezone value state-info))}]
+     [:div
+      [:a.btn.btn-secondary.mt-1 {:href "#" :on-click add-term-top} util.label/add-term]]
      (let [options-for-device-ids (model.device/build-select-options-from-list-and-total devices-list-and-total)]
-       (for [[index _] (dissoc (:draft state-info-terms) key-str-timezone)]
+       (for [index indexes-sorted]
          [:<> {:key index}
           (render-fields-for-term state-info-terms index options-for-device-ids (fn [] (delete-term index)))]))
-     [:a.btn.btn-secondary.mt-1 {:href "#" :on-click add-term} util.label/add-term]]))
+     (when (< 0 (count indexes-sorted))
+       [:div
+        [:a.btn.btn-secondary.mt-1 {:href "#" :on-click add-term-bottom} util.label/add-term]])]))

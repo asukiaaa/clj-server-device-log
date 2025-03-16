@@ -41,7 +41,17 @@
             :terms (util.watch-scope/terms-draft->params (:draft state-info-terms))
             :user_team_id (:draft state-info-id-user-team)
             :on-receive on-receive}))
-        load-list
+        load-devices
+        (fn [& [{:keys [user_team_id]}]]
+          (set-device-list-and-total nil)
+          (model.device/fetch-list-and-total-for-user-team
+           {:limit 1000
+            :user_team_id (if user_team_id user_team_id (:draft state-info-id-user-team))
+            :page 0
+            :on-receive
+            (fn [result errors]
+              (set-device-list-and-total result))}))
+        load-user-teams
         (fn []
           (wrapper.fetching/start info-wrapper-fetching)
           (model.user-team/fetch-list-and-total
@@ -49,19 +59,15 @@
             :page 0
             :on-receive (fn [result errors]
                           (set-user-team-list-and-total result)
-                          (wrapper.fetching/finished info-wrapper-fetching errors))}))
-        load-devices
-        (fn []
-          (model.device/fetch-list-and-total-for-user-team
-           {:limit 1000
-            :user_team_id (:draft state-info-id-user-team)
-            :page 0
-            :on-receive
-            (fn [result errors]
-              (set-device-list-and-total result))}))]
+                          (let [list (:list result)]
+                            (when (= 1 (count list))
+                              (let [id-user-team (-> list first :id)]
+                                (util/set-default-and-draft state-info-id-user-team id-user-team)
+                                (load-devices {:user_team_id id-user-team}))))
+                          (wrapper.fetching/finished info-wrapper-fetching errors))}))]
     (react/useEffect
      (fn []
-       (load-list)
+       (load-user-teams)
        (fn []))
      #js [])
     [:<>

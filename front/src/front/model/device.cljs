@@ -29,7 +29,7 @@
 (defn build-select-options-from-list-and-total [list-and-total]
   (for [item (:list list-and-total)]
     (let [id (:id item)
-          value (str (:name item) " " (-> item :device_type :name))]
+          value (str (-> item :device_type :name) " "(:name item) )]
       [id value])))
 
 (defn fetch-list-and-total [{:keys [on-receive limit page]}]

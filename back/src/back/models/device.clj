@@ -209,6 +209,7 @@
    name-table params
    {:str-keys-select (build-str-keys-select-with-peripherals)
     :str-before-where (build-str-join-tables)
+    :str-order "name DESC"
     :str-where str-where
     :build-item build-item
     :transaction transaction}))
