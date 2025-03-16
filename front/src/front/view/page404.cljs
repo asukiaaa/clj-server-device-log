@@ -1,4 +1,7 @@
-(ns front.view.page404)
+(ns front.view.page404
+  (:require
+   [front.view.util :as util]
+   [front.view.util.label :as util.label]))
 
 (defn core []
-  [:div "page not found"])
+  [util/area-content util.label/page-not-found])

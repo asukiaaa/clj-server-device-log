@@ -66,6 +66,7 @@
 (def member "Member")
 (def memo "Memo")
 (def owner-user "Owner user")
+(def page-not-found "Page not found")
 (def password "Password")
 (def password-10-chars-or-more "Password 10 chars or more")
 (def password-again "Password again")

@@ -17,6 +17,10 @@
         number-page (or (pagination/key-page query-params) 0)
         number-limit (or (:limit query-params) 50)
         number-total-page (pagination/calc-total-page number-limit total)
+        element-pagination
+        (when-not (= total number-result)
+          [util/area-content
+           [:f> pagination/core {:total-page number-total-page}]])
         load-list
         (fn []
           (wrapper.fetching/start info-wrapper-fetching)
@@ -38,6 +42,7 @@
        :renderer
        [:<>
         [util/area-content (util.label/result-in-total number-result total)]
+        element-pagination
         [:table.table.table-sm
          [:thead
           [:tr
@@ -47,6 +52,4 @@
           (for [item received-list]
             [:<> {:key (:id item)}
              [:f> render-item item load-list]])]]
-        (when-not (= total number-result)
-          [util/area-content
-           [:f> pagination/core {:total-page number-total-page}]])]})]))
+        element-pagination]})]))
