@@ -3,7 +3,8 @@
             [front.model.user :as user]
             ["react-router-dom" :as router]
             [front.route :as route]
-            [front.view.util :as util]))
+            [front.view.util :as util]
+            [front.view.util.label :as util.label]))
 
 (defn render-text-input [{:keys [default set-val label type]}]
   [:<>
@@ -16,6 +17,7 @@
         path-afetr-login (or (.get search-params "path_after_login") route/dashboard)
         state-info-email (util/build-state-info :email #(react/useState))
         state-info-password (util/build-state-info :password #(react/useState))
+        state-info-show-password (util/build-state-info :show-password #(react/useState))
         [errors set-errors] (react/useState)
         [waiting-response set-waiting-response] (react/useState)
         navigate (router/useNavigate)
@@ -38,11 +40,17 @@
      [:div.row
       [:div.col-md-4.col-lg-4]
       [:form.col-md-4.col-lg-4
-       [:h1 "Login"]
-       [util/render-errors-as-alerts errors]
-       [util/render-input "Email" state-info-email {:disabled waiting-response}]
-       [util/render-input "Password" state-info-password {:type :password :disabled waiting-response}]
-       [:div.mt-2.align-right
-        [:button.btn.btn-outline-primary
-         {:on-click on-click-login :class (when waiting-response :disabled)}
-         "login"]]]]]))
+       [util/area-content
+        [:h1 util.label/login]
+        [util/render-errors-as-alerts errors]
+        [util/render-input util.label/email state-info-email {:disabled waiting-response}]
+        (let [show-password (:draft state-info-show-password)
+              type-for-password (if (= show-password "true") :text :password)]
+          [:<>
+           [util/render-input util.label/password state-info-password
+            {:type type-for-password :disabled waiting-response}]])
+        [:div [util/render-checkbox util.label/show-password state-info-show-password]]
+        [:div.mt-2.align-right
+         [:button.btn.btn-outline-primary
+          {:on-click on-click-login :class (when waiting-response :disabled)}
+          util.label/login]]]]]]))
