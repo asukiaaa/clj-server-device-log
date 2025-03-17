@@ -26,7 +26,7 @@
      [:div.card
       [:a {:href "#" :on-click (fn [e] (.preventDefault e) (when on-click-image (on-click-image device-file)))}
        [:img.card-img-top {:src path-url
-                           :style {:object-fit :contain
+                           :style {:object-fit :cover
                                    :aspect-ratio "4/3"}}]]
       [:div.card-body.p-1
        (when-not without-device
