@@ -76,6 +76,16 @@
     (re-graph/mutate query () (fn [{:keys [data errors]}]
                                 (on-receive (:user_update data) (util/build-error-messages errors))))))
 
+(defn update-profile [{:keys [name email permission on-receive]}]
+  (util/mutate-with-receive-params
+   {:str-field "profile_update"
+    :str-input-params (format "user: { name: %s, email: %s, permission: %s }"
+                              (util/build-input-str-for-str name)
+                              (util/build-input-str-for-str email)
+                              (util/build-input-str-for-str permission))
+    :str-keys-receive (util.user/build-query-table-and-keys)
+    :on-receive on-receive}))
+
 (defn build-str-user [user]
   (str "user id:" (:id user) " name:" (:name user)))
 

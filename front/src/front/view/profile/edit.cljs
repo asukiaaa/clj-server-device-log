@@ -1,4 +1,4 @@
-(ns front.view.users.edit
+(ns front.view.profile.edit
   (:require ["react" :as react]
             ["react-router-dom" :as router]
             [clojure.walk :refer [keywordize-keys]]
@@ -11,17 +11,14 @@
             [front.view.util :as util]))
 
 (defn- page []
-  (let [params (js->clj (router/useParams))
-        id-user (get params "user_id")
+  (let [is-admin (util/detect-is-admin-loggedin)
         navigate (router/useNavigate)
-        [user set-user] (react/useState)
         state-info-system (util/build-state-info :__system #(react/useState))
         state-info-name (util/build-state-info :name #(react/useState))
         state-info-email (util/build-state-info :email #(react/useState))
         state-info-permission (util/build-state-info :permission #(react/useState))
         on-receive-user
         (fn [user]
-          (set-user user)
           (util/set-default-and-draft state-info-email (:email user))
           (util/set-default-and-draft state-info-name (:name user))
           (util/set-default-and-draft state-info-permission (:permission user)))
@@ -35,13 +32,12 @@
                   (let [key (:key state)
                         errors-for-key (get errors key)]
                     ((:set-errors state) errors-for-key))))
-              (when-let [id-user (-> data :user :id)]
-                (navigate (route/user-show id-user))))))
+              (when (-> data :user :id)
+                (navigate route/profile)))))
         on-click-apply (fn [e]
                          (.preventDefault e)
-                         (model.user/update
-                          {:id id-user
-                           :name (:draft state-info-name)
+                         (model.user/update-profile
+                          {:name (:draft state-info-name)
                            :email (:draft state-info-email)
                            :permission (:draft state-info-permission)
                            :on-receive on-receive-create-response}))
@@ -49,31 +45,31 @@
     (react/useEffect
      (fn []
        (wrapper.fetching/start info-wrapper-fetching)
-       (model.user/fetch-by-id {:id id-user
-                                :on-receive (fn [user errors]
-                                              (on-receive-user user)
-                                              (wrapper.fetching/finished info-wrapper-fetching errors))})
+       (model.user/get-loggedin
+        {:on-receive (fn [data errors]
+                       (on-receive-user (:user data))
+                       (wrapper.fetching/finished info-wrapper-fetching errors))})
        (fn []))
      #js [])
     [:<>
-     [:f> breadcrumb/core [{:label util.label/users :path route/users}
-                           {:label (util.label/user-item user) :path (route/user-show id-user)}
+     [:f> breadcrumb/core [{:label util.label/profile :path route/profile}
                            {:label util.label/edit}]]
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer
        (if (empty? (:default state-info-email))
-         [:div
-          "no data"]
+         [util/area-content
+          util.label/no-data]
          [:div
           [:form.form-control
            [util/render-errors-as-alerts (:errors state-info-system)]
-           [util/render-input "name" state-info-name]
-           [util/render-input "email" state-info-email]
-           [util/render-textarea "permission" state-info-permission]
+           [util/render-input util.label/name state-info-name]
+           [util/render-input util.label/email state-info-email]
+           (when is-admin
+             [util/render-textarea util.label/permission state-info-permission])
            [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} util.label/update]]])})]))
 
 (defn core []
   (wrapper.show404/wrapper
-   {:permission wrapper.show404/permission-admin
+   {:permission wrapper.show404/permission-login
     :page page}))

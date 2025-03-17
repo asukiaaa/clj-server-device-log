@@ -7,6 +7,7 @@
 (def logout (str front "/logout"))
 
 (def profile (str front "/profile"))
+(def profile-edit (str profile "/edit"))
 (def profile-password-edit (str profile "/password_edit"))
 
 (def users (str front "/users"))

@@ -535,6 +535,9 @@
     :user_team_create
     {:type ResponseUserTeamCreateUpdate
      :args {:user_team {:type InputUserTeamCreate}}}
+    :profile_update
+    {:type ResponseUserUpdate
+     :args {:user {:type InputUserUpdate}}}
     :user_team_update
     {:type ResponseUserTeamCreateUpdate
      :args {:id {:type (non-null Int)}

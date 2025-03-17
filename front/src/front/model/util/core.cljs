@@ -25,7 +25,7 @@
 
 (defn build-query-input-for-str [val]
   (let [val (escape-str val)]
-    (if (nil? val) "null" (format "\"%s\"" val))))
+    (if (or (nil? val) (= val "")) "null" (format "\"%s\"" val))))
 
 (defn build-info-query-fetch [{:keys [name-table query-params query-keys-of-item on-receive]}]
   {:name-table name-table

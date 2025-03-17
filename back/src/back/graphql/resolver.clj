@@ -17,6 +17,7 @@
             [com.walmartlabs.lacinia.resolve :refer [resolve-as]]
             [back.models.util.device :as util.device]
             [back.models.util.device-permission :as util.device-permission]
+            [back.models.util.user :as util.user]
             [back.models.util.user-permission :as util.user-permission]
             [back.models.util.user-team-permission :as util.user-team-permission]
             [back.models.util.watch-scope :as util.watch-scope]
@@ -148,7 +149,6 @@
 
 (defn user-update [context args _]
   (println "handle user-update")
-  #_(println "args user-edit" args)
   (handle-only-for-admin
    context
    (fn []
@@ -169,6 +169,14 @@
      (let [user-id (:id args)]
        (model.user/delete user-id)
        user-id))))
+
+(defn profile-update [context args _]
+  (when-let [user (get-user-loggedin context)]
+    (let [params-user (util.user/key-table args)]
+      (model.user/update (:id user)
+                         (if (model.user/admin? user)
+                           params-user
+                           (select-keys params-user util.user/keys-param))))))
 
 (defn user-teams
   [context args _]
@@ -812,5 +820,6 @@
    :Mutation/hash_for_resetting_password_create hash-for-resetting-password-create
    :Mutation/password_for_hash_user_reset password-for-hash-user-reset
    :Mutation/password_mine_reset password-mine-reset
+   :Mutation/profile_update profile-update
    :Mutation/login login
    :Mutation/logout logout})

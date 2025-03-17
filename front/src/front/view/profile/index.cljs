@@ -10,34 +10,34 @@
 
 (defn- page []
   (let [user (router/useRouteLoaderData util/key-user-loggedin)
-        info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))]
+        info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
+        is-admin (util/detect-is-admin-loggedin)]
     [:<>
      [:f> breadcrumb/core [{:label util.label/profile}]]
+     [util/area-content
+      [:> router/Link {:to route/profile-edit} util.label/edit]]
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer
        (if (empty? user)
          [:div util.label/no-data]
          [:div
-          " "
-          #_[:f> util/btn-confirm-delete
-             {:message-confirm (model.user/build-confirmation-message-for-deleting user)
-              :action-delete #(model.user/delete {:id (:id user)
-                                                  :on-receive (fn [] (navigate route/users))})}]
           [:table.table.table-sm
            [:thead
             [:tr
              [:th "key"]
              [:th "value"]]]
            [:tbody
-            (for [key [:id :email :name :permission :password :created_at :updated_at]]
-              [:tr {:key key}
-               [:td key]
-               [:td (cond
-                      (= key :password)
-                      [:> router/Link {:to route/profile-password-edit} util.label/password-edit]
-                      :else
-                      (get user key))]])]]])})]))
+            (for [[label value]
+                  (->> [[util.label/id (:id user)]
+                        [util.label/name (:name user)]
+                        [util.label/email (:email user)]
+                        (when is-admin [util.label/permission (:permission user)])
+                        [util.label/password [:> router/Link {:to route/profile-password-edit} util.label/password-edit]]
+                        [util.label/created-at (:created_at user)]
+                        [util.label/updated-at (:updated_at user)]]
+                       (remove nil?))]
+              [:tr {:key label} [:td label] [:td value]])]]])})]))
 
 (defn core []
   (wrapper.show404/wrapper

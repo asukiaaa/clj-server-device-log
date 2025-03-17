@@ -46,6 +46,7 @@
             [front.view.watch-scopes.device-files.index :as watch-scope.device-file.index]
             [front.view.watch-scopes.device-logs.index :as watch-scope.device-log.index]
             [front.view.profile.index :as profile.index]
+            [front.view.profile.edit :as profile.edit]
             [front.view.profile.password-edit :as profile.password-edit]
             [front.view.page404 :as page404]
             ["react-router-dom" :as router]))
@@ -69,6 +70,7 @@
          {:path "login" :element (r/as-element [:f> login/core])}
          {:path "profile" :children
           [{:index true :element (r/as-element [:f> profile.index/core])}
+           {:path "edit" :element (r/as-element [:f> profile.edit/core])}
            {:path "password_edit" :element (r/as-element [:f> profile.password-edit/core])}]}
          {:path "users" :children
           [{:index true :element (r/as-element [:f> user.index/core])}

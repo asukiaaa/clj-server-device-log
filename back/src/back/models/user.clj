@@ -10,7 +10,6 @@
             [back.config :refer [db-spec]]
             [back.models.util :as model.util]
             [back.models.util.user :as util.user]
-            [back.models.util.user-team :as util.user-team]
             [back.util.label :as util.label]))
 
 (def name-table util.user/name-table)
@@ -93,8 +92,7 @@
     (not (re-matches #".+\@.+\..+" email)) (conj "invalid format")))
 
 (defn validate-permission [permission]
-  (if (or (empty? permission) (= permission "null"))
-    ["required"]
+  (when-not (empty? permission)
     (let [parsed (model.util/parse-json permission)]
       (when-let [error (:error parsed)] [error]))))
 
@@ -149,9 +147,10 @@
                         (empty? user-in-db) (append-system-error "User does not exist"))]
         {:errors (json/write-str errors)}
         (do
-          (jdbc/update! t-con :user
-                        (filter-params-to-update params)
-                        ["id = ?" id])
+          (let [params (filter-params-to-update params)]
+            (jdbc/update! t-con :user
+                          params
+                          ["id = ?" id]))
           {:user (get-by-id id {:transaction t-con})})))))
 
 (defn is-correct-password [user password]
