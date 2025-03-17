@@ -12,13 +12,12 @@
         info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
         received-list (:list list-and-total)
         total (:total list-and-total)
-        number-result (count received-list)
         query-params (util/read-query-params)
         number-page (or (pagination/key-page query-params) 0)
         number-limit (or (:limit query-params) 50)
         number-total-page (pagination/calc-total-page number-limit total)
         element-pagination
-        (when-not (= total number-result)
+        (when-not (= total (count received-list))
           [util/area-content
            [:f> pagination/core {:total-page number-total-page}]])
         load-list
@@ -41,7 +40,7 @@
       {:info info-wrapper-fetching
        :renderer
        [:<>
-        [util/area-content (util.label/result-in-total number-result total)]
+        [util/area-content (util.label/display-page-limit-total number-page number-limit total)]
         element-pagination
         [:table.table.table-sm
          [:thead

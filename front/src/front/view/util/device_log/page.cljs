@@ -42,7 +42,6 @@
         [logs set-logs] (react/useState)
         [logs-key-fetched set-logs-key-fetched] (react/useState)
         [total set-total] (react/useState)
-        number-result (count logs)
         info-limit (build-state-info :limit #(react/useState))
         info-str-renderer (build-state-info :str-renderer #(react/useState))
         info-str-where (build-state-info :str-where #(react/useState))
@@ -51,7 +50,7 @@
         info-show-table (build-state-info :show-table #(react/useState true))
         total-page (pagination/calc-total-page (:default info-limit) total)
         query-params (util/read-query-params)
-        page-current (pagination/key-page query-params)
+        page-current (or (pagination/key-page query-params) 0)
         arr-info [info-limit info-str-renderer info-str-order info-str-where info-show-graph info-show-table]
         [show-config set-show-config] (react/useState false)
         [config-renderer parse-error-config-renderer] (parse-json (:default info-str-renderer))
@@ -120,7 +119,7 @@
            [:f> pagination/core {:total-page total-page}]])
         [util/area-content
          (when-not (nil? total)
-           (util.label/result-in-total number-result total))]
+           (util.label/display-page-limit-total page-current (:default info-limit) total))]
         (when (get-default-as-bool info-show-graph)
           [:f> util.graph/core logs-key-fetched logs config-renderer])
         (when (get-default-as-bool info-show-table)

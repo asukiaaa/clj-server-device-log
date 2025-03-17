@@ -49,6 +49,16 @@
 (def device-type-config "Device type config")
 (defn device-type-item [device-type] (show-key device-type [:name :id]))
 (def device-groups "Device groups")
+(defn display-page-limit-total [index-page number-limit total]
+  (let [number-from (inc (* index-page number-limit))
+        number-to (min (* (inc index-page) number-limit) total)]
+    (cond
+      (> number-to number-from)
+      (format "%d to %d of total %d" number-from number-to total)
+      (= number-to number-from)
+      (format "%d of total %d" number-to total)
+      :else
+      (format "None of total %d" total))))
 (def edit "Edit")
 (def email "Email")
 (def fetching "Fetching")

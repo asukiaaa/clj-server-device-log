@@ -105,7 +105,6 @@
         received-list (:list list-and-total)
         [index-show-modal set-index-show-modal] (react/useState)
         total (:total list-and-total)
-        number-result (count received-list)
         query-params (util/read-query-params)
         number-page (or (:page query-params) 0)
         number-limit (or (:limit query-params) 50)
@@ -163,7 +162,7 @@
        [:<>
         element-pagination
         [util/area-content
-         (util.label/result-in-total number-result total)]
+         (util.label/display-page-limit-total number-page number-limit total)]
         [:div (if show-iamge-in-half-window-width
                 {:class "row mx-1"}
                 {:class "mx-1"
