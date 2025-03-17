@@ -1,5 +1,6 @@
 (ns front.view.util.label
-  (:require [goog.string :refer [format]])
+  (:require [goog.string :refer [format]]
+            [cljs.reader])
   (:refer-clojure :exclude [name next time update]))
 
 (def logout "Logout")
@@ -49,8 +50,13 @@
 (def device-type-config "Device type config")
 (defn device-type-item [device-type] (show-key device-type [:name :id]))
 (def device-groups "Device groups")
+(defn- str->int-if-needed [val]
+  (if (string? val) (cljs.reader/read-string val) val))
 (defn display-page-limit-total [index-page number-limit total]
-  (let [number-from (inc (* index-page number-limit))
+  (let [index-page (str->int-if-needed index-page)
+        number-limit (str->int-if-needed number-limit)
+        total (str->int-if-needed total)
+        number-from (inc (* index-page number-limit))
         number-to (min (* (inc index-page) number-limit) total)]
     (cond
       (> number-to number-from)
