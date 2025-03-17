@@ -114,12 +114,12 @@
       {:info info-wrapper-fetching
        :renderer
        [:div
-        (when show-pagination
-          [util/area-content
-           [:f> pagination/core {:total-page total-page}]])
         [util/area-content
          (when-not (nil? total)
            (util.label/display-page-limit-total page-current (:default info-limit) total))]
+        (when show-pagination
+          [util/area-content
+           [:f> pagination/core {:total-page total-page}]])
         (when (get-default-as-bool info-show-graph)
           [:f> util.graph/core logs-key-fetched logs config-renderer])
         (when (get-default-as-bool info-show-table)

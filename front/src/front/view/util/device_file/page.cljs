@@ -160,9 +160,9 @@
       {:info info-wrapper-fetching
        :renderer
        [:<>
-        element-pagination
         [util/area-content
          (util.label/display-page-limit-total number-page number-limit total)]
+        element-pagination
         [:div (if show-iamge-in-half-window-width
                 {:class "row mx-1"}
                 {:class "mx-1"
