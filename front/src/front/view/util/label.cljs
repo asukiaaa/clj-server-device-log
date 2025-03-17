@@ -64,6 +64,7 @@
 (def no-term "No term")
 (def manager-user-team "Manager user team")
 (def member "Member")
+(def members "Members")
 (def memo "Memo")
 (def owner-user "Owner user")
 (def page-not-found "Page not found")

@@ -55,7 +55,7 @@
      [:f> breadcrumb/core
       [{:label util.label/user-teams :path route/user-teams}
        {:label (util.label/user-team-item user-team) :path (route/user-team-show id-user-team)}
-       {:label util.label/member :path (route/user-team-members id-user-team)}
+       {:label util.label/members :path (route/user-team-members id-user-team)}
        {:label util.label/create}]]
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching

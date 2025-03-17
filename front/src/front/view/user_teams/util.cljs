@@ -11,6 +11,6 @@
         is-admin (util/detect-is-admin-loggedin)]
     (->> [(util/build-link-or-text util.label/show (route/user-team-show id-item) path-current)
           (when is-admin (util/build-link-or-text util.label/edit (route/user-team-edit id-item) path-current))
-          (util/build-link-or-text util.label/member (route/user-team-members id-item) path-current)
-          (util/build-link-or-text util.label/device-type (route/user-team-device-types id-item) path-current)]
+          (util/build-link-or-text util.label/members (route/user-team-members id-item) path-current)
+          (util/build-link-or-text util.label/device-types (route/user-team-device-types id-item) path-current)]
          (remove nil?))))

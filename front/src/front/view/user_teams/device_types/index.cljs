@@ -55,7 +55,7 @@
      [:f> breadcrumb/core
       [{:label util.label/user-teams :path route/user-teams}
        {:label (util.label/user-team-item user-team) :path (route/user-team-show id-user-team)}
-       {:label util.label/device-type}]]
+       {:label util.label/device-types}]]
      (util/render-list-in-area-content-line
       (v.team.util/build-related-links user-team))
      (wrapper.fetching/wrapper
