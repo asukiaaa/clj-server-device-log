@@ -15,7 +15,8 @@
         navigate (router/useNavigate)
         id (get params "user_team_id")
         [item set-item] (react/useState)
-        info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))]
+        info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
+        is-admin (util/detect-is-admin-loggedin)]
     (react/useEffect
      (fn []
        (wrapper.fetching/start info-wrapper-fetching)
@@ -30,29 +31,32 @@
      [:f> breadcrumb/core
       [{:label util.label/user-teams :path route/user-teams}
        {:label (or (:name item) util.label/no-data)}]]
+     (util/render-list-in-area-content-line
+      (v.team.util/build-related-links item))
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer
        (if (empty? item)
          [:div "no data"]
          [:div
-          [:> router/Link {:to (route/user-team-edit id)} util.label/edit]
-          " "
-          [:f> util/btn-confirm-delete
-           {:message-confirm (model.user-team/build-confirmation-message-for-deleting item)
-            :action-delete #(model.user-team/delete {:id (:id item)
-                                                     :on-receive (fn [] (navigate route/user-teams))})}]
-          (for [[label link] (v.team.util/build-related-links id)]
-            [:<> {:key label}
-             " "
-             [:> router/Link {:to link} label]])
           [:table.table.table-sm
            [:thead
             [:tr
              [:th "key"]
              [:th "value"]]]
            [:tbody
-            (for [key [:id :name :memo :owner_user_id :created_at :updated_at]]
+            [:tr [:td util.label/id] [:td (:id item)]]
+            [:tr [:td util.label/name] [:td (:name item)]]
+            [:tr [:td util.label/owner-user] [:td [:> router/Link {:to (route/user-show (:owner_user_id item))}(str (:owner_user_id item))]]]
+            (when is-admin
+              [:tr
+               [:td util.label/action]
+               [:td
+                [:f> util/btn-confirm-delete
+                 {:message-confirm (model.user-team/build-confirmation-message-for-deleting item)
+                  :action-delete #(model.user-team/delete {:id (:id item)
+                                                           :on-receive (fn [] (navigate route/user-teams))})}]]])
+            (for [key [:created_at :updated_at]]
               [:tr {:key key}
                [:td key]
                [:td (get item key)]])]]])})]))

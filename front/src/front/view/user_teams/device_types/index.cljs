@@ -8,6 +8,7 @@
             [front.view.util :as util]
             [front.view.util.breadcrumb :as breadcrumb]
             [front.view.util.label :as util.label]
+            [front.view.user-teams.util :as v.team.util]
             [front.model.device-type :as model.device-type]
             [front.model.util.user-team :as util.user-team]))
 
@@ -55,6 +56,8 @@
       [{:label util.label/user-teams :path route/user-teams}
        {:label (util.label/user-team-item user-team) :path (route/user-team-show id-user-team)}
        {:label util.label/device-type}]]
+     (util/render-list-in-area-content-line
+      (v.team.util/build-related-links user-team))
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer

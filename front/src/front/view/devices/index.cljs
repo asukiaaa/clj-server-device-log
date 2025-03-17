@@ -8,9 +8,7 @@
             [front.view.util.label :as util.label]
             [front.view.util.table :as util.table]
             [front.model.user :as model.user]
-            [front.model.device :as model.device]
-            [front.model.util.device :as util.device]
-            [front.model.util.watch-scope :as util.watch-scope]))
+            [front.model.device :as model.device]))
 
 (defn render-device [device on-delete]
   [:tr

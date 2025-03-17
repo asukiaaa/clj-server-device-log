@@ -8,6 +8,7 @@
             [front.view.util :as util]
             [front.view.util.breadcrumb :as breadcrumb]
             [front.view.util.label :as util.label]
+            [front.view.user-teams.util :as v.team.util]
             [front.view.common.wrapper.fetching :as wrapper.fetching]))
 
 (defn- page []
@@ -61,6 +62,8 @@
       [{:label util.label/user-teams :path route/user-teams}
        {:label (or (:name item) util.label/no-data) :path (route/user-team-show id-item)}
        {:label util.label/edit}]]
+     (util/render-list-in-area-content-line
+      (v.team.util/build-related-links item))
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer
