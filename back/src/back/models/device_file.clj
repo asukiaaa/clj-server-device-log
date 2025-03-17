@@ -193,5 +193,6 @@
             (jdbc/insert-multi! db-spec key-table params-multi-insert))
           (doseq [path-file path-files]
             (when (util.filestorage/is-path-image? path-file)
-              (when (util.filestorage/create-thumbnail path-file)
-                (println "created thumbnail of" path-file)))))))))
+              (when-not (util.filestorage/present-thumbnail-of-file-local? path-file)
+                (println "create thumbnail of" path-file)
+                (util.filestorage/create-thumbnail path-file)))))))))

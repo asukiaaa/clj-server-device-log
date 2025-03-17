@@ -161,9 +161,12 @@
         #_(println :scaled scaled-width scaled-height)
         (ImageIO/write cropped-image name-extension (File. path-output))))))
 
+(defn present-thumbnail-of-file-local? [path-local]
+  (-> (convert-path-file-to-path-file-thumbnail path-local) io/file .exists))
+
 (defn create-thumbnail [path-local & [{:keys [force]}]]
-  (let [path-local-thumbnail (convert-path-file-to-path-file-thumbnail path-local)]
-    (when-not (or (-> path-local-thumbnail io/file .exists) force)
+  (when-not (or (present-thumbnail-of-file-local? path-local) force)
+    (let [path-local-thumbnail (convert-path-file-to-path-file-thumbnail path-local)]
       (io/make-parents path-local-thumbnail)
       (image-resize-and-crop-to-fit path-local path-local-thumbnail thumbnail-width thumbnail-height))))
 
