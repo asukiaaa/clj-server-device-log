@@ -32,19 +32,18 @@
                                                    (navigate route/login))}))]
     [:div
      [:> bs/Navbar {:bg :light :data-bs-theme :light}
-      [:> bs/Container {:fluid true}
-       [:> bs/Navbar.Brand {:to "/" :as router/Link} "Device log"]
-       [:> bs/Navbar.Toggle]
-       [:> bs/Navbar.Collapse {:class :justify-content-end}
-        [:> bs/Nav
-         (if (nil? user)
-           [:> bs/Nav.Link {:to route/login :as router/Link} "Login"]
-           [:<>
-            [:> bs/Nav.Link {:to route/dashboard :as router/Link} util.label/dashboard]
-            [:> bs/NavDropdown {:title (:name user) :id "nav-dropdown" :align :end}
-             (for [[label path] (util.links/build-list-menu-links-for-user user)]
-               [:<> {:key label}
-                [:> bs/NavDropdown.Item {:to path :as router/Link :key path} label]])
-             [:> bs/NavDropdown.Divider]
-             [:> bs/NavDropdown.Item {:on-click logout :href route/logout} util.label/logout]]])]]]]
+      [:> bs/Container {:fluid true :style {:display :block :text-align-last :justify}}
+       [:> bs/Navbar.Brand {:to "/" :as router/Link :style {:display :inline-block}} "Device log"]
+       [:span " "]
+       [:> bs/Nav {:style {:display :inline-block}}
+        (if (nil? user)
+          [:> bs/Nav.Link {:to route/login :as router/Link} "Login"]
+          [:<>
+           [:> bs/Nav.Link {:to route/dashboard :as router/Link :style {:display :inline-block}} util.label/dashboard]
+           [:> bs/NavDropdown {:title (:name user) :id "nav-dropdown" :align :end :style {:display :inline-block :text-align-last :start}}
+            (for [[label path] (util.links/build-list-menu-links-for-user user)]
+              [:<> {:key label}
+               [:> bs/NavDropdown.Item {:to path :as router/Link :key path} label]])
+            [:> bs/NavDropdown.Divider]
+            [:> bs/NavDropdown.Item {:on-click logout :href route/logout} util.label/logout]]])]]]
      [:> router/Outlet]]))
