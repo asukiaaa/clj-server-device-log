@@ -103,7 +103,8 @@
                 :str-keys-select (build-str-keys-select-with-peripherals)
                 :str-before-where (->> [str-before-where (build-query-join)] (remove nil?) (join " "))
                 :build-item build-item
-                :str-order "recorded_at DESC"))]
+                :str-order (format "%s.name DESC"
+                                   util.device/name-table)))]
     {:list (-> list
                (assign-watch-scoopes-to-list {:transaction transaction})
                assign-path-url-to-list)
