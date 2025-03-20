@@ -94,7 +94,7 @@
         assign-path-url-to-item
         assign-path-url-thumbnail-to-item)))
 
-(defn- get-list-with-total-base [params & [{:keys [:str-before-where] :as optional-params}]]
+(defn- get-list-with-total-base [params & [{:keys [str-before-where str-order] :as optional-params}]]
   (let [{:keys [transaction]} optional-params
         {:keys [list total]}
         (model.util/get-list-with-total-with-building-query
@@ -103,8 +103,9 @@
                 :str-keys-select (build-str-keys-select-with-peripherals)
                 :str-before-where (->> [str-before-where (build-query-join)] (remove nil?) (join " "))
                 :build-item build-item
-                :str-order (format "%s.name DESC"
-                                   util.device/name-table)))]
+                :str-order (or str-order
+                               (format "%s.recorded_at DESC"
+                                       name-table))))]
     {:list (-> list
                (assign-watch-scoopes-to-list {:transaction transaction})
                assign-path-url-to-list)
@@ -146,7 +147,10 @@
                          name-table
                          name-table-left-join
                          name-table
-                         name-table-left-join)]))}))
+                         name-table-left-join)]))
+    :str-order (format "%s.name DESC, %s.recorded_at DESC"
+                       util.device/name-table
+                       name-table)}))
 
 (defn get-list-with-total-latest-each-device [params sql-ids-device & [{:keys [transaction]}]]
   (get-list-with-total-latest-each-device-for-admin params {:sql-ids-device sql-ids-device :transaction transaction}))
