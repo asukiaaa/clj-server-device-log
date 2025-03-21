@@ -7,6 +7,7 @@ services:
     # command: bash -c "java -jar back.jar server-with-migration"
     volumes:
       - ./back:/usr/src/app/back
+      - ./common:/usr/src/app/common
       - ./filestorage:/usr/src/app/filestorage
       - ./front:/usr/src/app/front
       - .volumes/m2:/root/.m2
@@ -27,6 +28,7 @@ services:
     # command: bash -c "yarn && clj -M -m cljs.main -co build.edn -c"
     volumes:
       - ./front:/usr/src/app/front
+      - ./common:/usr/src/app/common
       - .volumes/m2:/root/.m2
     ports:
       - "9630:9630" # web socket for shadow js
