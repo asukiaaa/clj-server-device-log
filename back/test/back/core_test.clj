@@ -4,20 +4,23 @@
             [clojure.test :as t]
             [back.core]
             [back.test-helper.user :as h.user]
-            [clj-http.client :as http-client]
+            [clj-http.client :as http.client]
+            [clj-http.cookies :as http.cookies]
             [venia.core :as v]
             [back.config :refer [port]]))
 
 (defn build-url []
   (format "http://localhost:%d/graphql" port))
 
-(defn post-query [query]
+(defn post-query [query & [options]]
   (let [body (cheshire/generate-string {:query query})]
     #_(println :body-request body)
-    (-> (http-client/post (build-url)
-                          {:body body
-                           :content-type :json
-                           :throw-exceptions? false})
+    (-> (http.client/post (build-url)
+                          (merge
+                           {:body body
+                            :content-type :json
+                            :throw-exceptions? false}
+                           options))
         ((fn [result]
            (assoc result :body (cheshire/parse-string (:body result) true))))
         #_((fn [item] (println :body-response (:body item)) item)))))
@@ -49,10 +52,17 @@
         (t/is (nil? (get-id-user-loggedin (:data body))))))
     (t/testing "Able to login"
       (let [query (build-mutation-login (:email user) (:password user))
-            {:keys [body]} (post-query query)]
+            cookie-store (http.cookies/cookie-store)
+            {:keys [body]} (post-query query {:cookie-store cookie-store})]
         #_(println :query query)
         #_(println :result body)
-        (t/is (not (nil? (-> body :data :login :id))))))))
+        (t/is (not (nil? (-> body :data :login :id))))
+        (t/testing "Able to get user_loggedin"
+          (let [query (build-query-get-user-loggedin)
+                {:keys [body]} (post-query query {:cookie-store cookie-store})]
+            #_(println :query query)
+            #_(println :result body)
+            (t/is (nil? (get-id-user-loggedin (:data body))))))))))
 
 (def tests-to-create
   ["TODO list for create test for graphql"
