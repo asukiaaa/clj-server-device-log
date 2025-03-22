@@ -3,14 +3,14 @@
             [clj-time.format :as time.format]
             [clojure.java.io :as io]
             [clojure.string :as str]
-            [back.config :refer [path-local-filestorage]])
+            [back.config :refer [path-local-filestorage]]
+            [back.util.time :refer [timeformat-datetime-with-millis]])
   (:import
    [java.awt Image]
    [java.awt.image BufferedImage]
    [java.io File]
    [javax.imageio ImageIO]))
 
-(def timeformat-datetime-with-millis (time.format/formatter "yyyyMMdd-HHmmss-SSS"))
 (def path-url-filestorage "/filestorage")
 (def path-url-filestorage-thumbnail (str path-url-filestorage "/thumbnail"))
 (def path-local-filestorage-thumbnail (str path-local-filestorage "/thumbnail"))

@@ -1,15 +1,40 @@
 (ns back.core-test
-  (:require [clojure.core :refer [format]]
+  (:require [cheshire.core :as cheshire]
+            [clojure.core :refer [format]]
             [clojure.test :as t]
             [back.core]
             [back.test-helper.user :as h.user]
-            [re-graph.core :as re-graph]
+            [clj-http.client :as http-client]
             [venia.core :as v]
             [back.config :refer [port]]))
 
-(re-graph/init {:http {:url (format "http://localhost:%d/graphql" port)
-                       :supported-operations #{:query :mutate}}
-                :ws nil})
+(defn build-url []
+  (format "http://localhost:%d/graphql" port))
+
+(defn post-query [query]
+  (let [body (cheshire/generate-string {:query query})]
+    #_(println :body-request body)
+    (-> (http-client/post (build-url)
+                          {:body body
+                           :content-type :json
+                           :throw-exceptions? false})
+        ((fn [result]
+           (assoc result :body (cheshire/parse-string (:body result) true))))
+        #_((fn [item] (println :body-response (:body item)) item)))))
+
+(defn build-query-get-user-loggedin []
+  (v/graphql-query {:venia/queries [[:user_loggedin [[:user [:id :email]]]]]}))
+
+(defn build-mutation-login [email password]
+  (v/graphql-query
+   {:venia/operation {:operation/type :mutation
+                      :operation/name "Login"}
+    :venia/queries [[:login {:email email
+                             :password password}
+                     [:id :email]]]}))
+
+(defn get-id-user-loggedin [data]
+  (-> :data :user_loggedin :user :id))
 
 (t/deftest test-login
   (let [user (h.user/create-admin-user)]
@@ -17,28 +42,17 @@
       #_(println user)
       (t/is (not (nil? (:id user)))))
     (t/testing "Empty user before login"
-      (let [query (v/graphql-query {:venia/queries [[:user_loggedin [[:user [:id]]]]]})]
+      (let [query (build-query-get-user-loggedin)
+            {:keys [body]} (post-query query)]
         #_(println :query query)
-        (re-graph/query
-         {:query query
-          :callback
-          (fn [{:keys [data errors]}]
-            (println :data data :errors errors) ; not shown
-            (t/is (not (nil? (:user data)))))})))
+        #_(println :result body)
+        (t/is (nil? (get-id-user-loggedin (:data body))))))
     (t/testing "Able to login"
-      (let [query (v/graphql-query {:venia/queries [[:login {:email (:email user)
-                                                             :password (:password user)}
-                                                     [[:id :email]]]]})]
-        (re-graph/mutate
-         {:query query
-          :callback
-          (fn [{:keys [data errors]}]
-            (println :data data :errors errors) ; not shown
-            (t/is (and (nil? errors) (= (:email data) (:email user)))))})))))
-
-(t/deftest a-test
-  (t/testing "FIXME, I fail."
-    (t/is (= 0 1))))
+      (let [query (build-mutation-login (:email user) (:password user))
+            {:keys [body]} (post-query query)]
+        #_(println :query query)
+        #_(println :result body)
+        (t/is (not (nil? (-> body :data :login :id))))))))
 
 (def tests-to-create
   ["TODO list for create test for graphql"

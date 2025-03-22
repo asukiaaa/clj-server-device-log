@@ -1,0 +1,7 @@
+#!/bin/bash
+
+DIR_HERE=$(dirname $(realpath $0))
+DIR_REPO=$DIR_HERE/../
+cd $DIR_REPO
+
+$DIR_HERE/docker-compose-test exec mariadb bash -c "mariadb --host=localhost --user=\$MYSQL_USER --password=\$MYSQL_PASSWORD \$MYSQL_DATABASE"

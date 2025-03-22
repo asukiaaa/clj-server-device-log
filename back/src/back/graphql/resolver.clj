@@ -93,7 +93,7 @@
 (defn login [context args _]
   (println "requested user login")
   #_(println "args for login" args)
-  (:user-loggedin context))
+  (get-user-loggedin context))
 
 (defn logout [_ _ _]
   (println "received logout request")

@@ -4,4 +4,4 @@ DIR_HERE=$(dirname $(realpath $0))
 DIR_REPO=$DIR_HERE/../
 cd $DIR_REPO
 echo $@
-docker compose -f docker-compose-test.yml $@
+docker compose -f docker-compose.yml -f docker-compose.test.yml "$@"

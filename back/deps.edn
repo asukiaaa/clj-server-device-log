@@ -1,5 +1,6 @@
 {:paths ["src" "resources"]
  :deps {org.clojure/clojure {:mvn/version "1.10.3"}
+        cheshire/cheshire {:mvn/version "5.13.0"}
         clj-time/clj-time {:mvn/version "0.15.2"}
         com.walmartlabs/lacinia {:mvn/version "1.2.2"}
         com.walmartlabs/lacinia-pedestal {:mvn/version "1.2"}
@@ -34,7 +35,7 @@
    :exec-fn cognitect.test-runner.api/test}
   :test
   {:extra-paths ["test"]
-   :extra-deps {re-graph/re-graph {:mvn/version "0.2.0"}
+   :extra-deps {clj-http/clj-http {:mvn/version "3.13.0"}
                 vincit/venia {:mvn/version "0.2.4"}}
    ;:main-opts ["-m" "back.core-test"]
    }
