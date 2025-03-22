@@ -5,8 +5,8 @@ DIR_EXEC=$(pwd)
 if [ "$1" = "" ]; then
   echo "You can input dump file like
 Example:
-$0 db-\$(date '+%Y%m%d-%H%M%S').dump"
-  FILE_DUMP=db-$(date '+%Y%m%d-%H%M%S').dump
+$0 db-\$(date -u '+%Y%m%d-%H%M%S').dump"
+  FILE_DUMP=db-$(date -u '+%Y%m%d-%H%M%S').dump
 else
   FILE_DUMP=$1
 fi
