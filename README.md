@@ -21,7 +21,7 @@ Sample curl commands are written on [curl.md](./back/samples/curl.md).
 Access to mariadb
 
 ```bash
-./bin/mariadb
+./script/mariadb
 ```
 
 ## Test
