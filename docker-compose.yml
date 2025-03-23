@@ -37,7 +37,7 @@ services:
     volumes:
       - .volumes/mariadb:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: maria-root-pass
-      MYSQL_DATABASE: server_practice
-      MYSQL_USER: maria-user
-      MYSQL_PASSWORD: maria-pass
+      MARIADB_ROOT_PASSWORD: maria-root-pass
+      MARIADB_DATABASE: server_practice
+      MARIADB_USER: maria-user
+      MARIADB_PASSWORD: maria-pass

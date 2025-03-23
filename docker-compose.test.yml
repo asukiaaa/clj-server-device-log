@@ -1,12 +1,4 @@
 services:
-  back:
-    environment:
-      DATABASE_URL: mysql://mariadb:3306/test_db?user=maria-user&password=maria-pass
   mariadb:
     volumes:
       - .volumes/mariadb-test:/var/lib/mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: maria-root-pass
-      MYSQL_DATABASE: test_db
-      MYSQL_USER: maria-user
-      MYSQL_PASSWORD: maria-pass

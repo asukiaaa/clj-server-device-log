@@ -17,5 +17,4 @@ DIR_HERE=$(dirname $(realpath $0))
 DIR_REPO=$DIR_HERE/../
 cd $DIR_REPO
 
-# docker compose exec -T mariadb mysql --host=localhost --user=maria-user --password=maria-pass server_practice < $1
-docker compose exec -T mariadb bash -c "mariadb --host=localhost --user=\$MYSQL_USER --password=\$MYSQL_PASSWORD \$MYSQL_DATABASE" < $FILE_RESTORE
+docker compose exec -T mariadb bash -c "mariadb --host=localhost --user=\$MARIADB_USER --password=\$MARIADB_PASSWORD \$MARIADB_DATABASE" < $FILE_RESTORE

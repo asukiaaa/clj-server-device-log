@@ -19,4 +19,4 @@ DIR_HERE=$(dirname $(realpath $0))
 DIR_REPO=$DIR_HERE/../
 cd $DIR_REPO
 
-docker compose exec -T mariadb bash -c "mariadb-dump --host=localhost --user=\$MYSQL_USER --password=\$MYSQL_PASSWORD \$MYSQL_DATABASE" > $FILE_DUMP
+docker compose exec -T mariadb bash -c "mariadb-dump --host=localhost --user=\$MARIADB_USER --password=\$MARIADB_PASSWORD \$MARIADB_DATABASE" > $FILE_DUMP
