@@ -1,12 +1,11 @@
 (ns back.test-helper.user
-  (:require [clj-time.core :as time]
-            [clj-time.format :as time.format]
+  (:require [java-time.api :as java-time]
             [back.models.user :as model.user]
             [back.models.util :as model.util]
-            [back.util.time :refer [timeformat-datetime-with-millis]]))
+            [back.util.time :refer [time-format-datetime-with-millis]]))
 
 (defn create-admin-user []
-  (let [email (str "adimn-" (time.format/unparse timeformat-datetime-with-millis (time/now)) "@da.ze")
+  (let [email (str "adimn-" (java-time/format time-format-datetime-with-millis (java-time/local-date-time)) "@da.ze")
         params {:email email
                 :name "ho"
                 :password (model.util/build-random-str-alphabets-and-number 10)

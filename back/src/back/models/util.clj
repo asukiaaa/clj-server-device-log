@@ -1,14 +1,13 @@
 (ns back.models.util
-  (:require [clj-time.core :as cljt]
-            [clj-time.format :as cljt-format]
-            [clojure.java.jdbc :as jdbc]
+  (:require [clojure.java.jdbc :as jdbc]
             [clojure.data.json :as json]
             [clojure.core :refer [format]]
             [clojure.string :refer [escape join]]
+            [java-time.api :as java-time]
             [back.config :refer [db-spec]]
-            [back.util.encryption :as encryption]))
+            [back.util.encryption :as encryption]
+            [back.util.time :refer [time-format-yyyymmdd-hhmmss]]))
 
-(def time-format-yyyymmdd-hhmmss (cljt-format/formatter "YYYY-MM-dd HH:mm:ss"))
 (def ^:private str-alphabets-and-number "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 (def ^:private str-parentesis-and-special-chars ":[]\\/.,\"!#$%&'()-^")
 (def key-authorization-bearer :authorization_bearer)
@@ -101,4 +100,4 @@
   (when key-str
     (encryption/encode
      {key-table {key-key-str key-str}
-      :created_at (cljt-format/unparse time-format-yyyymmdd-hhmmss (cljt/now))})))
+      :created_at (java-time/format time-format-yyyymmdd-hhmmss (java-time/local-date-time))})))

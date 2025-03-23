@@ -4,11 +4,11 @@
             [clojure.core :refer [re-find re-matcher]]
             [clojure.data.json :as json]
             [clojure.walk :as walk]
-            [clj-time.core :as t]
-            [clj-time.format :as f]
+            [java-time.api :as java-time]
             [back.config :refer [db-spec]]
             [back.models.util.device-log :as util.device-log]
-            [back.models.util :as model.util]))
+            [back.models.util :as model.util]
+            [back.util.time :refer [time-format-yyyymmdd-hhmmss]]))
 
 (def defaults
   {:limit 100
@@ -93,8 +93,8 @@
       (join " " (let [[in-or-not-in str-hours] hours-action]
                   [target-key (if (= in-or-not-in "in") ">=" "<")
                    (format "\"%s\""
-                           (f/unparse model.util/time-format-yyyymmdd-hhmmss
-                                      (t/minus (t/now) (t/hours (Integer. str-hours)))))]))
+                           (java-time/format time-format-yyyymmdd-hhmmss
+                                             (java-time/minus (java-time/local-date-time) (java-time/hours (Integer. str-hours)))))]))
       :else (join " " [target-key target-action target-value]))))
 
 (defn build-query-item-where [params {:keys [base-table-key this-table-key]}]

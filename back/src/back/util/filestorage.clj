@@ -1,10 +1,9 @@
 (ns back.util.filestorage
-  (:require [clj-time.core :as time]
-            [clj-time.format :as time.format]
-            [clojure.java.io :as io]
+  (:require [clojure.java.io :as io]
             [clojure.string :as str]
+            [java-time.api :as java-time]
             [back.config :refer [path-local-filestorage]]
-            [back.util.time :refer [timeformat-datetime-with-millis]])
+            [back.util.time :refer [time-format-datetime-with-millis]])
   (:import
    [java.awt Image]
    [java.awt.image BufferedImage]
@@ -19,7 +18,7 @@
 (def thumbnail-height 450)
 
 (defn parse-str-datetime [str-datetime]
-  (time.format/parse timeformat-datetime-with-millis str-datetime))
+  (java-time/local-date-time time-format-datetime-with-millis str-datetime))
 
 (defn- build-path-dir-for-devices-after-filestorage []
   "device/")
@@ -171,7 +170,7 @@
       (image-resize-and-crop-to-fit path-local path-local-thumbnail thumbnail-width thumbnail-height))))
 
 (defn create-file-for-device [file-input filename id-device]
-  (let [str-datetime (time.format/unparse timeformat-datetime-with-millis (time/now))
+  (let [str-datetime (java-time/format time-format-datetime-with-millis (java-time/local-date-time))
         path-dir-afetr-filestorage (str (build-path-dir-for-device-after-filestorage id-device) "/" str-datetime)
         path-file-after-filestorage (str path-dir-afetr-filestorage "/" filename)
         path-dir (str path-local-filestorage "/" path-dir-afetr-filestorage)

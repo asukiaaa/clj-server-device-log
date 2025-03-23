@@ -5,12 +5,12 @@
             [clojure.walk :refer [keywordize-keys]]
             [buddy.core.hash :as bhash]
             [buddy.core.codecs :as codecs]
-            [clj-time.core :as t]
-            [clj-time.format :as f]
+            [java-time.api :as java-time]
             [back.config :refer [db-spec]]
             [back.models.util :as model.util]
             [back.models.util.user :as util.user]
-            [back.util.label :as util.label]))
+            [back.util.label :as util.label]
+            [back.util.time :refer [time-format-yyyymmdd-hhmmss]]))
 
 (def name-table util.user/name-table)
 (def key-table util.user/key-table)
@@ -65,10 +65,10 @@
         info-password-reset (when-let [str-password-reset (:password_reset user)]
                               (-> str-password-reset model.util/parse-json :parsed keywordize-keys))
         time-until (when-let [str-until (:until info-password-reset)]
-                     (f/parse model.util/time-format-yyyymmdd-hhmmss str-until))]
+                     (java-time/local-date-time time-format-yyyymmdd-hhmmss str-until))]
     (when (and (= hash-password-reset (:hash info-password-reset))
                (not (nil? time-until))
-               (t/after? time-until (t/now)))
+               (java-time/after? time-until (java-time/local-date-time)))
       user)))
 
 (defn filter-params-to-create [params]
@@ -221,8 +221,9 @@
           (jdbc/update! t-con :user
                         {:password_reset (json/write-str
                                           {:hash hash
-                                           :until (f/unparse model.util/time-format-yyyymmdd-hhmmss
-                                                             (t/plus (t/now) (t/days 1)))})}
+                                           :until (java-time/format
+                                                   time-format-yyyymmdd-hhmmss
+                                                   (java-time/plus (java-time/local-date-time) (java-time/days 1)))})}
                         ["id = ?" id])
           {:hash hash})))))
 

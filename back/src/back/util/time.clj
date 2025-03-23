@@ -1,4 +1,4 @@
-(ns back.util.time
-  (:require [clj-time.format :as time.format]))
+(ns back.util.time)
 
-(def timeformat-datetime-with-millis (time.format/formatter "yyyyMMdd-HHmmss-SSS"))
+(def time-format-datetime-with-millis "yyyyMMdd-HHmmss-SSS")
+(def time-format-yyyymmdd-hhmmss "YYYY-MM-dd HH:mm:ss")

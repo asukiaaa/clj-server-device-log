@@ -1,7 +1,7 @@
 {:paths ["src" "resources"]
  :deps {org.clojure/clojure {:mvn/version "1.10.3"}
         cheshire/cheshire {:mvn/version "5.13.0"}
-        clj-time/clj-time {:mvn/version "0.15.2"}
+        clojure.java-time/clojure.java-time {:mvn/version "1.4.3"}
         com.walmartlabs/lacinia {:mvn/version "1.2.2"}
         com.walmartlabs/lacinia-pedestal {:mvn/version "1.2"}
         hiccup/hiccup {:mvn/version "1.0.5"}

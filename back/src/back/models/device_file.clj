@@ -4,7 +4,7 @@
             [clojure.java.jdbc :as jdbc]
             [clojure.string :refer [join]]
             [clojure.walk :refer [keywordize-keys]]
-            [clj-time.format :as cljt-format]
+            [java-time.api :as java-time]
             [back.config :refer [db-spec]]
             [back.models.device :as model.device]
             [back.models.util :as model.util]
@@ -12,7 +12,8 @@
             [back.models.util.device-file :as util.device-file]
             [back.models.util.watch-scope :as util.watch-scope]
             [back.models.util.watch-scope-term :as util.watch-scope-term]
-            [back.util.filestorage :as util.filestorage]))
+            [back.util.filestorage :as util.filestorage]
+            [back.util.time :refer [time-format-yyyymmdd-hhmmss]]))
 
 (def name-table util.device-file/name-table)
 (def key-table util.device-file/key-table)
@@ -186,7 +187,7 @@
                 (let [path-url (util.filestorage/convert-path-file-to-path-url path)
                       str-created-at (util.filestorage/get-str-created-at-from-path-url path-url)
                       recorded-at (->> (util.filestorage/parse-str-datetime str-created-at)
-                                       (cljt-format/unparse model.util/time-format-yyyymmdd-hhmmss))]
+                                       (java-time/format time-format-yyyymmdd-hhmmss))]
                   {:device_id (util.filestorage/get-id-device-from-path-url path-url)
                    :datetime_dir str-created-at
                    :name (util.filestorage/get-filename-from-path-url path-url)
