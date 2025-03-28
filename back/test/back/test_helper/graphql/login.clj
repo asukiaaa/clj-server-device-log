@@ -1,6 +1,7 @@
 (ns back.test-helper.graphql.login
   (:require
    [clj-http.cookies :as http.cookies]
+   [clojure.spec.alpha :as s]
    [venia.core :as v]
    [back.test-helper.graphql.core :refer [post-query]]))
 
@@ -19,6 +20,10 @@
   (let [query (build-query-get-user-loggedin)
         result (post-query query {:cookie-store cookie-store})]
     (-> result :body :data :user_loggedin :user)))
+
+(s/fdef with-loggedin-session
+  :args (s/cat :binding (s/coll-of any? :kind vector? :count 2)
+               :body (s/* any?)))
 
 (defmacro with-loggedin-session [[cookie-store user] & body]
   `(let [~cookie-store (http.cookies/cookie-store)]
