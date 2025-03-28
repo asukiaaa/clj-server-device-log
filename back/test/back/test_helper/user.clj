@@ -1,8 +1,9 @@
 (ns back.test-helper.user
-  (:require [java-time.api :as java-time]
-            [back.models.user :as model.user]
-            [back.models.util :as model.util]
-            [back.util.time :refer [time-format-datetime-with-millis]]))
+  (:require
+   [java-time.api :as java-time]
+   [back.models.user :as model.user]
+   [back.models.util :as model.util]
+   [back.util.time :refer [time-format-datetime-with-millis]]))
 
 (defn create-admin-user []
   (let [email (str "adimn-" (java-time/format time-format-datetime-with-millis (java-time/local-date-time)) "@da.ze")
@@ -13,3 +14,9 @@
     (model.user/create-with-password params)
     (->> (model.user/get-by-email (:email params))
          (merge params))))
+
+(defmacro with-admin-user [[user-admin] & body]
+  `(let [~user-admin (create-admin-user)]
+     (try
+       ~@body
+       (finally (model.user/delete (:id ~user-admin))))))
