@@ -23,7 +23,9 @@
                                 ::binding)
                :body (s/* any?)))
 
-(defmacro with-admin-user [bindings & body]
+(defmacro with-admin-user
+  {:clj-kondo/lint-as 'clojure.core/fn}
+  [bindings & body]
   `(let [~(first bindings) (create-admin-user)]
      (try
        ~@body

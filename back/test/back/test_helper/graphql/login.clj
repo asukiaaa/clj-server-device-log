@@ -25,7 +25,9 @@
   :args (s/cat :binding (s/coll-of any? :kind vector? :count 2)
                :body (s/* any?)))
 
-(defmacro with-loggedin-session [[cookie-store user] & body]
+(defmacro with-loggedin-session
+  {:clj-kondo/lint-as 'clojure.core/let}
+  [[cookie-store user] & body]
   `(let [~cookie-store (http.cookies/cookie-store)]
      (post-query (build-mutation-login (:email ~user) (:password ~user))
                  {:cookie-store ~cookie-store})
