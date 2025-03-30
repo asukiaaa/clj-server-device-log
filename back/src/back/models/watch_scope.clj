@@ -76,6 +76,7 @@
     :str-keys-select (build-str-keys-select-with-join)
     :build-item build-item
     :str-where str-where
+    :str-order (format "%s.name ASC, %s.name ASC" name-table util.user-team/name-table)
     :transaction transaction}))
 
 (defn get-list-with-total-for-user-team [params id-user-team & [{:keys [transaction]}]]
