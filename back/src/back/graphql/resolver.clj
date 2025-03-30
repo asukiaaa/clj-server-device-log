@@ -1,6 +1,7 @@
 (ns back.graphql.resolver
   (:require [clojure.data.json :as json]
             [clojure.java.jdbc :as jdbc]
+            [com.walmartlabs.lacinia.resolve :refer [resolve-as]]
             [back.config :refer [db-spec]]
             [back.models.device-log :as model-device-log]
             [back.models.user :as model.user]
@@ -11,16 +12,16 @@
             [back.models.device :as model.device]
             [back.models.device-type :as model.device-type]
             [back.models.device-type-api-key :as model.device-type-api-key]
-            [back.models.watch-scope :as model.watch-scope]
-            [back.models.watch-scope-term :as model.watch-scope-term]
             [back.models.device-file :as model.device-file]
-            [com.walmartlabs.lacinia.resolve :refer [resolve-as]]
             [back.models.util.device :as util.device]
             [back.models.util.device-permission :as util.device-permission]
             [back.models.util.user :as util.user]
+            [back.models.util.user-team :as util.user-team]
             [back.models.util.user-permission :as util.user-permission]
             [back.models.util.user-team-permission :as util.user-team-permission]
             [back.models.util.watch-scope :as util.watch-scope]
+            [back.models.watch-scope :as model.watch-scope]
+            [back.models.watch-scope-term :as model.watch-scope-term]
             [back.util.label :as util.label]))
 
 (defn get-user-loggedin [context]
@@ -113,7 +114,7 @@
       (let [sql-ids-user
             (-> (util.user-team-permission/build-query-ids-for-user-show (:id user))
                 util.user-permission/build-query-ids-for-user-teams)]
-        (model.user/get-list-with-total-by-ids args sql-ids-user)))))
+        (model.user/get-list-with-total-by-ids-or-id args sql-ids-user (:id user))))))
 
 (defn user [context args _]
   (println "args for user" args)
@@ -124,7 +125,7 @@
         (let [sql-ids-user
               (-> (util.user-team-permission/build-query-ids-for-user-show (:id user))
                   util.user-permission/build-query-ids-for-user-teams)]
-          (model.user/get-by-id-in-ids id-user sql-ids-user))))))
+          (model.user/get-by-id-in-ids-or-id id-user sql-ids-user (:id user)))))))
 
 (defn user-for-resetting-password [context args _]
   (println "args for user-for-resetting-password" args)
@@ -218,7 +219,7 @@
   (println "args user-team-create" args)
   (let [user (get-user-loggedin context)
         params (model.user-team/key-table args)]
-    (when (model.user/admin? user) (model.user-team/create params))))
+    (when (model.user/admin? user) (util.user-team/key-table (model.user-team/create params)))))
 
 (defn user-team-update [context args _]
   (println "args user-team-update" args)

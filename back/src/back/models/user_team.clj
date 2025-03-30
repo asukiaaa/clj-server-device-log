@@ -38,7 +38,7 @@
                                         (util.user-team-permission/build-query-owner-or-member id-user))]))))
 
 (defn create [params]
-  {key-table (model.util/create key-table (filter-params params))})
+  (model.util/create key-table (filter-params params)))
 
 (defn get-list-with-total [params & [{:keys [str-where transaction]}]]
   (model.util/get-list-with-total-with-building-query name-table params {:str-where str-where :transaction transaction}))

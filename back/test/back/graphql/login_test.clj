@@ -11,10 +11,10 @@
   (-> data :user_loggedin :user :id))
 
 (t/deftest test-login
-  (h.user/with-admin-user [user-admin]
+  (h.user/with-user-admin [user-admin]
     #_(println user-admin)
     (t/testing "Able to create admin user"
-      #_(println user)
+      #_(println user-admin)
       (t/is (not (nil? (:id user-admin)))))
     (t/testing "Empty user before login"
       (t/is (nil? (graphql.login/get-user-loggedin nil))))
@@ -24,15 +24,16 @@
             {:keys [body]} (post-query query {:cookie-store cookie-store})]
         #_(println :query query)
         #_(println :result body)
-        (t/is (= (-> body :data :login :id) (:id user-admin)))
+        (t/is (= (-> body :data :login :email) (:email user-admin)))
         (t/testing "Able to get user_loggedin"
           (let [user-loggedin (graphql.login/get-user-loggedin cookie-store)]
-            (t/is (= (:id user-loggedin) (:id user-admin))))))
+            (t/is (= (:email user-loggedin) (:email user-admin))))))
       (graphql.login/with-loggedin-session [cookie-store user-admin]
         (t/testing "Able to get user_loggedin"
           (let [user-loggedin (graphql.login/get-user-loggedin cookie-store)]
             #_(println :user-loggedin user-loggedin)
-            (t/is (= (:id user-loggedin) (:id user-admin)))))))))
+            #_(println :user-admin user-admin)
+            (t/is (= (:email user-loggedin) (:email user-admin)))))))))
 
 (def tests-to-create
   ["TODO list for create test for graphql"

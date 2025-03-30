@@ -1,6 +1,14 @@
 (ns back.models.util.user
-  (:require [clojure.string :refer [join]]
-            [back.models.util.core :as util.core]))
+  (:require
+   [clojure.spec.alpha :as s]
+   [clojure.string :refer [join]]
+   [back.models.util.core :as util.core]))
+
+(s/def ::id integer?)
+(s/def ::name string?)
+(s/def ::email string?)
+
+(s/def ::user (s/keys :req-un [::id ::name ::email]))
 
 (def name-table "user")
 (def key-table (keyword name-table))

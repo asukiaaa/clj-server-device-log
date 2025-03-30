@@ -2,6 +2,7 @@
   (:refer-clojure :exclude [update])
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.data.json :as json]
+            [clojure.string :refer [join]]
             [clojure.walk :refer [keywordize-keys]]
             [buddy.core.hash :as bhash]
             [buddy.core.codecs :as codecs]
@@ -50,12 +51,20 @@
        {:str-keys-select (util.user/build-str-keys-select-for-table)
         :transaction transaction})))
 
-(defn get-by-id-in-ids [id sql-ids & [{:keys [transaction]}]]
+(defn get-by-id-in-ids [id sql-ids & [{:keys [transaction str-where-or]}]]
   (-> (model.util/get-by-id
        id name-table
        {:str-keys-select (util.user/build-str-keys-select-for-table)
-        :str-where (format "%s.id IN %s" name-table sql-ids)
+        :str-where (->> [(format "%s.id IN %s" name-table sql-ids)
+                         str-where-or]
+                        (remove nil?)
+                        (join " OR ")
+                        (format "(%s)"))
         :transaction transaction})))
+
+(defn get-by-id-in-ids-or-id [id sql-ids id-or & [{:keys [transaction]}]]
+  (get-by-id-in-ids id sql-ids {:transaction transaction
+                                :str-where-or (format "%s.id = %d" name-table id-or)}))
 
 (defn- get-by-id-bare [id & [{:keys [transaction]}]]
   (model.util/get-by-id id name-table {:transaction transaction}))
@@ -178,12 +187,21 @@
     :str-keys-select (util.user/build-str-keys-select-for-table {:with-permission true})
     :transaction transaction}))
 
-(defn get-list-with-total-by-ids [args sql-ids & [{:keys [transaction]}]]
+(defn get-list-with-total-by-ids [args sql-ids & [{:keys [transaction str-where-or]}]]
   (model.util/get-list-with-total-with-building-query
    name-table args
-   {:str-where (format "%s.id IN %s" name-table sql-ids)
+   {:str-where (->> [(format "%s.id IN %s" name-table sql-ids)
+                     str-where-or]
+                    (remove nil?)
+                    (join " OR ")
+                    (format "(%s)"))
     :str-keys-select (util.user/build-str-keys-select-for-table)
     :transaction transaction}))
+
+(defn get-list-with-total-by-ids-or-id [args sql-ids id-or & [{:keys [transaction]}]]
+  (get-list-with-total-by-ids args sql-ids
+                              {:transaction transaction
+                               :str-where-or (format "%s.id = %d" name-table id-or)}))
 
 (defn filter-for-session [user]
   (select-keys user [:id]))
