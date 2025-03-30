@@ -37,8 +37,6 @@
 
 (def tests-to-create
   ["TODO list for create test for graphql"
-   "users: admin can see all users"
-   "users: not admin can see users connected via user team"
    "device_logs_for_watch_scope: cannot see logs that the drvice does not belongs to user team by member"
    "files_for_watch_scope: cannot see logs that the drvice does not belongs to user team by member"])
 
