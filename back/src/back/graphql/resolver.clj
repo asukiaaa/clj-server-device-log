@@ -219,7 +219,7 @@
   (println "args user-team-create" args)
   (let [user (get-user-loggedin context)
         params (model.user-team/key-table args)]
-    (when (model.user/admin? user) (util.user-team/key-table (model.user-team/create params)))))
+    (when (model.user/admin? user) {util.user-team/key-table (model.user-team/create params)})))
 
 (defn user-team-update [context args _]
   (println "args user-team-update" args)
