@@ -1,26 +1,33 @@
 (ns front.view.util.label
   (:require [goog.string :refer [format]]
-            [cljs.reader])
+            [cljs.reader]
+            [front.view.util.label-lang.en :as lang.en]
+            [front.view.util.label-lang.ja :as lang.ja])
   (:refer-clojure :exclude [name next time update]))
 
-(def logout "Logout")
-(def login "Login")
+(defn- get-target-lang []
+  (.-language js/navigator))
 
-(def no-data "No data")
-(def name "Name")
+(defn- get-word-from-words [word-key]
+  (let [lang-target (get-target-lang)]
+    (or (cond
+          (= lang-target "ja")
+          (word-key (lang.ja/build-words)))
+        (word-key (lang.en/build-words)))))
 
 (defn- show-key [item keys]
-  (if (empty? item)
-    no-data
-    (->> (for [key (if (keyword? keys) [keys] keys)]
-           (str (if (keyword? key) (key item) (get-in item key))))
-         (remove empty?)
-         first
-         (#(or % no-data)))))
+  (let [str-no-data (get-word-from-words :no-data)]
+    (if (empty? item)
+      str-no-data
+      (->> (for [key (if (keyword? keys) [keys] keys)]
+             (str (if (keyword? key) (key item) (get-in item key))))
+           (remove empty?)
+           first
+           (#(or % str-no-data))))))
 
-(def action "Action")
-(def active-watch-scope "Active watch scope")
-(def add-term "Add term")
+(defn action [] (get-word-from-words :action))
+(defn active-watch-scope [] (get-word-from-words :active-watch-scope))
+(defn add-term [] (get-word-from-words :add-term))
 (def assign-device-to-user-team-to-list-up
   "Assign device to user team to list up")
 (def authorization-bearer "Authorizatino bearer")
@@ -33,21 +40,21 @@
 (def config-on-user-team "Config on user team")
 (def copy "Copy")
 (def copied "Copied")
-(def create "Create")
+(defn create [] (get-word-from-words :create))
 (def created-at "Created at")
 (def dashboard "Dashboard")
 (defn datetime-from-item [str-datetiem-from]
   (str "from " str-datetiem-from))
 (defn datetime-until-item [str-datetiem-from]
   (str "until " str-datetiem-from))
-(def delete "Delete")
-(def delete-term "Delete term")
-(def device "Device")
-(def devices "Devices")
+(defn delete [] (get-word-from-words :delete))
+(defn delete-term [] (get-word-from-words :delete-term))
+(defn device [] (get-word-from-words :device))
+(defn devices [] (get-word-from-words :devices))
 (defn device-item [device] (show-key device [:name :id]))
-(def device-types "Device types")
-(def device-type "Device type")
-(def device-type-config "Device type config")
+(defn device-types [] (get-word-from-words :device-type))
+(defn device-type [] (get-word-from-words :device-types))
+(defn device-type-config [] (get-word-from-words :device-type-config))
 (defn device-type-item [device-type] (show-key device-type [:name :id]))
 (def device-groups "Device groups")
 (defn- str->int-if-needed [val]
@@ -65,7 +72,7 @@
       (format "%d of total %d" number-to total)
       :else
       (format "None of total %d" total))))
-(def edit "Edit")
+(defn edit [] (get-word-from-words :edit))
 (def email "Email")
 (def fetching "Fetching")
 (def files "Files")
@@ -73,11 +80,15 @@
 (def get-bearer "Get bearer")
 (def hide "Hide")
 (def id "ID")
+(defn indefinite-term [] (get-word-from-words :indefinite-term))
 (def invalid-date "Invalid date")
+(defn login [] (get-word-from-words :login))
+(defn logout [] (get-word-from-words :logout))
 (def logs "Logs")
 (def next "Next")
+(defn name [] (get-word-from-words :name))
+(defn no-data [] (get-word-from-words :no-data))
 (def no-file-to-show "No file to show")
-(def no-term "No term")
 (def manager-user-team "Manager user team")
 (def member "Member")
 (def members "Members")
@@ -90,29 +101,29 @@
 (def password-edit "Edit password")
 (def permission "Permission")
 (def prev "Prev")
-(def profile "Profile")
+(defn profile [] (get-word-from-words :profile))
 (def reset-password "Reset password")
 (defn result-in-total [number-result total]
   (format "Result %d in %d" number-result total))
 (def select-team "Select team")
-(def show "Show")
-(def show-password "Show password")
-(def term "Term")
-(def terms "Terms")
-(def time "Time")
-(def timezone "Timezone")
+(defn show [] (get-word-from-words :show))
+(defn show-password [] (get-word-from-words :show-password))
+(defn term [] (get-word-from-words :term))
+(defn terms [] (get-word-from-words :terms))
+(defn time [] (get-word-from-words :time))
+(defn timezone [] (get-word-from-words :timezone))
 (def total "Total")
 (def until "Until")
-(def update "Update")
+(defn update [] (get-word-from-words :update))
 (def updated-at "Updated at")
 (defn user-item [user] (show-key user [:name :email :id]))
-(def users "Users")
-(def user-team "User team")
+(defn users [] (get-word-from-words :users))
+(defn user-team [] (get-word-from-words :user-team))
 (defn user-team-item [item] (show-key item [:name]))
-(def user-teams "User teams")
-(def user-team-config "User team config")
-(def user-team-configs "User team configs")
+(defn user-teams [] (get-word-from-words :user-teams))
+(defn user-team-config [] (get-word-from-words :user-team-config))
+(defn user-team-configs [] (get-word-from-words :user-team-configs))
 (defn user-team-member-item [item] (show-key item [[:member :name]]))
-(def watch-scope "Watch scope")
-(def watch-scopes "Watch scopes")
+(defn watch-scope [] (get-word-from-words :watch-scope))
+(defn watch-scopes [] (get-word-from-words :watch-scopes))
 (defn watch-scope-item [item] (show-key item [:name :id]))

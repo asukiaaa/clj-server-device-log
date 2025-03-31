@@ -17,7 +17,7 @@
         on-receive #(set-device (:device %))]
     [:<>
      [:f> breadcrumb/core
-      [{:label util.label/devices :path route/devices}
+      [{:label (util.label/devices) :path route/devices}
        {:label (util.label/device-item device) :path (route/device-show id-device)}
        {:label util.label/logs}]]
      (util/render-list-in-area-content-line

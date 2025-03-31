@@ -29,8 +29,8 @@
      #js [])
     [:<>
      [:f> breadcrumb/core
-      [{:label util.label/user-teams :path route/user-teams}
-       {:label (or (:name item) util.label/no-data)}]]
+      [{:label (util.label/user-teams) :path route/user-teams}
+       {:label (or (:name item) (util.label/no-data))}]]
      (util/render-list-in-area-content-line
       (v.team.util/build-related-links item))
      (wrapper.fetching/wrapper
@@ -46,11 +46,11 @@
              [:th "value"]]]
            [:tbody
             [:tr [:td util.label/id] [:td (:id item)]]
-            [:tr [:td util.label/name] [:td (:name item)]]
+            [:tr [:td (util.label/name)] [:td (:name item)]]
             [:tr [:td util.label/owner-user] [:td [:> router/Link {:to (route/user-show (:owner_user_id item))}(str (:owner_user_id item))]]]
             (when is-admin
               [:tr
-               [:td util.label/action]
+               [:td (util.label/action)]
                [:td
                 [:f> util/btn-confirm-delete
                  {:message-confirm (model.user-team/build-confirmation-message-for-deleting item)

@@ -32,7 +32,7 @@
      #js [])
     [:<>
      [:f> breadcrumb/core
-      [{:label util.label/user-teams :path route/user-teams}
+      [{:label (util.label/user-teams) :path route/user-teams}
        {:label (util.label/user-team-item user-team) :path (route/user-team-show id-user-team)}
        {:label util.label/members :path (route/user-team-members id-user-team)}
        {:label (util.label/user-team-member-item item)}]]
@@ -42,7 +42,7 @@
        (if (empty? item)
          [:div "no data"]
          [:div
-          [:> router/Link {:to (route/user-team-member-edit id-user-team id-item)} util.label/edit]
+          [:> router/Link {:to (route/user-team-member-edit id-user-team id-item)} (util.label/edit)]
           " "
           [:f> util/btn-confirm-delete
            {:message-confirm (model.user-team-member/build-confirmation-message-for-deleting item)

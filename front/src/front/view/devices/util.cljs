@@ -13,8 +13,8 @@
         id-item (:id item)
         user (util/get-user-loggedin)
         is-admin (model.user/admin? user)]
-    (->> [(util/build-link-or-text util.label/show (route/device-show id-item) path-current)
-          (when is-admin (util/build-link-or-text util.label/edit (route/device-edit id-item) path-current))
+    (->> [(util/build-link-or-text (util.label/show) (route/device-show id-item) path-current)
+          (when is-admin (util/build-link-or-text (util.label/edit) (route/device-edit id-item) path-current))
           (util/build-link-or-text util.label/files (route/device-device-files id-item) path-current)
           (util/build-link-or-text util.label/logs (route/device-device-logs id-item) path-current)]
          (remove nil?))))

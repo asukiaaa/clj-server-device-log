@@ -6,9 +6,9 @@
 
 (defn build-related-links [item load-list user-loggedin & [{:keys [path-current]}]]
   (let [id-user (:id item)]
-    (->> [(util/build-link-or-text util.label/show (route/user-show id-user) path-current)
+    (->> [(util/build-link-or-text (util.label/show) (route/user-show id-user) path-current)
           (when (model.user/admin? user-loggedin)
-            (util/build-link-or-text util.label/edit (route/user-edit id-user) path-current))
+            (util/build-link-or-text (util.label/edit) (route/user-edit id-user) path-current))
           (when (model.user/admin? user-loggedin)
             [:f> util/btn-confirm-delete
              {:message-confirm (model.user/build-confirmation-message-for-deleting item)

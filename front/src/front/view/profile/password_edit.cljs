@@ -41,7 +41,7 @@
                                :password-new (:draft state-info-password-new)
                                :on-receive on-receive-password-reset}))))]
     [:<>
-     [:f> breadcrumb/core [{:label util.label/profile :path route/profile}
+     [:f> breadcrumb/core [{:label (util.label/profile) :path route/profile}
                            {:label util.label/password-edit}]]
      (if (empty? user)
        [:div "no data"]
@@ -57,7 +57,7 @@
          [:div [util/render-checkbox "show password" state-info-show-password]]
          [:a.btn.btn-primary.mt-1 {:on-click on-click-apply
                                           :class (when waiting-response "disabled")}
-          util.label/update]]])]))
+          (util.label/update)]]])]))
 
 (defn core []
   (wrapper.show404/wrapper

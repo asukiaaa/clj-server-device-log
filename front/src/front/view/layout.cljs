@@ -1,8 +1,6 @@
 (ns front.view.layout
   (:require ["react-router-dom" :as router]
             ["react-bootstrap" :as bs]
-            [clojure.walk :refer [keywordize-keys]]
-            [lambdaisland.uri :as lamb.uri]
             [front.model.user :as model.user]
             [front.route :as route]
             [front.view.util.label :as util.label]
@@ -37,7 +35,7 @@
        [:span " "]
        [:> bs/Nav {:style {:display :inline-block}}
         (if (nil? user)
-          [:> bs/Nav.Link {:to route/login :as router/Link} "Login"]
+          [:> bs/Nav.Link {:to route/login :as router/Link} (util.label/login)]
           [:<>
            [:> bs/Nav.Link {:to route/dashboard :as router/Link :style {:display :inline-block}} util.label/dashboard]
            [:> bs/NavDropdown {:title (:name user) :id "nav-dropdown" :align :end :style {:display :inline-block :text-align-last :start}}
@@ -45,5 +43,5 @@
               [:<> {:key label}
                [:> bs/NavDropdown.Item {:to path :as router/Link :key path} label]])
             [:> bs/NavDropdown.Divider]
-            [:> bs/NavDropdown.Item {:on-click logout :href route/logout} util.label/logout]]])]]]
+            [:> bs/NavDropdown.Item {:on-click logout :href route/logout} (util.label/logout)]]])]]]
      [:> router/Outlet]]))

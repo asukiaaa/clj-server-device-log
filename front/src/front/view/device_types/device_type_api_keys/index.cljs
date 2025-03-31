@@ -16,16 +16,16 @@
    [:td (:name device-type-api-key)]
    [:td (:permission device-type-api-key)]
    [:td
-    [:> router/Link {:to (route/device-type-device-type-api-key-show (:device_type_id device-type-api-key) (:id device-type-api-key))} util.label/show]
+    [:> router/Link {:to (route/device-type-device-type-api-key-show (:device_type_id device-type-api-key) (:id device-type-api-key))} (util.label/show)]
     " "
-    [:> router/Link {:to (route/device-type-device-type-api-key-edit (:device_type_id device-type-api-key) (:id device-type-api-key))} util.label/edit]
+    [:> router/Link {:to (route/device-type-device-type-api-key-edit (:device_type_id device-type-api-key) (:id device-type-api-key))} (util.label/edit)]
     " "
     [:f> util/btn-confirm-delete
      {:message-confirm (model.device-type-api-key/build-confirmation-message-for-deleting device-type-api-key)
       :action-delete #(model.device-type-api-key/delete {:id (:id device-type-api-key) :on-receive on-delete})}]]])
 
 (defn- page []
-  (let [labels-header [util.label/name util.label/permission util.label/action]
+  (let [labels-header [(util.label/name) util.label/permission (util.label/action)]
         params (js->clj (router/useParams))
         id-device-type (get params "device_type_id")
         [device-type set-device-type] (react/useState)
@@ -38,7 +38,7 @@
           (set-device-type (model.device-type/key-table data)))]
     [:<>
      [:f> breadcrumb/core
-      [{:label util.label/device-types :path route/device-types}
+      [{:label (util.label/device-types) :path route/device-types}
        {:label (util.label/device-type-item device-type) :path (route/device-type-show id-device-type)}
        {:label util.label/api-keys}]]
      (util/render-list-in-area-content-line

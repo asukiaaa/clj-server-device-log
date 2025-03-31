@@ -23,7 +23,7 @@
      (let [datetime-from (key-datetime-from term)
            datetime-until (key-datetime-until term)]
        (if (and (nil? datetime-from) (nil? datetime-until))
-         util.label/no-term
+         (util.label/indefinite-term)
          (->> [(when datetime-from
                  (util.label/datetime-from-item
                   (util.timezone/build-datetime-str-in-timezone
@@ -119,13 +119,13 @@
   (let [term (get (:draft state-info-terms) index)]
     [:div.row
      [:div.col-sm
-      [util/render-select util.label/device state-info-terms options-for-device-ids
+      [util/render-select (util.label/device) state-info-terms options-for-device-ids
        {:keys-assoc-in [index :device_id]}]]
      [:div.col-sm
       [util/render-input util.label/from state-info-terms
        {:keys-assoc-in [index key-datetime-from-date]
         :type "date"}]
-      [util/render-input util.label/time state-info-terms
+      [util/render-input (util.label/time) state-info-terms
        {:keys-assoc-in [index key-datetime-from-time]
         :disabled (empty? (key-datetime-from-date term))
         :type "time"}]]
@@ -133,17 +133,17 @@
       [util/render-input util.label/until state-info-terms
        {:keys-assoc-in [index key-datetime-until-date]
         :type "date"}]
-      [util/render-input util.label/time state-info-terms
+      [util/render-input (util.label/time) state-info-terms
        {:keys-assoc-in [index key-datetime-until-time]
         :disabled (empty? (key-datetime-until-date term))
         :type "time"}]]
      [:div.col-sm
-      [:div util.label/action]
+      [:div (util.label/action)]
       [:a.btn.btn-secondary {:href "#"
                              :on-click (fn [e]
                                          (.preventDefault e)
                                          (on-click-delete))}
-       util.label/delete-term]]]))
+       (util.label/delete-term)]]]))
 
 (defn- build-new-key-last [terms]
   (let [key-last (->> terms keys (remove keyword?) sort last)]
@@ -176,19 +176,19 @@
           ((:set-default state-info-terms) (dissoc (:default state-info-terms) index)))
         indexes-sorted (->> (:draft state-info-terms) keys (remove keyword?) sort)]
     [:div
-     [:div util.label/terms]
-     [util/render-select util.label/timezone state-info-terms (util.timezone/build-options-for-select)
+     [:div (util.label/terms)]
+     [util/render-select (util.label/timezone) state-info-terms (util.timezone/build-options-for-select)
       {:keys-assoc-in [key-str-timezone]
        :without-empty-option true
        :override-on-change
        (fn [value state-info _keys-assoc-in]
          (change-timezone value state-info))}]
      [:div
-      [:a.btn.btn-secondary.mt-1 {:href "#" :on-click add-term-top} util.label/add-term]]
+      [:a.btn.btn-secondary.mt-1 {:href "#" :on-click add-term-top} (util.label/add-term)]]
      (let [options-for-device-ids (model.device/build-select-options-from-list-and-total devices-list-and-total)]
        (for [index indexes-sorted]
          [:<> {:key index}
           (render-fields-for-term state-info-terms index options-for-device-ids (fn [] (delete-term index)))]))
      (when (< 0 (count indexes-sorted))
        [:div
-        [:a.btn.btn-secondary.mt-1 {:href "#" :on-click add-term-bottom} util.label/add-term]])]))
+        [:a.btn.btn-secondary.mt-1 {:href "#" :on-click add-term-bottom} (util.label/add-term)]])]))

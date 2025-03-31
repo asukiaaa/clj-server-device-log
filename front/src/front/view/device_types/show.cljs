@@ -30,7 +30,7 @@
        (fn []))
      #js [])
     [:<>
-     [:f> breadcrumb/core [{:label util.label/device-types :path route/device-types}
+     [:f> breadcrumb/core [{:label (util.label/device-types) :path route/device-types}
                            {:label (util.label/device-type-item item)}]]
      (util/render-list-in-area-content-line
       (v.device-type.util/build-related-links item))
@@ -61,7 +61,7 @@
                   [:td (get item key)]])])
             (when is-admin
               [:tr
-               [:td util.label/action]
+               [:td (util.label/action)]
                [:td
                 [:f> util/btn-confirm-delete
                  {:message-confirm (model.device-type/build-confirmation-message-for-deleting item)

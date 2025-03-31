@@ -1,0 +1,42 @@
+(ns front.view.util.label-lang.en)
+
+(def ^:private words
+  {:action "Action"
+   :active-watch-scope "Active watch scope"
+   :add-term "Add term"
+   :create "Create"
+   :dashboard "Dashboard"
+   :delete "Delete"
+   :delete-term "Delete term"
+   :device "Device"
+   :devices "Devices"
+   :device-type "Device type"
+   :device-types "Device types"
+   :device-type-config "Device type config"
+   :edit "Edit"
+   :email "Email"
+   :indefinite-term "Indefinite term"
+   :login "Login"
+   :loghout "Logout"
+   :name "Name"
+   :no-data "No data"
+   :password "Password"
+   :profile "Profile"
+   :show "Show"
+   :show-password "Show password"
+   :term "Term"
+   :terms "Terms"
+   :time "Time"
+   :timezone "Timezone"
+   :update "Update"
+   :user "User"
+   :users "Users"
+   :user-team "User team"
+   :user-teams "User teams"
+   :user-team-config "User team config"
+   :user-team-configs "User team configs"
+   :watch-scope "Watch scope"
+   :watch-scopes "Watch scopes"})
+
+(defn build-words []
+  words)

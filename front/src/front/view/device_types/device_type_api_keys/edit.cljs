@@ -60,11 +60,11 @@
      #js [])
     [:<>
      [:f> breadcrumb/core
-      [{:label util.label/device-types :path route/device-types}
+      [{:label (util.label/device-types) :path route/device-types}
        {:label (util.label/device-type-item device-type) :path (route/device-type-show id-device-type)}
        {:label util.label/api-keys :path (route/device-type-device-type-api-keys id-device-type)}
        {:label (util.label/api-key-item item) :path (route/device-type-device-type-api-key-show id-device-type id-device-type-api-key)}
-       {:label util.label/edit}]]
+       {:label (util.label/edit)}]]
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer
@@ -73,10 +73,10 @@
          [:div
           [:form.form-control
            [util/render-errors-as-alerts (:errors state-info-system)]
-           [util/render-input util.label/name state-info-name]
+           [util/render-input (util.label/name) state-info-name]
            [util/render-input util.label/permission state-info-permission]
            [util.explanation/permission]
-           [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} util.label/update]]])})]))
+           [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} (util.label/update)]]])})]))
 
 (defn core []
   (wrapper.show404/wrapper

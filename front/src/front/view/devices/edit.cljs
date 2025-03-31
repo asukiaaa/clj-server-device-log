@@ -92,27 +92,27 @@
        (fn []))
      #js [])
     [:<>
-     [:f> breadcrumb/core [{:label util.label/devices :path route/devices}
+     [:f> breadcrumb/core [{:label (util.label/devices) :path route/devices}
                            {:label (util.label/device-item item)
                             :path (when item (route/device-show id-item))}
-                           {:label util.label/edit}]]
+                           {:label (util.label/edit)}]]
      (util/render-list-in-area-content-line
       (v.device.util/build-related-links item))
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer
        (if (empty? item)
-         [:div util.label/no-data]
+         [:div (util.label/no-data)]
          [:div
           [:form.form-control
-           [util/render-input util.label/name state-info-name]
-           [util/render-select util.label/device-type state-info-device-type-id
+           [util/render-input (util.label/name) state-info-name]
+           [util/render-select (util.label/device-type) state-info-device-type-id
             (model.device-type/build-select-options-from-list-and-total device-type-list-and-total)]
-           [util/render-select util.label/user-team state-info-user-team-id
+           [util/render-select (util.label/user-team) state-info-user-team-id
             (model.user-team/build-select-options-from-list-and-total user-team-list-and-total)]
            [util/render-textarea util.label/config-on-user-team state-info-user-team-device-config-config
             {:disabled (empty? (str (:draft state-info-user-team-id)))}]
-           [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} util.label/edit]]])})]))
+           [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} (util.label/edit)]]])})]))
 
 (defn core []
   (wrapper.show404/wrapper

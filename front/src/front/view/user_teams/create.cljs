@@ -53,18 +53,18 @@
        (fn []))
      #js [])
     [:<>
-     [:f> breadcrumb/core [{:label util.label/user-teams :path route/user-teams}
-                           {:label util.label/create}]]
+     [:f> breadcrumb/core [{:label (util.label/user-teams) :path route/user-teams}
+                           {:label (util.label/create)}]]
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer
        [:div
         [:form.form-control
          [util/render-errors-as-alerts (:errors state-info-system)]
-         [util/render-input util.label/name state-info-name {:disabled waiting-response}]
+         [util/render-input (util.label/name) state-info-name {:disabled waiting-response}]
          [util/render-textarea util.label/memo state-info-memo {:disabled waiting-response}]
          [util/render-select util.label/owner-user state-info-id-owner-user (model.user/build-select-options-from-list-and-total user-list-and-total) {:disabled waiting-response}]
-         [:button.btn.btn-primary.mt-1 {:on-click on-click-apply :disabled waiting-response} util.label/create]]]})]))
+         [:button.btn.btn-primary.mt-1 {:on-click on-click-apply :disabled waiting-response} (util.label/create)]]]})]))
 
 (defn core []
   (wrapper.show404/wrapper

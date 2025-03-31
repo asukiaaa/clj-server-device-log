@@ -35,15 +35,15 @@
                    {:on-receive on-receive}
                    list-state-info)))]
     [:div
-     [:f> breadcrumb/core [{:label util.label/device-types :path route/device-types}
-                           {:label util.label/create}]]
+     [:f> breadcrumb/core [{:label (util.label/device-types) :path route/device-types}
+                           {:label (util.label/create)}]]
      [:form.form-control
       [util/render-errors-as-alerts (:errors state-info-system)]
       [util/render-input util.label/manager-user-team state-info-id-manager-user-team]
-      [util/render-input util.label/name state-info-name]
+      [util/render-input (util.label/name) state-info-name]
       [util/render-textarea util.label/config-format state-info-config-format]
       [util/render-textarea util.label/config-default state-info-config-default]
-      [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} util.label/create]]]))
+      [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} (util.label/create)]]]))
 
 (defn core []
   (wrapper.show404/wrapper

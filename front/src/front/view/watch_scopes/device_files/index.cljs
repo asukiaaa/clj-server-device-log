@@ -23,7 +23,7 @@
            (assoc params :id-watch-scope id-item)))]
     [:<>
      [:f> breadcrumb/core
-      [{:label util.label/watch-scopes :path route/watch-scopes}
+      [{:label (util.label/watch-scopes) :path route/watch-scopes}
        {:label (util.label/watch-scope-item item) :path (route/watch-scope-show id-item)}
        {:label util.label/files}]]
      (util/render-list-in-area-content-line

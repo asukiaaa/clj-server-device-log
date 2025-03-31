@@ -53,10 +53,10 @@
      #js [])
     [:<>
      [:f> breadcrumb/core
-      [{:label util.label/user-teams :path route/user-teams}
+      [{:label (util.label/user-teams) :path route/user-teams}
        {:label (util.label/user-team-item user-team) :path (route/user-team-show id-user-team)}
        {:label util.label/members :path (route/user-team-members id-user-team)}
-       {:label util.label/create}]]
+       {:label (util.label/create)}]]
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer
@@ -65,7 +65,7 @@
          [util/render-errors-as-alerts (:errors state-info-system)]
          [util/render-input "user email" state-info-user-email {:disabled waiting-response}]
          [util/render-textarea "permission" state-info-permission {:disabled waiting-response}]
-         [:button.btn.btn-primary.mt-1 {:on-click on-click-apply :disabled waiting-response} util.label/create]]]})]))
+         [:button.btn.btn-primary.mt-1 {:on-click on-click-apply :disabled waiting-response} (util.label/create)]]]})]))
 
 (defn core []
   (wrapper.show404/wrapper

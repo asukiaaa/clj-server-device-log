@@ -60,24 +60,24 @@
      #js [])
     [:<>
      [:f> breadcrumb/core
-      [{:label util.label/device-types :path route/device-types}
+      [{:label (util.label/device-types) :path route/device-types}
        {:label (util.label/device-type-item item) :path (route/device-type-show id-item)}
-       {:label util.label/edit}]]
+       {:label (util.label/edit)}]]
      (util/render-list-in-area-content-line
       (v.device-type.util/build-related-links item))
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer
        (if (empty? item)
-         [:div util.label/no-data]
+         [:div (util.label/no-data)]
          [:div
           [util/render-errors-as-alerts (:errors state-info-system)]
           [:form.form-control
            [util/render-input util.label/manager-user-team state-info-id-manager-user-team]
-           [util/render-input util.label/name state-info-name]
+           [util/render-input (util.label/name) state-info-name]
            [util/render-textarea util.label/config-format state-info-config-format]
            [util/render-textarea util.label/config-default state-info-config-default]
-           [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} util.label/edit]]])})]))
+           [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} (util.label/edit)]]])})]))
 
 (defn core []
   (wrapper.show404/wrapper

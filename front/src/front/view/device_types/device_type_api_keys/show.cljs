@@ -36,7 +36,7 @@
      #js [])
     [:<>
      [:f> breadcrumb/core
-      [{:label util.label/device-types :path route/device-types}
+      [{:label (util.label/device-types) :path route/device-types}
        {:label (util.label/device-type-item device-type) :path (route/device-type-show id-device-type)}
        {:label util.label/api-keys :path (route/device-type-device-type-api-keys id-device-type)}
        {:label (util.label/api-key-item item)}]]
@@ -46,7 +46,7 @@
        (if (empty? item)
          [:div "no data"]
          [:div
-          [:> router/Link {:to (route/device-type-device-type-api-key-edit id-device-type id-device-type-api-key)} util.label/edit]
+          [:> router/Link {:to (route/device-type-device-type-api-key-edit id-device-type id-device-type-api-key)} (util.label/edit)]
           " "
           [:f> util/btn-confirm-delete
            {:message-confirm (model.device-type-api-key/build-confirmation-message-for-deleting item)

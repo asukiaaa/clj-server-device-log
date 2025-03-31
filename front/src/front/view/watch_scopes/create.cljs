@@ -71,20 +71,20 @@
        (fn []))
      #js [])
     [:<>
-     [:f> breadcrumb/core [{:label util.label/watch-scopes :path route/watch-scopes}
-                           {:label util.label/create}]]
+     [:f> breadcrumb/core [{:label (util.label/watch-scopes) :path route/watch-scopes}
+                           {:label (util.label/create)}]]
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer
        [:div
         [:form.form-control
          [util/render-errors-as-alerts (:errors state-info-system)]
-         [util/render-input util.label/name state-info-name]
-         [util/render-select util.label/user-team state-info-id-user-team
+         [util/render-input (util.label/name) state-info-name]
+         [util/render-select (util.label/user-team) state-info-id-user-team
           (model.user-team/build-select-options-from-list-and-total user-team-list-and-total)
           {:on-blur load-devices}]
          (util.watch-scope/render-fields-for-terms state-info-terms device-list-and-total)
-         [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} util.label/create]]]})]))
+         [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} (util.label/create)]]]})]))
 
 (defn core []
   (wrapper.show404/wrapper

@@ -35,18 +35,18 @@
      #js [])
     [:<>
      [:f> breadcrumb/core
-      [{:label util.label/device-types :path route/device-types}
+      [{:label (util.label/device-types) :path route/device-types}
        {:label (util.label/device-type-item device-type) :path (route/device-type-show id-device-type)}
-       {:label util.label/user-team-configs :path (route/device-type-user-team-configs id-device-type)}
+       {:label (util.label/user-team-configs) :path (route/device-type-user-team-configs id-device-type)}
        {:label (util.label/user-team-item (:user_team item))}]]
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer
        (if (empty? item)
-         [util/area-content util.label/no-data]
+         [util/area-content (util.label/no-data)]
          [:div
           [util/area-content
-           [:> router/Link {:to (route/device-type-user-team-config-edit id-device-type id-user-team)} util.label/edit]
+           [:> router/Link {:to (route/device-type-user-team-config-edit id-device-type id-user-team)} (util.label/edit)]
            " "
            [:f> util/btn-confirm-delete
             {:message-confirm (model.user-team-device-type-config/build-confirmation-message-for-deleting item)

@@ -45,13 +45,13 @@
        (fn []))
      #js [])
     [:<>
-     [:f> breadcrumb/core [{:label util.label/users :path route/users}
+     [:f> breadcrumb/core [{:label (util.label/users) :path route/users}
                            {:label (util.label/user-item user)}]]
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer
        (if (empty? user)
-         [:div util.label/no-data]
+         [:div (util.label/no-data)]
          [:<>
           (when is-admin
             [util/area-content

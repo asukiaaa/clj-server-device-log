@@ -169,7 +169,7 @@
          (.preventDefault e)
          (when (js/confirm message-confirm) (action-delete)))
        :href ""}
-   util.label/delete])
+   (util.label/delete)])
 
 (defn copy-to-clipboard [text]
   (-> js/navigator .-clipboard (.writeText text)))
@@ -205,7 +205,7 @@
        [:span.me-1
         (if show
           [:button.btn.btn-secondary.btn-sm {:on-click #(set-show false)} util.label/hide]
-          [:button.btn.btn-secondary.btn-sm {:on-click #(set-show true)} util.label/show])]
+          [:button.btn.btn-secondary.btn-sm {:on-click #(set-show true)} (util.label/show)])]
        [:f> button-to-copy-to-clipboard bearer]
        (when show
          [:div bearer])]

@@ -19,13 +19,13 @@
        (v.device-type.util/build-related-links device-type))]]))
 
 (defn- page []
-  (let [labels-header [util.label/name util.label/user-team util.label/action]
+  (let [labels-header [(util.label/name) (util.label/user-team) (util.label/action)]
         is-admin (util/detect-is-admin-loggedin)]
     [:<>
-     [:f> breadcrumb/core [{:label util.label/device-types}]]
+     [:f> breadcrumb/core [{:label (util.label/device-types)}]]
      [util/area-content
       (when is-admin
-        [:> router/Link {:to route/device-type-create} util.label/create])]
+        [:> router/Link {:to route/device-type-create} (util.label/create)])]
      [:f> util.table/core model.device-type/fetch-list-and-total labels-header render-device-type]]))
 
 (defn core []

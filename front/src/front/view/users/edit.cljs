@@ -56,9 +56,9 @@
        (fn []))
      #js [])
     [:<>
-     [:f> breadcrumb/core [{:label util.label/users :path route/users}
+     [:f> breadcrumb/core [{:label (util.label/users) :path route/users}
                            {:label (util.label/user-item user) :path (route/user-show id-user)}
-                           {:label util.label/edit}]]
+                           {:label (util.label/edit)}]]
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer
@@ -71,7 +71,7 @@
            [util/render-input "name" state-info-name]
            [util/render-input "email" state-info-email]
            [util/render-textarea "permission" state-info-permission]
-           [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} util.label/update]]])})]))
+           [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} (util.label/update)]]])})]))
 
 (defn core []
   (wrapper.show404/wrapper

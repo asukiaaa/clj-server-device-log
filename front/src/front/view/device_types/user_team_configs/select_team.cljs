@@ -16,10 +16,10 @@
      [:td [:> router/Link {:to (route/user-team-show (:id user-team))} (:name user-team)]]
      [:td
       [:> router/Link {:to (route/device-type-user-team-config-edit id-device-type (:id user-team))}
-       util.label/edit]]]))
+       (util.label/edit)]]]))
 
 (defn- page []
-  (let [labels-header [util.label/user-team util.label/action]
+  (let [labels-header [(util.label/user-team) (util.label/action)]
         params (js->clj (router/useParams))
         id-device-type (get params "device_type_id")
         [device-type set-device-type] (react/useState)
@@ -32,9 +32,9 @@
           (set-device-type (model.device-type/key-table data)))]
     [:<>
      [:f> breadcrumb/core
-      [{:label util.label/device-types :path route/device-types}
+      [{:label (util.label/device-types) :path route/device-types}
        {:label (util.label/device-type-item device-type) :path (route/device-type-show id-device-type)}
-       {:label util.label/user-team-configs :path (route/device-type-user-team-configs id-device-type)}
+       {:label (util.label/user-team-configs) :path (route/device-type-user-team-configs id-device-type)}
        {:label util.label/select-team}]]
      [util/area-content
       util.label/assign-device-to-user-team-to-list-up]

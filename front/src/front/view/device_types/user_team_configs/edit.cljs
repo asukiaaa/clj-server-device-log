@@ -64,11 +64,11 @@
      #js [])
     [:<>
      [:f> breadcrumb/core
-      [{:label util.label/device-types :path route/device-types}
+      [{:label (util.label/device-types) :path route/device-types}
        {:label (util.label/device-type-item device-type) :path (route/device-type-show id-device-type)}
-       {:label util.label/user-team-configs :path (route/device-type-user-team-configs id-device-type)}
+       {:label (util.label/user-team-configs) :path (route/device-type-user-team-configs id-device-type)}
        {:label (util.label/user-team-item user-team) :path (route/device-type-user-team-config-show id-device-type id-user-team)}
-       {:label util.label/edit}]]
+       {:label (util.label/edit)}]]
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer
@@ -78,7 +78,7 @@
           [:form.form-control
            [util/render-errors-as-alerts (:errors state-info-system)]
            [util/render-input util.label/config-on-user-team state-info-config]
-           [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} util.label/update]]])})]))
+           [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} (util.label/update)]]])})]))
 
 (defn core []
   (wrapper.show404/wrapper

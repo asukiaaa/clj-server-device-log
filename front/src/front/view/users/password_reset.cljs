@@ -66,7 +66,7 @@
          [util/area-content
           [:div message]
           [:div
-           [:> router/Link {:to route/login} util.label/login]]]
+           [:> router/Link {:to route/login} (util.label/login)]]]
          (nil? (:default state-info-id-user))
          [:f> page404/core]
          :else
@@ -78,7 +78,7 @@
              [:<>
               [util/render-input util.label/password-10-chars-or-more state-info-password {:type type-for-password}]
               [util/render-input util.label/password-again state-info-password-again {:type type-for-password}]])
-           [:div [util/render-checkbox util.label/show-password state-info-show-password]]
+           [:div [util/render-checkbox (util.label/show-password) state-info-show-password]]
            [:button.btn.btn-primary.mt-1 {:on-click on-click-apply :class (when waiting-response "disabled")}
             util.label/reset-password]]])]})))
 

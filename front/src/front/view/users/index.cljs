@@ -10,7 +10,7 @@
             [front.view.util :as util]))
 
 (defn- page []
-  (let [labels-header [util.label/name util.label/email util.label/action]
+  (let [labels-header [(util.label/name) util.label/email (util.label/action)]
         user-loggedin (util/get-user-loggedin)
         render-user
         (fn [user load-list]
@@ -21,10 +21,10 @@
             (util/render-list-inline
              (v.user.util/build-related-links user load-list user-loggedin))]])]
     [:<>
-     [:f> breadcrumb/core [{:label util.label/users}]]
+     [:f> breadcrumb/core [{:label (util.label/users)}]]
      (when (model.user/admin? user-loggedin)
        [util/area-content
-        [:> router/Link {:to route/user-create} util.label/create]])
+        [:> router/Link {:to route/user-create} (util.label/create)]])
      [:f> util.table/core model.user/fetch-list-and-total labels-header render-user]]))
 
 (defn core []

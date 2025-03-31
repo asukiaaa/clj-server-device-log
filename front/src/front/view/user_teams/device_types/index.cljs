@@ -18,9 +18,9 @@
      [:td id-device-type]
      [:td [:> router/Link {:to (route/device-type-show id-device-type)} (:name item)]]
      [:td
-      [:> router/Link {:to (route/device-type-user-team-config-show id-device-type id-user-team)} util.label/show]
+      [:> router/Link {:to (route/device-type-user-team-config-show id-device-type id-user-team)} (util.label/show)]
       " "
-      [:> router/Link {:to (route/device-type-user-team-config-edit id-device-type id-user-team)} util.label/edit]]]))
+      [:> router/Link {:to (route/device-type-user-team-config-edit id-device-type id-user-team)} (util.label/edit)]]]))
 
 (defn-  page []
   (let [params (js->clj (router/useParams))
@@ -53,9 +53,9 @@
      #js [location])
     [:<>
      [:f> breadcrumb/core
-      [{:label util.label/user-teams :path route/user-teams}
+      [{:label (util.label/user-teams) :path route/user-teams}
        {:label (util.label/user-team-item user-team) :path (route/user-team-show id-user-team)}
-       {:label util.label/device-types}]]
+       {:label (util.label/device-types)}]]
      (util/render-list-in-area-content-line
       (v.team.util/build-related-links user-team))
      (wrapper.fetching/wrapper
@@ -67,8 +67,8 @@
          [:thead
           [:tr
            [:th util.label/id]
-           [:th util.label/name]
-           [:th util.label/device-type-config]]]
+           [:th (util.label/name)]
+           [:th (util.label/device-type-config)]]]
          [:tbody
           (for [item received-list]
             [:<> {:key (:id item)}

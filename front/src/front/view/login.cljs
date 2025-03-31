@@ -37,11 +37,11 @@
                                       :password (:draft state-info-password)
                                       :on-receive on-receive}))]
     [:div
-     [:div.row
-      [:div.col-md-4.col-lg-4]
-      [:form.col-md-4.col-lg-4
+     [:div.row.m-0
+      [:div.col-md-3]
+      [:form.col-md-6.px-0.pt-2
        [util/area-content
-        [:h1 util.label/login]
+        [:h1 (util.label/login)]
         [util/render-errors-as-alerts errors]
         [util/render-input util.label/email state-info-email {:disabled waiting-response}]
         (let [show-password (:draft state-info-show-password)
@@ -49,8 +49,8 @@
           [:<>
            [util/render-input util.label/password state-info-password
             {:type type-for-password :disabled waiting-response}]])
-        [:div [util/render-checkbox util.label/show-password state-info-show-password]]
+        [:div [util/render-checkbox (util.label/show-password) state-info-show-password]]
         [:div.mt-2.align-right
          [:button.btn.btn-outline-primary
           {:on-click on-click-login :class (when waiting-response :disabled)}
-          util.label/login]]]]]]))
+          (util.label/login)]]]]]]))

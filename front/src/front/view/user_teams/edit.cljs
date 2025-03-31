@@ -59,23 +59,23 @@
      #js [])
     [:<>
      [:f> breadcrumb/core
-      [{:label util.label/user-teams :path route/user-teams}
+      [{:label (util.label/user-teams) :path route/user-teams}
        {:label (or (:name item) util.label/no-data) :path (route/user-team-show id-item)}
-       {:label util.label/edit}]]
+       {:label (util.label/edit)}]]
      (util/render-list-in-area-content-line
       (v.team.util/build-related-links item))
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer
        (if (empty? item)
-         [:div util.label/no-data]
+         [:div (util.label/no-data)]
          [:div
           [:form.form-control
            [util/render-errors-as-alerts (:errors state-info-system)]
-           [util/render-input util.label/name state-info-name {:disabled waiting-response}]
+           [util/render-input (util.label/name) state-info-name {:disabled waiting-response}]
            [util/render-input util.label/memo state-info-memo {:disabled waiting-response}]
            [util/render-input util.label/owner-user state-info-id-owner-user {:disabled waiting-response}]
-           [:button.btn.btn-primary.mt-1 {:on-click on-click-apply :disabled waiting-response} util.label/update]]])})]))
+           [:button.btn.btn-primary.mt-1 {:on-click on-click-apply :disabled waiting-response} (util.label/update)]]])})]))
 
 (defn core []
   (wrapper.show404/wrapper

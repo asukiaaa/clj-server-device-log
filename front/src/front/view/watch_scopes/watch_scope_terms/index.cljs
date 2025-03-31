@@ -65,10 +65,10 @@
      #js [location])
     [:<>
      [:f> breadcrumb/core
-      [{:label util.label/watch-scopes :path route/watch-scopes}
+      [{:label (util.label/watch-scopes) :path route/watch-scopes}
        {:label (util.label/watch-scope-item watch-scope) :path (route/watch-scope-show watch-scope)}
-       {:label util.label/terms}]]
-     [:> router/Link {:to (route/watch-scope-watch-scope-term-create id-watch-scope)} util.label/create]
+       {:label (util.label/terms)}]]
+     [:> router/Link {:to (route/watch-scope-watch-scope-term-create id-watch-scope)} (util.label/create)]
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer

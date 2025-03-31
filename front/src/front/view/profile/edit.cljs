@@ -52,22 +52,22 @@
        (fn []))
      #js [])
     [:<>
-     [:f> breadcrumb/core [{:label util.label/profile :path route/profile}
-                           {:label util.label/edit}]]
+     [:f> breadcrumb/core [{:label (util.label/profile) :path route/profile}
+                           {:label (util.label/edit)}]]
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer
        (if (empty? (:default state-info-email))
          [util/area-content
-          util.label/no-data]
+          (util.label/no-data)]
          [:div
           [:form.form-control
            [util/render-errors-as-alerts (:errors state-info-system)]
-           [util/render-input util.label/name state-info-name]
+           [util/render-input (util.label/name) state-info-name]
            [util/render-input util.label/email state-info-email]
            (when is-admin
              [util/render-textarea util.label/permission state-info-permission])
-           [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} util.label/update]]])})]))
+           [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} (util.label/update)]]])})]))
 
 (defn core []
   (wrapper.show404/wrapper

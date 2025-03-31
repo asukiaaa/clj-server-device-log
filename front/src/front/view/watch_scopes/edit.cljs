@@ -77,9 +77,9 @@
      #js [])
     [:<>
      [:f> breadcrumb/core
-      [{:label util.label/watch-scopes :path route/watch-scopes}
+      [{:label (util.label/watch-scopes) :path route/watch-scopes}
        {:label (util.label/watch-scope-item item) :path (route/watch-scope-show id-item)}
-       {:label util.label/edit}]]
+       {:label (util.label/edit)}]]
      (util/render-list-in-area-content-line
       (v.watch-scope.util/build-related-links item))
      (wrapper.fetching/wrapper
@@ -90,12 +90,12 @@
          [:div
           [:form.form-control
            [util/render-errors-as-alerts (:errors state-info-system)]
-           [util/render-input util.label/name state-info-name]
+           [util/render-input (util.label/name) state-info-name]
            [:div
-            [:div util.label/user-team]
+            [:div (util.label/user-team)]
             [:div (util.label/user-team-item user-team)]]
            (util.watch-scope/render-fields-for-terms state-info-terms device-list-and-total)
-           [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} util.label/update]]])})]))
+           [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} (util.label/update)]]])})]))
 
 (defn core []
   (wrapper.show404/wrapper

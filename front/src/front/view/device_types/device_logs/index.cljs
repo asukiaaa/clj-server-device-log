@@ -23,7 +23,7 @@
            (merge params {:id-device-type id-device-type})))]
     [:<>
      [:f> breadcrumb/core
-      [{:label util.label/device-types :path route/device-types}
+      [{:label (util.label/device-types) :path route/device-types}
        {:label (util.label/device-type-item device-type) :path (route/device-type-show id-device-type)}
        {:label util.label/logs}]]
      (util/render-list-in-area-content-line

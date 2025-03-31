@@ -40,7 +40,7 @@
        (fn []))
      #js [])
     [:<>
-     [:f> breadcrumb/core [{:label util.label/devices :path route/devices}
+     [:f> breadcrumb/core [{:label (util.label/devices) :path route/devices}
                            {:label (util.label/device-item item)}]]
      (util/render-list-in-area-content-line
       (v.device.util/build-related-links item))
@@ -57,26 +57,26 @@
              [:th "value"]]]
            [:tbody
             [:tr [:td util.label/id] [:td (:id item)]]
-            [:tr [:td util.label/name] [:td (:name item)]]
+            [:tr [:td (util.label/name)] [:td (:name item)]]
             [:tr
-             [:td util.label/active-watch-scope]
+             [:td (util.label/active-watch-scope)]
              [:td (v.device.util/render-active-watch-scope-terms item {:item-wrapper :div})]]
             (when is-admin
               [:tr
                [:td util.label/authorization-bearer]
                [:td [:f> util/button-to-fetch-authorization-bearer fetch-bearer {:on-fetched on-fetched-bearer}]]])
             [:tr
-             [:td util.label/device-type]
+             [:td (util.label/device-type)]
              (let [device-type (util.device-type/key-table item)]
                [:td [:> router/Link {:to (route/device-type-show (:id device-type))} (util.label/device-type-item device-type)]])]
             [:tr
-             [:td util.label/user-team]
+             [:td (util.label/user-team)]
              (let [user-team (util.user-team/key-table item)]
                [:td [:> router/Link {:to (route/user-team-show (:id user-team))} (util.label/user-team-item user-team)]])]
-            [:tr [:td util.label/user-team-config] [:td (-> item util.user-team-device-config/key-table :config)]]
+            [:tr [:td (util.label/user-team-config)] [:td (-> item util.user-team-device-config/key-table :config)]]
             (when is-admin
               [:tr
-               [:td util.label/action]
+               [:td (util.label/action)]
                [:td [:f> util/btn-confirm-delete
                      {:message-confirm (model.device/build-confirmation-message-for-deleting item)
                       :action-delete #(model.device/delete {:id (:id item)

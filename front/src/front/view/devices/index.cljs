@@ -23,13 +23,13 @@
      (v.device.util/build-related-links device))]])
 
 (defn- page []
-  (let [labels-header [util.label/name util.label/device-type util.label/user-team util.label/active-watch-scope util.label/action]
+  (let [labels-header [(util.label/name) (util.label/device-type) (util.label/user-team) (util.label/active-watch-scope) (util.label/action)]
         user-loggedin (util/get-user-loggedin)]
     [:<>
-     [:f> breadcrumb/core [{:label util.label/devices}]]
+     [:f> breadcrumb/core [{:label (util.label/devices)}]]
      (when (model.user/admin? user-loggedin)
        [util/area-content
-        [:> router/Link {:to route/device-create} util.label/create]])
+        [:> router/Link {:to route/device-create} (util.label/create)]])
      [:f> util.table/core model.device/fetch-list-and-total labels-header render-device]]))
 
 (defn core []

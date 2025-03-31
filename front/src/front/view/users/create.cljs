@@ -36,14 +36,14 @@
                            :permission (:draft state-info-permission)
                            :on-receive on-receive}))]
     [:div
-     [:f> breadcrumb/core [{:label util.label/users :path route/users} {:label util.label/create}]]
+     [:f> breadcrumb/core [{:label (util.label/users) :path route/users} {:label (util.label/create)}]]
      [:form.form-control
       [util/render-errors-as-alerts (:errors state-info-system)]
       [util/render-input "name" state-info-name]
       [util/render-input "email" state-info-email]
       [util/render-input "password (10 chars or more)" state-info-password {:type :password}]
       [util/render-textarea "permission" state-info-permission]
-      [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} util.label/create]]]))
+      [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} (util.label/create)]]]))
 
 (defn core []
   (wrapper.show404/wrapper

@@ -17,13 +17,13 @@
      (v.team.util/build-related-links user-team))]])
 
 (defn- page []
-  (let [labels-header [util.label/name util.label/action]
+  (let [labels-header [(util.label/name) (util.label/action)]
         is-admin (util/detect-is-admin-loggedin)]
     [:<>
-     [:f> breadcrumb/core [{:label util.label/user-teams}]]
+     [:f> breadcrumb/core [{:label (util.label/user-teams)}]]
      (when is-admin
        [util/area-content
-        [:> router/Link {:to route/user-team-create} util.label/create]])
+        [:> router/Link {:to route/user-team-create} (util.label/create)]])
      [:f> util.table/core model.user-team/fetch-list-and-total labels-header render-user-team]]))
 
 (defn core []

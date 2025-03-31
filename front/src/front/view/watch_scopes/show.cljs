@@ -34,7 +34,7 @@
      #js [])
     [:<>
      [:f> breadcrumb/core
-      [{:label util.label/watch-scopes :path route/watch-scopes}
+      [{:label (util.label/watch-scopes) :path route/watch-scopes}
        {:label (util.label/watch-scope-item item)}]]
      (util/render-list-in-area-content-line
       (v.watch-scope.util/build-related-links item))
@@ -60,11 +60,11 @@
                   (= key :user_team)
                   (if-let [team (:user_team item)]
                     [:> router/Link {:to (route/user-team-show (:id team))} (util.label/user-team-item team)]
-                    util.label/no-data)
+                    (util.label/no-data))
                   :else
                   (get item key))]])
             [:tr
-             [:td util.label/action]
+             [:td (util.label/action)]
              [:td
               [:f> util/btn-confirm-delete
                {:message-confirm (model.watch-scope/build-confirmation-message-for-deleting item)

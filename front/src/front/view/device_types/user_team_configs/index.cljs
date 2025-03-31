@@ -17,9 +17,9 @@
     [:tr
      [:td [:> router/Link {:to (route/user-team-show id-user-team)} (util.label/user-team-item (:user_team item))]]
      [:td
-      [:> router/Link {:to (route/device-type-user-team-config-show id-device-type id-user-team)} util.label/show]
+      [:> router/Link {:to (route/device-type-user-team-config-show id-device-type id-user-team)} (util.label/show)]
       " "
-      [:> router/Link {:to (route/device-type-user-team-config-edit id-device-type id-user-team)} util.label/edit]
+      [:> router/Link {:to (route/device-type-user-team-config-edit id-device-type id-user-team)} (util.label/edit)]
       " "
       [:f> util/btn-confirm-delete
        {:message-confirm (model.user-team-device-type-config/build-confirmation-message-for-deleting item)
@@ -27,7 +27,7 @@
                          {:device_type_id id-device-type :user_team_id id-user-team :on-receive on-delete})}]]]))
 
 (defn- page []
-  (let [labels-header [util.label/user-team util.label/action]
+  (let [labels-header [(util.label/user-team) (util.label/action)]
         params (js->clj (router/useParams))
         id-device-type (get params "device_type_id")
         [device-type set-device-type] (react/useState)
@@ -40,9 +40,9 @@
           (set-device-type (model.device-type/key-table data)))]
     [:<>
      [:f> breadcrumb/core
-      [{:label util.label/device-types :path route/device-types}
+      [{:label (util.label/device-types) :path route/device-types}
        {:label (util.label/device-type-item device-type) :path (route/device-type-show id-device-type)}
-       {:label util.label/user-team-configs}]]
+       {:label (util.label/user-team-configs)}]]
      (util/render-list-in-area-content-line
       (v.device-type.util/build-related-links device-type))
      [util/area-content
