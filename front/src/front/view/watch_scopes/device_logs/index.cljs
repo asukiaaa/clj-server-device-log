@@ -31,7 +31,7 @@
        {:label (util.label/watch-scope-item item) :path (route/watch-scope-show id-watch-scope)}
        {:label util.label/logs}]]
      (util/render-list-in-area-content-line
-      (v.watch-scope.util/build-related-links item))
+      (v.watch-scope.util/build-related-links item {:id-item id-watch-scope}))
      [util/render-errors-as-alerts errors]
      (device-log.page/core
       (fn [params] (model.device-log/fetch-list-and-total-for-watch-scope

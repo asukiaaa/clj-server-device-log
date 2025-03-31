@@ -64,7 +64,7 @@
        {:label (util.label/device-type-item item) :path (route/device-type-show id-item)}
        {:label (util.label/edit)}]]
      (util/render-list-in-area-content-line
-      (v.device-type.util/build-related-links item))
+      (v.device-type.util/build-related-links item {:id-item id-item}))
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer

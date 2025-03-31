@@ -37,7 +37,7 @@
       [{:label (util.label/watch-scopes) :path route/watch-scopes}
        {:label (util.label/watch-scope-item item)}]]
      (util/render-list-in-area-content-line
-      (v.watch-scope.util/build-related-links item))
+      (v.watch-scope.util/build-related-links item {:id-item id}))
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer

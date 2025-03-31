@@ -81,7 +81,7 @@
        {:label (util.label/watch-scope-item item) :path (route/watch-scope-show id-item)}
        {:label (util.label/edit)}]]
      (util/render-list-in-area-content-line
-      (v.watch-scope.util/build-related-links item))
+      (v.watch-scope.util/build-related-links item {:id-item id-item}))
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer

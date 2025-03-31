@@ -27,7 +27,7 @@
        {:label (util.label/watch-scope-item item) :path (route/watch-scope-show id-item)}
        {:label util.label/files}]]
      (util/render-list-in-area-content-line
-      (v.watch-scope.util/build-related-links item))
+      (v.watch-scope.util/build-related-links item {:id-item id-item}))
      [:f> file.page/core fetch-list-and-total {:on-receive on-receive}]]))
 
 (defn core []

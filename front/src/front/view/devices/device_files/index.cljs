@@ -27,7 +27,7 @@
        {:label (util.label/device-item device) :path (route/device-show id-device)}
        {:label util.label/files}]]
      (util/render-list-in-area-content-line
-      (v.device.util/build-related-links device))
+      (v.device.util/build-related-links device {:id-item id-device}))
      [:f> file.page/core fetch-list-and-total {:on-receive on-receive}]]))
 
 (defn core []

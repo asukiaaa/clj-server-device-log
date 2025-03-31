@@ -21,7 +21,7 @@
        {:label (util.label/device-item device) :path (route/device-show id-device)}
        {:label util.label/logs}]]
      (util/render-list-in-area-content-line
-      (v.device.util/build-related-links device))
+      (v.device.util/build-related-links device {:id-item id-device}))
      (device-log.page/core
       #(model.device-log/fetch-list-and-total-for-device
         (assoc % :id-device id-device))

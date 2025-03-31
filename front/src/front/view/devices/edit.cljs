@@ -97,7 +97,7 @@
                             :path (when item (route/device-show id-item))}
                            {:label (util.label/edit)}]]
      (util/render-list-in-area-content-line
-      (v.device.util/build-related-links item))
+      (v.device.util/build-related-links item {:id-item id-item}))
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer

@@ -42,7 +42,7 @@
        {:label (util.label/device-type-item device-type) :path (route/device-type-show id-device-type)}
        {:label util.label/api-keys}]]
      (util/render-list-in-area-content-line
-      (v.device-type.util/build-related-links device-type))
+      (v.device-type.util/build-related-links device-type {:id-item id-device-type}))
      [:f> util.table/core fetch-list-and-total labels-header render-device-type-api-key
       {:on-receive on-receive}]]))
 

@@ -63,7 +63,7 @@
        {:label (or (:name item) util.label/no-data) :path (route/user-team-show id-item)}
        {:label (util.label/edit)}]]
      (util/render-list-in-area-content-line
-      (v.team.util/build-related-links item))
+      (v.team.util/build-related-links item {:id-item id-item}))
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer

@@ -27,7 +27,7 @@
        {:label (util.label/device-type-item device-type) :path (route/device-type-show id-device-type)}
        {:label util.label/logs}]]
      (util/render-list-in-area-content-line
-      (v.device-type.util/build-related-links device-type))
+      (v.device-type.util/build-related-links device-type {:id-item id-device-type}))
      (device-log.page/core fetch-list-and-total {:on-receive on-receive})]))
 
 (defn core []

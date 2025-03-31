@@ -64,7 +64,7 @@
        {:label (util.label/user-team-item user-team) :path (route/user-team-show id-user-team)}
        {:label util.label/members}]]
      (util/render-list-in-area-content-line
-      (v.team.util/build-related-links user-team))
+      (v.team.util/build-related-links user-team {:id-item id-user-team}))
      [:> router/Link {:to (route/user-team-member-create id-user-team)} (util.label/create)]
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching

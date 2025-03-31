@@ -12,8 +12,6 @@
 
 (defn- page []
   (let [params (js->clj (router/useParams))
-        location (router/useLocation)
-        path-current (.-pathname location)
         navigate (router/useNavigate)
         user-loggedin (util/get-user-loggedin)
         is-admin (model.user/admin? user-loggedin)
@@ -23,8 +21,6 @@
         state-info-system (util/build-state-info :__system #(react/useState))
         info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
         [waiting-response set-waiting-response] (react/useState)
-        on-delete #(model.user/delete {:id (:id user)
-                                       :on-receive (fn [] (navigate route/users))})
         on-receive-hash-reset-password
         (fn [data errors]
           (when errors ((:set-draft state-info-system) errors))
@@ -56,7 +52,7 @@
           (when is-admin
             [util/area-content
              (util/render-list
-              (v.user.util/build-related-links user on-delete user-loggedin {:path-current path-current})
+              (v.user.util/build-related-links user {:id-item id-user})
               (fn [link] [:<> link " "]))])
           [:table.table.table-sm
            [:thead
@@ -86,7 +82,14 @@
                 :else
                 [:tr {:key key}
                  [:td key]
-                 [:td (get user key)]]))]]])})]))
+                 [:td (get user key)]]))
+            (when is-admin
+              [:tr
+               [:td (util.label/action)]
+               [:td
+                [:f> util/btn-confirm-delete
+                 {:message-confirm (model.user/build-confirmation-message-for-deleting id-user)
+                  :action-delete #(model.user/delete {:id id-user :on-receive (fn [] (js/alert "TODO"))})}]]])]]])})]))
 
 (defn core []
   (wrapper.show404/wrapper

@@ -32,7 +32,7 @@
       [{:label (util.label/user-teams) :path route/user-teams}
        {:label (or (:name item) (util.label/no-data))}]]
      (util/render-list-in-area-content-line
-      (v.team.util/build-related-links item))
+      (v.team.util/build-related-links item {:id-item id}))
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer

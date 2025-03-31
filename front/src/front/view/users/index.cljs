@@ -19,7 +19,7 @@
            [:td (:email user)]
            [:td
             (util/render-list-inline
-             (v.user.util/build-related-links user load-list user-loggedin))]])]
+             (v.user.util/build-related-links user))]])]
     [:<>
      [:f> breadcrumb/core [{:label (util.label/users)}]]
      (when (model.user/admin? user-loggedin)

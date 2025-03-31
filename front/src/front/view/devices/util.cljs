@@ -7,10 +7,10 @@
             [front.model.util.device :as util.device]
             [front.model.util.watch-scope :as util.watch-scope]))
 
-(defn build-related-links [item]
+(defn build-related-links [item & [{:keys [id-item]}]]
   (let [location (router/useLocation)
         path-current (.-pathname location)
-        id-item (:id item)
+        id-item (or id-item (:id item))
         user (util/get-user-loggedin)
         is-admin (model.user/admin? user)]
     (->> [(util/build-link-or-text (util.label/show) (route/device-show id-item) path-current)

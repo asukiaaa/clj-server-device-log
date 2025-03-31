@@ -33,7 +33,7 @@
      [:f> breadcrumb/core [{:label (util.label/device-types) :path route/device-types}
                            {:label (util.label/device-type-item item)}]]
      (util/render-list-in-area-content-line
-      (v.device-type.util/build-related-links item))
+      (v.device-type.util/build-related-links item {:id-item id}))
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer

@@ -44,7 +44,7 @@
        {:label (util.label/device-type-item device-type) :path (route/device-type-show id-device-type)}
        {:label (util.label/user-team-configs)}]]
      (util/render-list-in-area-content-line
-      (v.device-type.util/build-related-links device-type))
+      (v.device-type.util/build-related-links device-type {:id-item id-device-type}))
      [util/area-content
       [:> router/Link {:to (route/device-type-user-team-config-select-team id-device-type)} util.label/select-team]]
      [:f> util.table/core fetch-list-and-total labels-header render-user-team-device-type-config
