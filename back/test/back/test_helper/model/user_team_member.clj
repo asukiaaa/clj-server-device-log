@@ -1,4 +1,4 @@
-(ns back.test-helper.user-team-member
+(ns back.test-helper.model.user-team-member
   (:require
    [clojure.spec.alpha :as s]
    [back.models.user-team-member :as model.user-team-member]

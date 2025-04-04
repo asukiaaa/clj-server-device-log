@@ -3,8 +3,8 @@
    [clojure.test :as t]
    [back.core]
    [back.test-helper.graphql.core :refer [post-query]]
-   [back.test-helper.user :as h.user]
    [back.test-helper.graphql.login :as graphql.login]
+   [back.test-helper.model.user :as h.user]
    [clj-http.cookies :as http.cookies]))
 
 (defn get-id-user-loggedin [data]

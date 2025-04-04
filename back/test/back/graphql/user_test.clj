@@ -2,11 +2,9 @@
   (:require
    [clojure.test :as t]
    [back.core]
-   [back.test-helper.user :as h.user]
-   [back.test-helper.user-team :as h.user-team]
-   [back.test-helper.user-team-member :as h.user-team-member]
    [back.test-helper.graphql.login :as graphql.login]
-   [back.test-helper.graphql.user :as graphql.user]))
+   [back.test-helper.graphql.user :as graphql.user]
+   [back.test-helper.model.bundled :as h.model.bundled]))
 
 (defn test-is-in-list [label item list]
   (t/testing label
@@ -31,27 +29,22 @@
     (t/testing (str key-watcher " cannot see " key-user " by get query")
       (t/is (nil? user-by-query)))))
 
-(defn test-user-visivility [{:keys [user-admin user-owner-of-team user-team-member user-team-member-admin user-out-of-team]
-                             :as map-user}]
-  (let [keys-user-in-team [:user-owner-of-team :user-team-member :user-team-member-admin]
+(defn test-user-visivility [{:keys [map-user]}]
+  (t/is (seq map-user))
+  (let [keys-user-in-team [:team-owner :team-member :team-member-admin]
         cases-test
-        [{:watcher user-admin
-          :key-watcher :user-admin
+        [{:key-watcher :admin
           :keys-user-visible (keys map-user)}
-         {:watcher user-owner-of-team
-          :key-watcher :user-owner-of-team
+         {:key-watcher :team-owner
           :keys-user-visible keys-user-in-team}
-         {:watcher user-team-member
-          :key-watcher :user-team-member
+         {:key-watcher :team-member
           :keys-user-visible keys-user-in-team}
-         {:watcher user-team-member-admin
-          :key-watcher :user-team-member-admin
+         {:key-watcher :team-member-admin
           :keys-user-visible keys-user-in-team}
-         {:watcher user-out-of-team
-          :key-watcher :user-out-of-team
-          :keys-user-visible [:user-out-of-team]}]]
-    (doseq [{:keys [watcher key-watcher keys-user-visible]} cases-test]
-      (graphql.login/with-loggedin-session [cookie-store watcher]
+         {:key-watcher :out-of-team
+          :keys-user-visible [:out-of-team]}]]
+    (doseq [{:keys [key-watcher keys-user-visible]} cases-test]
+      (graphql.login/with-loggedin-session [cookie-store (key-watcher map-user)]
         (let [list-and-total-user (graphql.user/get-users cookie-store)
               users (:list list-and-total-user)]
           (doseq [key-user (keys map-user)]
@@ -67,18 +60,5 @@
                 (test-invisible info-test)))))))))
 
 (t/deftest user
-  (h.user/with-user-admin [user-admin]
-    (h.user/with-user [user-owner-of-team]
-      (h.user/with-user [user-team-member]
-        (h.user-team/with-user-team [user-team user-owner-of-team]
-          (h.user-team-member/with-member [_member [user-team user-team-member]]
-            (h.user/with-user [user-team-member-admin]
-              (h.user-team-member/with-member-admin [_member-admin [user-team user-team-member-admin]]
-                (h.user/with-user [user-out-of-team]
-                  (let [map-user {:user-admin user-admin
-                                  ;:user-fail {:id 0 :email "aaa"}
-                                  :user-owner-of-team user-owner-of-team
-                                  :user-team-member user-team-member
-                                  :user-team-member-admin user-team-member-admin
-                                  :user-out-of-team user-out-of-team}]
-                    (test-user-visivility map-user)))))))))))
+  (h.model.bundled/with-data-user-and-team [data]
+    (test-user-visivility data)))

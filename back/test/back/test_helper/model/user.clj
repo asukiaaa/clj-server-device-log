@@ -1,4 +1,4 @@
-(ns back.test-helper.user
+(ns back.test-helper.model.user
   (:require
    [cheshire.core :as cheshire]
    [clojure.spec.alpha :as s]
