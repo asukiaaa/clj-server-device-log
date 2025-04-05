@@ -10,7 +10,7 @@
 (defn get-id-user-loggedin [data]
   (-> data :user_loggedin :user :id))
 
-(t/deftest test-login
+(t/deftest core
   (h.user/with-user-admin [user-admin]
     #_(println user-admin)
     (t/testing "Able to create admin user"

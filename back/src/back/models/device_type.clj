@@ -102,7 +102,7 @@
     (let [id (-> (jdbc/query t-con "SELECT LAST_INSERT_ID()")
                  first vals first)
           item (get-by-id id {:transaction t-con})]
-      {key-table item})))
+      item)))
 
 (defn get-list-with-total [params & [{:keys [str-where transaction]}]]
   (model.util/get-list-with-total-with-building-query

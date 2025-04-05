@@ -22,7 +22,8 @@
             [back.models.util.watch-scope :as util.watch-scope]
             [back.models.watch-scope :as model.watch-scope]
             [back.models.watch-scope-term :as model.watch-scope-term]
-            [back.util.label :as util.label]))
+            [back.util.label :as util.label]
+            [back.models.util.device-type :as util.device-type]))
 
 (defn get-user-loggedin [context]
   (:user-loggedin context))
@@ -43,7 +44,10 @@
   (when-let [id-device (:device_id args)]
     (jdbc/with-db-transaction [transaction db-spec]
       (let [user (get-user-loggedin context)]
-        (when-let [device (model.device/get-by-id-for-user id-device (:id user) {:transaction transaction})]
+        (when-let [device (model.device/get-by-id-in-ids-user-team-or-ids-device
+                           {:id id-device
+                            :ids-user-team (util.user-team-permission/build-query-ids-for-user-write (:id user))
+                            :transaction transaction})]
           (-> (model-device-log/get-list-with-total
                args
                {:build-str-where-and #(format "%s.device_id = %d" % id-device)
@@ -447,7 +451,7 @@
   (let [user (get-user-loggedin context)
         params-device-type (:device_type args)]
     (when (model.user/admin? user)
-      (model.device-type/create params-device-type))))
+      {util.device-type/key-table (model.device-type/create params-device-type)})))
 
 (defn device-type-update [context args _]
   (println "args device-type-create" args)
@@ -678,9 +682,16 @@
 
 (defn device [context args _]
   (println "args device" args)
-  (let [user (get-user-loggedin context)]
+  (let [user (get-user-loggedin context)
+        id-user (:id user)
+        id-device (:id args)]
     (jdbc/with-db-transaction [transaction db-spec]
-      (-> (model.device/get-by-id-for-user (:id args) (:id user) {:transaction transaction})
+      (-> (if (model.user/admin? user)
+            (model.device/get-by-id id-device {:transaction transaction})
+            (model.device/get-by-id-in-ids-user-team-or-ids-device
+             {:id id-device
+              :ids-user-team (util.user-team-permission/build-query-ids-for-user-write id-user)
+              :transaction transaction}))
           (model.watch-scope-term/assign-actives-to-device {:transaction transaction})))))
 
 (defn create-user-team-device-config-with-checking-permission [{:keys [is-admin params id-user id-device transaction]}]
@@ -740,9 +751,11 @@
 
 (defn device-delete [context args _]
   (println "args device-delete" args)
-  (let [user (get-user-loggedin context)]
-    (when (model.user/admin? user)
-      (model.device/delete-for-user (:id args) (:id user)))))
+  (let [user (get-user-loggedin context)
+        id-device (:id args)]
+    (if (model.user/admin? user)
+      (model.device/delete id-device)
+      (model.device/delete-for-user id-device (:id user)))))
 
 (defn authorization-bearer-for-device [context args _]
   (println "authorization-bearer-for-device")

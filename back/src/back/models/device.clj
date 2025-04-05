@@ -91,13 +91,21 @@
     (jdbc/update! (or transaction db-spec) key-table params ["id = ?" id])
     (get-by-id id {:transaction transaction})))
 
-(defn get-by-id-for-user [id id-user & [{:keys [transaction]}]]
-  (let [sql-ids-user-team (util.user-team-permission/build-query-ids-for-user-show id-user)
-        str-where (format "(%s.user_team_id IN %s OR %s.manager_user_team_id IN %s)"
-                          name-table
-                          sql-ids-user-team
-                          util.device-type/name-table
-                          sql-ids-user-team)]
+(defn get-by-id-in-ids-user-team-or-ids-device [& [{:keys [id ids-user-team ids-device transaction]}]]
+  (let [str-where (->> [(when ids-user-team
+                          (format "(%s.user_team_id IN %s OR %s.manager_user_team_id IN %s)"
+                                  name-table
+                                  ids-user-team
+                                  util.device-type/name-table
+                                  ids-user-team))
+                        (when ids-device
+                          (format "%s.id IN %s" name-table ids-device))]
+                       (remove nil?)
+                       ((fn [arr] (if (seq arr)
+                                    arr
+                                    (throw (Exception. "ids-user-team or ids-device is needed")))))
+                       (join " OR ")
+                       (format "(%s)"))]
     (get-by-id
      id
      {:str-where str-where
@@ -158,7 +166,7 @@
           (let [id (-> (jdbc/query transaction "SELECT LAST_INSERT_ID()")
                        first vals first)
                 item (get-by-id id {:transaction transaction})]
-            {key-table item}))
+            item))
       {:errors {:name ["required to unique for device type"]}})))
 
 (defn create-for-user [params user-id & [{:keys [transaction]}]]

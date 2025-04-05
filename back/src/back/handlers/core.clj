@@ -124,10 +124,10 @@
               id-device-type (:device_type_id device-type-api-key)
               params-device (-> (:device params)
                                 (assoc :device_type_id id-device-type))
-              result-create (model.device/create params-device {:transaction transaction})
-              result-return (if-let [device (model.device/key-table result-create)]
-                              {model.util/key-authorization-bearer (model.device/build-authorization-bearer-for-item device)}
-                              result-create)]
+              device-or-errors (model.device/create params-device {:transaction transaction})
+              result-return (if (:id device-or-errors)
+                              {model.util/key-authorization-bearer (model.device/build-authorization-bearer-for-item device-or-errors)}
+                              device-or-errors)]
           {:status 200
            :body (json/write-str result-return)})))))
 
