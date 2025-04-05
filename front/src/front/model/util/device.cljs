@@ -1,9 +1,9 @@
 (ns front.model.util.device
-  (:require [goog.string :refer [format]]
-            [clojure.string :refer [join]]
+  (:require [clojure.string :refer [join]]
             [front.model.util.core :as util.core]))
 
 (def name-table "device")
+(def key-table (keyword name-table))
 (def keys-for-table [:id :device_type_id :user_team_id :name :created_at :updated_at])
 (def query-keys (join " " (map name keys-for-table)))
 (def key-active-watch-scope-terms :active_watch_scope_terms)

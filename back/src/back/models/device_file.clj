@@ -13,7 +13,8 @@
             [back.models.util.watch-scope :as util.watch-scope]
             [back.models.util.watch-scope-term :as util.watch-scope-term]
             [back.util.filestorage :as util.filestorage]
-            [back.util.time :refer [time-format-yyyymmdd-hhmmss]]))
+            [back.util.time :refer [time-format-yyyymmdd-hhmmss]]
+            [back.models.util.user-team-permission :as util.user-team-permission]))
 
 (def name-table util.device-file/name-table)
 (def key-table util.device-file/key-table)
@@ -119,7 +120,10 @@
 (defn get-path-file-for-user [path-url id-user & [{:keys [transaction]}]]
   (let [id-device (or (util.filestorage/get-id-device-from-path-url path-url)
                       (util.filestorage/get-id-device-from-path-url-thumbnail path-url))
-        device (model.device/get-by-id-for-user id-device id-user {:transaction transaction})]
+        device (model.device/get-by-id-in-ids-user-team-or-ids-device
+                {:id id-device
+                 :ids-user-team (util.user-team-permission/build-query-ids-for-user-write id-user)
+                 :transaction transaction})]
     (when device
       (util.filestorage/convert-path-url-to-path-file path-url))))
 

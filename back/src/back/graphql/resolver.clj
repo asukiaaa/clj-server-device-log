@@ -44,10 +44,12 @@
   (when-let [id-device (:device_id args)]
     (jdbc/with-db-transaction [transaction db-spec]
       (let [user (get-user-loggedin context)]
-        (when-let [device (model.device/get-by-id-in-ids-user-team-or-ids-device
-                           {:id id-device
-                            :ids-user-team (util.user-team-permission/build-query-ids-for-user-write (:id user))
-                            :transaction transaction})]
+        (when-let [device (if (model.user/admin? user)
+                            (model.device/get-by-id id-device {:transaction transaction})
+                            (model.device/get-by-id-in-ids-user-team-or-ids-device
+                             {:id id-device
+                              :ids-user-team (util.user-team-permission/build-query-ids-for-user-write (:id user))
+                              :transaction transaction}))]
           (-> (model-device-log/get-list-with-total
                args
                {:build-str-where-and #(format "%s.device_id = %d" % id-device)
@@ -61,10 +63,12 @@
     (let [id-device-type (:device_type_id args)
           id-user (:id user)]
       (jdbc/with-db-transaction [transaction db-spec]
-        (when-let [device-type (model.device-type/get-by-id-for-user-via
-                                id-device-type id-user {:via-device true
-                                                        :via-manager true
-                                                        :transaction transaction})]
+        (when-let [device-type (if (model.user/admin? user)
+                                 (model.device-type/get-by-id id-device-type {:transaction transaction})
+                                 (model.device-type/get-by-id-for-user-via
+                                  id-device-type id-user {:via-device true
+                                                          :via-manager true
+                                                          :transaction transaction}))]
           (-> (model-device-log/get-list-with-total
                args {:build-str-where-and
                      (fn [_]
@@ -458,10 +462,16 @@
   (when-let [user (get-user-loggedin context)]
     (let [id-device-type (:id args)
           id-user (:id user)
-          params-device-type (:device_type args)]
-      (model.device-type/update-for-user {:id id-device-type
-                                          :id-user id-user
-                                          :params params-device-type}))))
+          params-device-type (:device_type args)
+          item-or-errors
+          (if (model.user/admin? user)
+            (model.device-type/update id-device-type params-device-type)
+            (model.device-type/update-for-user {:id id-device-type
+                                                :id-user id-user
+                                                :params params-device-type}))]
+      (if (:id item-or-errors)
+        {util.device-type/key-table item-or-errors}
+        item-or-errors))))
 
 (defn device-type-delete [context args _]
   (println "args device-type-delete" args)
@@ -514,7 +524,10 @@
   (jdbc/with-db-transaction [transaction db-spec]
     (let [user (get-user-loggedin context)
           id-device (:device_id args)
-          device (model.device/get-by-id-for-user id-device (:id user) {:transaction transaction})
+          device (model.device/get-by-id-in-ids-user-team-or-ids-device
+                  {:id id-device
+                   :ids-user-team (util.user-team-permission/build-query-ids-for-user-write (:id user))
+                   :transaction transaction})
           files-list-total
           (when device
             (model.device-file/get-list-with-total-for-device args id-device {:transaction transaction}))]

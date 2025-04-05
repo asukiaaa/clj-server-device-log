@@ -49,26 +49,28 @@
                       :id id
                       :on-receive on-receive}))
 
-(defn create [{:keys [name config_default manager_user_team_id config_format on-receive]}]
-  (let [str-params (format "%s: {name: %s,  manager_user_team_id: %s, config_default: %s, config_format: %s}"
+(defn create [{:keys [name config_default manager_user_team_id config_format config_renderer_default on-receive]}]
+  (let [str-params (format "%s: {name: %s,  manager_user_team_id: %s, config_default: %s, config_format: %s, config_renderer_default: %s}"
                            name-table
                            (util/build-input-str-for-str name)
                            (util/build-input-str-for-int manager_user_team_id)
                            (util/build-input-str-for-str config_default)
-                           (util/build-input-str-for-str config_format))]
+                           (util/build-input-str-for-str config_format)
+                           (util/build-input-str-for-str config_renderer_default))]
     (util/create {:name-table name-table
                   :str-keys-receive (util.device-type/build-query-table-and-keys)
                   :str-input-params str-params
                   :on-receive on-receive})))
 
-(defn update [{:keys [id name manager_user_team_id config_default config_format on-receive]}]
-  (let [str-params (format "id: %s, %s: {name: %s, manager_user_team_id: %s, config_default: %s, config_format: %s}"
+(defn update [{:keys [id name manager_user_team_id config_default config_format config_renderer_default on-receive]}]
+  (let [str-params (format "id: %s, %s: {name: %s, manager_user_team_id: %s, config_default: %s, config_format: %s, config_renderer_default: %s}"
                            (util/build-input-str-for-int id)
                            name-table
                            (util/build-input-str-for-str name)
                            (util/build-input-str-for-int manager_user_team_id)
                            (util/build-input-str-for-str config_default)
-                           (util/build-input-str-for-str config_format))]
+                           (util/build-input-str-for-str config_format)
+                           (util/build-input-str-for-str config_renderer_default))]
     (util/update {:name-table name-table
                   :str-keys-receive (util.device-type/build-query-table-and-keys)
                   :str-input-params str-params

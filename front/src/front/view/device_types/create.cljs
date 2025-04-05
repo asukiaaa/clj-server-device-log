@@ -16,7 +16,8 @@
         state-info-id-manager-user-team (util/build-state-info :manager_user_team_id #(react/useState))
         state-info-config-default (util/build-state-info :config_default react/useState)
         state-info-config-format (util/build-state-info :config_format react/useState)
-        list-state-info [state-info-system state-info-id-manager-user-team state-info-name state-info-config-default state-info-config-format]
+        state-info-config-renderer-default (util/build-state-info :config_renderer_default react/useState)
+        list-state-info [state-info-system state-info-id-manager-user-team state-info-name state-info-config-default state-info-config-format state-info-config-renderer-default]
         on-receive (fn [data]
                      (if-let [errors-str (:errors data)]
                        (let [errors (keywordize-keys (js->clj (.parse js/JSON errors-str)))]
@@ -43,6 +44,7 @@
       [util/render-input (util.label/name) state-info-name]
       [util/render-textarea util.label/config-format state-info-config-format]
       [util/render-textarea util.label/config-default state-info-config-default]
+      [util/render-textarea util.label/config-renderer-default state-info-config-renderer-default]
       [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} (util.label/create)]]]))
 
 (defn core []

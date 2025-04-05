@@ -1,0 +1,6 @@
+{:up
+ ["ALTER TABLE device_type
+   ADD COLUMN config_renderer_default JSON AFTER config_format"]
+ :down
+ ["ALTER TABLE device_type
+   DROP COLUMN config_renderer_default"]}

@@ -21,7 +21,8 @@
         state-info-name (util/build-state-info :name #(react/useState))
         state-info-config-default (util/build-state-info :config_default react/useState)
         state-info-config-format (util/build-state-info :config_format react/useState)
-        list-state-info [state-info-id-manager-user-team state-info-system state-info-name state-info-config-default state-info-config-format]
+        state-info-config-renderer-default (util/build-state-info :config_renderer_default react/useState)
+        list-state-info [state-info-id-manager-user-team state-info-system state-info-name state-info-config-default state-info-config-format state-info-config-renderer-default]
         on-receive-item
         (fn [item]
           (set-item item)
@@ -77,7 +78,8 @@
            [util/render-input (util.label/name) state-info-name]
            [util/render-textarea util.label/config-format state-info-config-format]
            [util/render-textarea util.label/config-default state-info-config-default]
-           [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} (util.label/edit)]]])})]))
+           [util/render-textarea util.label/config-renderer-default state-info-config-renderer-default]
+           [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} (util.label/update)]]])})]))
 
 (defn core []
   (wrapper.show404/wrapper

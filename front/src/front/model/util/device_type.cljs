@@ -4,7 +4,8 @@
 
 (def name-table "device_type")
 (def key-table (keyword name-table))
-(def keys-for-table [:id :name :manager_user_team_id :config_format :config_default :created_at :updated_at])
+(def key-config-renderer-default :config_renderer_default)
+(def keys-for-table [:id :name :manager_user_team_id :config_format :config_default key-config-renderer-default :created_at :updated_at])
 (def query-keys (join " " (map name keys-for-table)))
 (def key-manager-user-team :manager_user_team)
 (def name-manager-user-team (name key-manager-user-team))

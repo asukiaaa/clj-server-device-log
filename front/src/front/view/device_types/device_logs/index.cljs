@@ -3,6 +3,7 @@
             ["react-router-dom" :as router]
             [front.route :as route]
             [front.model.device-log :as model.device-log]
+            [front.model.util.device-type :as m.util.device-type]
             [front.view.common.wrapper.show404 :as wrapper.show404]
             [front.view.device-types.util :as v.device-type.util]
             [front.view.util :as util]
@@ -15,8 +16,12 @@
         id-device-type (get params "device_type_id")
         [device-type set-device-type] (react/useState)
         on-receive
-        (fn [data]
-          (set-device-type (:device_type data)))
+        (fn [data errors {:keys [info-str-renderer]}]
+          (let [device-type (m.util.device-type/key-table data)
+                config-renderer-default (m.util.device-type/key-config-renderer-default device-type)]
+            (when (and info-str-renderer config-renderer-default)
+              (util/set-default-and-draft info-str-renderer config-renderer-default))
+            (set-device-type device-type)))
         fetch-list-and-total
         (fn [params]
           (model.device-log/fetch-list-and-total-for-device-type

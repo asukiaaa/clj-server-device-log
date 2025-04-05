@@ -49,7 +49,8 @@
    {:name {:type String}
     :manager_user_team_id {:type Int}
     :config_default {:type String}
-    :config_format {:type String}}}
+    :config_format {:type String}
+    :config_renderer_default {:type String}}}
   :InputDeviceTypeApiKeyCreate
   {:fields
    {:name {:type String}
@@ -203,6 +204,7 @@
     :name {:type String}
     :config_default {:type String}
     :config_format {:type String}
+    :config_renderer_default {:type String}
     :created_at {:type String}
     :updated_at {:type String}}}
   :ResponseDeviceTypeListTotal

@@ -60,7 +60,7 @@
   (jdbc/delete! db-spec key-table ["id = ?" id]))
 
 (defn update [id params]
-  (jdbc/update! db-spec key-table params ["id = ?" id]))
+  (model.util/update name-table id params))
 
 (defn update-for-user [{:keys [id id-user params]}]
   (jdbc/with-db-transaction [t-con db-spec]
@@ -69,7 +69,7 @@
      [(format "id = %d AND %s"
               id (build-query-filter-by-user-teams-via-manager
                   (util.user-team-permission/build-query-ids-for-user-write id-user)))])
-    {key-table (get-by-id id {:transaction t-con})}))
+    (get-by-id id {:transaction t-con})))
 
 (defn delete-for-user [{:keys [id id-user]}]
   (jdbc/delete!
@@ -88,7 +88,7 @@
 
 (defn get-by-id-for-user-via [id id-user & [{:keys [transaction via-device via-manager]}]]
   (get-by-id-for-user-teams-via
-   id (util.user-team-permission/build-query-ids-for-user-show id-user)
+   id (util.user-team-permission/build-query-ids-for-user-write id-user)
    {:transaction transaction :via-device via-device :via-manager via-manager}))
 
 (defn get-by-id-for-user-to-edit [id id-user & [{:keys [transaction]}]]

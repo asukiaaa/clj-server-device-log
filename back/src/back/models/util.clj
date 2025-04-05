@@ -1,4 +1,5 @@
 (ns back.models.util
+  (:refer-clojure :exclude [update])
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.data.json :as json]
             [clojure.core :refer [format]]
@@ -87,6 +88,17 @@
                  first vals first)
           item (get-by-id id (name key-table) {:transaction t-con})]
       item)))
+
+(defn update [key-table id params & [{:keys [transaction str-where]}]]
+  (jdbc/with-db-transaction [t-con (or transaction db-spec)]
+    (jdbc/update!
+     db-spec key-table params
+     [(->> [(format "id = %d"
+                    id)
+            str-where]
+           (remove nil?)
+           (join " AND "))])
+    (get-by-id id (name key-table) {:transaction t-con})))
 
 (defn get-list-with-total-with-building-query [name-table params & [{:keys [str-where str-keys-select transaction str-before-where str-order build-item]}]]
   (-> (build-query-get-index name-table {:str-keys-select str-keys-select})

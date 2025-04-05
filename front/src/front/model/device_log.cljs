@@ -51,7 +51,9 @@
 (defn fetch-list-and-total-for-device [{:keys [id-device str-where str-order limit page on-receive]}]
   (fetch-list-and-total {:str-where str-where
                          :str-order str-order
-                         :str-additional-field (util.device/build-query-table-and-keys)
+                         :str-additional-field
+                         (util.device/build-query-table-and-keys
+                          {:query-keys-additional (util.device-type/build-query-table-and-keys)})
                          :limit limit
                          :pate page
                          :on-receive on-receive}

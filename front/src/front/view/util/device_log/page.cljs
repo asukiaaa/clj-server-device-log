@@ -50,32 +50,39 @@
         info-show-table (build-state-info :show-table #(react/useState true))
         total-page (pagination/calc-total-page (:default info-limit) total)
         query-params (util/read-query-params)
+        [query-param-renderer set-query-param-renderer] (react/useState)
         page-current (or (pagination/key-page query-params) 0)
         arr-info [info-limit info-str-renderer info-str-order info-str-where info-show-graph info-show-table]
         [show-config set-show-config] (react/useState false)
         [config-renderer parse-error-config-renderer] (parse-json (:default info-str-renderer))
         [_ parse-error-where] (parse-json (:default info-str-where))
         [_ parse-error-order] (parse-json (:default info-str-order))
-        load-query-params #(let [query-params (util/read-query-params)]
-                             (doseq [info arr-info]
-                               (-> (get-param-str (:key info) query-params map-default)
-                                   (set-all-val info))))
-        fetch-device-logs (fn [str-where str-order limit]
-                            (let [logs-key (str str-where str-order limit)]
-                              (wrapper.fetching/start info-wrapper-fetching)
-                              (fetch-list-and-total
-                               {:str-order str-order
-                                :str-where str-where
-                                :limit limit
-                                :page page-current
-                                :on-receive
-                                (fn [data errors]
-                                  #_(println data errors)
-                                  (when-not (nil? on-receive) (on-receive data))
-                                  (set-logs (:list data))
-                                  (set-total (:total data))
-                                  (set-logs-key-fetched logs-key)
-                                  (wrapper.fetching/finished info-wrapper-fetching errors))})))
+        load-query-params
+        #(let [query-params (util/read-query-params)]
+           (doseq [info arr-info]
+             (when (= :str-renderer (:key info))
+               (set-query-param-renderer ((:key info) query-params)))
+             (->> (get-param-str (:key info) query-params map-default)
+                  (util/set-default-and-draft info))))
+        fetch-device-logs
+        (fn [str-where str-order limit]
+          (let [logs-key (str str-where str-order limit)]
+            (wrapper.fetching/start info-wrapper-fetching)
+            (fetch-list-and-total
+             {:str-order str-order
+              :str-where str-where
+              :limit limit
+              :page page-current
+              :on-receive
+              (fn [data errors]
+                #_(println data errors)
+                (when-not (nil? on-receive)
+                  (on-receive data errors {:info-str-renderer (when-not query-param-renderer
+                                                                info-str-renderer)}))
+                (set-logs (:list data))
+                (set-total (:total data))
+                (set-logs-key-fetched logs-key)
+                (wrapper.fetching/finished info-wrapper-fetching errors))})))
         on-click-apply (fn []
                          (->> (for [info arr-info] [(:key info) (:draft info)])
                               (into (sorted-map))

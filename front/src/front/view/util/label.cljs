@@ -37,6 +37,7 @@
 (def close "Close")
 (def config-default "Config default")
 (def config-format "Config format")
+(def config-renderer-default "Config renderer default")
 (def config-on-user-team "Config on user team")
 (def copy "Copy")
 (def copied "Copied")
