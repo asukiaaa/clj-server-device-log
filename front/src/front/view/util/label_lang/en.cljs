@@ -17,7 +17,7 @@
    :email "Email"
    :indefinite-term "Indefinite term"
    :login "Login"
-   :loghout "Logout"
+   :logout "Logout"
    :name "Name"
    :no-data "No data"
    :password "Password"
