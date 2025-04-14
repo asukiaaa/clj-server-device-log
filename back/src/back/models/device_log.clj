@@ -200,8 +200,10 @@
     #_(println "str-query" str-query transaction)
     (model.util/get-list-with-total [str-query] {:transaction transaction})))
 
-(defn get-by-id [id]
-  (first (jdbc/query db-spec [(format "select * from %s where id = ?" util.device-log/name-table) id])))
+(defn get-by-id [id & [{:keys [transaction]}]]
+  (model.util/get-by-id
+   id util.device-log/name-table
+   {:transaction transaction}))
 
 (defn create [params]
   (jdbc/insert! db-spec util.device-log/key-table params))

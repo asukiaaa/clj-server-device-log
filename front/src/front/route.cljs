@@ -34,8 +34,9 @@
 (def device-create (str devices "/create"))
 (defn device-show [id] (str devices "/" id))
 (defn device-edit [id] (str (device-show id) "/edit"))
-(defn device-device-logs [id-device] (str (device-show id-device) "/device_logs"))
 (defn device-device-files [id] (str (device-show id) "/device_files"))
+(defn device-device-logs [id-device] (str (device-show id-device) "/device_logs"))
+(defn device-device-log-show [id-device id-device-log] (str (device-device-logs id-device) "/" id-device-log))
 
 (def device-types (str front "/device_types"))
 (def device-type-create (str device-types "/create"))

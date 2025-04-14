@@ -6,6 +6,7 @@
    :add-term "期間を追加"
    :create "作成"
    :dashboard "ダッシュボード"
+   :data "情報"
    :delete "削除"
    :delete-term "期間を削除"
    :device "装置"

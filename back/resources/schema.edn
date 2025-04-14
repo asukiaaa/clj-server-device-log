@@ -88,8 +88,8 @@
  {:DeviceLog
   {:fields
    {:id {:type (non-null Int)}
+    :device {:type Device}
     :device_id {:type Int}
-    :device_name {:type String}
     :data {:type String}
     :created_at {:type String}}}
   :ResponseDeviceLogListTotal
@@ -354,6 +354,13 @@
     :authorization_bearer_for_device_type_api_key
     {:type ResponseAuthorizationBearer
      :args {:id {:type (non-null Int)}}}
+    :device_log
+    {:type DeviceLog
+     :args {:id {:type (non-null Int)}}}
+    :device_log_for_device
+    {:type DeviceLog
+     :args {:id {:type (non-null Int)}
+            :device_id {:type (non-null Int)}}}
     :device_logs
     {:type ResponseDeviceLogListTotal
      :args {:limit {:type Int}

@@ -44,6 +44,7 @@
 (defn create [] (get-word-from-words :create))
 (def created-at "Created at")
 (def dashboard "Dashboard")
+(defn data [] (get-word-from-words :data))
 (defn datetime-from-item [str-datetiem-from]
   (str "from " str-datetiem-from))
 (defn datetime-until-item [str-datetiem-from]

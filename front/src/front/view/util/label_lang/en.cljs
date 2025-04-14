@@ -6,6 +6,7 @@
    :add-term "Add term"
    :create "Create"
    :dashboard "Dashboard"
+   :data "Data"
    :delete "Delete"
    :delete-term "Delete term"
    :device "Device"

@@ -12,9 +12,7 @@
             [front.model.user :as model.user]
             [front.model.util.device-type :as util.device-type]
             [front.model.util.user-team :as util.user-team]
-            [front.model.util.user-team-device-config :as util.user-team-device-config]
-            [front.model.util.device :as util.device]
-            [front.view.users.util :as v.user.util]))
+            [front.model.util.user-team-device-config :as util.user-team-device-config]))
 
 (defn- page []
   (let [params (js->clj (router/useParams))

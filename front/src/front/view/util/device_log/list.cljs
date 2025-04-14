@@ -1,9 +1,11 @@
 (ns front.view.util.device-log.list
   (:require [cljs-time.core :as t]
             ["react" :as react]
-            [goog.string]
+            ["react-router-dom" :as router]
+            [front.route :as route]
             [front.util.timezone :as util.timezone]
-            [front.model.device-log :as model.log]))
+            [front.model.device-log :as model.log]
+            [front.view.util.label :as util.label]))
 
 (defn build-badge-item [record badge data id]
   (let [req-when (get badge "when")
@@ -56,7 +58,11 @@
              :on-click (fn [e]
                          (.preventDefault e)
                          (set-requested-to-open (not requested-to-open)))}
-            (if requested-to-open "close" "open")]]]
+            (if requested-to-open "close" "open")]
+       (when-let [id-device (:device_id log)]
+         [:<>
+          " "
+          [:> router/Link {:to (route/device-device-log-show id-device (:id log))} (util.label/show)]])]]
      (when requested-to-open
        [:tr
         [:td {:colSpan (+ 3 (count col-settings))}
@@ -70,7 +76,7 @@
      (for [col col-settings]
        (let [label (model.log/get-label-from-col-config col)]
          [:th {:key label} label]))
-     [:th "actions"]]]
+     [:th (util.label/action)]]]
    [:tbody
     (for [log logs]
       [:<> {:key (:id log)}

@@ -3,7 +3,7 @@
             [clojure.java.jdbc :as jdbc]
             [com.walmartlabs.lacinia.resolve :refer [resolve-as]]
             [back.config :refer [db-spec]]
-            [back.models.device-log :as model-device-log]
+            [back.models.device-log :as model.device-log]
             [back.models.user :as model.user]
             [back.models.user-team :as model.user-team]
             [back.models.user-team-device-config :as model.user-team-device-config]
@@ -33,10 +33,41 @@
     (fn-to-handle)
     (resolve-as nil {:message "no permission to handle"})))
 
+(defn device-log
+  [context args _]
+  (println "args for device-log" args)
+  (when-let [user (get-user-loggedin context)]
+    (jdbc/with-db-transaction [transaction db-spec]
+      (let [device-log (model.device-log/get-by-id (:id args) {:transaction transaction})]
+        (if (model.user/admin? user)
+          device-log
+          (let [id-device (:device_id device-log)]
+            (when (model.device/get-by-id-in-ids-user-team-or-ids-device
+                   {:id id-device
+                    :ids-user-team (util.user-team-permission/build-query-ids-for-user-write (:id user))
+                    :transaction transaction})
+              device-log)))))))
+
+(defn device-log-for-device
+  [context args _]
+  (println "args for device-log-for-device" args)
+  (when-let [user (get-user-loggedin context)]
+    (jdbc/with-db-transaction [transaction db-spec]
+      (let [device-log (model.device-log/get-by-id (:id args) {:transaction transaction})]
+        (if (model.user/admin? user)
+          device-log
+          (let [id-device (:device_id device-log)]
+            (when (and (= id-device (:device_id args))
+                       (model.device/get-by-id-in-ids-user-team-or-ids-device
+                        {:id id-device
+                         :ids-user-team (util.user-team-permission/build-query-ids-for-user-write (:id user))
+                         :transaction transaction}))
+              device-log)))))))
+
 (defn device-logs
   [_ args _]
   (println "args for device-logs" args)
-  (model-device-log/get-list-with-total args {:build-str-where-and #(format "%s.device_id IS NULL" %)}))
+  (model.device-log/get-list-with-total args {:build-str-where-and #(format "%s.device_id IS NULL" %)}))
 
 (defn device-logs-for-device
   [context args _]
@@ -50,7 +81,7 @@
                              {:id id-device
                               :ids-user-team (util.user-team-permission/build-query-ids-for-user-write (:id user))
                               :transaction transaction}))]
-          (-> (model-device-log/get-list-with-total
+          (-> (model.device-log/get-list-with-total
                args
                {:build-str-where-and #(format "%s.device_id = %d" % id-device)
                 :transaction transaction})
@@ -69,7 +100,7 @@
                                   id-device-type id-user {:via-device true
                                                           :via-manager true
                                                           :transaction transaction}))]
-          (-> (model-device-log/get-list-with-total
+          (-> (model.device-log/get-list-with-total
                args {:build-str-where-and
                      (fn [_]
                        (format "%s.id IN %s"
@@ -91,7 +122,7 @@
       (when (or (model.user/admin? user)
                 (model.user-team/user-has-permission-to-read {:id-user-team (:user_team_id watch-scope)
                                                               :id-user (:id user)}))
-        (model-device-log/get-list-with-total
+        (model.device-log/get-list-with-total
          args
          {:build-str-where-and
           (fn [name-table-device-log]
@@ -787,6 +818,8 @@
 (def resolver-map
   {:Query/authorization_bearer_for_device authorization-bearer-for-device
    :Query/authorization_bearer_for_device_type_api_key authorization-bearer-for-device-type-api-key
+   :Query/device_log device-log
+   :Query/device_log_for_device device-log-for-device
    :Query/device_logs device-logs
    :Query/device_logs_for_device device-logs-for-device
    :Query/device_logs_for_device_type device-logs-for-device-type

@@ -1,14 +1,18 @@
 (ns front.model.device-log
   (:require [goog.string :refer [format]]
-            clojure.string
+            [clojure.string :refer [join]]
             [front.model.util :as util :refer [build-input-str-for-str]]
             [front.model.util.device :as util.device]
+            [front.model.util.device-log :as util.device-log]
             [front.model.util.device-type :as util.device-type]))
 
-(def name-table "device_log")
-(def keys-for-device-logs [:id :device_id :device_name :created_at :data])
-(def str-keys-for-device-logs (clojure.string/join " " (map name keys-for-device-logs)))
-#_(def str-keys-for-device-logs-with-device-id (str str-keys-for-device " device{id name}"))
+(def name-table util.device-log/name-table)
+(defn build-query-keys-of-periperals []
+  (join " " [(util.device/build-query-table-and-keys
+              {:query-additional-keys (util.device-type/build-query-table-and-keys)})]))
+(defn build-query-keys-with-peripherals []
+  (join " " [util.device-log/query-keys
+             (build-query-keys-of-periperals)]))
 
 (defn get-by-json-key [data json-key]
   (when-not (nil? data)
@@ -37,9 +41,16 @@
         json-key (when-not (string? val-key) (rest val-key))]
     (get-by-json-key target-field json-key)))
 
+(defn fetch-by-id-for-device [{:keys [id id-device on-receive]}]
+  (util/fetch-by-id {:name-table (str name-table "_for_" util.device/name-table)
+                     :str-keys-of-item (build-query-keys-with-peripherals)
+                     :id id
+                     :str-additional-params (format "device_id: %d" id-device)
+                     :on-receive on-receive}))
+
 (defn fetch-list-and-total [{:keys [str-where str-order limit page on-receive str-additional-field]} & [{:keys [str-name-table str-params]}]]
   (util/fetch-list-and-total {:name-table (or str-name-table (str name-table "s"))
-                              :str-keys-of-item str-keys-for-device-logs
+                              :str-keys-of-item (build-query-keys-with-peripherals)
                               :str-additional-field str-additional-field
                               :str-params (str (if str-params (str str-params ", ") "")
                                                (format "where: %s, order: %s"
