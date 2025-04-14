@@ -55,7 +55,7 @@
                          (util.device/build-query-table-and-keys
                           {:query-keys-additional (util.device-type/build-query-table-and-keys)})
                          :limit limit
-                         :pate page
+                         :page page
                          :on-receive on-receive}
                         {:str-name-table (str name-table "s_for_device")
                          :str-params (format "device_id: %d" id-device)}))
@@ -65,7 +65,7 @@
                          :str-order str-order
                          :str-additional-field (util.device-type/build-query-table-and-keys)
                          :limit limit
-                         :pate page
+                         :page page
                          :on-receive on-receive}
                         {:str-name-table (str name-table "s_for_device_type")
                          :str-params (format "device_type_id: %d" id-device-type)}))
@@ -74,7 +74,7 @@
   (fetch-list-and-total {:str-where str-where
                          :str-order str-order
                          :limit limit
-                         :pate page
+                         :page page
                          :on-receive on-receive}
                         {:str-name-table (str name-table "s_for_watch_scope")
                          :str-params (format "watch_scope_id: %d" id-watch-scope)}))
