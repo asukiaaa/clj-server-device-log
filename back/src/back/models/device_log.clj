@@ -6,9 +6,39 @@
             [clojure.walk :as walk]
             [java-time.api :as java-time]
             [back.config :refer [db-spec]]
-            [back.models.util.device-log :as util.device-log]
             [back.models.util :as model.util]
+            [back.models.util.device :as util.device]
+            [back.models.util.device-log :as util.device-log]
+            [back.models.util.device-type :as util.device-type]
             [back.util.time :refer [time-format-yyyymmdd-hhmmss]]))
+
+(defn build-str-join-tables [& [name-table]]
+  (let [name-table (or name-table util.device-log/name-table)]
+    (join " " [(format "LEFT JOIN %s ON %s.id = %s.device_id"
+                       util.device/name-table
+                       util.device/name-table
+                       name-table)
+               (format "LEFT JOIN %s ON %s.id = %s.device_type_id"
+                       util.device-type/name-table
+                       util.device-type/name-table
+                       util.device/name-table)])))
+
+(defn build-str-keys-select-with-peripherals [& [name-table]]
+  (let [name-table (or name-table util.device-log/name-table)]
+    (format "%s.*, %s, %s"
+            name-table
+            (util.device/build-str-select-params-for-joined)
+            (util.device-type/build-str-select-params-for-joined))))
+
+(defn build-item [item]
+  (-> item
+      util.device/build-item-from-selected-params-joined
+      util.device-type/build-item-from-selected-params-joined
+      ((fn [item]
+         (let [device-type (util.device-type/key-table item)]
+           (-> (dissoc item util.device-type/key-table)
+               (assoc-in [util.device/key-table util.device-type/key-table] device-type)))))
+      #_((fn [item] (println item) item))))
 
 (def defaults
   {:limit 100
@@ -45,11 +75,10 @@
 (defn build-query-order [order table-key]
   #_(println "build-query-order " order)
   (let [order-to-handle (or (seq order) (:order defaults))]
-    (str "ORDER BY "
-         (join ", " (for [item order-to-handle]
-                      (join " " [(build-target-key {:key (or (get item "key") (:key item))
-                                                    :table-key table-key})
-                                 (filter-order-dir (or (get item "dir") (:dir item)))]))))))
+    (join ", " (for [item order-to-handle]
+                 (join " " [(build-target-key {:key (or (get item "key") (:key item))
+                                               :table-key table-key})
+                            (filter-order-dir (or (get item "dir") (:dir item)))])))))
 
 (defn filter-target-action [action]
   (case action
@@ -150,7 +179,7 @@
    (filter seq)
    ((fn [and-list]
       (when-not (empty? and-list)
-        (str "where " (join " AND " and-list)))))))
+        (join " AND " and-list))))))
 
 (defn build-query-select-max-group-by [where-max-group-by {:keys [name-table base-table-key]}]
   #_(println "build-query-select-max-group-by" where-max-group-by)
@@ -164,7 +193,8 @@
                               converted-group-by-key (:group-by keys-max-group-by)
                               group-by-key (build-target-key (walk/keywordize-keys (get item "group_by")))
                               query (join " " ["(SELECT"
-                                               "max(" (build-target-key (walk/keywordize-keys (get item "max"))) ") AS" converted-max-key ","
+                                               "max(" (build-target-key (walk/keywordize-keys (get item "max")))
+                                               ") AS" converted-max-key ","
                                                group-by-key "AS" converted-group-by-key
                                                "FROM" name-table
                                                "GROUP BY" group-by-key
@@ -191,19 +221,37 @@
                              "LEFT JOIN device_type ON device_type.id = device.device_type_id"
                              (when build-str-join (build-str-join base-table-key))
                              (when-not (empty? str-query-select-max-group-by) (str ", " str-query-select-max-group-by))
+                             "WHERE"
                              (build-query-where {:where where
                                                  :base-table-key base-table-key
                                                  :build-str-where-and build-str-where-and})
+                             "ORDER BY"
                              (build-query-order order base-table-key)
                              "LIMIT" limit
                              "OFFSET" (* limit page)])]
+    #_(model.util/get-list-with-total-with-building-query
+       util.device-log/name-table params
+       {:str-keys-select (build-str-keys-select-with-peripherals base-table-key)
+        :str-before-where (->> [(build-str-join-tables base-table-key)
+                                str-query-select-max-group-by]
+                               (remove nil?)
+                               (join ", "))
+        :str-order (build-query-order order base-table-key)
+        :str-where (build-query-where {:where where
+                                       :base-table-key base-table-key
+                                       :build-str-where-and build-str-where-and})
+        :build-item build-item
+        :transaction transaction})
     #_(println "str-query" str-query transaction)
     (model.util/get-list-with-total [str-query] {:transaction transaction})))
 
 (defn get-by-id [id & [{:keys [transaction]}]]
   (model.util/get-by-id
    id util.device-log/name-table
-   {:transaction transaction}))
+   {:transaction transaction
+    :str-keys-select (build-str-keys-select-with-peripherals)
+    :str-before-where (build-str-join-tables)
+    :build-item build-item}))
 
 (defn create [params]
   (jdbc/insert! db-spec util.device-log/key-table params))

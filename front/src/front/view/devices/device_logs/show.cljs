@@ -10,6 +10,7 @@
             [front.view.util.label :as util.label]
             [front.model.device-log :as model.device-log]
             [front.model.user :as model.user]
+            [front.model.util.device :as util.device]
             [front.model.util.device-type :as util.device-type]
             [front.model.util.user-team :as util.user-team]
             [front.model.util.user-team-device-config :as util.user-team-device-config]))
@@ -22,6 +23,9 @@
         user (util/get-user-loggedin)
         is-admin (model.user/admin? user)
         [item set-item] (react/useState)
+        device (util.device/key-table item)
+        device-type (util.device-type/key-table device)
+        id-device-type (:id device-type)
         info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))]
     (react/useEffect
      (fn []
@@ -36,11 +40,9 @@
      #js [])
     [:<>
      [:f> breadcrumb/core [{:label (util.label/devices) :path route/devices}
-                           {:label (util.label/device-item item) :path (route/device-show id-device)}
+                           {:label (util.label/device-item device) :path (route/device-show id-device)}
                            {:label util.label/logs :path (route/device-device-logs id-device)}
                            {:label (str id-device-log)}]]
-     (util/render-list-in-area-content-line
-      (v.device.util/build-related-links item {:id-item id-device}))
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer
@@ -57,9 +59,13 @@
             [:tr
              [:td (util.label/device)]
              [:td
-              (str (:device item))
-              [:> router/Link {:to (route/device-show (:device_id item))}
-               (util.label/device-item (:device item))]]]
+              [:> router/Link {:to (route/device-show id-device)}
+               (util.label/device-item device)]]]
+            [:tr
+             [:td (util.label/device-type)]
+             [:td
+              [:> router/Link {:to (route/device-type-show id-device-type)}
+               (util.label/device-type-item device-type)]]]
             [:tr
              [:td util.label/created-at]
              [:td (:created_at item)]]]]

@@ -9,7 +9,7 @@
 (def name-table util.device-log/name-table)
 (defn build-query-keys-of-periperals []
   (join " " [(util.device/build-query-table-and-keys
-              {:query-additional-keys (util.device-type/build-query-table-and-keys)})]))
+              {:query-keys-additional (util.device-type/build-query-table-and-keys)})]))
 (defn build-query-keys-with-peripherals []
   (join " " [util.device-log/query-keys
              (build-query-keys-of-periperals)]))
