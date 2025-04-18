@@ -3,7 +3,7 @@
 
 (def name-table "user_team_member")
 (def key-table (keyword name-table))
-(def keys-param [:id :permission :user_team_id :member_id :created_at :updated_at])
+(def keys-param [:id :permission :user_team_id :member_user_id :created_at :updated_at])
 (def key-member-user :member)
 (def name-member-user (name key-member-user))
 

@@ -4,24 +4,16 @@
             [front.route :as route]
             [front.view.common.wrapper.show404 :as wrapper.show404]
             [front.view.common.wrapper.fetching :as wrapper.fetching]
-            [front.view.devices.util :as v.device.util]
-            [front.view.util :as util]
             [front.view.util.breadcrumb :as breadcrumb]
             [front.view.util.label :as util.label]
             [front.model.device-log :as model.device-log]
-            [front.model.user :as model.user]
             [front.model.util.device :as util.device]
-            [front.model.util.device-type :as util.device-type]
-            [front.model.util.user-team :as util.user-team]
-            [front.model.util.user-team-device-config :as util.user-team-device-config]))
+            [front.model.util.device-type :as util.device-type]))
 
 (defn- page []
   (let [params (js->clj (router/useParams))
         id-device (get params "device_id")
         id-device-log (get params "device_log_id")
-        navigate (router/useNavigate)
-        user (util/get-user-loggedin)
-        is-admin (model.user/admin? user)
         [item set-item] (react/useState)
         device (util.device/key-table item)
         device-type (util.device-type/key-table device)

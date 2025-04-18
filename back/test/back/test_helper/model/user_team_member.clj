@@ -26,7 +26,7 @@
   [[user-team-member [user-team user]] & body]
   `(with-member-params [~user-team-member
                         {:user_team_id (:id ~user-team)
-                         :member_id (:id ~user)}]
+                         :member_user_id (:id ~user)}]
      ~@body))
 
 (s/fdef with-member-admin
@@ -38,6 +38,6 @@
   [[user-team-member [user-team user]] & body]
   `(with-member-params [~user-team-member
                         {:user_team_id (:id ~user-team)
-                         :member_id (:id ~user)
+                         :member_user_id (:id ~user)
                          :permission (cheshire/generate-string {:admin true})}]
      ~@body))

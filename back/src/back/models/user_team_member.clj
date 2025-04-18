@@ -17,7 +17,7 @@
           (util.user/build-str-select-params-for-joined)
           (util.user-team/build-str-select-params-for-joined)))
 (defn build-str-before-where []
-  (join " " [(format "INNER JOIN %s ON %s.id = %s.member_id"
+  (join " " [(format "INNER JOIN %s ON %s.id = %s.member_user_id"
                      util.user/name-table
                      util.user/name-table
                      name-table)
@@ -31,7 +31,7 @@
       (util.user-team/build-item-from-selected-params-joined)))
 
 (defn filter-params [params]
-  (select-keys params [:user_team_id :member_id :permission]))
+  (select-keys params [:user_team_id :member_user_id :permission]))
 
 (defn get-by-id [id & [{:keys [transaction]}]]
   (model.util/get-by-id

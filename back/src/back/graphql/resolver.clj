@@ -393,7 +393,7 @@
                     :id-user (:id user)
                     :transaction transaction}))
           (if-let [member (model.user/get-by-email (:user_email params))]
-            (model.user-team-member/create (assoc params :member_id (:id member)) {:transaction transaction})
+            (model.user-team-member/create (assoc params :member_user_id (:id member)) {:transaction transaction})
             (:errors (json/write-str {:user_email ["Not found"]}))))))))
 
 (defn user-team-member-update [context args _]

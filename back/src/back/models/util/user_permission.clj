@@ -13,7 +13,7 @@
                 util.user-team/name-table
                 util.user-team/name-table
                 util.user/name-table)
-        (format "LEFT JOIN %s ON %s.member_id = %s.id"
+        (format "LEFT JOIN %s ON %s.member_user_id = %s.id"
                 util.user-team-member/name-table
                 util.user-team-member/name-table
                 util.user/name-table)

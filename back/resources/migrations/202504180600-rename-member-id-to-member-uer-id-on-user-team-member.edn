@@ -1,0 +1,12 @@
+{:up
+ ["ALTER TABLE user_team_member
+   RENAME COLUMN member_id TO member_user_id,
+   DROP KEY IF EXISTS fk_user_team_member__member_id,
+   DROP FOREIGN KEY fk_user_team_member__member_id,
+   ADD CONSTRAINT fk_user_team_member__member_user_id FOREIGN KEY(member_user_id) REFERENCES user(id) ON DELETE CASCADE"]
+ :down
+ ["ALTER TABLE user_team_member
+   RENAME COLUMN member_user_id TO member_id,
+   DROP KEY IF EXISTS fk_user_team_member__member_user_id,
+   DROP FOREIGN KEY fk_user_team_member__member_user_id,
+   ADD CONSTRAINT fk_user_team_member__member_id FOREIGN KEY(member_id) REFERENCES user(id) ON DELETE CASCADE"]}

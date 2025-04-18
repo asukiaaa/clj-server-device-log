@@ -4,12 +4,12 @@
             [back.models.util.user-team-member :as util.user-team-member]))
 
 (defn build-query-owner-or-member [id-user]
-  (format "(%s.owner_user_id = %d OR %s.member_id = %d)"
+  (format "(%s.owner_user_id = %d OR %s.member_user_id = %d)"
           util.user-team/name-table id-user
           util.user-team-member/name-table id-user))
 
 (defn build-query-owner-or-member-writable [id-user]
-  (format "(%s.owner_user_id = %d OR (%s.member_id = %d AND JSON_VALUE(permission,\"$.admin\")))"
+  (format "(%s.owner_user_id = %d OR (%s.member_user_id = %d AND JSON_VALUE(permission,\"$.admin\")))"
           util.user-team/name-table id-user
           util.user-team-member/name-table id-user))
 

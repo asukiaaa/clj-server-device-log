@@ -4,7 +4,7 @@
 
 (def name-table "user_team_member")
 (def key-table (keyword name-table))
-(def keys-for-table [:id :user_team_id :member_id :permission :created_at :updated_at])
+(def keys-for-table [:id :user_team_id :member_user_id :permission :created_at :updated_at])
 (def query-keys (join " " (map name keys-for-table)))
 (def key-member-user :member)
 (def name-member-user (name key-member-user))

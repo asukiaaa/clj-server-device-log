@@ -133,7 +133,7 @@
   {:fields
    {:id {:type (non-null Int)}
     :user_team_id {:type (non-null Int)}
-    :member_id {:type (non-null Int)}
+    :member_user_id {:type (non-null Int)}
     :user_team {:type UserTeam}
     :member {:type UserWithoutPermission}
     :permission {:type String}
