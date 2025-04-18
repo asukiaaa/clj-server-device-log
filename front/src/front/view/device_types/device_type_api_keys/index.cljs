@@ -25,7 +25,7 @@
       :action-delete #(model.device-type-api-key/delete {:id (:id device-type-api-key) :on-receive on-delete})}]]])
 
 (defn- page []
-  (let [labels-header [(util.label/name) util.label/permission (util.label/action)]
+  (let [labels-header [(util.label/name) (util.label/permission) (util.label/action)]
         params (js->clj (router/useParams))
         id-device-type (get params "device_type_id")
         [device-type set-device-type] (react/useState)

@@ -43,8 +43,8 @@
           [:table.table.table-sm
            [:thead
             [:tr
-             [:th "key"]
-             [:th "value"]]]
+             [:th (util.label/element)]
+             [:th (util.label/value)]]]
            [:tbody
             (for [key model.util.device-type/keys-for-table]
               [:tr {:key key}

@@ -64,9 +64,9 @@
           [:form.form-control
            [util/render-errors-as-alerts (:errors state-info-system)]
            [util/render-input (util.label/name) state-info-name]
-           [util/render-input util.label/email state-info-email]
+           [util/render-input (util.label/email) state-info-email]
            (when is-admin
-             [util/render-textarea util.label/permission state-info-permission])
+             [util/render-textarea (util.label/permission) state-info-permission])
            [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} (util.label/update)]]])})]))
 
 (defn core []

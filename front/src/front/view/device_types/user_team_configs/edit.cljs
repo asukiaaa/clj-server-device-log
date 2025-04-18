@@ -77,7 +77,7 @@
          [:div
           [:form.form-control
            [util/render-errors-as-alerts (:errors state-info-system)]
-           [util/render-input util.label/config-on-user-team state-info-config]
+           [util/render-input (util.label/device-type-config-on-user-team) state-info-config]
            [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} (util.label/update)]]])})]))
 
 (defn core []

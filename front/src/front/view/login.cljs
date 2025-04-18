@@ -43,11 +43,11 @@
        [util/area-content
         [:h1 (util.label/login)]
         [util/render-errors-as-alerts errors]
-        [util/render-input util.label/email state-info-email {:disabled waiting-response}]
+        [util/render-input (util.label/email) state-info-email {:disabled waiting-response}]
         (let [show-password (:draft state-info-show-password)
               type-for-password (if (= show-password "true") :text :password)]
           [:<>
-           [util/render-input util.label/password state-info-password
+           [util/render-input (util.label/password) state-info-password
             {:type type-for-password :disabled waiting-response}]])
         [:div [util/render-checkbox (util.label/show-password) state-info-show-password]]
         [:div.mt-2.align-right

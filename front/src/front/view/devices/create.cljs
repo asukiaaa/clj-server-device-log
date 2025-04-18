@@ -93,7 +93,7 @@
           (model.device-type/build-select-options-from-list-and-total device-type-list-and-total)]
          [util/render-select (util.label/user-team) state-info-user-team-id
           (model.user-team/build-select-options-from-list-and-total user-team-list-and-total)]
-         [util/render-textarea util.label/config-on-user-team state-info-user-team-device-config-config
+         [util/render-textarea (util.label/device-type-config-on-user-team) state-info-user-team-device-config-config
           {:disabled (empty? (str (:draft state-info-user-team-id)))}]
          [:button.btn.btn-primary.mt-1
           {:on-click on-click-apply

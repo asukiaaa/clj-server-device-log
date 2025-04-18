@@ -57,8 +57,8 @@
           [:table.table.table-sm
            [:thead
             [:tr
-             [:th "key"]
-             [:th "value"]]]
+             [:th (util.label/element)]
+             [:th (util.label/value)]]]
            [:tbody
             (for [key (->> [:name :email (when is-admin :permission) (when is-admin :password) :created_at :updated_at]
                            (remove nil?))]

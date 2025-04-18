@@ -42,10 +42,10 @@
           [:table.table.table-sm
            [:thead
             [:tr
-             [:th "key"]
-             [:th "value"]]]
+             [:th (util.label/element)]
+             [:th (util.label/value)]]]
            [:tbody
-            [:tr [:td util.label/id] [:td (:id item)]]
+            [:tr [:td (util.label/id)] [:td (:id item)]]
             [:tr [:td (util.label/name)] [:td (:name item)]]
             [:tr [:td util.label/owner-user] [:td [:> router/Link {:to (route/user-show (:owner_user_id item))}(str (:owner_user_id item))]]]
             (when is-admin

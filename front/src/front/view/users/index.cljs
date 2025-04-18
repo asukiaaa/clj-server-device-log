@@ -10,7 +10,7 @@
             [front.view.util :as util]))
 
 (defn- page []
-  (let [labels-header [(util.label/name) util.label/email (util.label/action)]
+  (let [labels-header [(util.label/name) (util.label/email) (util.label/action)]
         user-loggedin (util/get-user-loggedin)
         render-user
         (fn [user load-list]

@@ -44,10 +44,10 @@
           [:table.table.table-sm.mb-1
            [:thead
             [:tr
-             [:th "key"]
-             [:th "value"]]]
+             [:th (util.label/element)]
+             [:th (util.label/value)]]]
            [:tbody
-            [:tr [:td util.label/id] [:td (:id item)]]
+            [:tr [:td (util.label/id)] [:td (:id item)]]
             [:tr
              [:td (util.label/device)]
              [:td
@@ -59,7 +59,7 @@
               [:> router/Link {:to (route/device-type-show id-device-type)}
                (util.label/device-type-item device-type)]]]
             [:tr
-             [:td util.label/created-at]
+             [:td (util.label/created-at)]
              [:td (:created_at item)]]]]
           [:div.m-1
            [:div (util.label/data)]

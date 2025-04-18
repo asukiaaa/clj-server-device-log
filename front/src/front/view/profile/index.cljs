@@ -25,17 +25,17 @@
           [:table.table.table-sm
            [:thead
             [:tr
-             [:th "key"]
-             [:th "value"]]]
+             [:th (util.label/element)]
+             [:th (util.label/value)]]]
            [:tbody
             (for [[label value]
-                  (->> [[util.label/id (:id user)]
+                  (->> [[(util.label/id) (:id user)]
                         [(util.label/name) (:name user)]
-                        [util.label/email (:email user)]
-                        (when is-admin [util.label/permission (:permission user)])
-                        [util.label/password [:> router/Link {:to route/profile-password-edit} util.label/password-edit]]
-                        [util.label/created-at (:created_at user)]
-                        [util.label/updated-at (:updated_at user)]]
+                        [(util.label/email) (:email user)]
+                        (when is-admin [(util.label/permission) (:permission user)])
+                        [(util.label/password) [:> router/Link {:to route/profile-password-edit} (util.label/password-edit)]]
+                        [(util.label/created-at) (:created_at user)]
+                        [(util.label/updated-at) (:updated_at user)]]
                        (remove nil?))]
               [:tr {:key label} [:td label] [:td value]])]]])})]))
 

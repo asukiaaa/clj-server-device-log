@@ -74,7 +74,7 @@
           [:form.form-control
            [util/render-errors-as-alerts (:errors state-info-system)]
            [util/render-input (util.label/name) state-info-name]
-           [util/render-input util.label/permission state-info-permission]
+           [util/render-input (util.label/permission) state-info-permission]
            [util.explanation/permission]
            [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} (util.label/update)]]])})]))
 

@@ -51,10 +51,10 @@
           [:table.table.table-sm
            [:thead
             [:tr
-             [:th "key"]
-             [:th "value"]]]
+             [:th (util.label/element)]
+             [:th (util.label/value)]]]
            [:tbody
-            [:tr [:td util.label/id] [:td (:id item)]]
+            [:tr [:td (util.label/id)] [:td (:id item)]]
             [:tr [:td (util.label/name)] [:td (:name item)]]
             [:tr
              [:td (util.label/active-watch-scope)]
@@ -82,8 +82,8 @@
             (for [key (->> [:created_at :updated_at]
                            (remove nil?))]
               [:tr {:key key}
-               [:td (cond (= key :created_at) util.label/created-at
-                          (= key :updated_at) util.label/updated-at)]
+               [:td (cond (= key :created_at) (util.label/created-at)
+                          (= key :updated_at) (util.label/updated-at))]
                [:td (let [val (key item)]
                       val)]])]]])})]))
 

@@ -60,7 +60,7 @@
      [:f> breadcrumb/core
       [{:label (util.label/user-teams) :path route/user-teams}
        {:label (util.label/user-team-item user-team) :path (route/user-team-show id-user-team)}
-       {:label util.label/members :path (route/user-team-members id-user-team)}
+       {:label (util.label/members) :path (route/user-team-members id-user-team)}
        {:label (util.label/user-team-member-item item) :path (route/user-team-member-show id-user-team id-item)}
        {:label (util.label/edit)}]]
      (wrapper.fetching/wrapper
@@ -71,7 +71,7 @@
          [:div
           [:form.form-control
            [util/render-errors-as-alerts (:errors state-info-system)]
-           [util/render-textarea util.label/permission state-info-permission {:disabled waiting-response}]
+           [util/render-textarea (util.label/permission) state-info-permission {:disabled waiting-response}]
            [:button.btn.btn-primary.mt-1 {:on-click on-click-apply :disabled waiting-response} (util.label/edit)]]])})]))
 
 (defn core []

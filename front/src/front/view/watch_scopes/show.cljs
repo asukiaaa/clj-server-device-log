@@ -47,8 +47,8 @@
           [:table.table.table-sm
            [:thead
             [:tr
-             [:th "key"]
-             [:th "value"]]]
+             [:th (util.label/element)]
+             [:th (util.label/value)]]]
            [:tbody
             (for [key [:name :user_team :terms :created_at :updated_at]]
               [:tr {:key key}
