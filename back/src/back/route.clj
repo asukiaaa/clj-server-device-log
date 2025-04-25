@@ -75,7 +75,9 @@
        :route-name :show-device-log
        :constraints {:id #"[0-9]+"}]
     ["/graphql" :post (into [] (concat [interceptor-session] handler-graphql/core)) :route-name :graphql]
-    ["/ws/echo/:prefix" :get handler.websocket/echo-prefix :route-name :ws-echo]
+    #_["/ws/echo/:prefix" :get handler.websocket/echo-prefix]
+    ["/ws/device-io" :get handler.websocket/device-io]
+    ["/ws/device-control/:id-device" :get handler.websocket/device-control]
     ["/css/*" :get (build-file-handler "../front/resources/public") :route-name :handle-css]
     ["/out-cljs/*" :get (build-file-handler "../front/out-cljs/public") :route-name :handle-out-cljs]
     ["/api/raw_device_log"
