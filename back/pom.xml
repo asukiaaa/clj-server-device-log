@@ -43,7 +43,7 @@
     <dependency>
       <groupId>io.pedestal</groupId>
       <artifactId>pedestal.jetty</artifactId>
-      <version>0.6.3</version>
+      <version>0.8.0-alpha-2</version>
     </dependency>
     <dependency>
       <groupId>org.clojure</groupId>
@@ -53,12 +53,12 @@
     <dependency>
       <groupId>com.walmartlabs</groupId>
       <artifactId>lacinia-pedestal</artifactId>
-      <version>1.2</version>
+      <version>1.3.1</version>
     </dependency>
     <dependency>
       <groupId>io.pedestal</groupId>
       <artifactId>pedestal.service</artifactId>
-      <version>0.6.3</version>
+      <version>0.8.0-alpha-2</version>
     </dependency>
     <dependency>
       <groupId>com.walmartlabs</groupId>
@@ -123,6 +123,10 @@
     <repository>
       <id>clojars</id>
       <url>https://repo.clojars.org/</url>
+    </repository>
+    <repository>
+      <id>rpl</id>
+      <url>https://nexus.redplanetlabs.com/repository/maven-public-releases</url>
     </repository>
   </repositories>
   <distributionManagement>
