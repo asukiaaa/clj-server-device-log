@@ -132,7 +132,9 @@
       (build-unique-key-str transaction))))
 
 (defn create [params & [{:keys [transaction]}]]
-  (model.util/create key-table params {:transaction transaction}))
+  (let [key-str (build-unique-key-str transaction)]
+    (model.util/create key-table (-> params filter-params (assoc :key_str key-str))
+                       {:transaction transaction})))
 
 (defn create-for-user [params id-user & [{:keys [transaction]}]]
   (jdbc/with-db-transaction [transaction (or transaction db-spec)]
@@ -146,14 +148,7 @@
                   {:__system [(format "Not found %s or no permission to create %s"
                                       util.device-type/name-table
                                       name-table)]})}
-        (let [key-str (build-unique-key-str transaction)]
-          (try
-            (jdbc/insert! transaction key-table (-> params filter-params (assoc :key_str key-str)))
-            (let [id (-> (jdbc/query transaction "SELECT LAST_INSERT_ID()")
-                         first vals first)]
-              (get-by-id id {:transaction transaction}))
-            (catch Exception ex
-              {:errors (json/write-str {:__system [(.getMessage ex)]})})))))))
+        (create params {:transaction transaction})))))
 
 (defn- get-list-with-total-base [params & [{:keys [str-where transaction]}]]
   (model.util/get-list-with-total-with-building-query
