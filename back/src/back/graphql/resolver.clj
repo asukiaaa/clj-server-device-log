@@ -514,41 +514,57 @@
   (println "args for device-type-api-keys-for-device-type" args)
   (when-let [user (get-user-loggedin context)]
     (let [id-user (:id user)
+          is-admin (model.user/admin? user)
           id-device-type (:device_type_id args)]
       (jdbc/with-db-transaction [transaction db-spec]
-        (when-let [device-type (model.device-type/get-by-id-for-user-to-edit
-                                id-device-type id-user {:transaction transaction})]
+        (when-let [device-type (if is-admin
+                                 (model.device-type/get-by-id
+                                  id-device-type {:transaction transaction})
+                                 (model.device-type/get-by-id-for-user-to-edit
+                                  id-device-type id-user {:transaction transaction}))]
           (-> (model.device-type-api-key/get-list-with-total-for-device-type
                args id-device-type {:transaction transaction})
               (assoc model.device-type/key-table device-type)))))))
 
 (defn device-type-api-key-for-device-type [context args _]
   (println "args for device-type-api-key-for-device-type" args)
-  (let [user (get-user-loggedin context)]
-    (when-let [id-device-type (:device_type_id args)]
+  (let [user (get-user-loggedin context)
+        id-device-type (:device_type_id args)]
+    (if (model.user/admin? user)
+      (model.device-type-api-key/get-by-id (:id args))
       (model.device-type-api-key/get-by-id-for-user-and-device-type
        (:id args) (:id user) id-device-type))))
 
 (defn device-type-api-key-create [context args _]
   (println "args device-type-api-key-create" args)
   (let [user (get-user-loggedin context)
-        params (:device_type_api_key args)]
-    (model.device-type-api-key/create-for-user params (:id user))))
+        params (:device_type_api_key args)
+        item (if (model.user/admin? user)
+               (model.device-type-api-key/create params)
+               (model.device-type-api-key/create-for-user params (:id user)))]
+    {model.device-type-api-key/key-table item}))
 
 (defn device-type-api-key-update [context args _]
   (println "args device-type-api-key-update" args)
   (let [user (get-user-loggedin context)
-        params (:device_type_api_key args)]
-    (model.device-type-api-key/update-for-user
-     {:params params
-      :id (:id args)
-      :id-user (:id user)})))
+        params (:device_type_api_key args)
+        id-item (:id args)
+        item (if (model.user/admin? user)
+               (model.device-type-api-key/update id-item params)
+               (model.device-type-api-key/update-for-user
+                {:params params
+                 :id id-item
+                 :id-user (:id user)}))]
+    {model.device-type-api-key/key-table item}))
 
 (defn device-type-api-key-delete [context args _]
   (println "args device-type-api-key-delete" args)
-  (let [user (get-user-loggedin context)]
-    (model.device-type-api-key/delete-for-user {:id (:id args)
-                                                :id-user (:id user)})))
+  (let [user (get-user-loggedin context)
+        id-item (:id args)]
+    (if (model.user/admin? user)
+      (model.device-type-api-key/delete id-item)
+      (model.device-type-api-key/delete-for-user {:id id-item
+                                                  :id-user (:id user)}))))
 
 (defn device-files-for-device [context args _]
   (println "args for device-files-for-device" args)

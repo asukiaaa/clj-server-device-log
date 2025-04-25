@@ -103,12 +103,18 @@
    (util.user-team-permission/build-query-ids-for-user-write id-user)
    (:transaction transaction)))
 
+(defn update [id params]
+  (model.util/update key-table id params))
+
 (defn update-for-user [{:keys [id id-user params]}]
   (jdbc/with-db-transaction [t-con db-spec]
     (when-let [_ (get-by-id-for-user id id-user {:transaction t-con})]
       (jdbc/update! t-con key-table params ["id = ?" id])
       (let [item (get-by-id-for-user id id-user {:transaction t-con})]
-        {key-table item}))))
+        item))))
+
+(defn delete [id]
+  (model.util/delete name-table id))
 
 (defn delete-for-user [{:keys [id id-user]}]
   (jdbc/with-db-transaction [t-con db-spec]
@@ -124,6 +130,9 @@
     (if (empty? user)
       key-str
       (build-unique-key-str transaction))))
+
+(defn create [params & [{:keys [transaction]}]]
+  (model.util/create key-table params {:transaction transaction}))
 
 (defn create-for-user [params id-user & [{:keys [transaction]}]]
   (jdbc/with-db-transaction [transaction (or transaction db-spec)]
@@ -141,9 +150,8 @@
           (try
             (jdbc/insert! transaction key-table (-> params filter-params (assoc :key_str key-str)))
             (let [id (-> (jdbc/query transaction "SELECT LAST_INSERT_ID()")
-                         first vals first)
-                  item (get-by-id id {:transaction transaction})]
-              {key-table item})
+                         first vals first)]
+              (get-by-id id {:transaction transaction}))
             (catch Exception ex
               {:errors (json/write-str {:__system [(.getMessage ex)]})})))))))
 

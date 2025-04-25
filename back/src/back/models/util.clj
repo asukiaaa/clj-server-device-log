@@ -100,6 +100,9 @@
            (join " AND "))])
     (get-by-id id (name key-table) {:transaction t-con})))
 
+(defn delete [key-table id & [{:keys [transaction]}]]
+  (jdbc/delete! (or transaction db-spec) key-table ["id = ?" id]))
+
 (defn get-list-with-total-with-building-query [name-table params & [{:keys [str-where str-keys-select transaction str-before-where str-order build-item]}]]
   (-> (build-query-get-index name-table {:str-keys-select str-keys-select})
       (#(if-not (empty? str-before-where) (str % " " str-before-where) %))

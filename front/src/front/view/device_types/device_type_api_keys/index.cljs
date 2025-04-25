@@ -28,6 +28,7 @@
   (let [labels-header [(util.label/name) (util.label/permission) (util.label/action)]
         params (js->clj (router/useParams))
         id-device-type (get params "device_type_id")
+        is-admin (util/detect-is-admin-loggedin)
         [device-type set-device-type] (react/useState)
         fetch-list-and-total
         (fn [params]
@@ -43,6 +44,9 @@
        {:label util.label/api-keys}]]
      (util/render-list-in-area-content-line
       (v.device-type.util/build-related-links device-type {:id-item id-device-type}))
+     (when is-admin
+       [util/area-content
+        [:> router/Link {:to (route/device-type-device-type-api-key-create id-device-type)} (util.label/create)]])
      [:f> util.table/core fetch-list-and-total labels-header render-device-type-api-key
       {:on-receive on-receive}]]))
 
