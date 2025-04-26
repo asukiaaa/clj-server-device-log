@@ -13,8 +13,10 @@
                          :on-change (fn [e] (set-val (-> e .-target .-value)))}]])
 
 (defn core []
-  (let [[search-params _set-search-params] (router/useSearchParams)
-        path-afetr-login (or (.get search-params "path_after_login") route/dashboard)
+  (let [location (router/useLocation)
+        [search-params _set-search-params] (router/useSearchParams)
+        path-afetr-login (or (-> location .-state js->clj (get "path_after_login"))
+                             route/dashboard)
         state-info-email (util/build-state-info :email #(react/useState))
         state-info-password (util/build-state-info :password #(react/useState))
         state-info-show-password (util/build-state-info :show-password #(react/useState))

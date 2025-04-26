@@ -22,11 +22,13 @@
    :id nil
    :indefinite-term "無期限"
    :login "ログイン"
+   :login-and-show-this-page "ログインしてこのページを表示"
    :logout "ログアウト"
    :name "名前"
    :no-data "情報無し"
    :member "班員"
    :members "班員"
+   :page-not-found "該当するページはありません"
    :password "パスワード"
    :password-edit "パスワードを編集"
    :permission "権限"
