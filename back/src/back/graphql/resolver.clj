@@ -571,10 +571,12 @@
   (jdbc/with-db-transaction [transaction db-spec]
     (let [user (get-user-loggedin context)
           id-device (:device_id args)
-          device (model.device/get-by-id-in-ids-user-team-or-ids-device
-                  {:id id-device
-                   :ids-user-team (util.user-team-permission/build-query-ids-for-user-write (:id user))
-                   :transaction transaction})
+          device (if (model.user/admin? user)
+                   (model.device/get-by-id id-device {:transaction transaction})
+                   (model.device/get-by-id-in-ids-user-team-or-ids-device
+                    {:id id-device
+                     :ids-user-team (util.user-team-permission/build-query-ids-for-user-write (:id user))
+                     :transaction transaction}))
           files-list-total
           (when device
             (model.device-file/get-list-with-total-for-device args id-device {:transaction transaction}))]
