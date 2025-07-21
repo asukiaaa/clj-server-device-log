@@ -10,6 +10,7 @@
             [back.models.device-type-api-key :as model.device-type-api-key]
             [back.models.device :as model.device]
             [back.models.device-file :as model.device-file]
+            [back.models.user :as model.user]
             [back.models.util :as model.util]))
 
 (defn top [req]
@@ -59,7 +60,7 @@
 
 #_(defn device-logs [req]
     (let [list-and-total (model-device-log/get-list-with-total)
-        ;; total (:total list-and-total)
+          ;; total (:total list-and-total)
           logs (:list list-and-total)]
       {:status 200
        :body (html5
@@ -159,8 +160,12 @@
 
 (defn get-file-from-filestorage [request]
   (let [path-url (-> request :path-info)
-        id-user (-> request :session :user handler.util/decode-user-in-session :id)
-        path-file (model.device-file/get-path-file-for-user path-url id-user)]
+        user (-> request :session :user handler.util/decode-user-in-session)
+        id-user (:id user)
+        is-admin (model.user/admin? user)
+        path-file (if is-admin
+                    (model.device-file/get-path-file path-url)
+                    (model.device-file/get-path-file-for-user path-url id-user))]
     (if path-file
       {:status 200
        :body (io/input-stream path-file)}

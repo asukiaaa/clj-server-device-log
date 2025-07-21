@@ -117,6 +117,13 @@
   (get-list-with-total-base params {:transaction transaction
                                     :str-where (format "device_id = %s" id-device)}))
 
+(defn get-path-file [path-url & [{:keys [transaction]}]]
+  (let [id-device (or (util.filestorage/get-id-device-from-path-url path-url)
+                      (util.filestorage/get-id-device-from-path-url-thumbnail path-url))
+        device (model.device/get-by-id id-device {:transaction transaction})]
+    (when device
+      (util.filestorage/convert-path-url-to-path-file path-url))))
+
 (defn get-path-file-for-user [path-url id-user & [{:keys [transaction]}]]
   (let [id-device (or (util.filestorage/get-id-device-from-path-url path-url)
                       (util.filestorage/get-id-device-from-path-url-thumbnail path-url))

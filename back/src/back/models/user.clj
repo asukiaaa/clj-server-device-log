@@ -24,6 +24,11 @@
   (when-let [str-permission (:permission user)]
     (-> str-permission json/read-json :role (= "admin"))))
 
+#_(defn build-query-is-admin [id-user]
+    (join " " ["SELECT id,permission FROM" name-table
+               "WHERE id =" (model.util/build-input-str-for-str id-user)
+               "AND JSON_VALUE(permission, \"$.role\") = \"admin\""]))
+
 (defn build-hash [password salt]
   (-> (str password salt) bhash/sha3-512 codecs/bytes->hex))
 
