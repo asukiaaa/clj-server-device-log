@@ -181,7 +181,10 @@
     (.mkdirs (io/file path-dir))
     (io/copy file-input (io/file path-file)) ; TODO avoid overwriting
     (when (is-path-image? path-file)
-      (create-thumbnail path-file))
+      (try
+        (create-thumbnail path-file)
+        (catch Exception _
+          (println "Cannot create thumbnail of" path-file))))
     params))
 
 (defn build-path-local-for-device-file [item]
