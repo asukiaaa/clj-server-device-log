@@ -103,12 +103,14 @@
           (-> (model.device-log/get-list-with-total
                args {:build-str-where-and
                      (fn [_]
-                       (format "%s.id IN %s"
+                       (format "%s.id IN %s AND %s.device_type_id = %d"
                                util.device/name-table
                                (-> id-user
                                    util.user-team-permission/build-query-ids-for-user-show
                                    (util.device-permission/build-query-ids-for-user-teams-via
-                                    {:via-device true :via-manager true}))))
+                                    {:via-device true :via-manager true}))
+                               util.device/name-table
+                               (:id device-type)))
                      :transaction transaction})
               (assoc model.device-type/key-table device-type)))))))
 
