@@ -44,7 +44,7 @@
     (create-record (merge file-config params) {:transaction transaction})
     (util.filestorage/build-path-url-for-device params)))
 
-(defn- assign-watch-scoopes-to-list [list-file & [{:keys [transaction]}]]
+(defn- assign-watch-scopes-to-list [list-file & [{:keys [transaction]}]]
   (when-not (empty? list-file)
     (let [key-id-device-file (keyword (format "%s_id" util.device-file/name-table))
           sql-ids-device-file (->> (map :id list-file) (join ",") (format "(%s)"))
@@ -109,7 +109,7 @@
                                (format "%s.recorded_at DESC"
                                        name-table))))]
     {:list (-> list
-               (assign-watch-scoopes-to-list {:transaction transaction})
+               (assign-watch-scopes-to-list {:transaction transaction})
                assign-path-url-to-list)
      :total total}))
 
