@@ -42,7 +42,7 @@
       :query-keys-of-item query-keys-of-item
       :on-receive on-receive})))
 
-(defn build-query-args-offset-limit-for-index [limit page]
+(defn- build-query-args-offset-limit-for-index [limit page]
   (let [limit (if (int? limit) limit (js/parseInt limit))
         page (if (int? page) page (js/parseInt page))]
     (->> [(when (int? limit) (format "limit: %d" limit))
@@ -50,9 +50,15 @@
          (filter seq)
          (join ", "))))
 
-(defn build-info-query-fetch-list-and-total [{:keys [name-table query-keys-of-item limit page query-params query-additional-field on-receive]}]
+(defn- build-query-args-order [order]
+  (when (and order (not (= order "")))
+    (str "order: " (build-query-input-for-str order))))
+
+(defn build-info-query-fetch-list-and-total [{:keys [name-table query-keys-of-item limit page order where query-params query-additional-field on-receive]}]
   (let [query-offset-limit-for-user (build-query-args-offset-limit-for-index limit page)
-        query-params (if query-params (str query-params ", " query-offset-limit-for-user) query-offset-limit-for-user)
+        query-params (->> [query-params query-offset-limit-for-user (build-query-args-order order)]
+                          (remove nil?)
+                          (join ", "))
         query-args-with-parenthesis (format "(%s)" query-params)
         query (format "%s %s { total list { %s } %s }"
                       name-table

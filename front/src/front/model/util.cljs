@@ -13,9 +13,6 @@
                      (remove nil?) first str)]
       [id value])))
 
-(defn build-str-args-offset-limit-for-index [limit page]
-  (util.core/build-query-args-offset-limit-for-index limit page))
-
 (defn build-input-str-for-int [val]
   (util.core/build-query-input-for-int val))
 
@@ -41,13 +38,14 @@
 (defn fetch-info-query [info-query]
   (fetch-arr-info-query [info-query]))
 
-(defn fetch-list-and-total [{:keys [name-table str-keys-of-item on-receive limit page str-params str-additional-field]}]
+(defn fetch-list-and-total [{:keys [name-table str-keys-of-item on-receive limit page order str-params str-additional-field]}]
   (fetch-info-query
    (util.core/build-info-query-fetch-list-and-total
     {:name-table name-table
      :query-keys-of-item str-keys-of-item
      :limit limit
      :page page
+     :order order
      :query-params str-params
      :query-additional-field str-additional-field
      :on-receive on-receive})))

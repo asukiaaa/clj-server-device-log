@@ -98,6 +98,8 @@
 (defn members [] (get-word-from-words :members))
 (def memo "Memo")
 (def owner-user "Owner user")
+(defn order-by-device [] (get-word-from-words :order-by-device))
+(defn order-by-watch-scope [] (get-word-from-words :order-by-watch-scope))
 (defn page-not-found [] (get-word-from-words :page-not-found))
 (defn password [] (get-word-from-words :password))
 (def password-10-chars-or-more "Password 10 chars or more")

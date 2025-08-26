@@ -232,3 +232,8 @@
   (if (= path path-current)
     [:span label]
     [:> router/Link {:to path} label]))
+
+(defn render-link-or-text [text params-for-link & [{:keys [show-text]}]]
+  (if show-text
+    text
+    [:> router/Link params-for-link text]))

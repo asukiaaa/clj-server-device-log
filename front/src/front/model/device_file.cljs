@@ -34,9 +34,11 @@
                               :limit limit
                               :page page}))
 
-(defn fetch-list-and-total-latest-each-device [{:keys [on-receive limit page]}]
+(defn fetch-list-and-total-latest-each-device [{:keys [allow_duplicate_for_watch_scope on-receive order limit page]}]
   (util/fetch-list-and-total {:name-table (str name-table "s_latest_each_device")
                               :str-keys-of-item (build-query-keys-with-device)
+                              :str-params (format "allow_duplicate_for_watch_scope: %s" allow_duplicate_for_watch_scope)
                               :on-receive on-receive
+                              :order order
                               :limit limit
                               :page page}))

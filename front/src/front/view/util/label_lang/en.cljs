@@ -29,6 +29,8 @@
    :no-data "No data"
    :member "Member"
    :members "Members"
+   :order-by-device "Order by device"
+   :order-by-watch-scope "Order by watch scope"
    :page-not-found "Page not found"
    :password "Password"
    :password-edit "Edit password"

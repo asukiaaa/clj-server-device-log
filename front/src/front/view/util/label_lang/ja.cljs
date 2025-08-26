@@ -28,6 +28,8 @@
    :no-data "情報無し"
    :member "班員"
    :members "班員"
+   :order-by-device "装置順"
+   :order-by-watch-scope "閲覧範囲順"
    :page-not-found "該当するページはありません"
    :password "パスワード"
    :password-edit "パスワードを編集"

@@ -6,10 +6,28 @@
             [front.view.util.breadcrumb :as breadcrumb]
             [front.view.util.links :as util.links]
             [front.view.util.device-file.page :as file.page]
-            [front.view.util :as util]))
+            [front.view.util :as util]
+            [front.route :as route]
+            [front.view.util.label :as util.label]
+            [front.model.watch-scope :as model.watch-scope]
+            [front.model.device :as model.device]))
 
 (defn page []
-  (let [user-loggedin (util/get-user-loggedin)]
+  (let [user-loggedin (util/get-user-loggedin)
+        query-params (util/read-query-params)
+        order-by-watch-scope-name (= "true" (:order_by_watch_scope_name query-params))
+        fetch-list-and-total
+        (fn [params]
+          (model.device-file/fetch-list-and-total-latest-each-device
+           (assoc params
+                  :allow_duplicate_for_watch_scope order-by-watch-scope-name
+                  :order (when order-by-watch-scope-name
+                           (->> [{:key (str model.watch-scope/name-table ".name") :dir "IS NULL ASC"}
+                                 {:key (str model.watch-scope/name-table ".name") :dir "asc"}
+                                 {:key (str model.device/name-table ".name") :dir "desc"}
+                                 {:key (str model.device-file/name-table ".recorded_at") :dir "desc"}]
+                                clj->js
+                                (.stringify js/JSON))))))]
     [:<>
      [:> bs/Container {:fluid true}
       [:> bs/Row
@@ -20,7 +38,14 @@
            [:<> {:key name}
             [:> router/Link {:to url :class "list-group-item list-group-item-action"} name]])]]
        [:> bs/Col {:class :px-0}
-        [:f> file.page/core model.device-file/fetch-list-and-total-latest-each-device]]]]]))
+        [:div.px-2
+         [util/render-link-or-text (util.label/order-by-device) {:to route/front}
+          {:show-text (not order-by-watch-scope-name)}]
+         " "
+         [util/render-link-or-text (util.label/order-by-watch-scope)
+          {:to (str route/front "?order_by_watch_scope_name=true") :disabled order-by-watch-scope-name}
+          {:show-text order-by-watch-scope-name}]]
+        [:f> file.page/core fetch-list-and-total]]]]]))
 
 (defn core []
   (wrapper.show404/wrapper

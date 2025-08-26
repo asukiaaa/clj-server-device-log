@@ -31,6 +31,17 @@
 (defn build-item [item]
   (-> item
       util.device/build-item-from-selected-params-joined))
+(defn build-query-join-watch-scope [& [{:keys [allow-duplicate]}]]
+  (format "LEFT JOIN %s ON %s.id %s (SELECT %s.watch_scope_id FROM %s WHERE %s.device_id = %s.device_id AND %s %s)"
+          util.watch-scope/name-table
+          util.watch-scope/name-table
+          (if allow-duplicate "in" "=")
+          util.watch-scope-term/name-table
+          util.watch-scope-term/name-table
+          util.watch-scope-term/name-table
+          name-table
+          (util.watch-scope-term/build-sql-datetime-is-target (format "%s.recorded_at" name-table))
+          (if allow-duplicate "" "LIMIT 1")))
 
 (defn filter-params [params]
   (select-keys params [:name :datetime_dir :device_id :recorded_at]))
@@ -141,28 +152,44 @@
                       id-device)))
 
 (defn get-list-with-total-latest-each-device-for-admin [params & [{:keys [sql-ids-device transaction]}]]
-  (get-list-with-total-base
-   params
-   {:transaction transaction
-    :str-before-where
-    (let [name-table-left-join "df2"]
-      (join " " ["INNER JOIN"
-                 (->> [(format "SELECT max(recorded_at) max_recorded_at, device_id FROM %s"
-                               name-table)
-                       (when sql-ids-device (format "WHERE device_id IN %s" sql-ids-device))
-                       "GROUP BY device_id"]
-                      (remove nil?)
-                      (join " ")
-                      (format "(%s)"))
-                 name-table-left-join
-                 (format "ON %s.recorded_at = %s.max_recorded_at AND %s.device_id = %s.device_id"
-                         name-table
-                         name-table-left-join
-                         name-table
-                         name-table-left-join)]))
-    :str-order (format "%s.name DESC, %s.recorded_at DESC"
-                       util.device/name-table
-                       name-table)}))
+  (let [allow-duplicate-for-watch-scope (:allow_duplicate_for_watch_scope params)
+        str-order (:order params)]
+    (get-list-with-total-base
+     params
+     {:transaction transaction
+      :str-before-where
+      (let [name-table-left-join "df2"]
+        (join " " ["INNER JOIN"
+                   (->> [(format "SELECT max(recorded_at) max_recorded_at, device_id FROM %s"
+                                 name-table)
+                         (when sql-ids-device (format "WHERE device_id IN %s" sql-ids-device))
+                         "GROUP BY device_id"]
+                        (remove nil?)
+                        (join " ")
+                        (format "(%s)"))
+                   name-table-left-join
+                   (format "ON %s.recorded_at = %s.max_recorded_at AND %s.device_id = %s.device_id"
+                           name-table
+                           name-table-left-join
+                           name-table
+                           name-table-left-join)
+                   (build-query-join-watch-scope {:allow-duplicate allow-duplicate-for-watch-scope})]))
+      :str-order (model.util/build-query-order
+                  (if str-order
+                    (json/read-str str-order) [{:key (str util.device/name-table ".name") :dir "desc"}
+                                               {:key (str name-table ".recorded_at") :dir "desc"}])
+                  (fn [{:keys [key]}]
+                    (when (.contains [(str util.device/name-table ".name")
+                                      (str name-table ".recorded_at")
+                                      (str util.watch-scope/name-table ".name")]
+                                     key)
+                      key)))
+      #_(format "%s.name DESC, %s.recorded_at ASC"
+                util.watch-scope/name-table
+                name-table)
+      #_(format "%s.name DESC, %s.recorded_at DESC"
+                util.device/name-table
+                name-table)})))
 
 (defn get-list-with-total-latest-each-device [params sql-ids-device & [{:keys [transaction]}]]
   (get-list-with-total-latest-each-device-for-admin params {:sql-ids-device sql-ids-device :transaction transaction}))

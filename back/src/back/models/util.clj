@@ -116,3 +116,12 @@
     (encryption/encode
      {key-table {key-key-str key-str}
       :created_at (java-time/format time-format-yyyymmdd-hhmmss (java-time/local-date-time))})))
+
+(defn- filter-order-dir [dir]
+  (when (.contains ["DESC" "desc" "ASC" "asc" "IS NULL ASC" "IS NULL DESC"] dir)
+    dir))
+
+(defn build-query-order [order build-target-key]
+  (join ", " (for [item order]
+               (join " " [(build-target-key {:key (or (get item "key") (:key item))})
+                          (filter-order-dir (or (get item "dir") (:dir item)))]))))
