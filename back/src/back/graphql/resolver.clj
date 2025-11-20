@@ -1,6 +1,7 @@
 (ns back.graphql.resolver
   (:require [clojure.data.json :as json]
             [clojure.java.jdbc :as jdbc]
+            [clojure.string :refer [join]]
             [com.walmartlabs.lacinia.resolve :refer [resolve-as]]
             [back.config :refer [db-spec]]
             [back.models.device-log :as model.device-log]
@@ -92,9 +93,10 @@
   (println "args for device-logs-for-device-type" args)
   (when-let [user (get-user-loggedin context)]
     (let [id-device-type (:device_type_id args)
-          id-user (:id user)]
+          id-user (:id user)
+          is-admin (model.user/admin? user)]
       (jdbc/with-db-transaction [transaction db-spec]
-        (when-let [device-type (if (model.user/admin? user)
+        (when-let [device-type (if is-admin
                                  (model.device-type/get-by-id id-device-type {:transaction transaction})
                                  (model.device-type/get-by-id-for-user-via
                                   id-device-type id-user {:via-device true
@@ -103,14 +105,18 @@
           (-> (model.device-log/get-list-with-total
                args {:build-str-where-and
                      (fn [_]
-                       (format "%s.id IN %s AND %s.device_type_id = %d"
-                               util.device/name-table
-                               (-> id-user
-                                   util.user-team-permission/build-query-ids-for-user-show
-                                   (util.device-permission/build-query-ids-for-user-teams-via
-                                    {:via-device true :via-manager true}))
-                               util.device/name-table
-                               (:id device-type)))
+                       (->> [(when-not is-admin
+                               (format "%s.id IN %s"
+                                       util.device/name-table
+                                       (-> id-user
+                                           util.user-team-permission/build-query-ids-for-user-show
+                                           (util.device-permission/build-query-ids-for-user-teams-via
+                                            {:via-device true :via-manager true}))))
+                             (format "%s.device_type_id = %d"
+                                     util.device/name-table
+                                     (:id device-type))]
+                            (remove nil?)
+                            (join " AND ")))
                      :transaction transaction})
               (assoc model.device-type/key-table device-type)))))))
 
@@ -778,7 +784,8 @@
         params-config (model.user-team-device-config/key-table args)]
     (jdbc/with-db-transaction [transaction db-spec]
       (let [device
-            (when is-admin
+            (if is-admin
+              (model.device/create params-device {:transaction transaction})
               (model.device/create-for-user params-device id-user {:transaction transaction}))
             user-team-device-config
             (create-user-team-device-config-with-checking-permission
