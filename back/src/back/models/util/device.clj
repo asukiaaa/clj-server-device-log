@@ -22,6 +22,10 @@
           name-table
           sql-id-user-team))
 
+(defn build-sql-ids-all []
+  (format "(SELECT id FROM %s)"
+          name-table))
+
 (defn build-sql-ids-user-team-for-device-type [id-device-type & [{:keys [sql-ids-user-team]}]]
   (format "(SELECT user_team_id from %s WHERE %s)"
           name-table

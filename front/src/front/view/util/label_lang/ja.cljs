@@ -35,6 +35,7 @@
    :password-edit "パスワードを編集"
    :permission "権限"
    :profile "会員情報"
+   :search "検索"
    :show "表示"
    :show-password "パスワードを表示"
    :term "期間"

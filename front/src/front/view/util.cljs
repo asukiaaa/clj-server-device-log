@@ -36,6 +36,10 @@
     ;; (println "url-search-params" url-search-params)
     (js/history.pushState nil nil (str "?" url-search-params))))
 
+(defn search-params->map [url-search-params]
+  (into {} (for [key (.keys url-search-params)]
+             [(keyword key) (.get url-search-params key)])))
+
 (defn read-query-params []
   ;; (println "read-params")
   (let [url-object (build-current-url-object)
@@ -44,8 +48,7 @@
     ;; (println "url-object" url-object)
     ;; (println "url-search-params" url-search-params)
     ;; (println "cljs params" (js->clj url-search-params))
-    (into {} (for [key (.keys url-search-params)]
-               [(keyword key) (.get url-search-params key)]))))
+    (search-params->map url-search-params)))
 
 (defn build-state-info [key build-state & [{:keys [default draft]}]]
   (let [value-default default
@@ -107,7 +110,7 @@
                (assoc-in draft keys-assoc-in value)
                value)))
 
-(defn render-input [label state-info {:keys [type str-class-wrapper str-class-input disabled keys-assoc-in]}]
+(defn render-input [label state-info {:keys [type str-class-wrapper str-class-input disabled keys-assoc-in after-input]}]
   (let [{:keys [item-default item-draft item-errors item-key]} (build-item-values state-info keys-assoc-in)]
     #_[:input.form-control
        {:id label
@@ -135,6 +138,7 @@
        (fn [e]
          (let [value (-> e .-target .-value)]
            (assign-to-draft value state-info keys-assoc-in)))}]
+     (when after-input after-input)
      (render-errors-for-input item-errors)]))
 
 (defn render-select [label state-info value-labels & [{:keys [type str-class-wrapper disabled on-blur keys-assoc-in override-on-change without-empty-option]}]]
@@ -237,3 +241,8 @@
   (if show-text
     text
     [:> router/Link params-for-link text]))
+
+(defn clj-search-params->str [search-params]
+  (->> (clj->js search-params)
+       (new js/URLSearchParams)
+       .toString))

@@ -36,6 +36,7 @@
    :password-edit "Edit password"
    :permission "Permission"
    :profile "Profile"
+   :search "Search"
    :show "Show"
    :show-password "Show password"
    :term "Term"

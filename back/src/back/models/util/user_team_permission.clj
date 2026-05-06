@@ -25,6 +25,9 @@
        (join " ")
        (format "(%s)")))
 
+(defn build-query-ids-all []
+  (format "(SELECT id FROM %s)" util.user-team/name-table))
+
 (defn build-query-ids-for-user-show [id-user]
   (build-query-ids-for-user-base (build-query-owner-or-member id-user)))
 

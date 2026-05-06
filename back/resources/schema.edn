@@ -452,6 +452,7 @@
             :page {:type Int}
             :where {:type String}
             :allow_duplicate_for_watch_scope {:type Boolean}
+            :str_search {:type String}
             :order {:type String}}}
     :device_files_for_device
     {:type ResponseDeviceFileForDeviceListTotal

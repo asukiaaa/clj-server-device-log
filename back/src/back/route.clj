@@ -58,7 +58,6 @@
 (def main
   #{["/" :get [html-body handlers/top] :route-name :top]
     ["/front" :get [html-body handlers/top] :route-name :front-dashboard]
-    ["/front/" :get [html-body handlers/top] :route-name :front-dashboard-with-slash]
     ["/front/*" :get [html-body handlers/top] :route-name :front]
     ["/graph" :get [html-body handlers/top] :route-name :graph]
     #_["/device_logs" :get [html-body handlers/device-logs] :route-name :device-logs]

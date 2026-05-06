@@ -12,7 +12,9 @@
             [back.models.util.user-team-device-config :as util.user-team-device-config]
             [back.models.util :as model.util]
             [back.models.util.user-team-permission :as util.user-team-permission]
-            [back.models.device-type :as model.device-type]))
+            [back.models.device-type :as model.device-type]
+            [back.models.util.watch-scope :as util.watch-scope]
+            [back.models.util.watch-scope-term :as util.watch-scope-term]))
 
 (def name-table util.device/name-table)
 (def key-table util.device/key-table)
@@ -39,6 +41,30 @@
           (util.device-type/build-str-select-params-for-joined)
           (util.user-team/build-str-select-params-for-joined)
           (util.user-team-device-config/build-str-select-params-for-joined)))
+
+(defn build-sql-ids-filter-by-str-search [str-search sql-ids]
+  (let [str-left-join-active-watch-scope
+        (format "LEFT JOIN %s ON %s.device_id = %s.id AND %s"
+                util.watch-scope-term/name-table
+                util.watch-scope-term/name-table
+                name-table
+                (util.watch-scope-term/build-sql-is-active))
+        str-left-join-watch-scope
+        (format "LEFT JOIN %s ON %s.id = %s.watch_scope_id"
+                util.watch-scope/name-table
+                util.watch-scope/name-table
+                util.watch-scope-term/name-table)]
+    (format "(SELECT %s.id FROM %s WHERE (%s.name LIKE \"%%%s%%\" OR %s.name LIKE \"%%%s%%\") AND %s.id IN %s)"
+            name-table
+            (join " " [name-table
+                       str-left-join-active-watch-scope
+                       str-left-join-watch-scope])
+            name-table
+            str-search
+            util.watch-scope/name-table
+            str-search
+            name-table
+            sql-ids)))
 
 (defn build-item [item]
   (-> item

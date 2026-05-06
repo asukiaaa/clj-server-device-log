@@ -594,11 +594,16 @@
   (println "args for device-files-latest-each-device" args)
   (when-let [user (get-user-loggedin context)]
     (jdbc/with-db-transaction [transaction db-spec]
-      (let [sql-ids-user-team (util.user-team-permission/build-query-ids-for-user-show (:id user))
-            sql-ids-devices (util.device/build-sql-ids-for-user-teams sql-ids-user-team)
-            list-and-total (if (model.user/admin? user)
-                             (model.device-file/get-list-with-total-latest-each-device-for-admin args {:transaction transaction})
-                             (model.device-file/get-list-with-total-latest-each-device args sql-ids-devices {:transaction transaction}))]
+      (let [is-admin (model.user/admin? user)
+            sql-ids-user-team (util.user-team-permission/build-query-ids-for-user-show (:id user))
+            sql-ids-devices (if is-admin
+                              (util.device/build-sql-ids-all)
+                              (util.device/build-sql-ids-for-user-teams sql-ids-user-team))
+            str-search (:str_search args)
+            sql-ids-devices (if str-search
+                              (model.device/build-sql-ids-filter-by-str-search str-search sql-ids-devices)
+                              sql-ids-devices)
+            list-and-total (model.device-file/get-list-with-total-latest-each-device args sql-ids-devices {:transaction transaction})]
         list-and-total))))
 
 (defn device-files-for-watch-scope [context args _]

@@ -111,6 +111,7 @@
 (def reset-password "Reset password")
 (defn result-in-total [number-result total]
   (format "Result %d in %d" number-result total))
+(defn search [] (get-word-from-words :search))
 (def select-team "Select team")
 (defn show [] (get-word-from-words :show))
 (defn show-password [] (get-word-from-words :show-password))
