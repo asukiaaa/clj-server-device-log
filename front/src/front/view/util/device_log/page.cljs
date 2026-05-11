@@ -110,6 +110,7 @@
      [:form.form-control {:style {:display (if show-config "block" "none")}}
       [render-textarea "renderer" info-str-renderer parse-error-config-renderer]
       [render-textarea "where" info-str-where parse-error-where]
+      [:div "example: [{\"key\": \"created_at\", \"action\": \"in-hours-24\"}]"]
       [render-textarea "order" info-str-order parse-error-order]
       [:div
        [render-input "limit" info-limit {:type "number"}]]

@@ -2,7 +2,7 @@
   (:require [reagent.core :as r]
             [reagent.dom.client :as rc]
             [re-graph.core :as re-graph]
-            [front.view.top :as top]
+            [front.view.root :as root]
             [front.view.login :as login]
             [front.view.dashboard :as dashboard]
             [front.view.layout :as layout]
@@ -65,7 +65,7 @@
       :loader layout/loader
       :shouldRevalidate (fn [] true)
       :element (r/as-element [:f> layout/core]) :children
-      [{:index true :element (r/as-element [:f> top/core])}
+      [{:index true :element (r/as-element [:f> root/core])}
        {:path "front" :children
         [{:index true :element (r/as-element [:f> dashboard/core])}
          {:path "login" :element (r/as-element [:f> login/core])}
