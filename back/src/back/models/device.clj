@@ -3,7 +3,7 @@
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.core :refer [format]]
             [clojure.data.json :as json]
-            [clojure.string :refer [join]]
+            [clojure.string :refer [join split]]
             [back.config :refer [db-spec]]
             [back.util.encryption :as encryption]
             [back.models.util.device :as util.device]
@@ -53,16 +53,32 @@
         (format "LEFT JOIN %s ON %s.id = %s.watch_scope_id"
                 util.watch-scope/name-table
                 util.watch-scope/name-table
-                util.watch-scope-term/name-table)]
-    (format "(SELECT %s.id FROM %s WHERE (%s.name LIKE \"%%%s%%\" OR %s.name LIKE \"%%%s%%\") AND %s.id IN %s)"
+                util.watch-scope-term/name-table)
+        str-left-join-user-team
+        (format "LEFT JOIN %s ON %s.id = %s.user_team_id"
+                util.user-team/name-table
+                util.user-team/name-table
+                util.device/name-table)
+        str-search (model.util/escape-for-sql str-search)
+        str-where
+        (->> (split str-search #" ")
+             (map (fn [str-search]
+                    (format "(%s.name LIKE \"%%%s%%\" OR %s.name LIKE \"%%%s%%\" OR %s.name LIKE \"%%%s%%\")"
+                            name-table
+                            str-search
+                            util.watch-scope/name-table
+                            str-search
+                            util.user-team/name-table
+                            str-search)))
+             (join " AND ")
+             (format "(%s)"))]
+    (format "(SELECT %s.id FROM %s WHERE %s AND %s.id IN %s)"
             name-table
             (join " " [name-table
                        str-left-join-active-watch-scope
-                       str-left-join-watch-scope])
-            name-table
-            str-search
-            util.watch-scope/name-table
-            str-search
+                       str-left-join-watch-scope
+                       str-left-join-user-team])
+            str-where
             name-table
             sql-ids)))
 
