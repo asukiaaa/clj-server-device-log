@@ -10,6 +10,7 @@
             [back.models.util :as model.util]
             [back.models.util.device :as util.device]
             [back.models.util.device-file :as util.device-file]
+            [back.models.util.user-team :as util.user-team]
             [back.models.util.watch-scope :as util.watch-scope]
             [back.models.util.watch-scope-term :as util.watch-scope-term]
             [back.util.filestorage :as util.filestorage]
@@ -20,17 +21,25 @@
 (def key-table util.device-file/key-table)
 
 (defn build-query-join []
-  (format "INNER JOIN %s ON %s.id = %s.device_id"
-          util.device/name-table
-          util.device/name-table
-          name-table))
+  (join " " [(format "INNER JOIN %s ON %s.id = %s.device_id"
+                     util.device/name-table
+                     util.device/name-table
+                     name-table)
+             (format "LEFT JOIN %s on %s.id = %s.user_team_id"
+                     util.user-team/name-table
+                     util.user-team/name-table
+                     util.device/name-table)]))
 (defn build-str-keys-select-with-peripherals []
-  (format "%s.*, %s"
+  (format "%s.*, %s, %s"
           name-table
-          (util.device/build-str-select-params-for-joined)))
+          (util.device/build-str-select-params-for-joined)
+          (util.user-team/build-str-select-params-for-joined)))
 (defn build-item [item]
   (-> item
-      util.device/build-item-from-selected-params-joined))
+      util.device/build-item-from-selected-params-joined
+      (util.user-team/build-item-from-selected-params-joined
+       {:name-table-destination [util.device/name-table
+                                 util.user-team/name-table]})))
 (defn build-query-join-watch-scope [& [{:keys [allow-duplicate]}]]
   (format "LEFT JOIN %s ON %s.id %s (SELECT %s.watch_scope_id FROM %s WHERE %s.device_id = %s.device_id AND %s %s)"
           util.watch-scope/name-table
@@ -230,9 +239,6 @@
                    :datetime_dir str-created-at
                    :name (util.filestorage/get-filename-from-path-url path-url)
                    :recorded_at recorded-at}))]
-          #_(println :files-to-create-record files-to-create-record)
-          (println :id-device id-device :params-multi-insert params-multi-insert)
-          #_(println id-device path-files device-files map-device-files)
           (when-not (empty? params-multi-insert)
             (jdbc/insert-multi! db-spec key-table params-multi-insert))
           (doseq [path-file path-files]

@@ -3,6 +3,7 @@
   (:require [goog.string :refer [format]]
             [clojure.string :refer [join]]
             [front.model.util.device :as util.device]
+            [front.model.util.user-team :as util.user-team]
             [front.model.util.watch-scope :as util.watch-scope]
             [front.model.util :as util]))
 
@@ -12,7 +13,8 @@
 (defn build-query-keys-with-device []
   (format "%s %s %s{%s}"
           query-keys
-          (util.device/build-query-table-and-keys)
+          (util.device/build-query-table-and-keys
+           {:query-keys-additional (util.user-team/build-query-table-and-keys)})
           (str util.watch-scope/name-table "s")
           util.watch-scope/query-keys))
 

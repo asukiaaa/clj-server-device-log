@@ -3,6 +3,8 @@
             ["react-router-dom" :as router]
             ["react-bootstrap" :as bs]
             [front.route :as route]
+            [front.model.util.device :as util.device]
+            [front.model.util.user-team :as util.user-team]
             [front.view.common.component.pagination :as pagination]
             [front.view.common.wrapper.fetching :as wrapper.fetching]
             [front.view.util :as util]
@@ -11,12 +13,13 @@
 
 (def window-width-use-half-screen-width-image 450)
 
-(defn render-card [device-file & [{:keys [use-half-width without-device on-click-image]}]]
+(defn render-card [device-file & [{:keys [use-half-width without-device without-user-team on-click-image]}]]
   (let [width 200
         path-url (or (:path_thumbnail device-file) (:path device-file))
         recorded-at (:recorded_at device-file)
         id-device (:device_id device-file)
-        device (:device device-file)]
+        device (util.device/key-table device-file)
+        user-team (util.user-team/key-table device)]
     [:div (if use-half-width
             {:class (when use-half-width "col-6 p-1")}
             {:class "m-1"
@@ -29,6 +32,8 @@
                            :style {:object-fit :cover
                                    :aspect-ratio "4/3"}}]]
       [:div.card-body.p-1
+       (when-not without-user-team
+         [:div (-> user-team :name)])
        (when-not without-device
          [:div
           [:> router/Link {:to (route/device-device-files id-device)}

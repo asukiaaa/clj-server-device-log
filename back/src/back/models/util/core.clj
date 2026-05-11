@@ -16,4 +16,6 @@
                   (into {}))]
     (if (empty? item)
       params
-      (assoc params (keyword (or name-table-destination name-table)) item))))
+      (if (or (list? name-table-destination) (vector? name-table-destination))
+        (assoc-in params (map keyword name-table-destination) item)
+        (assoc params (keyword (or name-table-destination name-table)) item)))))
