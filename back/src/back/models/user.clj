@@ -222,7 +222,7 @@
     (let [password-current (:password args)
           key-password-new :password_new
           password-new (key-password-new args)
-          user (get-by-id id {:transaction t-con})]
+          user (get-by-id-bare id {:transaction t-con})]
       (if-let [errors (cond-> (-> nil
                                   (check-errors-is-correct-password user password-current)
                                   (check-errors-of-params-for-password args {:key-password key-password-new}))

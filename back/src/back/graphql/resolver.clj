@@ -749,7 +749,7 @@
   (model.user/reset-password-for-hash-user args))
 
 (defn password-mine-reset [context args _]
-  (println "args password-mine-reset" args)
+  (println "requested password-mine-reset")
   (Thread/sleep 1000) ; wait to take tome for brute force attack
   (let [user (get-user-loggedin context)]
     (when-not (empty? user)
