@@ -73,7 +73,7 @@
       (add-item-to-loaded-if-not index-show-modal))
     [:> bs/Modal {:show (seq item-on-modal) :size :xl :onHide #(set-index-show-modal nil)}
      [:> bs/Modal.Header {:closeButton true}
-      (let [device (-> item-on-modal :device)]
+      (let [device (-> item-on-modal util.device/key-table)]
         [:<>
          [:> router/Link {:to (route/device-device-files (:id device))}
           (util.label/device-item device)]
@@ -94,6 +94,7 @@
              :style {:object-fit :contain
                      :width "100%"}}]]
      [:> bs/Modal.Footer
+      [:span (-> item-on-modal util.device/key-table util.user-team/key-table :name)]
       (for [watch-scope (:watch_scopes item-on-modal)]
         [:div {:key (:id watch-scope)}
          [:> router/Link {:to (route/watch-scope-device-files (:id watch-scope))}
