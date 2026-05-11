@@ -112,7 +112,7 @@
             (model.user-team/build-select-options-from-list-and-total user-team-list-and-total)]
            [util/render-textarea (util.label/device-type-config-on-user-team) state-info-user-team-device-config-config
             {:disabled (empty? (str (:draft state-info-user-team-id)))}]
-           [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} (util.label/edit)]]])})]))
+           [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} (util.label/update)]]])})]))
 
 (defn core []
   (wrapper.show404/wrapper
