@@ -31,13 +31,13 @@
     [:div
      [:> bs/Navbar {:bg :light :data-bs-theme :light}
       [:> bs/Container {:fluid true :style {:display :block :text-align-last :justify}}
-       [:> bs/Navbar.Brand {:to "/" :as router/Link :style {:display :inline-block}} "Device log"]
+       [:> bs/Navbar.Brand {:to route/home :as router/Link :style {:display :inline-block}} "Device log"]
        [:span " "]
        [:> bs/Nav {:style {:display :inline-block}}
         (if (nil? user)
           [:> bs/Nav.Link {:to route/login :as router/Link} (util.label/login)]
           [:<>
-           [:> bs/Nav.Link {:to route/dashboard :as router/Link :style {:display :inline-block}} util.label/dashboard]
+           #_[:> bs/Nav.Link {:to route/home :as router/Link :style {:display :inline-block}} (util.label/home)]
            [:> bs/NavDropdown {:title (:name user) :id "nav-dropdown" :align :end :style {:display :inline-block :text-align-last :start}}
             (for [[label path] (util.links/build-list-menu-links-for-user user)]
               [:<> {:key label}

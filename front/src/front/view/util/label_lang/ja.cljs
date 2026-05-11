@@ -6,7 +6,6 @@
    :add-term "期間を追加"
    :create "作成"
    :created-at "作成日時"
-   :dashboard "ダッシュボード"
    :data "情報"
    :delete "削除"
    :delete-term "期間を削除"
@@ -19,6 +18,7 @@
    :edit "編集"
    :element "要素"
    :email "メールアドレス"
+   :home "ホーム"
    :id nil
    :indefinite-term "無期限"
    :login "ログイン"

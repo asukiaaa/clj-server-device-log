@@ -42,7 +42,6 @@
 (def copied "Copied")
 (defn create [] (get-word-from-words :create))
 (defn created-at [] (get-word-from-words :created-at))
-(def dashboard "Dashboard")
 (defn data [] (get-word-from-words :data))
 (defn datetime-from-item [str-datetiem-from]
   (str "from " str-datetiem-from))
@@ -82,6 +81,7 @@
 (def from "From")
 (def get-bearer "Get bearer")
 (def hide "Hide")
+(defn home [] (get-word-from-words :home))
 (defn id []  (get-word-from-words :id))
 (defn indefinite-term [] (get-word-from-words :indefinite-term))
 (def invalid-date "Invalid date")

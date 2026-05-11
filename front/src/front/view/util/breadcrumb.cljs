@@ -7,9 +7,9 @@
 (defn core [links]
   [util/area-content
    (if (empty? links)
-     [:span util.label/dashboard]
+     [:span (util.label/home)]
      [:<>
-      [:> router/Link {:to route/dashboard} util.label/dashboard]
+      [:> router/Link {:to route/home} (util.label/home)]
       (for [link links]
         (let [path (:path link)
               label (:label link)]

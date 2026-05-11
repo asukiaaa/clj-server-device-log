@@ -16,7 +16,7 @@
   (let [location (router/useLocation)
         [search-params _set-search-params] (router/useSearchParams)
         path-afetr-login (or (-> location .-state js->clj (get "path_after_login"))
-                             route/dashboard)
+                             route/home)
         state-info-email (util/build-state-info :email #(react/useState))
         state-info-password (util/build-state-info :password #(react/useState))
         state-info-show-password (util/build-state-info :show-password #(react/useState))

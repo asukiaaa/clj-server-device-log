@@ -2,7 +2,7 @@
   (:require [clojure.string :refer [includes?]]))
 
 (def front "/front")
-(def dashboard front)
+(def home front)
 (def login (str front "/login"))
 (def logout (str front "/logout"))
 

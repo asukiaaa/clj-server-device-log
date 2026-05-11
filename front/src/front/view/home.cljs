@@ -1,4 +1,4 @@
-(ns front.view.dashboard
+(ns front.view.home
   (:require ["react" :as react]
             ["react-bootstrap" :as bs]
             ["react-router-dom" :as router]

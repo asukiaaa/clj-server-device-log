@@ -4,7 +4,7 @@
             [re-graph.core :as re-graph]
             [front.view.root :as root]
             [front.view.login :as login]
-            [front.view.dashboard :as dashboard]
+            [front.view.home :as home]
             [front.view.layout :as layout]
             [front.view.users.index :as user.index]
             [front.view.users.create :as user.create]
@@ -67,7 +67,7 @@
       :element (r/as-element [:f> layout/core]) :children
       [{:index true :element (r/as-element [:f> root/core])}
        {:path "front" :children
-        [{:index true :element (r/as-element [:f> dashboard/core])}
+        [{:index true :element (r/as-element [:f> home/core])}
          {:path "login" :element (r/as-element [:f> login/core])}
          {:path "profile" :children
           [{:index true :element (r/as-element [:f> profile.index/core])}
