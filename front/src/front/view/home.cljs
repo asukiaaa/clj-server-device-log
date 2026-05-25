@@ -43,6 +43,7 @@
             (set-received false)
             (-> query-params
                 (assoc :str_search (:draft state-info-str-search))
+                (dissoc :page)
                 clj->js set-search-params)))]
     (react/useEffect
      (fn []
