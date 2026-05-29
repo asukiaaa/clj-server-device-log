@@ -2,11 +2,22 @@
   (:require ["react" :as react]
             ["react-router-dom" :as router]
             [front.view.util.label :as util.label]
-            [front.model.user :as model.user]))
+            [front.model.user :as model.user]
+            [front.model.util.session-permission :as util.session-permission]
+            [front.model.util.user :as util.user]))
 
 (def key-user-loggedin "user-loggedin")
 (defn get-user-loggedin []
-  (router/useRouteLoaderData key-user-loggedin))
+  (-> (router/useRouteLoaderData key-user-loggedin)
+      util.user/key-table))
+
+(defn get-session-permission []
+  (-> (router/useRouteLoaderData key-user-loggedin)
+      util.session-permission/key-table))
+
+(defn get-ids-user-team-editable []
+  (-> (get-session-permission)
+      :ids_user_team_editable))
 
 (defn detect-is-admin-loggedin []
   (-> (get-user-loggedin) model.user/admin?))

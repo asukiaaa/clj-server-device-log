@@ -16,6 +16,7 @@
             [back.models.device-file :as model.device-file]
             [back.models.util.device :as util.device]
             [back.models.util.device-permission :as util.device-permission]
+            [back.models.util.session-permission :as util.session-permission]
             [back.models.util.user :as util.user]
             [back.models.util.user-team :as util.user-team]
             [back.models.util.user-permission :as util.user-permission]
@@ -28,6 +29,9 @@
 
 (defn get-user-loggedin [context]
   (:user-loggedin context))
+
+(defn ^:private get-session-permission [context]
+  (util.session-permission/key-table context))
 
 (defn handle-only-for-admin [context fn-to-handle]
   (if (model.user/admin? (get-user-loggedin context))
@@ -150,7 +154,9 @@
 (defn user-loggedin [context args _]
   (println "args for user-loggedin" args)
   (if-let [user-loggedin (get-user-loggedin context)]
-    {model.user/key-table user-loggedin}
+    (let [ids-user-team-editable (model.user-team/get-ids-to-editable-for-user (:id user-loggedin))]
+      {model.user/key-table user-loggedin
+       util.session-permission/key-table {:ids_user_team_editable ids-user-team-editable}})
     {:errors (json/write-str ["not found"])}))
 
 (defn users [context args _]

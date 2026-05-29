@@ -65,3 +65,8 @@
 
 (defn user-has-permission-to-read [{:keys [id-user-team id-user transaction]}]
   (user-has-permission-base id-user-team (util.user-team-permission/build-query-owner-or-member id-user) {:transaction transaction}))
+
+(defn get-ids-to-editable-for-user [id-user & [{:keys [transaction]}]]
+  (jdbc/with-db-transaction [t-con (or transaction db-spec)]
+    (->> (jdbc/query t-con (util.user-team-permission/build-query-ids-for-user-write id-user))
+         (map :id))))

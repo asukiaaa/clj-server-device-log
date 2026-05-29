@@ -10,7 +10,7 @@
             [front.model.user :as model.user]))
 
 (defn- page []
-  (let [user (router/useRouteLoaderData util/key-user-loggedin)
+  (let [user (util/get-user-loggedin)
         navigate (router/useNavigate)
         state-info-system (util/build-state-info :__system #(react/useState))
         state-info-show-password (util/build-state-info :show-password #(react/useState))
@@ -56,7 +56,7 @@
             [util/render-input "new password again" state-info-password-new-again {:type type-for-password}]])
          [:div [util/render-checkbox "show password" state-info-show-password]]
          [:a.btn.btn-primary.mt-1 {:on-click on-click-apply
-                                          :class (when waiting-response "disabled")}
+                                   :class (when waiting-response "disabled")}
           (util.label/update)]]])]))
 
 (defn core []

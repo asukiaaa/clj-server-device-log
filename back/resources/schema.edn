@@ -106,6 +106,9 @@
    {:list {:type (list :DeviceLog)}
     :total {:type Int}
     :device_type {:type DeviceType}}}
+  :SessionPermission
+  {:fields
+   {:ids_user_team_editable {:type (list Int)}}}
   :User
   {:fields
    {:id {:type (non-null Int)}
@@ -160,6 +163,7 @@
   :ResponseUserLoggedin
   {:fields
    {:user {:type User}
+    :session_permission {:type SessionPermission}
     :errors {:type String}}}
   :ResponseUserTeamListTotal
   {:fields

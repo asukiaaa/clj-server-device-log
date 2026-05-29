@@ -9,7 +9,7 @@
             [front.view.util :as util]))
 
 (defn- page []
-  (let [user (router/useRouteLoaderData util/key-user-loggedin)
+  (let [user (util/get-user-loggedin)
         info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
         is-admin (util/detect-is-admin-loggedin)]
     [:<>

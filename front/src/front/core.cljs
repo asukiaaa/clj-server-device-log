@@ -20,6 +20,7 @@
             [front.view.user-teams.members.create :as user-team.member.create]
             [front.view.user-teams.members.show :as user-team.member.show]
             [front.view.user-teams.members.edit :as user-team.member.edit]
+            [front.view.util :as util]
             [front.view.devices.index :as device.index]
             [front.view.devices.create :as device.create]
             [front.view.devices.show :as device.show]
@@ -62,7 +63,7 @@
   (router/createBrowserRouter
    (clj->js
     [{:path "/"
-      :id "user-loggedin"
+      :id util/key-user-loggedin
       :loader layout/loader
       :shouldRevalidate (fn [] true)
       :element (r/as-element [:f> layout/core]) :children

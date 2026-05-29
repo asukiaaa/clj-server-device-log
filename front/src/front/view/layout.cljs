@@ -12,17 +12,13 @@
    (fn [resolve _reject]
      (model.user/get-loggedin
       {:on-receive
-       (fn [{:keys [user errors]}]
-         (if (or user errors)
-           (if user
-             (resolve user)
-             (resolve nil))
-           (resolve nil)))}))))
+       (fn [data]
+         (resolve data))}))))
 
 (defn core []
   (let [navigate (router/useNavigate)
         revalidator (router/useRevalidator)
-        user (router/useRouteLoaderData util/key-user-loggedin)
+        user (util/get-user-loggedin)
         logout (fn [e]
                  (.preventDefault e)
                  (model.user/logout {:on-receive (fn []

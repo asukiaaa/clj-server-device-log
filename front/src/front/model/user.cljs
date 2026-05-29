@@ -4,6 +4,7 @@
             clojure.string
             [clojure.walk :refer [keywordize-keys]]
             [front.model.util :as util :refer [build-input-str-for-str]]
+            [front.model.util.session-permission :as util.session-permission]
             [front.model.util.user :as util.user]
             [re-graph.core :as re-graph]))
 
@@ -28,7 +29,9 @@
                                      (on-receive (:logout data) (util/build-error-messages errors)))))
 
 (defn get-loggedin [{:keys [on-receive]}]
-  (let [query (goog.string.format "{ user_loggedin { errors %s } }" (util.user/build-query-table-and-keys-with-permission))]
+  (let [query (goog.string.format "{ user_loggedin { errors %s %s } }"
+                                  (util.user/build-query-table-and-keys-with-permission)
+                                  (util.session-permission/build-query-table-and-keys))]
     (re-graph/query query () (fn [{:keys [data errors]}]
                                (on-receive (:user_loggedin data) (util/build-error-messages errors))))))
 
