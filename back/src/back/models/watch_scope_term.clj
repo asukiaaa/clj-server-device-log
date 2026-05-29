@@ -14,6 +14,28 @@
 (def name-table util.watch-scope-term/name-table)
 (def key-table util.watch-scope-term/key-table)
 
+(defn build-str-join-tables []
+  (join " " [(format "INNER JOIN %s ON %s.id = %s.device_id"
+                     util.device/name-table
+                     util.device/name-table
+                     name-table)
+             (format "INNER JOIN %s ON %s.id = %s.watch_scope_id"
+                     util.watch-scope/name-table
+                     util.watch-scope/name-table
+                     name-table)]))
+
+(defn build-str-keys-select-with-peripherals []
+  (format "%s.*, %s, %s"
+          name-table
+          (util.device/build-str-select-params-for-joined)
+          (util.watch-scope/build-str-select-params-for-joined)))
+
+(defn build-item [item]
+  (-> item
+      util.device/build-item-from-selected-params-joined
+      util.watch-scope/build-item-from-selected-params-joined
+      #_((fn [item] (println item) item))))
+
 (defn filter-params [params]
   (select-keys params [:id :device_id :watch_scope_id :datetime_from :datetime_until]))
 
@@ -114,10 +136,17 @@
   (model.util/get-list-with-total-with-building-query
    name-table params
    {:str-where str-where
+    :str-keys-select (build-str-keys-select-with-peripherals)
+    :str-before-where (build-str-join-tables)
+    :build-item build-item
     :transaction transaction}))
 
 (defn get-list-with-total [params & [{:keys [transaction]}]]
   (get-list-with-total-base params {:transaction transaction}))
+
+(defn get-list-with-total-for-device [id-device params & [{:keys [transaction]}]]
+  (get-list-with-total-base params {:str-where (format "%s.device_id = %s" name-table id-device)
+                                    :transaction transaction}))
 
 (defn assign-to-list-watch-scope [list-watch-scope & [{:keys [transaction]}]]
   (when-not (empty? list-watch-scope)

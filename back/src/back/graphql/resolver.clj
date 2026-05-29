@@ -699,9 +699,26 @@
       (model.watch-scope/delete id)
       {:errors (json/write-str [(util.label/no-permission)])})))
 
+(defn watch-scope-terms-for-device
+  [context args _]
+  (println "args for watch-scope-terms-for-device" args)
+  (when-let [user (get-user-loggedin context)]
+    (jdbc/with-db-transaction [transaction db-spec]
+      (let [is-admin (model.user/admin? user)
+            id-device (:device_id args)
+            device (if is-admin
+                     (model.device/get-by-id id-device {:transaction transaction})
+                     (model.device/get-by-id-in-ids-user-team-or-ids-device
+                      {:id id-device
+                       :transaction transaction
+                       :ids-user-team (util.user-team-permission/build-query-ids-for-user-show (:id user))}))]
+        (when device
+          (-> (model.watch-scope-term/get-list-with-total-for-device id-device args {:transaction transaction})
+              (assoc model.device/key-table device)))))))
+
 (defn watch-scope-terms-for-watch-scope
   [context args _]
-  (println "args for watch-scope-terms" args)
+  (println "args for watch-scope-terms-for-watch-scope" args)
   (when-let [user (get-user-loggedin context)]
     (when (model.user/admin? user)
       (jdbc/with-db-transaction [transaction db-spec]
@@ -860,6 +877,7 @@
    :Query/device_type_api_key_for_device_type device-type-api-key-for-device-type
    :Query/watch_scopes watch-scopes
    :Query/watch_scope watch-scope
+   :Query/watch_scope_terms_for_device watch-scope-terms-for-device
    :Query/watch_scope_terms_for_watch_scope watch-scope-terms-for-watch-scope
    :Query/watch_scope_term_for_watch_scope watch-scope-term-for-watch-scope
    :Query/device_files_for_device device-files-for-device

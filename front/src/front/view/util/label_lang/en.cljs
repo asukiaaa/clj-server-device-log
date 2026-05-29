@@ -41,6 +41,7 @@
    :show-password "Show password"
    :term "Term"
    :terms "Terms"
+   :term-of-watch-scope "Term of watch scope"
    :time "Time"
    :timezone "Timezone"
    :update "Update"

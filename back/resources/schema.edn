@@ -285,6 +285,11 @@
   :ResponseAuthorizationBearer
   {:fields
    {:authorization_bearer {:type String}}}
+  :ResponseWatchScopeTermForDeviceListTotal
+  {:fields
+   {:list {:type (list WatchScopeTerm)}
+    :total {:type Int}
+    :device {:type Device}}}
   :ResponseWatchScopeTermForWatchScopeListTotal
   {:fields
    {:list {:type (list WatchScopeTerm)}
@@ -477,6 +482,13 @@
     :watch_scope
     {:type WatchScope
      :args {:id {:type (non-null Int)}}}
+    :watch_scope_terms_for_device
+    {:type ResponseWatchScopeTermForDeviceListTotal
+     :args {:device_id {:type (non-null Int)}
+            :limit {:type Int}
+            :page {:type Int}
+            :where {:type String}
+            :order {:type String}}}
     :watch_scope_terms_for_watch_scope
     {:type ResponseWatchScopeTermForWatchScopeListTotal
      :args {:watch_scope_id {:type (non-null Int)}

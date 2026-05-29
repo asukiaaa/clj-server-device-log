@@ -94,7 +94,7 @@
            [:div
             [:div (util.label/user-team)]
             [:div (util.label/user-team-item user-team)]]
-           (util.watch-scope/render-fields-for-terms state-info-terms device-list-and-total)
+           (util.watch-scope/render-fields-for-terms-refer-device state-info-terms device-list-and-total)
            [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} (util.label/update)]]])})]))
 
 (defn core []

@@ -40,6 +40,7 @@
    :show-password "パスワードを表示"
    :term "期間"
    :terms "期間"
+   :term-of-watch-scope "閲覧範囲の期間"
    :time "時間"
    :timezone "標準時間帯"
    :update "更新"

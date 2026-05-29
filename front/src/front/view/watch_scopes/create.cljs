@@ -83,7 +83,7 @@
          [util/render-select (util.label/user-team) state-info-id-user-team
           (model.user-team/build-select-options-from-list-and-total user-team-list-and-total)
           {:on-blur load-devices}]
-         (util.watch-scope/render-fields-for-terms state-info-terms device-list-and-total)
+         (util.watch-scope/render-fields-for-terms-refer-device state-info-terms device-list-and-total)
          [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} (util.label/create)]]]})]))
 
 (defn core []

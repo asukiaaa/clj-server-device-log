@@ -56,7 +56,7 @@
                [:td
                 (cond
                   (= key :terms)
-                  (util.watch-scope/render-terms (key item))
+                  (util.watch-scope/render-terms-with-device (key item))
                   (= key :user_team)
                   (if-let [team (:user_team item)]
                     [:> router/Link {:to (route/user-team-show (:id team))} (util.label/user-team-item team)]

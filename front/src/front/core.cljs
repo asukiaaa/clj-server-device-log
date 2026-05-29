@@ -27,6 +27,7 @@
             [front.view.devices.device-files.index :as device.device-files.index]
             [front.view.devices.device-logs.index :as device.device-log.index]
             [front.view.devices.device-logs.show :as device.device-log.show]
+            [front.view.devices.watch-scope-terms.index :as device.watch-scope-term.index]
             [front.view.device-types.index :as device-type.index]
             [front.view.device-types.create :as device-type.create]
             [front.view.device-types.show :as device-type.show]
@@ -104,7 +105,9 @@
               [{:index true :element (r/as-element [:f> device.device-log.index/core])}
                {:path ":device_log_id" :children
                 [{:index true :element (r/as-element [:f> device.device-log.show/core])}]}]}
-             {:path "device_files" :element (r/as-element [:f> device.device-files.index/core])}]}]}
+             {:path "device_files" :element (r/as-element [:f> device.device-files.index/core])}
+             {:path "watch_scope_terms" :children
+              [{:index true :element (r/as-element [:f> device.watch-scope-term.index/core])}]}]}]}
          {:path "device_types" :children
           [{:index true :element (r/as-element [:f> device-type.index/core])}
            {:path "create" :element (r/as-element [:f> device-type.create/core])}

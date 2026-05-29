@@ -5,7 +5,8 @@
             [front.view.util.label :as util.label]
             [front.view.util :as util]
             [front.util.timezone :as util.timezone]
-            [front.model.device :as model.device]))
+            [front.model.device :as model.device]
+            [front.model.watch-scope :as model.watch-scope]))
 
 (def key-str-timezone :str-timezone)
 (def key-datetime-from :datetime_from)
@@ -15,32 +16,35 @@
 (def key-datetime-until-date :datetime_until_date)
 (def key-datetime-until-time :datetime_until_time)
 
-(defn render-term [term]
+(defn render-term-from-to [term]
+  (let [datetime-from (key-datetime-from term)
+        datetime-until (key-datetime-until term)]
+    (if (and (nil? datetime-from) (nil? datetime-until))
+      (util.label/indefinite-term)
+      (->> [(when datetime-from
+              (util.label/datetime-from-item
+               (util.timezone/build-datetime-str-in-timezone
+                datetime-from
+                {:datetime-format util.timezone/date-fns-format-with-timezone-until-minute})))
+            (when datetime-until
+              (util.label/datetime-until-item
+               (util.timezone/build-datetime-str-in-timezone
+                datetime-until
+                {:datetime-format util.timezone/date-fns-format-with-timezone-until-minute})))]
+           (remove nil?)
+           (join " ")))))
+
+(defn render-term-with-device [term]
   (let [device (:device term)]
     [:div
      [:> router/Link {:to (route/device-show (:id device))} (util.label/device-item device)]
      " "
-     (let [datetime-from (key-datetime-from term)
-           datetime-until (key-datetime-until term)]
-       (if (and (nil? datetime-from) (nil? datetime-until))
-         (util.label/indefinite-term)
-         (->> [(when datetime-from
-                 (util.label/datetime-from-item
-                  (util.timezone/build-datetime-str-in-timezone
-                   datetime-from
-                   {:datetime-format util.timezone/date-fns-format-with-timezone-until-minute})))
-               (when datetime-until
-                 (util.label/datetime-until-item
-                  (util.timezone/build-datetime-str-in-timezone
-                   datetime-until
-                   {:datetime-format util.timezone/date-fns-format-with-timezone-until-minute})))]
-              (remove nil?)
-              (join " "))))]))
+     (render-term-from-to term)]))
 
-(defn render-terms [terms]
+(defn render-terms-with-device [terms]
   (for [term terms]
     [:<> {:key (:id term)}
-     (render-term term)]))
+     (render-term-with-device term)]))
 
 (defn- str-date-and-time->str-datetime-in-utc [str-date str-time str-timezone]
   (when-not (empty? str-date)
@@ -115,11 +119,11 @@
                 (keys (dissoc draft key-str-timezone)))]
     (set-draft draft-updated)))
 
-(defn- render-fields-for-term [state-info-terms index options-for-device-ids on-click-delete]
+(defn- render-fields-for-term [state-info-terms index label-id options-for-ids on-click-delete]
   (let [term (get (:draft state-info-terms) index)]
     [:div.row
      [:div.col-sm
-      [util/render-select (util.label/device) state-info-terms options-for-device-ids
+      [util/render-select label-id state-info-terms options-for-ids
        {:keys-assoc-in [index :device_id]}]]
      [:div.col-sm
       [util/render-input util.label/from state-info-terms
@@ -159,7 +163,7 @@
 (defn- add-empty-map-to-first [terms]
   (assoc terms (build-new-key-first terms) {}))
 
-(defn render-fields-for-terms [state-info-terms devices-list-and-total]
+(defn render-fields-for-terms-refer-device [state-info-terms devices-list-and-total]
   (let [add-term-top
         (fn [e]
           (.preventDefault e)
@@ -188,7 +192,41 @@
      (let [options-for-device-ids (model.device/build-select-options-from-list-and-total devices-list-and-total)]
        (for [index indexes-sorted]
          [:<> {:key index}
-          (render-fields-for-term state-info-terms index options-for-device-ids (fn [] (delete-term index)))]))
+          (render-fields-for-term state-info-terms index (util.label/device) options-for-device-ids (fn [] (delete-term index)))]))
+     (when (< 0 (count indexes-sorted))
+       [:div
+        [:a.btn.btn-secondary.mt-1 {:href "#" :on-click add-term-bottom} (util.label/add-term)]])]))
+
+(defn render-fields-for-terms-refer-watch-scope [state-info-terms watch-scope-list-and-total]
+  (let [add-term-top
+        (fn [e]
+          (.preventDefault e)
+          ((:set-draft state-info-terms) (add-empty-map-to-first (:draft state-info-terms)))
+          ((:set-default state-info-terms) (add-empty-map-to-first (:default state-info-terms))))
+        add-term-bottom
+        (fn [e]
+          (.preventDefault e)
+          ((:set-draft state-info-terms) (add-empty-map-to-last (:draft state-info-terms)))
+          ((:set-default state-info-terms) (add-empty-map-to-last (:default state-info-terms))))
+        delete-term
+        (fn [index]
+          ((:set-draft state-info-terms) (dissoc (:draft state-info-terms) index))
+          ((:set-default state-info-terms) (dissoc (:default state-info-terms) index)))
+        indexes-sorted (->> (:draft state-info-terms) keys (remove keyword?) sort)]
+    [:div
+     [:div (util.label/terms)]
+     [util/render-select (util.label/timezone) state-info-terms (util.timezone/build-options-for-select)
+      {:keys-assoc-in [key-str-timezone]
+       :without-empty-option true
+       :override-on-change
+       (fn [value state-info _keys-assoc-in]
+         (change-timezone value state-info))}]
+     [:div
+      [:a.btn.btn-secondary.mt-1 {:href "#" :on-click add-term-top} (util.label/add-term)]]
+     (let [options-for-watch-scope-ids (model.watch-scope/build-select-options-from-list-and-total watch-scope-list-and-total)]
+       (for [index indexes-sorted]
+         [:<> {:key index}
+          (render-fields-for-term state-info-terms index (util.label/watch-scope) options-for-watch-scope-ids (fn [] (delete-term index)))]))
      (when (< 0 (count indexes-sorted))
        [:div
         [:a.btn.btn-secondary.mt-1 {:href "#" :on-click add-term-bottom} (util.label/add-term)]])]))

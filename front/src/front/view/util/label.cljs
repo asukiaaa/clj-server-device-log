@@ -117,6 +117,7 @@
 (defn show-password [] (get-word-from-words :show-password))
 (defn term [] (get-word-from-words :term))
 (defn terms [] (get-word-from-words :terms))
+(defn term-of-watch-scope [] (get-word-from-words :term-of-watch-scope))
 (defn time [] (get-word-from-words :time))
 (defn timezone [] (get-word-from-words :timezone))
 (def total "Total")

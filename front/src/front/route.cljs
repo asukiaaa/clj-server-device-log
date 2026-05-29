@@ -37,6 +37,10 @@
 (defn device-device-files [id] (str (device-show id) "/device_files"))
 (defn device-device-logs [id-device] (str (device-show id-device) "/device_logs"))
 (defn device-device-log-show [id-device id-device-log] (str (device-device-logs id-device) "/" id-device-log))
+(defn device-watch-scope-terms [id-device] (str (device-show id-device) "/watch_scope_terms"))
+(defn device-watch-scope-term-create [id-device] (str (device-watch-scope-terms id-device) "/create"))
+(defn device-watch-scope-term-show [id-device id-watch-scope] (str (device-watch-scope-terms id-device) "/" id-watch-scope))
+(defn device-watch-scope-term-edit [id-device id-watch-scope] (str (device-watch-scope-term-show id-device id-watch-scope) "/edit"))
 
 (def device-types (str front "/device_types"))
 (def device-type-create (str device-types "/create"))

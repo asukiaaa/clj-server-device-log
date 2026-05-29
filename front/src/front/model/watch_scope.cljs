@@ -11,7 +11,7 @@
 (def key-table util.watch-scope/key-table)
 (def query-keys util.watch-scope/query-keys)
 
-(defn build-query-keys-with-watch-joined-tables []
+(defn build-query-keys-with-joined-tables []
   (format "%s %s %s {%s %s {%s}}"
           query-keys
           (util.user-team/build-query-table-and-keys)
@@ -24,18 +24,18 @@
   (for [item (:list list-and-total)]
     (let [id (:id item)
           name (:name item)]
-      [id (str id " " name)])))
+      [id name])))
 
 (defn fetch-list-and-total [{:keys [on-receive limit page]}]
   (util/fetch-list-and-total {:name-table (str name-table "s")
-                              :str-keys-of-item (build-query-keys-with-watch-joined-tables)
+                              :str-keys-of-item (build-query-keys-with-joined-tables)
                               :on-receive on-receive
                               :limit limit
                               :page page}))
 
 (defn fetch-by-id [{:keys [id on-receive]}]
   (util/fetch-by-id {:name-table name-table
-                     :str-keys-of-item (build-query-keys-with-watch-joined-tables)
+                     :str-keys-of-item (build-query-keys-with-joined-tables)
                      :id id
                      :on-receive on-receive}))
 
