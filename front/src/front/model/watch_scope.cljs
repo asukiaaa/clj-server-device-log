@@ -33,6 +33,16 @@
                               :limit limit
                               :page page}))
 
+(defn fetch-list-and-total-for-user-team [id-user-team {:keys [on-receive limit page without-terms]}]
+  (util/fetch-list-and-total {:name-table (str name-table "s_for_" util.user-team/name-table)
+                              :str-params (format "user_team_id: %s, without_terms: %s"
+                                                  (util/build-input-str-for-int id-user-team)
+                                                  (if without-terms "true" "false"))
+                              :str-keys-of-item (build-query-keys-with-joined-tables)
+                              :on-receive on-receive
+                              :limit limit
+                              :page page}))
+
 (defn fetch-by-id [{:keys [id on-receive]}]
   (util/fetch-by-id {:name-table name-table
                      :str-keys-of-item (build-query-keys-with-joined-tables)

@@ -3,7 +3,7 @@
             [front.route :as route]
             [clojure.string :refer [split join]]
             [front.view.util.label :as util.label]
-            [front.view.util :as util]
+            [front.view.util :as util :refer [parse-str-datetime str-date-and-time->str-datetime-in-utc]]
             [front.util.timezone :as util.timezone]
             [front.model.device :as model.device]
             [front.model.watch-scope :as model.watch-scope]))
@@ -46,15 +46,6 @@
     [:<> {:key (:id term)}
      (render-term-with-device term)]))
 
-(defn- str-date-and-time->str-datetime-in-utc [str-date str-time str-timezone]
-  (when-not (empty? str-date)
-    (let [str-time (or str-time "00:00")]
-      (-> (str str-date " " str-time)
-          (util.timezone/datetime-str-without-timzone->datetime-in-timezone {:str-timezone str-timezone})
-          (util.timezone/datetime->str-in-timezone
-           {:str-timezone util.timezone/timezone-utc
-            :datetime-format util.timezone/date-fns-format})))))
-
 (defn terms-draft->params [terms]
   (let [str-timezone (get terms key-str-timezone)]
     (for [[_index term] (dissoc terms key-str-timezone)]
@@ -67,12 +58,6 @@
                                   (key-datetime-until-date term)
                                   (key-datetime-until-time term)
                                   str-timezone)}))))
-
-(defn- parse-str-datetime [str-datetime str-timezone]
-  (when str-datetime
-    (-> str-datetime
-        (util.timezone/build-datetime-str-in-timezone {:str-timezone str-timezone})
-        (split  #" "))))
 
 (defn- term-params->draft [term str-timezone]
   (let [[from-date from-time] (parse-str-datetime (key-datetime-from term) str-timezone)

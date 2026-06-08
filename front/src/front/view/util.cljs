@@ -1,10 +1,12 @@
 (ns front.view.util
   (:require ["react" :as react]
             ["react-router-dom" :as router]
+            [clojure.string :refer [split]]
             [front.view.util.label :as util.label]
             [front.model.user :as model.user]
             [front.model.util.session-permission :as util.session-permission]
-            [front.model.util.user :as util.user]))
+            [front.model.util.user :as util.user]
+            [front.util.timezone :as util.timezone]))
 
 (def key-user-loggedin "user-loggedin")
 (defn get-user-loggedin []
@@ -257,3 +259,44 @@
   (->> (clj->js search-params)
        (new js/URLSearchParams)
        .toString))
+
+(def key-datetime-date :datetime_date)
+(def key-datetime-time :datetime_time)
+
+(defn parse-str-datetime [str-datetime str-timezone]
+  (when str-datetime
+    (-> str-datetime
+        (util.timezone/build-datetime-str-in-timezone {:str-timezone str-timezone})
+        (split  #" "))))
+
+(defn str-date-and-time->str-datetime-in-utc [str-date str-time str-timezone]
+  (when-not (empty? str-date)
+    (let [str-time (or str-time "00:00")]
+      (-> (str str-date " " str-time)
+          (util.timezone/datetime-str-without-timzone->datetime-in-timezone {:str-timezone str-timezone})
+          (util.timezone/datetime->str-in-timezone
+           {:str-timezone util.timezone/timezone-utc
+            :datetime-format util.timezone/date-fns-format})))))
+
+(defn set-draft-from-str-datetime [str-datetime state-info str-timezone]
+  (let [[str-date str-time] (parse-str-datetime str-datetime str-timezone)]
+    ((:set-draft state-info) {key-datetime-date str-date
+                              key-datetime-time str-time})))
+
+(defn build-str-datetime-from-draft [state-info str-timezone]
+  (let [draft (:draft state-info)
+        str-date (key-datetime-date draft)
+        str-time (key-datetime-time draft)]
+    (str-date-and-time->str-datetime-in-utc str-date str-time str-timezone)))
+
+(defn render-datetime [label state-info value-labels & [{:keys [type str-class-wrapper disabled on-blur keys-assoc-in override-on-change without-empty-option]}]]
+  (let [draft (:draft state-info)
+        str-time (key-datetime-time draft)]
+    [:div.col-sm
+     [render-input (or label (util.label/date)) state-info
+      {:keys-assoc-in [key-datetime-date]
+       :type "date"}]
+     [render-input (util.label/time) state-info
+      {:keys-assoc-in [key-datetime-time]
+       :disabled (empty? str-time)
+       :type "time"}]]))

@@ -25,7 +25,8 @@
             [back.models.watch-scope :as model.watch-scope]
             [back.models.watch-scope-term :as model.watch-scope-term]
             [back.util.label :as util.label]
-            [back.models.util.device-type :as util.device-type]))
+            [back.models.util.device-type :as util.device-type]
+            [back.models.util.watch-scope-term :as util.watch-scope-term]))
 
 (defn get-user-loggedin [context]
   (:user-loggedin context))
@@ -644,6 +645,24 @@
                                  (model.watch-scope-term/assign-to-list-watch-scope {:transaction transaction}))]
         (assoc list-and-total :list list-watch-scope)))))
 
+(defn watch-scopes-for-user-team [context args _]
+  (println "args for watch-scopes-for-user-team" args)
+  (when-let [user (get-user-loggedin context)]
+    (jdbc/with-db-transaction [transaction db-spec]
+      (let [id-user-team (:user_team_id args)
+            user-team (if (model.user/admin? user)
+                        (model.user-team/get-by-id id-user-team {:transaction transaction})
+                        (model.user-team/get-by-id-for-user id-user-team (:id user) {:transaction transaction}))
+            list-and-total (when user-team
+                             (model.watch-scope/get-list-with-total-for-user-team args id-user-team))
+            list-watch-scope (if (:without_terms args)
+                               list-and-total
+                               (-> (:list list-and-total)
+                                   (model.watch-scope-term/assign-to-list-watch-scope {:transaction transaction})))]
+        (assoc list-and-total
+               :list list-watch-scope
+               model.user-team/key-table user-team)))))
+
 (defn watch-scope [context args _]
   (println "args for watch-scope" args)
   (when-let [user (get-user-loggedin context)]
@@ -705,6 +724,20 @@
       (model.watch-scope/delete id)
       {:errors (json/write-str [(util.label/no-permission)])})))
 
+(defn watch-scope-term [context args _]
+  (println "args for watch-scope-term" args)
+  (when-let [user (get-user-loggedin context)]
+    (jdbc/with-db-transaction [transaction db-spec]
+      (when-let [watch-scope-term
+                 (if (model.user/admin? user)
+                   (model.watch-scope-term/get-by-id (:id args) {:transaction transaction})
+                   (model.watch-scope-term/get-by-id-for-user-teams
+                    (:id args)
+                    (util.user-team-permission/build-query-ids-for-user-show (:id user))
+                    {:transaction transaction}))]
+        watch-scope-term))))
+
+
 (defn watch-scope-terms-for-device
   [context args _]
   (println "args for watch-scope-terms-for-device" args)
@@ -744,20 +777,44 @@
   (println "args watch-scope-term-create" args)
   (let [user (get-user-loggedin context)
         params (:watch_scope_term args)]
-    (when (model.user/admin? user) (model.watch-scope-term/create params))))
+    (if (model.user/admin? user)
+      (model.watch-scope-term/create params)
+      (jdbc/with-db-transaction [transaction db-spec]
+        (let [id-device (-> args util.watch-scope-term/key-table :device_id)
+              device (model.device-type/get-by-id-for-user-to-edit
+                      id-device (:id user)
+                      {:transaction transaction})]
+          (when device
+            (model.watch-scope-term/create params {:transaction transaction})))))))
 
 (defn watch-scope-term-update [context args _]
   (println "args watch-scope-term-update" args)
   (let [user (get-user-loggedin context)
+        id-user (:id user)
         id (:id args)
         params (:watch_scope_term args)]
-    (when (model.user/admin? user) (model.watch-scope-term/update id params))))
+    (if (model.user/admin? user)
+      (model.watch-scope-term/update id params)
+      (jdbc/with-db-transaction [transaction db-spec]
+        (let [sql-ids-user-team (util.user-team-permission/build-query-ids-for-user-write id-user)
+              watch-scope-term (model.watch-scope-term/get-by-id-for-user-teams
+                                id sql-ids-user-team {:transaction transaction})]
+          (when watch-scope-term
+            (model.watch-scope-term/update id params {:transaction transaction})))))))
 
 (defn watch-scope-term-delete [context args _]
   (println "args watch-scope-term-delete" args)
   (let [user (get-user-loggedin context)
+        id-user (:id user)
         id (:id args)]
-    (when (model.user/admin? user) (model.watch-scope-term/delete id))))
+    (if (model.user/admin? user)
+      (model.watch-scope-term/delete id)
+      (jdbc/with-db-transaction [transaction db-spec]
+        (let [sql-ids-user-team (util.user-team-permission/build-query-ids-for-user-write id-user)
+              watch-scope-term (model.watch-scope-term/get-by-id-for-user-teams
+                                id sql-ids-user-team {:transaction transaction})]
+          (when watch-scope-term
+            (model.watch-scope-term/delete id {:transaction transaction})))))))
 
 (defn hash-for-resetting-password-create [context args _]
   (println "args hash-for-resetting-password-create" args)
@@ -882,7 +939,9 @@
    :Query/device_type_api_keys_for_device_type device-type-api-keys-for-device-type
    :Query/device_type_api_key_for_device_type device-type-api-key-for-device-type
    :Query/watch_scopes watch-scopes
+   :Query/watch_scopes_for_user_team watch-scopes-for-user-team
    :Query/watch_scope watch-scope
+   :Query/watch_scope_term watch-scope-term
    :Query/watch_scope_terms_for_device watch-scope-terms-for-device
    :Query/watch_scope_terms_for_watch_scope watch-scope-terms-for-watch-scope
    :Query/watch_scope_term_for_watch_scope watch-scope-term-for-watch-scope

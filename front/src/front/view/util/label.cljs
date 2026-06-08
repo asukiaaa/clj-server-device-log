@@ -43,6 +43,7 @@
 (defn create [] (get-word-from-words :create))
 (defn created-at [] (get-word-from-words :created-at))
 (defn data [] (get-word-from-words :data))
+(defn date [] (get-word-from-words :date))
 (defn datetime-from-item [str-datetiem-from]
   (str "from " str-datetiem-from))
 (defn datetime-until-item [str-datetiem-from]
@@ -75,6 +76,7 @@
       (format "None of total %d" total))))
 (defn edit [] (get-word-from-words :edit))
 (defn element [] (get-word-from-words :element))
+(defn end [] (get-word-from-words :end))
 (defn email [] (get-word-from-words :email))
 (def fetching "Fetching")
 (def files "Files")
@@ -115,6 +117,7 @@
 (def select-team "Select team")
 (defn show [] (get-word-from-words :show))
 (defn show-password [] (get-word-from-words :show-password))
+(defn start [] (get-word-from-words :start))
 (defn term [] (get-word-from-words :term))
 (defn terms [] (get-word-from-words :terms))
 (defn term-of-watch-scope [] (get-word-from-words :term-of-watch-scope))

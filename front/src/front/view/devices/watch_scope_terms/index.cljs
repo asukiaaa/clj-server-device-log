@@ -18,7 +18,8 @@
         ids-user-team-editable (util/get-ids-user-team-editable)
         id-device (get params "device_id")
         [device set-device] (react/useState)
-        editable (m.util.device/detect-editable-for-user-team device ids-user-team-editable)
+        editable (or (util/detect-is-admin-loggedin)
+                     (m.util.device/detect-editable-for-user-team device ids-user-team-editable))
         on-receive
         (fn [data _errors]
           (set-device (m.util.device/key-table data)))

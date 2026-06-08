@@ -1,4 +1,4 @@
-(ns front.view.devices.watch-scope-terms.edit
+(ns front.view.devices.watch-scope-terms.create
   (:require ["react" :as react]
             ["react-router-dom" :as router]
             [clojure.walk :refer [keywordize-keys]]
@@ -17,25 +17,14 @@
 (defn- page []
   (let [params (js->clj (router/useParams))
         id-device (get params "device_id")
-        id-item (get params "watch_scope_term_id")
         navigate (router/useNavigate)
         [device set-device] (react/useState)
-        [item set-item] (react/useState)
+        [watch-scope-list-and-total set-watch-scope-list-and-total] (react/useState)
         state-info-timezone (util/build-state-info :tiemzone react/useState {:default (util.timezone/get)})
         state-info-watch-scope-id (util/build-state-info :watch_scope_id react/useState)
         state-info-datetime-from (util/build-state-info :datetime_from react/useState)
         state-info-datetime-until (util/build-state-info :datetime_until react/useState)
         arr-state-info [state-info-watch-scope-id state-info-datetime-from state-info-datetime-until]
-        on-receive-item
-        (fn [item]
-          (set-item item)
-          (doseq [state arr-state-info]
-            (let [key-state (:key state)]
-              (cond
-                (some #(= % key-state) [:datetime_from :datetime_until])
-                (util/set-draft-from-str-datetime (key-state item) state (:draft state-info-timezone))
-                :else
-                (util/set-default-and-draft state (key-state item))))))
         info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
         on-receive-response (fn [data errors]
                               (wrapper.fetching/set-errors info-wrapper-fetching errors)
@@ -58,26 +47,36 @@
                                              :else
                                              (:draft state))]
                                    (assoc params key-state val)))
-                               item arr-state-info)]
-            (model.watch-scope-term/update
+                               {:device_id id-device} arr-state-info)]
+            (println :params params)
+            (model.watch-scope-term/create
              (merge params
-                    {:id id-item
-                     :on-receive on-receive-response}))))
-        fetch-watch-scope-term
+                    {:on-receive on-receive-response}))))
+        fetch-watch-scopes
+        (fn [id-user-team errors next]
+          (model.watch-scope/fetch-list-and-total-for-user-team
+           id-user-team
+           {:on-receive (fn [data new-errors]
+                          (set-watch-scope-list-and-total data)
+                          (next (concat errors new-errors)))}))
+        fetch-device
         (fn [errors next]
-          (model.watch-scope-term/fetch-by-id
-           {:id id-item
+          (model.device/fetch-by-id
+           {:id id-device
             :on-receive (fn [item new-errors]
-                          (set-device (:device item))
-                          (on-receive-item item)
-                          (next (concat errors new-errors)))}))]
+                          (set-device item)
+                          (next (concat errors new-errors) item))}))]
     (react/useEffect
      (fn []
        (wrapper.fetching/start info-wrapper-fetching)
-       (fetch-watch-scope-term
+       (fetch-device
         nil
-        (fn [errors]
-          (wrapper.fetching/finished info-wrapper-fetching errors)))
+        (fn [errors device]
+          (fetch-watch-scopes
+           (:user_team_id device)
+           errors
+           (fn [errors]
+             (wrapper.fetching/finished info-wrapper-fetching errors)))))
        (fn []))
      #js [])
     [:<>
@@ -87,22 +86,18 @@
         :path (route/device-show id-device)}
        {:label (util.label/term-of-watch-scope)
         :path (route/device-watch-scope-terms id-device)}
-       {:label (util.label/edit)}]]
+       {:label (util.label/create)}]]
      (wrapper.fetching/wrapper
       {:info info-wrapper-fetching
        :renderer
-       (if (empty? item)
-         [:div (util.label/no-data)]
-         [:div
-          [:form.form-control
-           [:div (util.label/watch-scope)]
-           [:div (-> item model.watch-scope/key-table :name)]
-           [:div (util.label/device)]
-           [:div (-> item model.device/key-table :name)]
-           #_[:div (:draft state-info-timezone)]
-           (util/render-datetime (util.label/start) state-info-datetime-from (:draft state-info-timezone))
-           (util/render-datetime (util.label/end) state-info-datetime-until (:draft state-info-timezone))
-           [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} (util.label/update)]]])})]))
+       [:div
+        [:form.form-control
+         [util/render-select (util.label/watch-scope) state-info-watch-scope-id
+          (model.watch-scope/build-select-options-from-list-and-total watch-scope-list-and-total)]
+         [:div (:draft state-info-timezone)]
+         (util/render-datetime (util.label/start) state-info-datetime-from (:draft state-info-timezone))
+         (util/render-datetime (util.label/end) state-info-datetime-until (:draft state-info-timezone))
+         [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} (util.label/create)]]]})]))
 
 (defn core []
   (wrapper.show404/wrapper

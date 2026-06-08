@@ -12,6 +12,8 @@
             [front.model.util.watch-scope-term :as util.watch-scope-term]))
 
 (def name-table util.device/name-table)
+(def key-table util.device/key-table)
+
 (defn build-query-keys-of-periperals []
   (join " " [(util.device-type/build-query-table-and-keys)
              (util.user-team/build-query-table-and-keys)

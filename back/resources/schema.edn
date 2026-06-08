@@ -269,6 +269,11 @@
   {:fields
    {:list {:type (list WatchScope)}
     :total {:type Int}}}
+  :ResponseWatchScopeListTotalForUserTeam
+  {:fields
+   {:list {:type (list WatchScope)}
+    :total {:type Int}
+    :user_team {:type UserTeam}}}
   :WatchScopeTerm
   {:fields
    {:id {:type (non-null Int)}
@@ -483,8 +488,19 @@
             :page {:type Int}
             :where {:type String}
             :order {:type String}}}
+    :watch_scopes_for_user_team
+    {:type ResponseWatchScopeListTotal
+     :args {:limit {:type Int}
+            :page {:type Int}
+            :user_team_id {:type Int}
+            :without_terms {:type Boolean}
+            :where {:type String}
+            :order {:type String}}}
     :watch_scope
     {:type WatchScope
+     :args {:id {:type (non-null Int)}}}
+    :watch_scope_term
+    {:type WatchScopeTerm
      :args {:id {:type (non-null Int)}}}
     :watch_scope_terms_for_device
     {:type ResponseWatchScopeTermForDeviceListTotal

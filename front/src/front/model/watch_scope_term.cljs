@@ -10,7 +10,7 @@
 (def name-table util.watch-scope-term/name-table)
 (def query-keys util.watch-scope-term/query-keys)
 (defn build-query-keys-with-joined-tables []
-  (format "%s %s"
+  (format "%s %s %s"
           query-keys
           (util.watch-scope/build-query-table-and-keys)
           (util.device/build-query-table-and-keys)))
@@ -33,11 +33,11 @@
                               :limit limit
                               :page page}))
 
-#_(defn fetch-by-id [{:keys [id on-receive]}]
-    (util/fetch-by-id {:name-table name-table
-                       :str-keys-of-item query-keys
-                       :id id
-                       :on-receive on-receive}))
+(defn fetch-by-id [{:keys [id on-receive]}]
+  (util/fetch-by-id {:name-table name-table
+                     :str-keys-of-item (build-query-keys-with-joined-tables)
+                     :id id
+                     :on-receive on-receive}))
 
 (defn fetch-by-id-for-watch-scope [{:keys [id id-watch-scope on-receive]}]
   (util/fetch-by-id {:name-table (str name-table "_for_watch_scope")
@@ -51,12 +51,13 @@
                       :id id
                       :on-receive on-receive}))
 
-(defn create [{:keys [display-name id-device id-watch-scope on-receive]}]
-  (let [str-params (format "%s: {display_name: %s, device_id: %s, watch_scope_id: %s}"
+(defn create [{:keys [device_id watch_scope_id datetime_from datetime_until on-receive]}]
+  (let [str-params (format "%s: {device_id: %s, watch_scope_id: %s, datetime_from: %s, datetime_until: %s}"
                            name-table
-                           (util/build-input-str-for-str display-name)
-                           (util/build-input-str-for-int id-device)
-                           (util/build-input-str-for-int id-watch-scope))]
+                           (util/build-input-str-for-int device_id)
+                           (util/build-input-str-for-int watch_scope_id)
+                           (util/build-input-str-for-str datetime_from)
+                           (util/build-input-str-for-str datetime_until))]
     (util/create {:name-table name-table
                   :str-keys-receive (format "%s { %s }"
                                             name-table
@@ -64,11 +65,12 @@
                   :str-input-params str-params
                   :on-receive on-receive})))
 
-(defn update [{:keys [id display-name on-receive]}]
-  (let [str-params (format "id: %s, %s: {display_name: %s}"
+(defn update [{:keys [id on-receive datetime_from datetime_until]}]
+  (let [str-params (format "id: %s, %s: {datetime_from: %s, datetime_until: %s}"
                            (util/build-input-str-for-int id)
                            name-table
-                           (util/build-input-str-for-str display-name))]
+                           (util/build-input-str-for-str datetime_from)
+                           (util/build-input-str-for-str datetime_until))]
     (util/update {:name-table name-table
                   :str-keys-receive (format "%s { %s }"
                                             name-table

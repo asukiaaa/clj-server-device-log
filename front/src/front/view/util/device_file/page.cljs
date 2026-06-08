@@ -43,7 +43,8 @@
          [:div {:key (:id watch-scope)}
           [:> router/Link {:to (route/watch-scope-device-files (:id watch-scope))}
            (-> watch-scope util.label/watch-scope-item)]])
-       [:div [:> router/Link {:to (route/device-watch-scope-terms id-device)} (util.label/term-of-watch-scope)]]]]]))
+       (when (:user_team_id device)
+         [:div [:> router/Link {:to (route/device-watch-scope-terms id-device)} (util.label/term-of-watch-scope)]])]]]))
 
 (defn render-hiddend-image [item]
   (when item

@@ -29,6 +29,9 @@
             [front.view.devices.device-logs.index :as device.device-log.index]
             [front.view.devices.device-logs.show :as device.device-log.show]
             [front.view.devices.watch-scope-terms.index :as device.watch-scope-term.index]
+            [front.view.devices.watch-scope-terms.create :as device.watch-scope-term.create]
+            [front.view.devices.watch-scope-terms.edit :as device.watch-scope-term.edit]
+            [front.view.devices.watch-scope-terms.show :as device.watch-scope-term.show]
             [front.view.device-types.index :as device-type.index]
             [front.view.device-types.create :as device-type.create]
             [front.view.device-types.show :as device-type.show]
@@ -108,7 +111,11 @@
                 [{:index true :element (r/as-element [:f> device.device-log.show/core])}]}]}
              {:path "device_files" :element (r/as-element [:f> device.device-files.index/core])}
              {:path "watch_scope_terms" :children
-              [{:index true :element (r/as-element [:f> device.watch-scope-term.index/core])}]}]}]}
+              [{:index true :element (r/as-element [:f> device.watch-scope-term.index/core])}
+               {:path "create" :element (r/as-element [:f> device.watch-scope-term.create/core])}
+               {:path ":watch_scope_term_id" :children
+                [{:index true :element (r/as-element [:f> device.watch-scope-term.show/core])}
+                 {:path "edit" :element (r/as-element [:f> device.watch-scope-term.edit/core])}]}]}]}]}
          {:path "device_types" :children
           [{:index true :element (r/as-element [:f> device-type.index/core])}
            {:path "create" :element (r/as-element [:f> device-type.create/core])}

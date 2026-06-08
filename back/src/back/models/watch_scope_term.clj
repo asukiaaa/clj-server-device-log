@@ -8,6 +8,7 @@
             [back.models.util.device :as util.device]
             [back.models.util.device-log :as util.device-log]
             [back.models.util.device-file :as util.device-file]
+            [back.models.util.user-team :as util.user-team]
             [back.models.util.watch-scope :as util.watch-scope]
             [back.models.util.watch-scope-term :as util.watch-scope-term]))
 
@@ -66,18 +67,27 @@
    util.device-file/name-table
    (format "%s.recorded_at" util.device-file/name-table)))
 
-(defn get-by-id [id & [{:keys [transaction]}]]
-  (model.util/get-by-id id name-table
-                        {:transaction transaction
-                         :str-key-id (str name-table ".id")}))
+(defn get-by-id [id & [{:keys [transaction str-where]}]]
+  (model.util/get-by-id
+   id name-table
+   {:str-keys-select (build-str-keys-select-with-peripherals)
+    :str-before-where (build-str-join-tables)
+    :str-where str-where
+    :build-item build-item
+    :transaction transaction}))
 
-(defn delete [id]
-  (jdbc/delete! db-spec key-table ["id = ?" id]))
+(defn get-by-id-for-user-teams [id sql-ids-user-team & [{:keys [transaction]}]]
+  (get-by-id
+   id
+   {:str-where (format "%s.%s_id IN %s" util.device/name-table util.user-team/name-table sql-ids-user-team)
+    :transaction transaction}))
 
-(defn update [id params]
-  (jdbc/with-db-transaction [t-con db-spec]
-    (jdbc/update! db-spec key-table params ["id = ?" id])
-    {key-table (get-by-id id {:transaction t-con})}))
+(defn delete [id & [{:keys [transaction]}]]
+  (model.util/delete key-table id {:transaction transaction}))
+
+(defn update [id params & [{:keys [transaction]}]]
+  (->> (model.util/update key-table id params {:transaction transaction})
+       (assoc {} key-table)))
 
 (defn update-for-owner-user [{:keys [id id-user params]}]
   (jdbc/with-db-transaction [t-con db-spec]
@@ -91,13 +101,12 @@
   (first (jdbc/query (or transaction db-spec)
                      [(str "SELECT * FROM " name-table " WHERE id = ? AND owner_user_id = ?") id user-id])))
 
-(defn create [params]
-  (jdbc/with-db-transaction [t-con db-spec]
-    (jdbc/insert! t-con key-table (filter-params params))
-    (let [id (-> (jdbc/query t-con "SELECT LAST_INSERT_ID()")
-                 first vals first)
-          item (get-by-id id {:transaction t-con})]
-      {key-table item})))
+(defn create [params & [{:keys [transaction]}]]
+  (let [item (model.util/create
+              key-table
+              (filter-params params)
+              {:transaction transaction})]
+    {key-table item}))
 
 (defn delete-list-for-watch-scope [id-watch-scope & [{:keys [transaction]}]]
   (println :delete-list-for-watch-scoep id-watch-scope)
@@ -108,7 +117,6 @@
     (jdbc/insert-multi! (or transaction db-spec) key-table params)))
 
 (defn get-list-with-device [{:keys [str-where transaction]}]
-  (println :get-list-with-device str-where)
   (let [query
         (->> [(format "SELECT %s.*, %s FROM %s" name-table (util.device/build-str-select-params-for-joined) name-table)
               (format "INNER JOIN %s ON %s.id = %s.device_id" util.device/name-table util.device/name-table name-table)

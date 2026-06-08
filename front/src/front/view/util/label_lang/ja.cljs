@@ -7,6 +7,7 @@
    :create "作成"
    :created-at "作成日時"
    :data "情報"
+   :date "日付"
    :delete "削除"
    :delete-term "期間を削除"
    :device "装置"
@@ -17,6 +18,7 @@
    :device-type-config-on-user-team "班の型式の設定"
    :edit "編集"
    :element "要素"
+   :end "終了"
    :email "メールアドレス"
    :home "ホーム"
    :id nil
@@ -38,6 +40,7 @@
    :search "検索"
    :show "表示"
    :show-password "パスワードを表示"
+   :start "開始"
    :term "期間"
    :terms "期間"
    :term-of-watch-scope "閲覧範囲の期間"
