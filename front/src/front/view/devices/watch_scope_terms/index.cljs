@@ -1,9 +1,12 @@
 (ns front.view.devices.watch-scope-terms.index
-  (:require ["react" :as react]
+  (:require [goog.string :refer [format]]
+            [clojure.string :refer [join]]
+            ["react" :as react]
             ["react-router-dom" :as router]
             [front.route :as route]
             [front.model.watch-scope-term :as model.watch-scope-term]
             [front.model.util.device :as m.util.device]
+            [front.model.util.watch-scope :as m.util.watch-scope]
             [front.view.common.wrapper.show404 :as wrapper.show404]
             [front.view.util.breadcrumb :as breadcrumb]
             [front.view.util.label :as util.label]
@@ -26,7 +29,15 @@
         fetch-list-and-total
         (fn [params]
           (model.watch-scope-term/fetch-list-and-total-for-device
-           (assoc params :id-device id-device)))
+           (assoc params
+                  :order (join ", "
+                               [(format "%s.datetime_until IS NOT NULL"
+                                        model.watch-scope-term/name-table)
+                                (format "%s.name ASC"
+                                        m.util.watch-scope/name-table)
+                                (format "%s.datetime_until DESC"
+                                        model.watch-scope-term/name-table)])
+                  :id-device id-device)))
         render-item
         (fn [watch-scope-term]
           [:tr

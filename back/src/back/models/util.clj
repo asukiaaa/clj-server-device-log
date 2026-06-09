@@ -3,7 +3,7 @@
   (:require [clojure.java.jdbc :as jdbc]
             [clojure.data.json :as json]
             [clojure.core :refer [format]]
-            [clojure.string :refer [escape join]]
+            [clojure.string :refer [escape join includes?]]
             [java-time.api :as java-time]
             [back.config :refer [db-spec]]
             [back.util.encryption :as encryption]
@@ -103,13 +103,21 @@
 (defn delete [key-table id & [{:keys [transaction]}]]
   (jdbc/delete! (or transaction db-spec) key-table ["id = ?" id]))
 
+(defn- validate-str-order [str-order]
+  (when str-order
+    (let [invalid (or (includes? str-order "%")
+                      (includes? str-order ";"))]
+      (when (not invalid) str-order))))
+
 (defn get-list-with-total-with-building-query [name-table params & [{:keys [str-where str-keys-select transaction str-before-where str-order build-item]}]]
-  (-> (build-query-get-index name-table {:str-keys-select str-keys-select})
-      (#(if-not (empty? str-before-where) (str % " " str-before-where) %))
-      (#(if-not (empty? str-where) (str % " WHERE " str-where) %))
-      (#(if-not (empty? str-order) (str % " ORDER BY " str-order) %))
-      (append-limit-offset-by-limit-page-params params)
-      (get-list-with-total {:transaction transaction :build-item build-item})))
+  (let [str-order (-> (or str-order (:order params))
+                      validate-str-order)]
+    (-> (build-query-get-index name-table {:str-keys-select str-keys-select})
+        (#(if-not (empty? str-before-where) (str % " " str-before-where) %))
+        (#(if-not (empty? str-where) (str % " WHERE " str-where) %))
+        (#(if-not (empty? str-order) (str % " ORDER BY " str-order) %))
+        (append-limit-offset-by-limit-page-params params)
+        (get-list-with-total {:transaction transaction :build-item build-item}))))
 
 (defn build-authorization-bearer [key-str key-table key-key-str]
   (when key-str

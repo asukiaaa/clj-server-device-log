@@ -16,11 +16,12 @@
           (util.watch-scope/build-query-table-and-keys)
           (util.device/build-query-table-and-keys)))
 
-(defn fetch-list-and-total-for-device [{:keys [id-device on-receive limit page]}]
+(defn fetch-list-and-total-for-device [{:keys [id-device on-receive limit page order]}]
   (util/fetch-list-and-total {:name-table (str name-table "s_for_device")
                               :str-keys-of-item (build-query-keys-with-joined-tables)
                               :str-params (format "device_id: %s" (util/build-input-str-for-int id-device))
                               :str-additional-field (util.device/build-query-table-and-keys)
+                              :order order
                               :on-receive on-receive
                               :limit limit
                               :page page}))

@@ -737,7 +737,6 @@
                     {:transaction transaction}))]
         watch-scope-term))))
 
-
 (defn watch-scope-terms-for-device
   [context args _]
   (println "args for watch-scope-terms-for-device" args)

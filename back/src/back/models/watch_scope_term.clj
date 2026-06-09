@@ -141,13 +141,13 @@
     :transaction transaction}))
 
 (defn- get-list-with-total-base [params & [{:keys [str-where transaction]}]]
-  (model.util/get-list-with-total-with-building-query
-   name-table params
-   {:str-where str-where
-    :str-keys-select (build-str-keys-select-with-peripherals)
-    :str-before-where (build-str-join-tables)
-    :build-item build-item
-    :transaction transaction}))
+    (model.util/get-list-with-total-with-building-query
+ name-table params
+ {:str-where str-where
+  :str-keys-select (build-str-keys-select-with-peripherals)
+  :str-before-where (build-str-join-tables)
+  :build-item build-item
+  :transaction transaction}))
 
 (defn get-list-with-total [params & [{:keys [transaction]}]]
   (get-list-with-total-base params {:transaction transaction}))
