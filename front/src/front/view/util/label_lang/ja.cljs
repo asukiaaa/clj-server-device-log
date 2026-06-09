@@ -1,4 +1,5 @@
-(ns front.view.util.label-lang.ja)
+(ns front.view.util.label-lang.ja
+  (:require [goog.string :refer [format]]))
 
 (def ^:private words
   {:action "操作"
@@ -38,6 +39,7 @@
    :permission "権限"
    :profile "会員情報"
    :search "検索"
+   :select "選択"
    :show "表示"
    :show-password "パスワードを表示"
    :start "開始"
@@ -60,3 +62,14 @@
 
 (defn build-words []
   words)
+
+(def ^:private fns
+  {:create-watch-scope-for-user-team
+   (fn [name-watch-scope name-user-team]
+     (format "「%s」を%sの%sとして作成"
+             (or name-watch-scope "")
+             (or name-user-team "")
+             (:watch-scope words)))})
+
+(defn build-fns []
+  fns)

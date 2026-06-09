@@ -1,4 +1,5 @@
-(ns front.view.util.label-lang.en)
+(ns front.view.util.label-lang.en
+  (:require [goog.string :refer [format]]))
 
 (def ^:private words
   {:action "Action"
@@ -39,6 +40,7 @@
    :permission "Permission"
    :profile "Profile"
    :search "Search"
+   :select "Select"
    :show "Show"
    :show-password "Show password"
    :start "Start"
@@ -61,3 +63,14 @@
 
 (defn build-words []
   words)
+
+(def ^:private fns
+  {:create-watch-scope-for-user-team
+   (fn [name-watch-scope name-user-team]
+     (format "Create \"%s\" as %s of %s"
+             (or name-watch-scope "")
+             (:watch-scope words)
+             (or name-user-team "")))})
+
+(defn build-fns []
+  fns)

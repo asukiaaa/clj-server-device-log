@@ -71,7 +71,8 @@
     :terms {:type (list InputWatchScopeTermOnWatchScope)}}}
   :InputWatchScopeTermCreate
   {:fields
-   {:watch_scope_id {:type (non-null Int)}
+   {:watch_scope_id {:type Int}
+    :watch_scope_name {:type String}
     :device_id {:type (non-null Int)}
     :datetime_from {:type String}
     :datetime_until {:type String}}}

@@ -53,11 +53,12 @@
                       :id id
                       :on-receive on-receive}))
 
-(defn create [{:keys [device_id watch_scope_id datetime_from datetime_until on-receive]}]
-  (let [str-params (format "%s: {device_id: %s, watch_scope_id: %s, datetime_from: %s, datetime_until: %s}"
+(defn create [{:keys [device_id watch_scope_id watch_scope_name datetime_from datetime_until on-receive]}]
+  (let [str-params (format "%s: {device_id: %s, watch_scope_id: %s, watch_scope_name: %s, datetime_from: %s, datetime_until: %s}"
                            name-table
                            (util/build-input-str-for-int device_id)
                            (util/build-input-str-for-int watch_scope_id)
+                           (util/build-input-str-for-str watch_scope_name)
                            (util/build-input-str-for-str datetime_from)
                            (util/build-input-str-for-str datetime_until))]
     (util/create {:name-table name-table

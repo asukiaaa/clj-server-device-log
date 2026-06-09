@@ -15,6 +15,13 @@
           (word-key (lang.ja/build-words)))
         (word-key (lang.en/build-words)))))
 
+(defn- get-fn [word-key]
+  (let [lang-target (get-target-lang)]
+    (or (cond
+          (= lang-target "ja")
+          (word-key (lang.ja/build-fns)))
+        (word-key (lang.en/build-fns)))))
+
 (defn- show-key [item keys]
   (let [str-no-data (get-word-from-words :no-data)]
     (if (empty? item)
@@ -42,6 +49,10 @@
 (def copied "Copied")
 (defn create [] (get-word-from-words :create))
 (defn created-at [] (get-word-from-words :created-at))
+(defn create-watch-scope-for-user-team [name-watch-scope name-user-team]
+  (let [fn-label (get-fn :create-watch-scope-for-user-team)]
+    (when fn-label
+      (fn-label name-watch-scope name-user-team))))
 (defn data [] (get-word-from-words :data))
 (defn date [] (get-word-from-words :date))
 (defn datetime-from-item [str-datetiem-from]
@@ -114,6 +125,7 @@
 (defn result-in-total [number-result total]
   (format "Result %d in %d" number-result total))
 (defn search [] (get-word-from-words :search))
+(defn select [] (get-word-from-words :select))
 (def select-team "Select team")
 (defn show [] (get-word-from-words :show))
 (defn show-password [] (get-word-from-words :show-password))

@@ -1,7 +1,7 @@
 (ns front.view.util
   (:require ["react" :as react]
             ["react-router-dom" :as router]
-            [clojure.string :refer [split]]
+            [clojure.string :refer [split join]]
             [front.view.util.label :as util.label]
             [front.model.user :as model.user]
             [front.model.util.session-permission :as util.session-permission]
@@ -102,15 +102,15 @@
      :on-change (fn [e] (set-draft (-> e .-target .-value)))}]
    (render-errors-for-input errors)])
 
-(defn render-checkbox [label {:keys [draft set-draft]}]
+(defn render-checkbox [label {:keys [draft set-draft]} & [{:keys [disabled]}]]
   [:span
    [:input.p-2
     {:id label
      :type "checkbox"
      :checked (= "true" draft)
+     :disabled disabled
      :on-change (fn [] (set-draft (if (= "true" draft) "false" "true")))}]
-   [:label.p-2 {:for label} label]])
-
+   [:label.p-2 {:for label :class (join " " (remove nil? [(when disabled "text-secondary")]))} label]])
 
 (defn build-item-values [{:keys [default key draft errors]} keys-assoc-in]
   {:item-default (if keys-assoc-in (get-in default keys-assoc-in) default)

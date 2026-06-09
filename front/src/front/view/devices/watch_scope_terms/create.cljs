@@ -1,6 +1,7 @@
 (ns front.view.devices.watch-scope-terms.create
   (:require ["react" :as react]
             ["react-router-dom" :as router]
+            [clojure.string :refer [includes?]]
             [clojure.walk :refer [keywordize-keys]]
             [front.route :as route]
             [front.view.common.wrapper.show404 :as wrapper.show404]
@@ -12,7 +13,8 @@
             [front.model.watch-scope-term :as model.watch-scope-term]
             [front.model.watch-scope :as model.watch-scope]
             [front.model.util.watch-scope-term :as util.watch-scope-term]
-            [front.util.timezone :as util.timezone]))
+            [front.util.timezone :as util.timezone]
+            [front.model.util.user-team :as util.user-team]))
 
 (defn- page []
   (let [params (js->clj (router/useParams))
@@ -21,11 +23,20 @@
         [device set-device] (react/useState)
         [watch-scope-list-and-total set-watch-scope-list-and-total] (react/useState)
         state-info-timezone (util/build-state-info :tiemzone react/useState {:default (util.timezone/get)})
+        state-info-watch-scope-search (util/build-state-info :watch_scope_search react/useState)
+        state-info-flag-create-watch-scope (util/build-state-info :flag_create_watch_scope react/useState)
         state-info-watch-scope-id (util/build-state-info :watch_scope_id react/useState)
         state-info-datetime-from (util/build-state-info :datetime_from react/useState)
         state-info-datetime-until (util/build-state-info :datetime_until react/useState)
         arr-state-info [state-info-watch-scope-id state-info-datetime-from state-info-datetime-until]
         info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
+        [list-for-options set-list-for-options] (react/useState (:list watch-scope-list-and-total))
+        creatable-watch-scope
+        (let [word-search (:draft state-info-watch-scope-search)]
+          (if (and (seq word-search)
+                   (not (some #(= (:name %) word-search)
+                              (:list watch-scope-list-and-total))))
+            true false))
         on-receive-response (fn [data errors]
                               (wrapper.fetching/set-errors info-wrapper-fetching errors)
                               (if-let [errors-str (:errors data)]
@@ -47,7 +58,12 @@
                                              :else
                                              (:draft state))]
                                    (assoc params key-state val)))
-                               {:device_id id-device} arr-state-info)]
+                               {:device_id id-device} arr-state-info)
+                params (if (:draft state-info-flag-create-watch-scope)
+                         (-> params
+                             (dissoc :watch_scope_id)
+                             (assoc :watch_scope_name (:draft state-info-watch-scope-search)))
+                         params)]
             (println :params params)
             (model.watch-scope-term/create
              (merge params
@@ -79,6 +95,22 @@
              (wrapper.fetching/finished info-wrapper-fetching errors)))))
        (fn []))
      #js [])
+    (react/useEffect
+     (fn []
+       (let [list-for-options
+             (if-let [search-word (:draft state-info-watch-scope-search)]
+               (->> (:list watch-scope-list-and-total)
+                    (filter (fn [watch-scope]
+                              (includes? (:name watch-scope) search-word))))
+               (:list watch-scope-list-and-total))
+             id (if (= 1 (count list-for-options))
+                  (-> list-for-options first :id)
+                  nil)]
+         (util/set-default-and-draft state-info-watch-scope-id (str id))
+         ((:set-draft state-info-flag-create-watch-scope "false"))
+         (set-list-for-options list-for-options))
+       (fn []))
+     #js [(:draft state-info-watch-scope-search) watch-scope-list-and-total])
     [:<>
      [:f> breadcrumb/core
       [{:label (util.label/devices) :path route/devices}
@@ -92,8 +124,16 @@
        :renderer
        [:div
         [:form.form-control
-         [util/render-select (util.label/watch-scope) state-info-watch-scope-id
-          (model.watch-scope/build-select-options-from-list-and-total watch-scope-list-and-total)]
+         [:div.border.border-2.rounded.p-2.round
+          [:span (util.label/watch-scope)]
+          [util/render-input (util.label/search) state-info-watch-scope-search]
+          [:<> {:key (str "search" (:draft state-info-watch-scope-search) (:default state-info-watch-scope-id))}
+           [util/render-select (util.label/select) state-info-watch-scope-id
+            (model.watch-scope/build-select-options-from-list list-for-options)
+            {:disabled (= "true" (:draft state-info-flag-create-watch-scope))}]]
+          (util/render-checkbox (str (util.label/create-watch-scope-for-user-team (:draft state-info-watch-scope-search) (-> device util.user-team/key-table :name)))
+                                state-info-flag-create-watch-scope
+                                {:disabled (not creatable-watch-scope)})]
          [:div (:draft state-info-timezone)]
          (util/render-datetime (util.label/start) state-info-datetime-from (:draft state-info-timezone))
          (util/render-datetime (util.label/end) state-info-datetime-until (:draft state-info-timezone))

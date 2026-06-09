@@ -20,11 +20,14 @@
           util.device/name-table
           util.device/query-keys))
 
-(defn build-select-options-from-list-and-total [list-and-total]
-  (for [item (:list list-and-total)]
+(defn build-select-options-from-list [list-of-item]
+  (for [item list-of-item]
     (let [id (:id item)
           name (:name item)]
       [id name])))
+
+(defn build-select-options-from-list-and-total [list-and-total]
+  (build-select-options-from-list (:list list-and-total)))
 
 (defn fetch-list-and-total [{:keys [on-receive limit page]}]
   (util/fetch-list-and-total {:name-table (str name-table "s")

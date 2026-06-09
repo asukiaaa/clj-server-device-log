@@ -775,16 +775,30 @@
 (defn watch-scope-term-create [context args _]
   (println "args watch-scope-term-create" args)
   (let [user (get-user-loggedin context)
-        params (:watch_scope_term args)]
-    (if (model.user/admin? user)
-      (model.watch-scope-term/create params)
-      (jdbc/with-db-transaction [transaction db-spec]
-        (let [id-device (-> args util.watch-scope-term/key-table :device_id)
-              device (model.device-type/get-by-id-for-user-to-edit
-                      id-device (:id user)
-                      {:transaction transaction})]
-          (when device
-            (model.watch-scope-term/create params {:transaction transaction})))))))
+        params (util.watch-scope-term/key-table args)
+        name-watch-scope (:watch_scope_name params)
+        params (dissoc params :watch_scope_name)
+        id-device (:device_id params)
+        is-admin (model.user/admin? user)]
+    (jdbc/with-db-transaction [transaction db-spec]
+      (let [device
+            (if is-admin
+              (model.device/get-by-id id-device {:transaction transaction})
+              (let [sql-ids-user-team-editable (util.user-team-permission/build-query-ids-for-user-write (:id user))]
+                (model.device/get-by-id-in-ids-user-team-or-ids-device
+                 {:id id-device
+                  :ids-user-team
+                  sql-ids-user-team-editable
+                  :transaction transaction})))
+            watch-scope (when (and device name-watch-scope)
+                          (model.watch-scope/create
+                           {:name name-watch-scope
+                            :user_team_id (:user_team_id device)}))
+            params (if name-watch-scope
+                     (assoc params :watch_scope_id (:id watch-scope))
+                     params)]
+        (when device
+          (model.watch-scope-term/create params {:transaction transaction}))))))
 
 (defn watch-scope-term-update [context args _]
   (println "args watch-scope-term-update" args)
