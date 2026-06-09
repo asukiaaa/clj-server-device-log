@@ -1,11 +1,12 @@
 (ns front.model.watch-scope-term
   (:refer-clojure :exclude [update])
   (:require [goog.string :refer [format]]
-            clojure.string
+            [clojure.string :refer [join]]
             [front.model.util.device :as util.device]
             [front.model.util.watch-scope :as util.watch-scope]
             [front.model.util.watch-scope-term :as util.watch-scope-term]
-            [front.model.util :as util]))
+            [front.model.util :as util]
+            [front.view.util.label :as util.label]))
 
 (def name-table util.watch-scope-term/name-table)
 (def query-keys util.watch-scope-term/query-keys)
@@ -79,4 +80,7 @@
                   :on-receive on-receive})))
 
 (defn build-confirmation-message-for-deleting [item]
-  (str "delete " name-table " id:" (:id item) " name:" (:name item)))
+  (join " " [(util.label/delete)
+             (util.label/term-of-watch-scope)
+             (-> item util.device/key-table :name)
+             (-> item util.watch-scope/key-table :name)]))

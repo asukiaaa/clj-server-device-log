@@ -13,6 +13,7 @@
 
 (defn- page []
   (let [params (js->clj (router/useParams))
+        navigate (router/useNavigate)
         ids-user-team-editable (util/get-ids-user-team-editable)
         id-device (get params "device_id")
         id-item (get params "watch_scope_term_id")
@@ -21,6 +22,7 @@
         info-wrapper-fetching (wrapper.fetching/build-info #(react/useState))
         editable (or (util/detect-is-admin-loggedin)
                      (m.util.device/detect-editable-for-user-team device ids-user-team-editable))
+        on-delete #(navigate (route/device-watch-scope-terms id-device))
         fetch-watch-scope-term
         (fn [errors next]
           (model.watch-scope-term/fetch-by-id
@@ -75,9 +77,10 @@
                [:td (util.label/action)]
                [:td
                 [:> router/Link {:to (route/device-watch-scope-term-edit id-device id-item)} (util.label/edit)]
-                #_[:f> util/btn-confirm-delete
-                   {:message-confirm (model.watch-scope/build-confirmation-message-for-deleting item)
-                    :action-delete #(model.watch-scope/delete {:id id :on-receive on-delete})}]]])]]])})]))
+                " "
+                [:f> util/btn-confirm-delete
+                 {:message-confirm (model.watch-scope-term/build-confirmation-message-for-deleting item)
+                  :action-delete #(model.watch-scope-term/delete {:id id-item :on-receive on-delete})}]]])]]])})]))
 
 (defn core []
   (wrapper.show404/wrapper
