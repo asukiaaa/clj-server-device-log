@@ -10,6 +10,7 @@
             [back.models.util.device-type :as util.device-type]
             [back.models.util.user-team :as util.user-team]
             [back.models.util.user-team-device-config :as util.user-team-device-config]
+            [back.models.util.user-team-device-type-config :as util.user-team-device-type-config]
             [back.models.util :as model.util]
             [back.models.util.user-team-permission :as util.user-team-permission]
             [back.models.device-type :as model.device-type]
@@ -262,7 +263,7 @@
                                            :via-manager via-manager
                                            :transaction transaction}))
 
-(defn get-config [id-device & [{:keys [transaction]}]]
+(defn- get-config-device-type [id-device & [{:keys [transaction]}]]
   (let [query (join " " [(format "SELECT %s.config_default FROM %s" util.device-type/name-table name-table)
                          (format "INNER JOIN %s ON %s.device_type_id = %s.id"
                                  util.device-type/name-table
@@ -272,3 +273,27 @@
         item (first (jdbc/query (or transaction db-spec) query))
         config-default (when-let [str-config (:config_default item)] (json/read-str str-config))]
     config-default))
+
+(defn- get-config-user-team-device-type [id-user-team id-device-type & [{:keys [transaction]}]]
+  (when (and id-user-team id-device-type)
+    (let [query (join " " [(format "SELECT config FROM %s" util.user-team-device-type-config/name-table)
+                           (format "WHERE user_team_id = %d AND device_type_id = %d"
+                                   id-user-team id-device-type)])
+          _ (println query)
+          item (first (jdbc/query (or transaction db-spec) query))
+          config (when-let [str-config (:config item)] (json/read-str str-config))]
+      config)))
+
+(defn get-config [id-device & [{:keys [transaction]}]]
+  (let [device (get-by-id id-device {:transaction transaction})
+        id-user-team (-> device util.user-team/key-table :id)
+        id-device-type (-> device util.device-type/key-table :id)
+        config-device-type (get-config-device-type id-device {:transaction transaction})
+        config-user-team-device-type (get-config-user-team-device-type id-user-team id-device-type {:transaction transaction})
+        config-user-team-device (-> device util.user-team-device-config/key-table :config
+                                    ((fn [str-config]
+                                       (when str-config (json/read-str str-config)))))]
+    (merge {}
+           config-device-type
+           config-user-team-device-type
+           config-user-team-device)))
