@@ -99,7 +99,8 @@
            [:div (-> item model.watch-scope/key-table :name)]
            [:div (util.label/device)]
            [:div (-> item model.device/key-table :name)]
-           #_[:div (:draft state-info-timezone)]
+           [:div (util.label/timezone)
+            [:div (:draft state-info-timezone)]]
            (util/render-datetime (util.label/start) state-info-datetime-from (:draft state-info-timezone))
            (util/render-datetime (util.label/end) state-info-datetime-until (:draft state-info-timezone))
            [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} (util.label/update)]]])})]))

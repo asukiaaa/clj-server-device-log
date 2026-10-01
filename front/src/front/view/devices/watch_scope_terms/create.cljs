@@ -134,7 +134,10 @@
           (util/render-checkbox (str (util.label/create-watch-scope-for-user-team (:draft state-info-watch-scope-search) (-> device util.user-team/key-table :name)))
                                 state-info-flag-create-watch-scope
                                 {:disabled (not creatable-watch-scope)})]
-         [:div (:draft state-info-timezone)]
+         [:div (util.label/device)]
+         [:div (-> device :name)]
+         [:div (util.label/timezone)
+          [:div (:draft state-info-timezone)]]
          (util/render-datetime (util.label/start) state-info-datetime-from (:draft state-info-timezone))
          (util/render-datetime (util.label/end) state-info-datetime-until (:draft state-info-timezone))
          [:button.btn.btn-primary.mt-1 {:on-click on-click-apply} (util.label/create)]]]})]))
