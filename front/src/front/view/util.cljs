@@ -291,12 +291,12 @@
 
 (defn render-datetime [label state-info value-labels & [{:keys [type str-class-wrapper disabled on-blur keys-assoc-in override-on-change without-empty-option]}]]
   (let [draft (:draft state-info)
-        str-time (key-datetime-time draft)]
+        str-date (key-datetime-date draft)]
     [:div.col-sm
      [render-input (or label (util.label/date)) state-info
       {:keys-assoc-in [key-datetime-date]
        :type "date"}]
      [render-input (util.label/time) state-info
       {:keys-assoc-in [key-datetime-time]
-       :disabled (empty? str-time)
+       :disabled (empty? str-date)
        :type "time"}]]))
