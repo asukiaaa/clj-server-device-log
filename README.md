@@ -27,7 +27,7 @@ Access to mariadb
 ## Test
 
 ```bash
-docker compose run back clj -X:test:runner
+docker compose run back clojure -X:test:runner
 ```
 
 ## References

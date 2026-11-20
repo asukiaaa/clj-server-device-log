@@ -3,7 +3,7 @@ services:
     # image: clojure:openjdk-18-tools-deps-bullseye
     # working_dir: /usr/src/app/back
     build: ./back
-    command: "clj -X:dev"
+    command: "clojure -X:dev"
     # command: bash -c "java -jar back.jar server-with-migration"
     volumes:
       - ./back:/usr/src/app/back

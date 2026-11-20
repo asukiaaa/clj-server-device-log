@@ -5,4 +5,4 @@ DIR_REPO=$DIR_HERE/../
 cd $DIR_REPO
 
 docker compose down back
-docker compose run back clj -X:uberjar
+docker compose run back clojure -X:uberjar

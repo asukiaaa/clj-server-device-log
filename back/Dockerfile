@@ -1,4 +1,5 @@
-FROM clojure:openjdk-18-bullseye
+FROM openjdk:28-ea-oraclelinux10
 WORKDIR /usr/src/app/back
-# ENTRYPOINT ["clj"]
-# RUN apt update && apt upgrade -y
+RUN curl -L -O https://github.com/clojure/brew-install/releases/latest/download/linux-install.sh
+RUN chmod +x linux-install.sh
+RUN ./linux-install.sh

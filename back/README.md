@@ -9,14 +9,14 @@ A project to practice of creating web server in clojure.
 ## Usage
 
 ```sh
-clj -M:run db migrate
-clj -X:dev
+clojure -M:run db migrate
+clojure -X:dev
 ```
 
 ## Load local files for device
 
 ```sh
-clj -M:run db load-local-device-files
+clojure -M:run db load-local-device-files
 ```
 
 ### Build an uberjar
@@ -29,7 +29,7 @@ java -jar back.jar server-with-migration
 ### Test
 
 ```sh
-clj -M:runner:test
+clojure -M:runner:test
 ```
 
 ## License
